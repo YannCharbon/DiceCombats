@@ -1,0 +1,15 @@
+﻿@using System.Net
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using HtmlAgilityPack
+
+<h3>CreatureEditor</h3>
+
+
+<p>@CreatureGuid</p>
+
+
+@code {
+    [Parameter]
+    public string CreatureGuid { get; set; } = default!;
+}

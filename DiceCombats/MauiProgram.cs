@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MudBlazor.Services;
 
 namespace DiceCombats
 {
@@ -20,6 +21,11 @@ namespace DiceCombats
     		builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
+
+            // MudBlazor
+            builder.Services.AddMudServices();
+
+            builder.Services.AddSingleton<DiceCombatsService>();
 
             return builder.Build();
         }

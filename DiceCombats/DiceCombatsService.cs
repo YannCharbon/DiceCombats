@@ -8,6 +8,11 @@ namespace DiceCombats
 {
     public class DiceCombatsService
     {
-        public List<Creature> CreatureList { get; set; } = new List<Creature>();
+        public List<DCCreature> CreatureList { get; set; } = new List<DCCreature>();
+
+        public DCCreature? GetCreatureFromGUID(string guid)
+        {
+            return CreatureList.Find(x => x.Id.ToString() == guid);
+        }
     }
 }

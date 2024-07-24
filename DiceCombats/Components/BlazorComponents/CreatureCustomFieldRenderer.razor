@@ -1,0 +1,89 @@
+﻿@using DiceCombats
+
+<div>
+    @if (EditionMode)
+    {
+        <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
+    }
+
+    @if (Field is DCCreatureNumericField numericField)
+    {
+        <MudNumericField @bind-Value="numericField.Value" Label="@Field.Title" Variant="Variant.Outlined" />
+    }
+    else if (Field is DCCreatureTextField textField)
+    {
+        <MudTextField @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" />
+    } else if (Field is DCCreatureCheckboxGridField checkboxGridField)
+    {
+        @if (EditionMode)
+        {
+            <div class="row">
+                <div class="col col-md-2">
+                    <MudNumericField @bind-Value="checkboxGridField.HorizontalCount" Label="Horizontal checkbox count" Variant="Variant.Outlined" Min="1" />
+                </div>
+                <div class="col col-md-2">
+                    <MudNumericField @bind-Value="checkboxGridField.VerticalCount" Label="Vertical checkbox count" Variant="Variant.Outlined" Min="1" />
+                </div>
+                <div class="col col-md-2">
+                    <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasHorizontalLabels" Label="Horizontal labels"></MudCheckBox>
+                </div>
+                <div class="col col-md-2">
+                    <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasVerticalLabels" Label="Horizontal labels"></MudCheckBox>
+                </div>
+            </div>
+        }
+        <div styl="padding:10px;">
+            <table>
+                @if (checkboxGridField.HasHorizontalLabels)
+                {
+                    <tr>
+                    @if (checkboxGridField.HasVerticalLabels)
+                    {
+                        <td>&nbsp;</td>
+                    }
+                        @for (int i = 0; i < checkboxGridField.HorizontalLabels.Count; i++)
+                        {
+                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.HorizontalLabels[i]" Label="Edit field name" Variant="Variant.Outlined" /></td>
+                        }
+                    </tr>
+                }
+                @for (int i = 0; i < checkboxGridField.VerticalCount; i++)
+                {
+                    <tr>
+                        @if (checkboxGridField.HasVerticalLabels)
+                        {
+                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.VerticalLabels[i]" Label="Edit field name" Variant="Variant.Outlined" /></td>
+                        }
+                        @for (int j = 0; j < checkboxGridField.HorizontalCount; j++)
+                        {
+                            <td><MudCheckBox T="bool" @bind-Value="checkboxGridField.SelectedOptions[i][j]"></MudCheckBox></td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public DCCreatureCustomField Field { get; set; } = default!;
+    [Parameter]
+    public bool EditionMode { get; set; } = false;
+
+    private void OnCheckboxChanged(bool isChecked, string option)
+    {
+        if (Field is DCCreatureCheckboxField checkboxField)
+        {
+            if (isChecked)
+            {
+                if (!checkboxField.SelectedOptions.Contains(option))
+                    checkboxField.SelectedOptions.Add(option);
+            }
+            else
+            {
+                checkboxField.SelectedOptions.Remove(option);
+            }
+        }
+    }
+}

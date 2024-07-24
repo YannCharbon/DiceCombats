@@ -32,7 +32,7 @@
         }
         else if (_layoutMode == "aidedd.org website")
         {
-            <MudTextField Label="Enter URL" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
+            <MudTextField DebounceInterval="500" Label="Enter URL" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
             <MudLink Href="https://www.aidedd.org/">Visit aidedd.org</MudLink>
         }
     </div>
@@ -145,7 +145,7 @@
 
     private void _registerNewCreature()
     {
-        Creature newCreature = new Creature(_creatureName);
+        DCCreature newCreature = new DCCreature(_creatureName);
         if (_layoutMode == "Local image")
         {            
             newCreature.SetImageSheetBase64(_localImageBase64);

@@ -4,18 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Collections.Generic;
 
 namespace DiceCombats
 {
-    public class Creature
+    public class DCCreature
     {
         public Guid Id { get; private set; } = Guid.Empty;
         public string Name { get; private set; } = string.Empty;
-        public int MaxHitPoints { get; private set; } = 0;
+        public int MaxHitPoints { get; set; } = 0;
+        public int CurrentHitPoints { get; set; } = 0;
         public string ImageSheetBas64 { get; private set; } = string.Empty;
         public string HtmlSheet { get; private set; } = string.Empty;
 
-        public Creature(string name)
+        public List<DCCreatureCustomField> CustomFields { get; set; } = new List<DCCreatureCustomField>();
+
+        public DCCreature(string name)
         {
             Name = name;
             Id = Guid.NewGuid();
@@ -29,11 +33,6 @@ namespace DiceCombats
         public void SetHtmlSheet(string htmlSheet)
         {
             HtmlSheet = htmlSheet;
-        }
-
-        public void SetMaxHitPoints(int maxHitPoints)
-        {
-            MaxHitPoints = maxHitPoints;
         }
 
         public string SerializeToJson()

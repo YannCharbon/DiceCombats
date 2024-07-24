@@ -1,0 +1,62 @@
+﻿@using DiceCombats
+@using System.Collections.Generic
+@using Microsoft.AspNetCore.Components
+
+<div>
+    <h3>Add additional fields to this creatures</h3>
+
+    <div style="padding:10px;">
+        <MudSelect T="string" Label="Field type" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
+            <MudSelectItem T="string" Value="@("Numeric")" />
+            <MudSelectItem T="string" Value="@("Checkbox")" />
+            <MudSelectItem T="string" Value="@("CheckboxGrid")" />
+            <MudSelectItem T="string" Value="@("Text")" />
+        </MudSelect>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddField">Add Field</MudButton>
+    </div>
+
+    <div style ="padding:10px;">
+        @foreach (var field in Fields)
+        {
+            <div>
+                <CreatureCustomFieldRenderer Field="field" EditionMode="true" />
+                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="() => RemoveField(field)">Remove</MudButton>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<DCCreatureCustomField> Fields { get; set; } = new List<DCCreatureCustomField>();
+
+    private string newFieldType = "Numeric";
+
+    private void AddField()
+    {
+        DCCreatureCustomField newField;
+        switch (newFieldType)
+        {
+            case "Numeric":
+                newField = new DCCreatureNumericField { Title = "New Numeric Field" };
+                break;
+            case "Checkbox":
+                newField = new DCCreatureCheckboxField { Title = "New Checkbox Field", Options = new List<string> { "Option 1", "Option 2" } };
+                break;
+            case "CheckboxGrid":
+                newField = new DCCreatureCheckboxGridField { Title = "New Checkbox Grid Field" };
+                break;
+            case "Text":
+                newField = new DCCreatureTextField { Title = "New Text Field" };
+                break;
+            default:
+                throw new InvalidOperationException("Unknown field type");
+        }
+        Fields.Add(newField);
+    }
+
+    private void RemoveField(DCCreatureCustomField field)
+    {
+        Fields.Remove(field);
+    }
+}

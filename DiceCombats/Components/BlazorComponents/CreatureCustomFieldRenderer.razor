@@ -20,58 +20,51 @@
         {
             <div class="row">
                 <div class="col col-md-2">
-                    <MudNumericField @bind-Value="checkboxGridField.Columns" Label="Row checkbox count" Variant="Variant.Outlined" Min="1" />
+                    <MudNumericField @bind-Value="checkboxGridField.Columns" Label="Horizontal checkbox count" Variant="Variant.Outlined" Min="1" />
                 </div>
                 <div class="col col-md-2">
-                    <MudNumericField @bind-Value="checkboxGridField.Rows" Label="Column checkbox count" Variant="Variant.Outlined" Min="1" />
-                </div>
-                <div class="col col-md-2">
-                    <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasRowHeaders" Label="Row labels"></MudCheckBox>
+                    <MudNumericField @bind-Value="checkboxGridField.Rows" Label="Vertical checkbox count" Variant="Variant.Outlined" Min="1" />
                 </div>
                 <div class="col col-md-2">
                     <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasColumnHeaders" Label="Column labels"></MudCheckBox>
                 </div>
+                <div class="col col-md-2">
+                    <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasRowHeaders" Label="Row labels"></MudCheckBox>
+                </div>
             </div>
         }
-        @try
-        {
         <div style="padding:10px;">
             <table>
                 @if (checkboxGridField.HasColumnHeaders)
                 {
                     <tr>
-                    @if (checkboxGridField.HasRowHeaders)
-                    {
-                        <td>&nbsp;</td>
-                    }
-                        @for (int i = 0; i < checkboxGridField.ColumnHeaders.Count; i++)
+                        @if (checkboxGridField.HasRowHeaders)
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.ColumnHeaders[i]" Label="Edit field name" Variant="Variant.Outlined" /></td>
+                            <td>&nbsp;</td>
+                        }
+                        @foreach (int i in Enumerable.Range(0,checkboxGridField.ColumnHeaders.Count))
+                        {
+                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.ColumnHeaders[i]" Label="Edit column name" Variant="Variant.Outlined" /></td>
                         }
                     </tr>
                 }
-                @for (int i = 0; i < checkboxGridField.Rows; i++)
+            @foreach (int i in Enumerable.Range(0, checkboxGridField.Rows))
                 {
                     <tr>
                         @if (checkboxGridField.HasRowHeaders)
                         {
                             <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.RowHeaders[i]" Label="Edit row name" Variant="Variant.Outlined" /></td>
                         }
-                        @for (int j = 0; j < checkboxGridField.Columns; j++)
+                        @foreach (int j in Enumerable.Range(0, checkboxGridField.Columns))
                         {
-                            <td style="padding:5px;">
-                                <input type="checkbox" checked="@checkboxGridField.GetCheckboxState(i, j)" @onchange="(e) => OnCheckboxChanged(i, j, e)" />
+                            <td>
+                                <input type="checkbox" @bind="checkboxGridField.GridState[i,j]" />
                             </td>
                         }
                     </tr>
                 }
             </table>
         </div>
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
     }
 </div>
 
@@ -81,12 +74,4 @@
     [Parameter]
     public bool EditionMode { get; set; } = false;
 
-    private void OnCheckboxChanged(int row, int column, ChangeEventArgs e)
-    {
-        if (Field is DCCreatureCheckboxGridField checkboxGridField)
-        {
-            bool isChecked = (bool)e.Value;
-            checkboxGridField.SetCheckboxState(row, column, isChecked);
-        }
-    }
 }

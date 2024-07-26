@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DiceCombats
 {
@@ -41,10 +42,11 @@ namespace DiceCombats
 
         public List<string> RowHeaders { get; set; } = new List<string>();
         public List<string> ColumnHeaders { get; set; } = new List<string>();
-        public bool[,] GridState { get; private set; } = default!;
+        public bool[,] GridState { get; private set; }
 
         public DCCreatureCheckboxGridField()
         {
+            Debug.WriteLine("DCCreatureCheckboxGridField");
             InitializeGrid();
         }
 
@@ -77,23 +79,6 @@ namespace DiceCombats
             }
 
             InitializeHeaders();
-        }
-
-        public bool GetCheckboxState(int row, int column)
-        {
-            if (row >= 0 && row < Rows && column >= 0 && column < Columns)
-            {
-                return GridState[row, column];
-            }
-            return false;
-        }
-
-        public void SetCheckboxState(int row, int column, bool state)
-        {
-            if (row >= 0 && row < Rows && column >= 0 && column < Columns)
-            {
-                GridState[row, column] = state;
-            }
         }
 
         public override object GetValue()

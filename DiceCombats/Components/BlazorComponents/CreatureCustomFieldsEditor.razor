@@ -2,8 +2,27 @@
 @using System.Collections.Generic
 @using Microsoft.AspNetCore.Components
 
+@inject IJSRuntime JS
+
+<style>
+    .CreatureCustomFieldsEditorCustomField{
+        padding:10px;
+        margin:5px;
+        background-color:#F0F0F0;
+        border-radius:10px;
+    }
+</style>
+
 <div>
     <h3>Add additional fields to this creatures</h3>
+
+    @foreach (var field in Fields)
+    {
+        <div class="CreatureCustomFieldsEditorCustomField">
+            <CreatureCustomFieldRenderer Field="field" EditionMode="true" />
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="() => RemoveField(field)">Remove</MudButton>
+        </div>
+    }
 
     <div style="padding:10px;">
         <MudSelect T="string" Label="Field type" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
@@ -12,17 +31,9 @@
             <MudSelectItem T="string" Value="@("CheckboxGrid")" />
             <MudSelectItem T="string" Value="@("Text")" />
         </MudSelect>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddField">Add Field</MudButton>
-    </div>
-
-    <div style ="padding:10px;">
-        @foreach (var field in Fields)
-        {
-            <div>
-                <CreatureCustomFieldRenderer Field="field" EditionMode="true" />
-                <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="() => RemoveField(field)">Remove</MudButton>
-            </div>
-        }
+        <div style="padding-top:5px;">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddField">Add Field</MudButton>
+        </div>
     </div>
 </div>
 
@@ -58,5 +69,14 @@
     private void RemoveField(DCCreatureCustomField field)
     {
         Fields.Remove(field);
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            JS.InvokeVoidAsync("scrollToBottom");
+        }
+        return base.OnAfterRenderAsync(firstRender);
     }
 }

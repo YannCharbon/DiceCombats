@@ -8,7 +8,7 @@
     .CreatureCustomFieldsEditorCustomField{
         padding:10px;
         margin:5px;
-        background-color:#F0F0F0;
+        background-color:#F8F8F8;
         border-radius:10px;
     }
 </style>
@@ -30,6 +30,7 @@
             <MudSelectItem T="string" Value="@("Checkbox")" />
             <MudSelectItem T="string" Value="@("CheckboxGrid")" />
             <MudSelectItem T="string" Value="@("Text")" />
+            <MudSelectItem T="string" Value="@("Color")" />
         </MudSelect>
         <div style="padding-top:5px;">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddField">Add Field</MudButton>
@@ -59,6 +60,9 @@
                 break;
             case "Text":
                 newField = new DCCreatureTextField { Title = "New Text Field" };
+                break;
+            case "Color":
+                newField = new DCCreatureColorField { Title = "New Color Field" };
                 break;
             default:
                 throw new InvalidOperationException("Unknown field type");

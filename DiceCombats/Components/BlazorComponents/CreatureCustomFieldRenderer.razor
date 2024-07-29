@@ -1,4 +1,5 @@
 ﻿@using DiceCombats
+@using MudBlazor.Utilities
 
 <div>
     @if (EditionMode)
@@ -65,6 +66,13 @@
                 }
             </table>
         </div>
+    }
+    else if (Field is DCCreatureColorField colorField)
+    {
+        @if (EditionMode)
+        {
+            <MudColorPicker Label="Basic Color Picker" @bind-Text="colorField.Value" Style="@($"color: {colorField.Value};")" Placeholder="Select Color" />
+        }
     }
 </div>
 

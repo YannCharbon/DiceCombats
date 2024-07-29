@@ -14,7 +14,18 @@
     <p>@(CreatureGuid) does not exist</p>
 } else
 {
-    <h1>@creature.Name</h1>
+    <div class="row">
+        <div class="col col-md-4">
+            <h1>@creature.Name</h1>
+        </div>
+        <div class="col col-md-2">
+            <MudButton OnClick="Save" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" IconColor="Color.Primary" Size="Size.Large">Save</MudButton>
+        </div>
+        <div class="col col-md-2">
+            <MudButton OnClick="Cancel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" IconColor="Color.Secondary" Size="Size.Large">Cancel</MudButton>
+        </div>
+    </div>
+    
     <div style="padding:10px">
         @if (creature.ImageSheetBas64 != string.Empty)
         {
@@ -52,5 +63,23 @@
     {
         creature = CombatService.GetCreatureFromGUID(CreatureGuid);
         base.OnInitialized();
+    }
+
+    private void Save()
+    {
+        if (creature != null)
+        {
+            CombatService.SaveCreatures();
+        }
+        Navigation.NavigateTo($"/creaturesexplorer");
+    }
+
+    private void Cancel()
+    {
+        if (creature != null)
+        {
+            CombatService.DeleteCreature(creature);
+        }
+        Navigation.NavigateTo($"/");
     }
 }

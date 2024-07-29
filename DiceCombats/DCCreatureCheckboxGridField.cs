@@ -7,6 +7,7 @@ namespace DiceCombats
     public class DCCreatureCheckboxGridField : DCCreatureCustomField
     {
         public override string FieldType => "CheckboxGrid";
+        public override string Discriminator => nameof(DCCreatureCheckboxGridField);
 
         private int rows = 3;
         private int columns = 3;
@@ -42,7 +43,7 @@ namespace DiceCombats
 
         public List<string> RowHeaders { get; set; } = new List<string>();
         public List<string> ColumnHeaders { get; set; } = new List<string>();
-        public bool[,] GridState { get; private set; }
+        public List<List<bool>> GridState { get; private set; }
 
         public DCCreatureCheckboxGridField()
         {
@@ -52,7 +53,11 @@ namespace DiceCombats
 
         private void InitializeGrid()
         {
-            GridState = new bool[Rows, Columns];
+            GridState = new List<List<bool>>();
+            for (int i = 0; i < rows; i++)
+            {
+                GridState.Add(new List<bool>( new bool[columns]));
+            }
             InitializeHeaders();
         }
 
@@ -68,13 +73,17 @@ namespace DiceCombats
         private void ResizeGrid()
         {
             var oldGrid = GridState;
-            GridState = new bool[Rows, Columns];
-
-            for (int i = 0; i < Math.Min(Rows, oldGrid.GetLength(0)); i++)
+            GridState = new List<List<bool>>();
+            for (int i = 0; i < rows; i++)
             {
-                for (int j = 0; j < Math.Min(Columns, oldGrid.GetLength(1)); j++)
+                GridState.Add(new List<bool>(new bool[columns]));
+            }
+
+            for (int i = 0; i < Math.Min(Rows, oldGrid.Count); i++)
+            {
+                for (int j = 0; j < Math.Min(Columns, oldGrid[0].Count); j++)
                 {
-                    GridState[i, j] = oldGrid[i, j];
+                    GridState[i][j] = oldGrid[i][j];
                 }
             }
 

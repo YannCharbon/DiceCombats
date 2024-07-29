@@ -1,0 +1,45 @@
+﻿@inject DiceCombatsService CombatService
+@inject NavigationManager Navigation
+
+<style>
+    .CreatureViewerCreature {
+        padding:10px;
+        margin:5px;
+        border-radius:10px;
+        background-color:#FAFAFA;
+    }
+</style>
+
+<div>
+    @for(char chr = 'a'; chr < 'z'; chr++)
+    {
+        @if (CombatService.GetCreatureList().Find(x => x.Name.ToLower().StartsWith(chr)) != null)
+        {
+            <div style="border-bottom:solid; border-bottom-width:1px; border-bottom-color:black;">
+                <h2>@chr.ToString().ToUpper()</h2>
+            </div>
+            <div class="row">
+                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr)))
+                {
+                    <div class="col col-md-3 CreatureViewerCreature">
+                        <MudStack Row="true">
+                                <h4>@creature.Name</h4>
+                                <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                                    <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large"></MudIconButton>
+                                    <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large"></MudIconButton>
+                                </MudButtonGroup>
+                        </MudStack>
+                    </div>
+                }
+            </div>
+        }        
+    }
+    
+</div>
+
+@code {
+    private void Edit(DCCreature creature)
+    {
+        Navigation.NavigateTo($"/creatureedit/{creature.Id.ToString()}");
+    }
+}

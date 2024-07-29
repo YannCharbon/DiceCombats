@@ -154,7 +154,7 @@
         {
             newCreature.SetHtmlSheet(_aideDDCreatureSheet);
         }
-        CombatService.CreatureList.Add(newCreature);
+        CombatService.GetCreatureList().Add(newCreature);
 
         Debug.WriteLine(newCreature.Id.ToString());
 

@@ -9,5 +9,6 @@
         {
             return Value;
         }
+        public override string Discriminator => nameof(DCCreatureNumericField);
     }
 }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace DiceCombats
 {
@@ -14,7 +15,9 @@ namespace DiceCombats
         public string Name { get; private set; } = string.Empty;
         public int MaxHitPoints { get; set; } = 0;
         public int CurrentHitPoints { get; set; } = 0;
+        [JsonInclude]
         public string ImageSheetBas64 { get; private set; } = string.Empty;
+        [JsonInclude]
         public string HtmlSheet { get; private set; } = string.Empty;
 
         public List<DCCreatureCustomField> CustomFields { get; set; } = new List<DCCreatureCustomField>();

@@ -5,6 +5,7 @@ namespace DiceCombats
     public class DCCreatureCheckboxField : DCCreatureCustomField
     {
         public override string FieldType => "Checkbox";
+        public override string Discriminator => nameof(DCCreatureCheckboxField);
         public List<string> Options { get; set; } = new List<string>();
         public List<string> SelectedOptions { get; set; } = new List<string>();
 

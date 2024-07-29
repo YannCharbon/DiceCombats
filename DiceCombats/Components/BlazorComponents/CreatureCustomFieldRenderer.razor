@@ -58,7 +58,7 @@
                         @foreach (int j in Enumerable.Range(0, checkboxGridField.Columns))
                         {
                             <td>
-                                <input type="checkbox" @bind="checkboxGridField.GridState[i,j]" />
+                                <input type="checkbox" @bind="checkboxGridField.GridState[i][j]" />
                             </td>
                         }
                     </tr>

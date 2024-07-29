@@ -1,10 +1,28 @@
 ﻿@using DiceCombats
 @using MudBlazor.Utilities
 
+<style>
+    .CreatureCustomFieldRendererFieldTitle {
+        background-color:#100060;
+        color:white;
+        border-radius: 10px;
+        padding:10px;
+        margin:5px;
+    }
+
+    .CreatureCustomFieldRendererCheckBoxGridLabels {
+        font-size:10pt;
+        padding: 4px;
+    }
+</style>
+
 <div>
     @if (EditionMode)
     {
-        <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
+        <MudStack Row="true">
+            <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
+            <MudCheckBox Label="Field is shared between all instances of this creature" Variant="Variant.Outlined" @bind-Value="Field.SharedAcrossCreatureInstances" />
+        </MudStack>        
     }
 
     @if (Field is DCCreatureNumericField numericField)
@@ -33,6 +51,9 @@
                     <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasRowHeaders" Label="Row labels"></MudCheckBox>
                 </div>
             </div>
+        } else
+        {
+            <span class="CreatureCustomFieldRendererFieldTitle">@checkboxGridField.Title</span>
         }
         <div style="padding:10px;">
             <table>
@@ -45,8 +66,14 @@
                         }
                         @foreach (int i in Enumerable.Range(0,checkboxGridField.ColumnHeaders.Count))
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.ColumnHeaders[i]" Label="Edit column name" Variant="Variant.Outlined" /></td>
-                        }
+                            @if (EditionMode)
+                            {
+                                <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.ColumnHeaders[i]" Label="Edit column name" Variant="Variant.Outlined" /></td>
+                            } else
+                            {
+                                <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@checkboxGridField.ColumnHeaders[i]</span></td>
+                            }
+                }
                     </tr>
                 }
             @foreach (int i in Enumerable.Range(0, checkboxGridField.Rows))
@@ -54,7 +81,15 @@
                     <tr>
                         @if (checkboxGridField.HasRowHeaders)
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.RowHeaders[i]" Label="Edit row name" Variant="Variant.Outlined" /></td>
+                            @if (EditionMode)
+                            {
+                                <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.RowHeaders[i]" Label="Edit row name" Variant="Variant.Outlined" /></td>
+                            }
+                            else
+                            {
+                                <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@checkboxGridField.RowHeaders[i]</span></td>
+                            }
+                            
                         }
                         @foreach (int j in Enumerable.Range(0, checkboxGridField.Columns))
                         {
@@ -71,7 +106,11 @@
     {
         @if (EditionMode)
         {
-            <MudColorPicker Label="Basic Color Picker" @bind-Text="colorField.Value" Style="@($"color: {colorField.Value};")" Placeholder="Select Color" />
+            <MudColorPicker Variant="Variant.Outlined" Label="Basic Color Picker" @bind-Text="colorField.Value" Style="@($"color: {colorField.Value};")" Placeholder="Select Color" />
+        } else
+        {
+            <span class="CreatureCustomFieldRendererFieldTitle">@colorField.Title</span>
+            <span style="@($"background-color:{colorField.Value ?? ""};")">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
         }
     }
 </div>

@@ -10,5 +10,6 @@ namespace DiceCombats
         public abstract string FieldType { get; }
         public abstract object GetValue();
         public abstract string Discriminator { get; }
+        public bool SharedAcrossCreatureInstances { get; set; } = true;
     }
 }

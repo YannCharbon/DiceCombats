@@ -14,17 +14,12 @@
     <p>@(CreatureGuid) does not exist</p>
 } else
 {
-    <div class="row">
-        <div class="col col-md-4">
-            <h1>@creature.Name</h1>
-        </div>
-        <div class="col col-md-2">
-            <MudButton OnClick="Save" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" IconColor="Color.Primary" Size="Size.Large">Save</MudButton>
-        </div>
-        <div class="col col-md-2">
-            <MudButton OnClick="Cancel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" IconColor="Color.Secondary" Size="Size.Large">Cancel</MudButton>
-        </div>
-    </div>
+    <MudStack Row="true">
+        <h1>@creature.Name</h1>
+        <MudButton OnClick="Save" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" IconColor="Color.Primary" Size="Size.Large">Save</MudButton>
+        <MudButton OnClick="Cancel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" IconColor="Color.Secondary" Size="Size.Large">Cancel</MudButton>
+        <MudCheckBox Variant="Variant.Filled" Label="Edition mode" @bind-Value="_editionMode"></MudCheckBox>
+    </MudStack>
     
     <div style="padding:10px">
         @if (creature.ImageSheetBas64 != string.Empty)
@@ -45,7 +40,7 @@
         <MudNumericField @bind-Value="creature.CurrentHitPoints" Label="Current hit points (always present)" Variant="Variant.Outlined" Step="1" Disabled="true" />
     </div>
     <div style="padding:10px;">
-        <CreatureCustomFieldsEditor Fields="creature.CustomFields" />
+        <CreatureCustomFieldsEditor Fields="creature.CustomFields" EditionMode="_editionMode" />
     </div>
 }
 
@@ -58,6 +53,7 @@
 
 
     private DCCreature? creature = null;
+    private bool _editionMode = true;
 
     protected override void OnInitialized()
     {

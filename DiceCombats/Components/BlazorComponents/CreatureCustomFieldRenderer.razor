@@ -39,7 +39,7 @@
         <div class="d-flex flex-wrap gap-4">
             @foreach (int i in Enumerable.Range(0, checkBoxField.Labels.Count))
             {
-                <MudStack Row="true" Style=" padding:5px;background-color:#DADADA;border-radius:5px;">
+                <MudStack Row="true" Style=" padding:5px;background-color:#404040;border-radius:5px;">
                     <MudTextField Immediate="true" @bind-Value="checkBoxField.Labels[i]" Label="Option label" Variant="Variant.Outlined" />
                     <MudCheckBox Label="@checkBoxField.Labels[i]" @bind-Value="checkBoxField.SelectedOptions[i]"></MudCheckBox>
                     <MudButton OnClick="@(() => checkBoxField.RemoveOption(checkBoxField.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>

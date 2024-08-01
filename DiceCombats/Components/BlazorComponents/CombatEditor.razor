@@ -3,19 +3,46 @@
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
-        position: fixed; /* Fixes the element relative to the viewport */
-        bottom: 50px; /* Adjust the distance from the top */
-        right: 10px; /* Adjust the distance from the right edge */
-        width: 350px; /* Set a fixed width */
-        background-color: #fff; /* Background color */
-        border: 1px solid #ccc; /* Border for visibility */
+        position: fixed;
+        bottom: 50px;
+        right: 10px;
+        width: 350px;
+        background-color: #303030;
+        border: 1px solid #505050;
         border-radius:10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional shadow */
-        padding: 10px; /* Padding inside the floating window */
-        z-index: 1000; /* Ensures it stays above other content */
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        z-index: 1000;
         max-height: 250px;
         overflow-y: scroll;
         overflow-x: hidden;
+    }
+
+    .CombatEditorCreatureBox {
+        background-color: #2A2A2A;
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        border: 1px solid #505050;
+        border-radius: 10px;
+        display: inline-block;
+        vertical-align: top;
+        white-space: normal;
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .CombatEditorCreatureLayout {
+        background-color: #303030;
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        border: 1px solid #505050;
+        padding: 5px;
+        border-radius: 10px;
+    }
+
+    .CombatEditorCustomFieldsLayout {
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        border: 1px solid #505050;
+        padding: 5px;
+        border-radius: 10px;
     }
 </style>
 
@@ -26,11 +53,11 @@
             <MudItem sm="10"><h3>Initiative</h3></MudItem>
             @if (_initiativeWindowsMaximized)
             {
-                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Reduce"></MudIcon></MudItem>
+                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Reduce" Style="cursor:pointer;"></MudIcon></MudItem>
             }
             else
             {
-                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Maximize"></MudIcon></MudItem>
+                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Maximize" Style="cursor:pointer;"></MudIcon></MudItem>
             }
         </MudGrid>
 
@@ -50,7 +77,7 @@
                         <td style="width:60px;padding:5px;"><MudNumericField T="int"></MudNumericField></td>
                         <td style="width:60px;padding:5px;"><MudNumericField T="int"></MudNumericField></td>
                         <td style="width:100px;padding:5px;">
-                            <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:aliceblue;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">Quick jump</a>
+                            <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:darkcyan;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">Quick jump</a>
                         </td>
                     </tr>
                 }
@@ -81,62 +108,66 @@
 
 @if (EditionMode)
 {
-    <div style="white-space: nowrap; width: 100%;">
-        <div style="display: inline-block; vertical-align: top; white-space: normal; width: 50%; padding:10px; margin:10px; border:solid; border-width:1px; border-radius:10px;">
-            <h2>Add/Remove creatures</h2>
-            <div style="padding-bottom:10px;">
-                <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="Search creature" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+    <MudGrid>
+        <MudItem sm="8">
+            <div class="CombatEditorCreatureBox">
+                <h2>Add/Remove creatures</h2>
+                <div style="padding-bottom:10px;">
+                    <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="Search creature" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+                </div>
+                <div style="height:200px;overflow-y:scroll;overflow-x:hidden;">            
+                    @foreach (DCCreature creature in creatureSearchList)
+                        {
+                        <div class="row">
+                            <div class="col col-xs-4">
+                                <span>@creature.Name</span>
+                            </div>
+                    
+                                @if (_combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
+                                {
+                                    <div class="col col-xs-2">
+                                        <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
+                                    </div>
+                                } else
+                                {
+                                    <div class="col col-xs-3">
+                                        <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
+                                    </div>
+                                    <div class="col col-xs-4">
+                                        <span>Creature already added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                                    </div>                            
+                                }
+                    
+                        </div>
+                        <MudDivider />
+                    }
+            
+                </div>
             </div>
-            <div style="height:200px;overflow-y:scroll;overflow-x:hidden;">            
-                @foreach (DCCreature creature in creatureSearchList)
-                    {
+        </MudItem>
+        <MudItem sm="4">
+            <div class="CombatEditorCreatureBox">
+                @foreach (DCCreature creature in _combat.CreaturesList)
+                {
                     <div class="row">
                         <div class="col col-xs-4">
                             <span>@creature.Name</span>
                         </div>
-                    
-                            @if (_combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
-                            {
-                                <div class="col col-xs-2">
-                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
-                                </div>
-                            } else
-                            {
-                                <div class="col col-xs-3">
-                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
-                                </div>
-                                <div class="col col-xs-4">
-                                    <span>Creature already added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
-                                </div>                            
-                            }
-                    
+                        <div class="col col-xs-4">
+                        <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => _combat.UpdateInstanceCount(args, creature)" Label="Instances count" Variant="Variant.Outlined"></MudNumericField>
+                        </div>
                     </div>
-                    <MudDivider />
                 }
-            
             </div>
-        </div>
-        <div style="display: inline-block; vertical-align: top; white-space: normal; width: 40%; padding:10px; margin:10px; border:solid; border-width:1px; border-radius:10px;">
-            @foreach (DCCreature creature in _combat.CreaturesList)
-            {
-                <div class="row">
-                    <div class="col col-xs-4">
-                        <span>@creature.Name</span>
-                    </div>
-                    <div class="col col-xs-4">
-                    <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => _combat.UpdateInstanceCount(args, creature)" Label="Instances count" Variant="Variant.Outlined"></MudNumericField>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
+        </MudItem>
+    </MudGrid>
 } else
 {
     <MudGrid>
         @foreach(DCCreature creature in _combat.CreaturesList)
         {
             <MudItem sm="6" Style="padding:10px;">
-                <div style="background-color:#F0F0F0;padding:5px;border-radius:10px;">
+                <div class="CombatEditorCreatureLayout">
                     <div style="padding:10px" id="@creature.Id.ToString()">
                         @if (creature.ImageSheetBas64 != string.Empty)
                         {
@@ -145,7 +176,9 @@
                         }
                         else if (creature.HtmlSheet != string.Empty)
                         {
-                            @((MarkupString)creature.HtmlSheet)
+                            <div style="color:black">
+                                @((MarkupString)creature.HtmlSheet)
+                            </div>
                         }
                         else if (creature.IsPlayer)
                         {
@@ -159,8 +192,8 @@
                     <div style="padding:10px;">
                         @foreach (List<DCCreatureCustomField> instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
                         {
-                            <div style="@($"background-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;margin:10px;")">
-                                <div class="d-flex flex-wrap gap-4">
+                            <div class="CombatEditorCustomFieldsLayout" style="@($"background-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;margin:10px;")">
+                                <div class="d-flex flex-wrap gap-2">
                                     @foreach(DCCreatureCustomField field in instanceCustomFields)
                                     {
                                         <div style="width:max-content;">

@@ -28,7 +28,9 @@
         }
         else if (creature.HtmlSheet != string.Empty)
         {
-            @((MarkupString)creature.HtmlSheet)
+            <div style="color:black;">
+                @((MarkupString)creature.HtmlSheet)
+            </div>
         }
         else if (creature.IsPlayer)
         {

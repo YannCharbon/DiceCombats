@@ -10,5 +10,15 @@
         {
             return Text;
         }
+
+        public override DCCreatureCustomField Clone()
+        {
+            return new DCCreatureTextField
+            {
+                Title = this.Title,
+                Text = this.Text,
+                SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
+            };
+        }
     }
 }

@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DiceCombats
+{
+    public class DCCombat
+    {
+        public Guid Id { get; private set; } = Guid.Empty;
+        public string Name { get; set; } = string.Empty;
+        public List<DCCreature> CreaturesList { get; set; } = new List<DCCreature>();
+
+        public List<List<List<DCCreatureCustomField>>> InCombatCustomFieldsInstances { get; set; } = new List<List<List<DCCreatureCustomField>>>();
+
+        public DCCombat(string name)
+        {
+            Name = name;
+            Id = Guid.NewGuid();
+        }
+
+        public void AddCreature(DCCreature creature)
+        {
+            CreaturesList.Add(creature);
+            List<List<DCCreatureCustomField>> tmp = new List<List<DCCreatureCustomField>>();
+            for (int i = 0; i < creature.InCombatInstanceCount; i++)
+            {
+                tmp.Add(creature.CustomFields.Select(item => item.Clone()).ToList());
+            }
+            InCombatCustomFieldsInstances.Add(tmp);
+        }
+
+        public void RemoveCreature(DCCreature creature)
+        {
+            int creatureIdx = CreaturesList.FindIndex(x => x.Name == creature.Name);
+            if (creatureIdx != -1 && creatureIdx < InCombatCustomFieldsInstances.Count())
+            {
+                InCombatCustomFieldsInstances.RemoveAt(creatureIdx);
+            }
+            CreaturesList.RemoveAt(creatureIdx);
+        }
+
+        public List<List<DCCreatureCustomField>> GetCreatureInstancesCustomFields(DCCreature creature)
+        {
+            int creatureIdx = CreaturesList.IndexOf(creature);
+            if (creatureIdx != -1 && creatureIdx < InCombatCustomFieldsInstances.Count())
+            {
+                return InCombatCustomFieldsInstances[creatureIdx];
+            }
+            return new List<List<DCCreatureCustomField>>();
+        }
+
+        public void UpdateInstanceCount(uint instanceCount, DCCreature creature)
+        {
+            int creatureIdx = CreaturesList.IndexOf(creature);
+            if (creatureIdx != -1)
+            {
+                InCombatCustomFieldsInstances[creatureIdx].Clear();
+                for (int i = 0; i < instanceCount; i++)
+                {
+                    InCombatCustomFieldsInstances[creatureIdx].Add(creature.CustomFields.Select(item => item.Clone()).ToList());
+                }
+                creature.InCombatInstanceCount = instanceCount;
+            }
+            
+        }
+    }
+}

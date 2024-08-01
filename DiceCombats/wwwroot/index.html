@@ -21,6 +21,19 @@
         function scrollToBottom() {
             window.scrollTo(0, document.body.scrollHeight);
         }
+
+        function scrollToElementById(id) {
+            var element = document.getElementById(id);
+            if (element) {
+                var elementPosition = element.getBoundingClientRect().top + window.scrollY;
+                var offsetPosition = elementPosition - 150;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
     </script>
 
     <div class="status-bar-safe-area"></div>

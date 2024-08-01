@@ -15,6 +15,7 @@ namespace DiceCombats
                     string? discriminator = discriminatorElement.GetString();
                     return discriminator switch
                     {
+                        nameof(DCCreatureHitPointsField) => JsonSerializer.Deserialize<DCCreatureHitPointsField>(doc.RootElement.GetRawText(), options),
                         nameof(DCCreatureNumericField) => JsonSerializer.Deserialize<DCCreatureNumericField>(doc.RootElement.GetRawText(), options),
                         nameof(DCCreatureCheckboxGridField) => JsonSerializer.Deserialize<DCCreatureCheckboxGridField>(doc.RootElement.GetRawText(), options),
                         nameof(DCCreatureCheckboxField) => JsonSerializer.Deserialize<DCCreatureCheckboxField>(doc.RootElement.GetRawText(), options),

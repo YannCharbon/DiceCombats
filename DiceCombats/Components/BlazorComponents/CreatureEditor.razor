@@ -20,24 +20,24 @@
         <MudButton OnClick="Cancel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" IconColor="Color.Secondary" Size="Size.Large">Cancel</MudButton>
         <MudCheckBox Variant="Variant.Filled" Label="Edition mode" @bind-Value="_editionMode"></MudCheckBox>
     </MudStack>
-    
+
     <div style="padding:10px">
         @if (creature.ImageSheetBas64 != string.Empty)
         {
             <img src="@creature.ImageSheetBas64" height="400px" />
-        } else if (creature.HtmlSheet != string.Empty)
+        }
+        else if (creature.HtmlSheet != string.Empty)
         {
             @((MarkupString)creature.HtmlSheet)
-        } else
+        }
+        else if (creature.IsPlayer)
+        {
+            <h3>Player</h3>
+        }
+        else
         {
             <p>Could not render creature sheet</p>
         }
-    </div>
-    <div style="padding:10px;">
-        <MudNumericField @bind-Value="creature.MaxHitPoints" Label="Maximum hit points (always present)" Variant="Variant.Outlined" Step="1" />
-    </div>
-    <div style="padding:10px;">
-        <MudNumericField @bind-Value="creature.CurrentHitPoints" Label="Current hit points (always present)" Variant="Variant.Outlined" Step="1" Disabled="true" />
     </div>
     <div style="padding:10px;">
         <CreatureCustomFieldsEditor Fields="creature.CustomFields" EditionMode="_editionMode" />
@@ -67,7 +67,7 @@
         {
             CombatService.SaveCreatures();
         }
-        Navigation.NavigateTo($"/creaturesexplorer");
+        Navigation.NavigateTo($"/creatures");
     }
 
     private void Cancel()

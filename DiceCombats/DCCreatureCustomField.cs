@@ -11,5 +11,6 @@ namespace DiceCombats
         public abstract object GetValue();
         public abstract string Discriminator { get; }
         public bool SharedAcrossCreatureInstances { get; set; } = true;
+        public abstract DCCreatureCustomField Clone();
     }
 }

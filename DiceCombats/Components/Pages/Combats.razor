@@ -1,0 +1,36 @@
+﻿@page "/combats"
+@inject NavigationManager Navigation
+@inject DiceCombatsService CombatService
+
+<style>
+    .CombatsCombatLink {
+        background-color:#D8D8F0;
+        border-radius:30px;
+        padding:10px;
+        margin:5px;
+    }
+</style>
+
+<div style="padding-bottom:20px;">
+    <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">New combat</MudButton>
+</div>
+
+<div>
+    @for (char chr = 'a'; chr < 'z'; chr++)
+    {
+        @if (CombatService.GetCombatList().Find(x => x.Name.ToLower().StartsWith(chr)) != null)
+        {
+            <div style="border-bottom:solid; border-bottom-width:1px; border-bottom-color:black;">
+                <h2>@chr.ToString().ToUpper()</h2>
+            </div>
+            <div class="d-flex flex-wrap gap-4">
+                @foreach (DCCombat combat in CombatService.GetCombatList().FindAll(x => x.Name.ToLower().StartsWith(chr)))
+                {
+                    <div class="CombatsCombatLink">
+                        <h3><a href="/combatmanager/@combat.Id.ToString()">@combat.Name</a></h3>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

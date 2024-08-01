@@ -39,6 +39,7 @@
         <div style="padding:10px;">
             <MudStack Row="true">
                 <MudSelect T="string" Label="Field type" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
+                    <MudSelectItem T="string" Value="@("HitPoints")" />
                     <MudSelectItem T="string" Value="@("Numeric")" />
                     <MudSelectItem T="string" Value="@("Checkbox")" />
                     <MudSelectItem T="string" Value="@("CheckboxGrid")" />
@@ -59,18 +60,21 @@
     [Parameter]
     public bool EditionMode { get; set; } = true;
 
-    private string newFieldType = "Numeric";
+    private string newFieldType = "HitPoints";
 
     private void AddField()
     {
         DCCreatureCustomField newField;
         switch (newFieldType)
         {
+            case "HitPoints":
+                newField = new DCCreatureHitPointsField { Title = "Hit points" };
+                break;
             case "Numeric":
                 newField = new DCCreatureNumericField { Title = "New Numeric Field" };
                 break;
             case "Checkbox":
-                newField = new DCCreatureCheckboxField { Title = "New Checkbox Field", Options = new List<string> { "Option 1", "Option 2" } };
+                newField = new DCCreatureCheckboxField { Title = "New Checkbox Field" };
                 break;
             case "CheckboxGrid":
                 newField = new DCCreatureCheckboxGridField { Title = "New Checkbox Grid Field" };

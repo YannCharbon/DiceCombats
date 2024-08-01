@@ -1,0 +1,12 @@
+﻿@page "/creatures/"
+@inject NavigationManager Navigation
+
+<div style="padding-bottom:20px;">
+    <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">New creature</MudButton>
+</div>
+
+<CreatureViewer></CreatureViewer>
+
+@code {
+
+}

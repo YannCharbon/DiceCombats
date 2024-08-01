@@ -12,5 +12,15 @@ namespace DiceCombats
             return Value;
         }
         public override string Discriminator => nameof(DCCreatureColorField);
+
+        public override DCCreatureCustomField Clone()
+        {
+            return new DCCreatureColorField
+            {
+                Title = this.Title,
+                Value = this.Value,
+                SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
+            };
+        }
     }
 }

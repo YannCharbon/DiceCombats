@@ -94,5 +94,21 @@ namespace DiceCombats
         {
             return GridState;
         }
+
+        public override DCCreatureCustomField Clone()
+        {
+            return new DCCreatureCheckboxGridField
+            {
+                Title = this.Title,
+                Rows = this.Rows,
+                Columns = this.Columns,
+                HasRowHeaders = this.HasRowHeaders,
+                RowHeaders = this.RowHeaders,
+                HasColumnHeaders = this.HasColumnHeaders,
+                ColumnHeaders = this.ColumnHeaders,
+                GridState = this.GridState,
+                SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
+            };
+        }
     }
 }

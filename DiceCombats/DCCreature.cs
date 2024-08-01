@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using MudBlazor;
 
 namespace DiceCombats
 {
@@ -13,14 +14,15 @@ namespace DiceCombats
     {
         public Guid Id { get; private set; } = Guid.Empty;
         public string Name { get; private set; } = string.Empty;
-        public int MaxHitPoints { get; set; } = 0;
-        public int CurrentHitPoints { get; set; } = 0;
+
         [JsonInclude]
         public string ImageSheetBas64 { get; private set; } = string.Empty;
         [JsonInclude]
         public string HtmlSheet { get; private set; } = string.Empty;
 
         public List<DCCreatureCustomField> CustomFields { get; set; } = new List<DCCreatureCustomField>();
+        public uint InCombatInstanceCount { get; set; } = 1;
+        public bool IsPlayer { get; set; } = false;
 
         public DCCreature(string name)
         {

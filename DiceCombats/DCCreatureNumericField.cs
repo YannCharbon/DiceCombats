@@ -10,5 +10,15 @@
             return Value;
         }
         public override string Discriminator => nameof(DCCreatureNumericField);
+
+        public override DCCreatureCustomField Clone()
+        {
+            return new DCCreatureNumericField
+            {
+                Title = this.Title,
+                Value = this.Value,
+                SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
+            };
+        }
     }
 }

@@ -1,0 +1,8 @@
+﻿@page "/combatmanager/{combatguidstr}"
+
+<CombatEditor CombatGuid="@combatGuidStr"></CombatEditor>
+
+@code {
+    [Parameter]
+    public string combatGuidStr { get; set; } = "new";
+}

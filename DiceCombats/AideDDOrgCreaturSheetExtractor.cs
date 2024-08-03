@@ -81,6 +81,8 @@ namespace DiceCombats
                             }
                         }
                     }
+
+                    styleContents += "a:link { color:#6D0000; }\na:hover { color: #6D0000; text-decoration: underline; }\n";
                 }
 
                 

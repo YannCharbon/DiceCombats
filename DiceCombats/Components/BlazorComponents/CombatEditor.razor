@@ -13,7 +13,7 @@
         box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
         padding: 10px;
         z-index: 1000;
-        max-height: 250px;
+        max-height: 350px;
         overflow-y: scroll;
         overflow-x: hidden;
     }
@@ -53,11 +53,11 @@
             <MudItem sm="10"><h3>Initiative</h3></MudItem>
             @if (_initiativeWindowsMaximized)
             {
-                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Reduce" Style="cursor:pointer;"></MudIcon></MudItem>
+                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Reduce" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
             }
             else
             {
-                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Maximize" Style="cursor:pointer;"></MudIcon></MudItem>
+                <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Maximize" Style="cursor:pointer;"  Size="@Size.Large"></MudIcon></MudItem>
             }
         </MudGrid>
 
@@ -74,8 +74,8 @@
                 {
                     <tr style="border-bottom:solid; border-bottom-width:1px;">
                         <td style="padding:5px;">@creature.Name</td>
-                        <td style="width:60px;padding:5px;"><MudNumericField T="int"></MudNumericField></td>
-                        <td style="width:60px;padding:5px;"><MudNumericField T="int"></MudNumericField></td>
+                        <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:#A0A0A0;"></MudNumericField></td>
+                        <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:white;font-weight:bold;font-size:16pt"></MudNumericField></td>
                         <td style="width:100px;padding:5px;">
                             <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:darkcyan;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">Quick jump</a>
                         </td>

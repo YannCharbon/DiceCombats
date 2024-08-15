@@ -28,6 +28,7 @@
         white-space: normal;
         padding: 10px;
         margin: 10px;
+        width:100%;
     }
 
     .CombatEditorCreatureLayout {
@@ -118,27 +119,27 @@
                 <div style="height:200px;overflow-y:scroll;overflow-x:hidden;">            
                     @foreach (DCCreature creature in creatureSearchList)
                         {
-                        <div class="row">
-                            <div class="col col-xs-4">
+                        <MudGrid>
+                            <MudItem sm="4">
                                 <span>@creature.Name</span>
-                            </div>
+                            </MudItem>
                     
                                 @if (_combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
                                 {
-                                    <div class="col col-xs-2">
+                                    <MudItem sm="3">
                                         <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
-                                    </div>
+                                    </MudItem>
                                 } else
                                 {
-                                    <div class="col col-xs-3">
+                                    <MudItem sm="3">
                                         <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
-                                    </div>
-                                    <div class="col col-xs-4">
+                                    </MudItem>
+                                    <MudItem sm="4">
                                         <span>Creature already added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
-                                    </div>                            
+                                    </MudItem>                            
                                 }
                     
-                        </div>
+                        </MudGrid>
                         <MudDivider />
                     }
             

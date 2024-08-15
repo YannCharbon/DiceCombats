@@ -45,6 +45,7 @@
                     <MudSelectItem T="string" Value="@("CheckboxGrid")" />
                     <MudSelectItem T="string" Value="@("Text")" />
                     <MudSelectItem T="string" Value="@("Color")" />
+                    <MudSelectItem T="string" Value="@("DnD conditions")" />
                 </MudSelect>
                 <div style="padding-top:5px;">
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddField">Add Field</MudButton>
@@ -84,6 +85,9 @@
                 break;
             case "Color":
                 newField = new DCCreatureColorField { Title = "New Color Field" };
+                break;
+            case "DnD conditions":
+                newField = new DCCreatureDnDConditionsField { Title = "New DnDConditions Field" };
                 break;
             default:
                 throw new InvalidOperationException("Unknown field type");

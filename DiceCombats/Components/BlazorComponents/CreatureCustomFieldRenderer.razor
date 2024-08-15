@@ -102,6 +102,21 @@
     {
         <MudColorPicker Variant="Variant.Outlined" ColorPickerView="ColorPickerView.GridCompact" Label="Basic Color Picker" @bind-Text="colorField.Value" Style="@($"color: {colorField.Value};")" Placeholder="Select Color" />
     }
+    else if (Field is DCCreatureDnDConditionsField dndConditionsField)
+    {
+        <MudStack Row="true" style="padding-top:5px;padding-bottom:5px;">
+            <p>This field cannot be edited</p>
+        </MudStack>
+        <div class="d-flex flex-wrap gap-4">
+            @foreach (int i in Enumerable.Range(0, dndConditionsField.Labels.Count))
+            {
+                <MudStack Row="true" Style=" padding:5px;background-color:#404040;border-radius:5px;">
+                    <MudTextField Immediate="true" @bind-Value="dndConditionsField.Labels[i]" Label="Option label" Variant="Variant.Outlined" />
+                    <MudCheckBox Label="@dndConditionsField.Labels[i]" @bind-Value="dndConditionsField.SelectedOptions[i]"></MudCheckBox>
+                </MudStack>
+            }
+        </div>
+    }
 }
 else
 {
@@ -180,6 +195,17 @@ else
         
         <span class="CreatureCustomFieldRendererFieldTitle">@colorField.Title</span>
         <span style="@($"cursor:pointer;background-color:{colorField.Value ?? ""};border-radius:5px;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+    }
+    else if (Field is DCCreatureDnDConditionsField dndConditionsField)
+    {
+        <MudStack Row="true" Wrap="Wrap.Wrap">
+            @foreach (int i in Enumerable.Range(0, dndConditionsField.Labels.Count))
+            {
+                <MudItem Style="margin:-5px;padding:-5px;">
+                <MudCheckBox Label="@dndConditionsField.Labels[i]" @bind-Value="dndConditionsField.SelectedOptions[i]"></MudCheckBox>
+                    </MudItem>
+            }
+        </MudStack>
     }
 }
 

@@ -41,6 +41,46 @@ namespace DiceCombats
             CreaturesList.RemoveAt(creatureIdx);
         }
 
+        public void MoveCreature(DCCreature creature, bool up)
+        {
+            int oldIndex = CreaturesList.IndexOf(creature);
+            if (oldIndex != -1)
+            {
+                if (!up)
+                {
+                    if (oldIndex < CreaturesList.Count - 1)
+                    {
+                        CreaturesList.RemoveAt(oldIndex);
+                        CreaturesList.Insert(oldIndex + 1, creature);
+
+                        List<List<DCCreatureCustomField>> InCombatCustomFieldsInstance = InCombatCustomFieldsInstances[oldIndex];
+                        InCombatCustomFieldsInstances.RemoveAt(oldIndex);
+                        InCombatCustomFieldsInstances.Insert(oldIndex + 1, InCombatCustomFieldsInstance);
+                    }
+                } else
+                {
+                    if (oldIndex > 0)
+                    {
+                        CreaturesList.RemoveAt(oldIndex);
+                        CreaturesList.Insert(oldIndex - 1, creature);
+
+                        List<List<DCCreatureCustomField>> InCombatCustomFieldsInstance = InCombatCustomFieldsInstances[oldIndex];
+                        InCombatCustomFieldsInstances.RemoveAt(oldIndex);
+                        InCombatCustomFieldsInstances.Insert(oldIndex - 1, InCombatCustomFieldsInstance);
+                    }
+                }
+            }
+        }
+
+        public void SyncCreatures()
+        {
+            foreach (DCCreature creature in CreaturesList.ToList())
+            {
+                RemoveCreature(creature);
+                AddCreature(creature);
+            }
+        }
+
         public List<List<DCCreatureCustomField>> GetCreatureInstancesCustomFields(DCCreature creature)
         {
             int creatureIdx = CreaturesList.IndexOf(creature);

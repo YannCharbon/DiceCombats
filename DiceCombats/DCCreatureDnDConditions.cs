@@ -5,7 +5,7 @@ namespace DiceCombats
     public class DCCreatureDnDConditionsField : DCCreatureCustomField
     {
         public override string FieldType => "DnDConditions";
-        public override string Discriminator => nameof(DCCreatureCheckboxField);
+        public override string Discriminator => nameof(DCCreatureDnDConditionsField);
         public List<string> Labels { get; set; } = new List<string>{"Blinded", "Charmed", "Deafened", "Frightened", "Grappled", "Incapacitated", "Invisible", "Paralyzed", "Petrified", "Poisoned", "Prone", "Restrained", "Stunned", "Unconscious"};
         public List<bool> SelectedOptions { get; set; } = new List<bool>(new bool[14]);
 
@@ -16,7 +16,7 @@ namespace DiceCombats
 
         public override DCCreatureCustomField Clone()
         {
-            return new DCCreatureCheckboxField
+            return new DCCreatureDnDConditionsField
             {
                 Title = this.Title,
                 SelectedOptions = this.SelectedOptions,

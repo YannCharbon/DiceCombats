@@ -14,10 +14,14 @@
 
 @if (EditionMode)
 {
-    <MudStack Row="true">
-        <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
-        <MudCheckBox Label="Field is shared between all instances of this creature" Variant="Variant.Outlined" @bind-Value="Field.SharedAcrossCreatureInstances" />
-    </MudStack>
+    <MudGrid>
+        <MudItem sm="4">
+            <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
+        </MudItem>
+        <MudItem sm="4">
+            <MudCheckBox Label="Field is shared between all instances of this creature" Variant="Variant.Outlined" @bind-Value="Field.SharedAcrossCreatureInstances" />
+        </MudItem>
+    </MudGrid>
 
     @if (Field is DCCreatureHitPointsField hitPointsField)
     {
@@ -202,8 +206,8 @@ else
             @foreach (int i in Enumerable.Range(0, dndConditionsField.Labels.Count))
             {
                 <MudItem Style="margin:-5px;padding:-5px;">
-                <MudCheckBox Label="@dndConditionsField.Labels[i]" @bind-Value="dndConditionsField.SelectedOptions[i]"></MudCheckBox>
-                    </MudItem>
+                    <MudCheckBox Label="@dndConditionsField.Labels[i]" @bind-Value="dndConditionsField.SelectedOptions[i]"></MudCheckBox>
+                </MudItem>
             }
         </MudStack>
     }

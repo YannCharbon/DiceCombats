@@ -87,12 +87,12 @@
     </div>
 }
 
-<MudStack Row="true" Style="padding-bottom:20px;">
+<MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
     @if (EditionMode)
     {
         <MudTextField Label="Combat name" Variant="Variant.Outlined" T="string" @bind-Value="_combat.Name"></MudTextField>
         <MudButton OnClick="SaveCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Size="Size.Large">Exit edition</MudButton>
-        <MudButton OnClick="() => _combat.SyncCreatures()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" Title="Synchronize creatures with newest fields" Size="Size.Large">Update creatures</MudButton>
+        <MudButton OnClick="SyncCreatures" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" Title="Synchronize creatures with newest fields" Size="Size.Large">Update creatures</MudButton>
         <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">Delete</MudButton>
     } else
     {
@@ -160,7 +160,7 @@
                             <span>@creature.Name</span>
                         </div>
                         <div class="col col-xs-4">
-                        <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => _combat.UpdateInstanceCount(args, creature)" Label="Instances count" Variant="Variant.Outlined"></MudNumericField>
+                        <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => _combat.UpdateInstanceCount(args, creature)" Label="Instances" Variant="Variant.Outlined"></MudNumericField>
                         </div>
                     </div>
                 }
@@ -299,9 +299,18 @@
         _combat.RemoveCreature(creature);
     }
 
+    private void SyncCreatures()
+    {
+        foreach (DCCreature creature in _combat.CreaturesList.ToList())
+        {
+            RemoveCreature(creature);
+            AddCreature(CombatService.GetCreatureList().Find(x => x.Name == creature.Name));
+        }
+    }
+
     private void UpdateCreatureSearchList(string arg)
     {
-        var tmp = CombatService.GetCreatureList().FindAll(x => x.Name.Contains(arg));
+        var tmp = CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().Contains(arg.ToLower()));
         creatureSearchList = tmp;
     }
 

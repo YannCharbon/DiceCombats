@@ -3,9 +3,11 @@
 @inject DiceCombatsService CombatsService
 
 <div class="page">
-    <div class="sidebar">
+    <!--<div class="sidebar">
         <NavMenu />
-    </div>
+    </div>-->
+    <DCNavMenu />
+
 
     <main>
         <MudThemeProvider IsDarkMode="true" />
@@ -13,7 +15,7 @@
         <MudDialogProvider />
         <MudSnackbarProvider />
 
-        <article class="content px-4" id="mainpagebody">
+        <article class="content px-4" style="padding-top:70px;" id="mainpagebody">
             @Body
         </article>
     </main>

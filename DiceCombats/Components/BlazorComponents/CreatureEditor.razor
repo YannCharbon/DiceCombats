@@ -6,15 +6,12 @@
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
 
-<h3>CreatureEditor</h3>
-
-
 @if (creature == null)
 {
     <p>@(CreatureGuid) does not exist</p>
 } else
 {
-    <MudStack Row="true">
+    <MudStack Row="true" Wrap="Wrap.Wrap">
         <h1>@creature.Name</h1>
         <MudButton OnClick="Save" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" IconColor="Color.Primary" Size="Size.Large">Save</MudButton>
         <MudButton OnClick="Cancel" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Cancel" IconColor="Color.Secondary" Size="Size.Large">Cancel</MudButton>

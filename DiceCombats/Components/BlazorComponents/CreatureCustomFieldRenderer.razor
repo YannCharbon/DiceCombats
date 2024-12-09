@@ -114,7 +114,7 @@
         <div class="d-flex flex-wrap gap-4">
             @foreach (int i in Enumerable.Range(0, dndConditionsField.Labels.Count))
             {
-                <MudStack Row="true" Style=" padding:5px;background-color:#404040;border-radius:5px;">
+                <MudStack Row="true" Style="padding:5px;background-color:#404040;border-radius:5px;">
                     <MudTextField Immediate="true" @bind-Value="dndConditionsField.Labels[i]" Label="Option label" Variant="Variant.Outlined" />
                     <MudCheckBox Label="@dndConditionsField.Labels[i]" @bind-Value="dndConditionsField.SelectedOptions[i]"></MudCheckBox>
                 </MudStack>

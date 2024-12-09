@@ -12,11 +12,13 @@ namespace DiceCombats
     {
         private List<DCCreature> _CreatureList = new List<DCCreature>();
         private List<DCCombat> _CombatsList = new List<DCCombat>();
+        private List<string> _favoriteCombats = new List<string>();
 
         public DiceCombatsService()
         {
             LoadCreatureListAsync();
             LoadCombatsListAsync();
+            LoadFavoriteCombatsListAsync();
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -143,6 +145,66 @@ namespace DiceCombats
                 if (temp != null)
                 {
                     _CombatsList = temp;
+                }
+            }
+        }
+
+        public void AddCombatToFavoriteByGUID(string guid)
+        {
+            if (_favoriteCombats.Contains(guid) == false)
+            {
+                _favoriteCombats.Add(guid);
+                SaveFavoriteCombatsListAsync();
+            }
+        }
+
+        public void RemoveCombatToFavoriteByGUID(string guid)
+        {
+            if (_favoriteCombats.Contains(guid) == true)
+            {
+                _favoriteCombats.Remove(guid);
+                SaveFavoriteCombatsListAsync();
+            }
+        }
+
+        public bool IsCombatFavorite(string guid)
+        {
+            return _favoriteCombats.Contains(guid);
+        }
+
+        public List<string> GetFavoriteCombatsGuids()
+        {
+            return _favoriteCombats;
+        }
+
+        private static string favoriteCombatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "favoritesCombats.json");
+
+        public async Task SaveFavoriteCombatsListAsync()
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+            string json = JsonSerializer.Serialize(_favoriteCombats, options);
+            await File.WriteAllTextAsync(favoriteCombatsFilePath, json);
+            Debug.WriteLine($"Write file to {favoriteCombatsFilePath}");
+        }
+
+        public async Task LoadFavoriteCombatsListAsync()
+        {
+            if (File.Exists(favoriteCombatsFilePath))
+            {
+                Debug.WriteLine("File exists");
+                string json = await File.ReadAllTextAsync(favoriteCombatsFilePath);
+                var options = new JsonSerializerOptions
+                {
+                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+                };
+                var temp = JsonSerializer.Deserialize<List<string>>(json, options);
+                if (temp != null)
+                {
+                    _favoriteCombats = temp;
                 }
             }
         }

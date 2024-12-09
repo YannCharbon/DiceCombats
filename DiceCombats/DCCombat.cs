@@ -8,7 +8,7 @@ namespace DiceCombats
 {
     public class DCCombat
     {
-        public Guid Id { get; private set; } = Guid.Empty;
+        public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; set; } = string.Empty;
         public List<DCCreature> CreaturesList { get; set; } = new List<DCCreature>();
 

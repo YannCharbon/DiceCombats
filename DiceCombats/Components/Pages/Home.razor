@@ -1,9 +1,77 @@
 ﻿@page "/"
 
+@inject NavigationManager Navigation
+@inject DiceCombatsService CombatService
+
+<style>
+    .favorite-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
 <div style="justify-content:center;text-align:center;padding-top:50px">
     <h3>Welcome to DiceCombats !</h3>
     
     <p>This TTRPG tool to help you managing creatures and combats for any type of game system.</p>
 </div>
 
+<div style="justify-content:center;text-align:center;padding-top:50px">
+    <h3>Your favorite combats</h3>
 
+    @if (CombatService.GetCreatureList().Count == 0)
+    {
+        <p>You don't have any creature yet which are required to create your first combat.</p>
+        <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))"
+                    Variant="Variant.Filled"
+                    StartIcon="@Icons.Material.Filled.Add"
+                    Color="@Color.Primary"
+                    Size="Size.Large">
+            Create your first creature or player
+        </MudButton>
+    }
+    else if (CombatService.GetCombatList().Count == 0)
+    {
+        <p>You don't have any combat yet.</p>
+        <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
+                    Variant="Variant.Filled"
+                    StartIcon="@Icons.Material.Filled.Add"
+                    Color="@Color.Primary"
+                    Size="Size.Large">
+            Create your first combat
+        </MudButton>
+    }
+    else if (CombatService.GetFavoriteCombatsGuids().Count == 0)
+    {
+        <p>You don't have any combat added to favorites.</p>
+        <MudButton OnClick="@(() => Navigation.NavigateTo("/combats"))"
+                   Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Color="@Color.Primary"
+                   Size="Size.Large">
+            Select favorite combats
+        </MudButton>
+    } else
+    {
+        <div class="row favorite-container">
+            @foreach (string guid in CombatService.GetFavoriteCombatsGuids())
+            {
+                <div style="border-radius:10px;background-color:#1E867F;padding:5px;margin:5px;width:18rem;">
+                    <h4><a href="/combatmanager/@guid">@CombatService.GetCombatFromGUID(guid)?.Name</a></h4>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InvokeAsync(() => StateHasChanged());
+        }
+    }
+}

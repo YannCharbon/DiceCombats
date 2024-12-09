@@ -1,8 +1,11 @@
-﻿@page "/combatmanager/{combatguidstr}"
+﻿@page "/combatmanager/{combatGuidStr}"
 
-<CombatEditor CombatGuid="@combatGuidStr"></CombatEditor>
+<CombatEditor CombatGuid="@combatGuidStr" EditionMode="@EditonMode"></CombatEditor>
 
 @code {
     [Parameter]
     public string combatGuidStr { get; set; } = "new";
+
+    [SupplyParameterFromQuery] // This binds the query string parameter
+    public bool EditonMode { get; set; } = false;
 }

@@ -1,5 +1,6 @@
 ﻿@inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
@@ -45,7 +46,49 @@
         padding: 5px;
         border-radius: 10px;
     }
+
+
+    .masonry-layout {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem; /* Space between items */
+    }
+
+    .masonry-item {
+        display: block;
+        width: calc(50% - 1rem); /* Adjust width for 3 items per row */
+        margin-bottom: 1rem;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .masonry-item {
+            width: calc(100% - 1rem); /* Adjust for smaller screens */
+        }
+    }
+
+    @@media screen and (max-width: 480px) {
+        .masonry-item {
+            width: 100%; /* Single column for narrow screens */
+        }
+    }
+
 </style>
+
+<script>
+window.initializeMasonry = (selector) => {
+    const grid = document.querySelector(selector);
+    if (grid) {
+        new Masonry(grid, {
+            itemSelector: '.masonry-item',
+            columnWidth: '.masonry-item',
+            percentPosition: true,
+            gutter: 10
+        });
+    }
+};
+</script>
+
+
 
 @if (!EditionMode)
 {
@@ -169,10 +212,10 @@
     </MudGrid>
 } else
 {
-    <MudGrid>
-        @foreach(DCCreature creature in _combat.CreaturesList)
+    <div id="masonry-layout" class="masonry-layout">
+        @foreach (DCCreature creature in _combat.CreaturesList)
         {
-            <MudItem sm="6" Style="padding:10px;">
+            <div class="masonry-item">
                 <div class="CombatEditorCreatureLayout">
                     <div style="padding:10px" id="@creature.Id.ToString()">
                         @if (creature.ImageSheetBas64 != string.Empty)
@@ -200,7 +243,7 @@
                         {
                             <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
                                 <div class="d-flex flex-wrap gap-2">
-                                    @foreach(DCCreatureCustomField field in instanceCustomFields)
+                                    @foreach (DCCreatureCustomField field in instanceCustomFields)
                                     {
                                         <div>
                                             <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
@@ -213,13 +256,14 @@
                         }            
                     </div>
                 </div>
-            </MudItem>
+            </div>
         }
-    </MudGrid>
+    </div>
     <div style="height:250px">
         <!--Some margin-->
     </div>
 }
+
 
 @code {
     [Parameter]
@@ -254,6 +298,14 @@
         }
 
         base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout");
+        }
     }
 
     private void SaveCombat()

@@ -139,15 +139,10 @@ window.initializeMasonry = (selector) => {
         <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">Delete</MudButton>
     } else
     {
-        <MudGrid>
-            <MudItem sm="6" Style="padding:10px;">
-                <h1>@_combat.Name</h1>
-                <MudButton OnClick="() => EditionMode = true" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">Edit</MudButton>
-            </MudItem>
-            <MudItem sm="6" Style="padding:10px;">
-
-            </MudItem>
-        </MudGrid>        
+        <MudStack Row="true">
+            <h1>@_combat.Name</h1>
+            <MudButton OnClick="() => EditionMode = true" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">Edit</MudButton>
+        </MudStack>
     }
 </MudStack>
 
@@ -302,10 +297,7 @@ window.initializeMasonry = (selector) => {
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout");
-        }
+        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout");
     }
 
     private void SaveCombat()
@@ -342,7 +334,7 @@ window.initializeMasonry = (selector) => {
     {
         if (!_combat.CreaturesList.Contains(creature))
         {
-            _combat.AddCreature(creature);
+            _combat.AddCreature((DCCreature)creature.Clone());
         }        
     }
 
@@ -356,7 +348,11 @@ window.initializeMasonry = (selector) => {
         foreach (DCCreature creature in _combat.CreaturesList.ToList())
         {
             RemoveCreature(creature);
-            AddCreature(CombatService.GetCreatureList().Find(x => x.Name == creature.Name));
+            DCCreature? tempCreature = CombatService.GetCreatureList().Find(x => x.Name == creature.Name);
+            if (tempCreature != null)
+            {
+                AddCreature(tempCreature);
+            }
         }
     }
 

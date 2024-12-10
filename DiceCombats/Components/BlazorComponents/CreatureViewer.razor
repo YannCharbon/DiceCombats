@@ -22,7 +22,7 @@
                 <h4>@chr.ToString().ToUpper()</h4>
             </div>
             <div class="row">
-                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr)))
+                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == false))
                 {
                     <div class="col col-md-3 CreatureViewerCreature">
                         <MudStack Row="true">
@@ -52,7 +52,7 @@
                 <h4>@chr.ToString().ToUpper()</h4>
             </div>
             <div class="row">
-                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr)))
+                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == true))
                 {
                     <div class="col col-md-3 CreatureViewerCreature">
                         <MudStack Row="true">

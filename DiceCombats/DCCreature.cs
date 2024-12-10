@@ -10,7 +10,7 @@ using MudBlazor;
 
 namespace DiceCombats
 {
-    public class DCCreature
+    public class DCCreature : ICloneable
     {
         public Guid Id { get; private set; } = Guid.Empty;
         public string Name { get; private set; } = string.Empty;
@@ -43,6 +43,12 @@ namespace DiceCombats
         public string SerializeToJson()
         {
             return JsonSerializer.Serialize(this);
+        }
+
+        public object Clone()
+        {
+            var json = JsonSerializer.Serialize(this);
+            return JsonSerializer.Deserialize<DCCreature>(json)!;
         }
     }
 }

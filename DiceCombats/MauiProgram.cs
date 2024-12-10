@@ -5,12 +5,16 @@ using MudBlazor.Services;
 #if WINDOWS
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
+using WinRT.Interop;
+using System.Runtime.InteropServices;
 #endif
 
 namespace DiceCombats
 {
     public static class MauiProgram
     {
+        public static IServiceProvider ServiceProvider { get; private set; } = default!;
+
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -20,8 +24,6 @@ namespace DiceCombats
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 })
-
-                // Add maximize window on startup
                 .ConfigureLifecycleEvents(events =>
                 {
 #if WINDOWS
@@ -29,14 +31,44 @@ namespace DiceCombats
                     {
                         w.OnWindowCreated(window =>
                         {
-                            window.ExtendsContentIntoTitleBar = true; //If you need to completely hide the minimized maximized close button, you need to set this value to false.
+                            // Extend the title bar
+                            window.ExtendsContentIntoTitleBar = true;
                             IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
                             WindowId myWndId = Win32Interop.GetWindowIdFromWindow(hWnd);
                             var _appWindow = AppWindow.GetFromWindowId(myWndId);
                             _appWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
-                            if(_appWindow.Presenter is OverlappedPresenter p)
+
+                            // Maximize the window on creation
+                            if (_appWindow.Presenter is OverlappedPresenter p)
                             {
                                 p.Maximize();
+                            }
+
+                            // Attach to the Closing event and use the service provider
+                            _appWindow.Closing += (s, e) =>
+                            {
+                                var diceService = ServiceProvider.GetRequiredService<DiceCombatsService>();
+                                if (diceService != null)
+                                {
+                                    diceService.SaveCreatures();
+                                    diceService.SaveCombats();
+                                }
+                            };
+                        });
+                    });
+#endif
+
+#if ANDROID
+                    events.AddAndroid(android =>
+                    {
+                        android.OnPause(activity =>
+                        {
+                            // Use the root service provider
+                            var diceService = ServiceProvider.GetRequiredService<DiceCombatsService>();
+                            if (diceService != null)
+                            {
+                                diceService.SaveCreatures();
+                                diceService.SaveCombats();
                             }
                         });
                     });
@@ -46,16 +78,16 @@ namespace DiceCombats
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
 
-            // MudBlazor
             builder.Services.AddMudServices();
-
             builder.Services.AddSingleton<DiceCombatsService>();
 
-            return builder.Build();
+            var app = builder.Build();
+            ServiceProvider = app.Services; // Assign the root service provider
+            return app;
         }
     }
 }

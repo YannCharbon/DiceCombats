@@ -93,6 +93,8 @@ namespace DiceCombats
             builder.Services.AddSingleton<IFileHandler, FileHandler>();
 #endif
 
+            builder.Services.AddScoped<PopupNotificationService>();
+
             var app = builder.Build();
             ServiceProvider = app.Services; // Assign the root service provider
             return app;

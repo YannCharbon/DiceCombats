@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @inject DiceCombatsService CombatService
 @inject IFileHandler FileHandler
+@inject PopupNotificationService PopupNotificationService
 
 <style>
     .CombatsCombatLink {
@@ -101,6 +102,8 @@
         var data = System.Text.Encoding.UTF8.GetBytes(json);
 
         await FileHandler.SaveFileAsync(fileName, data);
+
+        PopupNotificationService.Show("Combat export", $"Successfully exported '{combat.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
     }
 
     private async Task ExportAllCombats()
@@ -116,6 +119,8 @@
         var data = System.Text.Encoding.UTF8.GetBytes(json);
 
         await FileHandler.SaveFileAsync(fileName, data);
+
+        PopupNotificationService.Show("Combat export", "Successfully exported all combats", PopupNotificationService.Type.SUCCESS, 3000);
     }
 
     private async Task ImportCombats()
@@ -145,6 +150,7 @@
                                 Debug.WriteLine($"Add '{creature.Name}' creature");
                             }
                         }
+                        PopupNotificationService.Show("Combat import", $"Successfully imported '{newCombat.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
                     }
                     else
                     {
@@ -177,6 +183,7 @@
                                         Debug.WriteLine($"Add '{creature.Name}' creature");
                                     }
                                 }
+                                PopupNotificationService.Show("Combat import", "Successfully imported multiple combats", PopupNotificationService.Type.SUCCESS, 3000);
                             }
                             else
                             {
@@ -189,12 +196,14 @@
                 {
                     Debug.WriteLine(ex1.Message);
                     Debug.WriteLine("File does not contain any valid combat.");
+                    PopupNotificationService.Show("Combat import", "File does not contain any valid combat", PopupNotificationService.Type.FAILURE, 4000);
                 }
             }
         }
         else
         {
             Debug.WriteLine("File does not contain any data.");
+            PopupNotificationService.Show("Combat import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
         }
     }
 }

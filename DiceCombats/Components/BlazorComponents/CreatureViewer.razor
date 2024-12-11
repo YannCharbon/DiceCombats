@@ -2,6 +2,7 @@
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
 @inject IFileHandler FileHandler
+@inject PopupNotificationService PopupNotificationService
 
 <style>
     .CreatureViewerCreature {
@@ -101,6 +102,8 @@
         var data = System.Text.Encoding.UTF8.GetBytes(json);
 
         await FileHandler.SaveFileAsync(fileName, data);
+
+        PopupNotificationService.Show("Creature export", $"Successfully exported '{creature.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
     }
 
     private async Task ExportAllCreatures()
@@ -116,6 +119,8 @@
         var data = System.Text.Encoding.UTF8.GetBytes(json);
 
         await FileHandler.SaveFileAsync(fileName, data);
+
+        PopupNotificationService.Show("Creature export", "Successfully exported all creatures", PopupNotificationService.Type.SUCCESS, 3000);
     }
 
     private async Task ImportCreatures()
@@ -141,6 +146,7 @@
                     {
                         Debug.WriteLine($"The creature '{newCreature.Name}' already exists.");
                     }
+                    PopupNotificationService.Show("Creature import", $"Successfully imported {newCreature.Name}", PopupNotificationService.Type.SUCCESS, 3000);
                 }
             } catch
             {
@@ -164,16 +170,19 @@
                                 Debug.WriteLine($"The creature '{creature.Name}' already exists.");
                             }
                         }
+                        PopupNotificationService.Show("Creature import", "Successfully imported multiple creatures", PopupNotificationService.Type.SUCCESS, 3000);
                     }
                 } catch
                 {
                     Debug.WriteLine("File does not contain any valid creature.");
+                    PopupNotificationService.Show("Creature import", "File does not contain any valid creature", PopupNotificationService.Type.FAILURE, 4000);
                 }
             }
         }
         else
         {
             Debug.WriteLine("File does not contain any data.");
+            PopupNotificationService.Show("Creature import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
         }
     }
 }

@@ -24,7 +24,27 @@ namespace DiceCombats
 
             var chooser = Intent.CreateChooser(intent, "Share File");
             chooser.SetFlags(ActivityFlags.NewTask);
-            context.StartActivity(chooser);
+
+            var activity = MainActivity.Instance;
+            if (activity == null)
+                throw new InvalidOperationException("Current activity is not available.");
+
+            var taskCompletionSource = new TaskCompletionSource<bool>();
+
+            MainActivity.ActivityResult += OnActivityResult;
+
+            activity.StartActivityForResult(chooser, 2000);
+
+            await taskCompletionSource.Task;
+
+            void OnActivityResult(int requestCode, Result resultCode, Intent data)
+            {
+                if (requestCode == 2000)
+                {
+                    MainActivity.ActivityResult -= OnActivityResult;
+                    taskCompletionSource.SetResult(resultCode == Result.Ok);
+                }
+            }
         }
 
         public async Task<byte[]> LoadFileAsync()
@@ -34,40 +54,40 @@ namespace DiceCombats
             intent.AddCategory(Intent.CategoryOpenable);
 
             var activity = MainActivity.Instance;
-
             if (activity == null)
                 throw new InvalidOperationException("Current activity is not available.");
 
             var taskCompletionSource = new TaskCompletionSource<byte[]>();
 
-            MainActivity.ActivityResult += (requestCode, resultCode, data) =>
-            {
-                if (requestCode == 1000 && resultCode == Result.Ok)
-                {
-                    var uri = data?.Data;
-                    if (uri != null)
-                    {
-                        var stream = activity.ContentResolver.OpenInputStream(uri);
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            stream.CopyTo(memoryStream);
-                            taskCompletionSource.TrySetResult(memoryStream.ToArray());
-                        }
-                    }
-                    else
-                    {
-                        taskCompletionSource.TrySetResult(null);
-                    }
-                }
-                else
-                {
-                    taskCompletionSource.TrySetResult(null);
-                }
-            };
+            MainActivity.ActivityResult += OnActivityResult;
 
             activity.StartActivityForResult(intent, 1000);
 
             return await taskCompletionSource.Task;
+
+            void OnActivityResult(int requestCode, Result resultCode, Intent data)
+            {
+                if (requestCode == 1000)
+                {
+                    MainActivity.ActivityResult -= OnActivityResult;
+
+                    if (resultCode == Result.Ok && data?.Data != null)
+                    {
+                        var uri = data.Data;
+                        var stream = activity.ContentResolver.OpenInputStream(uri);
+
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            stream.CopyTo(memoryStream);
+                            taskCompletionSource.SetResult(memoryStream.ToArray());
+                        }
+                    }
+                    else
+                    {
+                        taskCompletionSource.SetResult(null);
+                    }
+                }
+            }
         }
     }
 }

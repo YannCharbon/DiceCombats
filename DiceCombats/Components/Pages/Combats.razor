@@ -1,6 +1,8 @@
 ﻿@page "/combats"
+@using System.Text.Json
 @inject NavigationManager Navigation
 @inject DiceCombatsService CombatService
+@inject IFileHandler FileHandler
 
 <style>
     .CombatsCombatLink {
@@ -22,6 +24,22 @@
                    Color="@Color.Primary"
                    Size="Size.Large">
             New combat
+        </MudButton>
+        <MudButton OnClick="@(() => ExportAllCombats())"
+                   Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Upload"
+                   Color="@Color.Primary"
+                   Size="Size.Large"
+                   title="Export all combats">
+            Export combats
+        </MudButton>
+        <MudButton OnClick="@(() => ImportCombats())"
+                   Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Download"
+                   Color="@Color.Primary"
+                   Size="Size.Large"
+                   title="Import one or multiple combats">
+            Import combats
         </MudButton>
     </MudStack>
 </div>
@@ -49,8 +67,9 @@
                                 }
                                 @if (_showEditionButtons)
                                 {
-                                    <MudIconButton OnClick="() => Edit(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large"></MudIconButton>
-                                    <MudIconButton OnClick="() => CombatService.DeleteCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large"></MudIconButton>
+                                    <MudIconButton OnClick="() => Edit(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
+                                    <MudIconButton OnClick="() => ExportCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
+                                    <MudIconButton OnClick="() => CombatService.DeleteCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
                                 }
                         </MudStack>
                     </div>
@@ -67,5 +86,115 @@
     private void Edit(DCCombat combat)
     {
         Navigation.NavigateTo($"/combatmanager/{combat.Id.ToString()}?EditonMode=true");
+    }
+
+    private async Task ExportCombat(DCCombat combat)
+    {
+        var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+        string json = JsonSerializer.Serialize(combat, options);
+
+        var fileName = $"DC_combat_{combat.Name}.json";
+        var data = System.Text.Encoding.UTF8.GetBytes(json);
+
+        await FileHandler.SaveFileAsync(fileName, data);
+    }
+
+    private async Task ExportAllCombats()
+    {
+        var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+        string json = JsonSerializer.Serialize(CombatService.GetCombatList(), options);
+
+        var fileName = $"DC_all_combats.json";
+        var data = System.Text.Encoding.UTF8.GetBytes(json);
+
+        await FileHandler.SaveFileAsync(fileName, data);
+    }
+
+    private async Task ImportCombats()
+    {
+        var fileData = await FileHandler.LoadFileAsync();
+        if (fileData != null)
+        {
+            string json = System.Text.Encoding.UTF8.GetString(fileData);
+            var options = new JsonSerializerOptions
+                {
+                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+                };
+            try
+            {
+                var newCombat = JsonSerializer.Deserialize<DCCombat>(json, options);
+                if (newCombat != null)
+                {
+                    if (CombatService.GetCombatFromGUID(newCombat.Id.ToString()) == null)
+                    {
+                        CombatService.AddCombat(newCombat);
+                        Debug.WriteLine($"Added new combat '{newCombat.Name}'");
+                        foreach (DCCreature creature in newCombat.CreaturesList)
+                        {
+                            if (CombatService.GetCreatureFromGUID(creature.Id.ToString()) == null)
+                            {
+                                CombatService.AddCreature(creature);
+                                Debug.WriteLine($"Add '{creature.Name}' creature");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"The combat '{newCombat.Name}' already exists.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                try
+                {
+                    Debug.WriteLine("File does not contain a single creature. Trying a Creature list.");
+
+                    var newCombatList = JsonSerializer.Deserialize<List<DCCombat>>(json, options);
+
+                    if (newCombatList != null)
+                    {
+                        foreach (DCCombat combat in newCombatList)
+                        {
+                            if (CombatService.GetCombatFromGUID(combat.Id.ToString()) == null)
+                            {
+                                CombatService.AddCombat(combat);
+                                Debug.WriteLine($"Added new combat '{combat.Name}'");
+                                foreach (DCCreature creature in combat.CreaturesList)
+                                {
+                                    if (CombatService.GetCreatureFromGUID(creature.Id.ToString()) == null)
+                                    {
+                                        CombatService.AddCreature(creature);
+                                        Debug.WriteLine($"Add '{creature.Name}' creature");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Debug.WriteLine($"The combat '{combat.Name}' already exists.");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex1)
+                {
+                    Debug.WriteLine(ex1.Message);
+                    Debug.WriteLine("File does not contain any valid combat.");
+                }
+            }
+        }
+        else
+        {
+            Debug.WriteLine("File does not contain any data.");
+        }
     }
 }

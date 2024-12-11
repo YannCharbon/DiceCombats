@@ -12,7 +12,7 @@ namespace DiceCombats
 {
     public class DCCreature : ICloneable
     {
-        public Guid Id { get; private set; } = Guid.Empty;
+        public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; private set; } = string.Empty;
 
         [JsonInclude]

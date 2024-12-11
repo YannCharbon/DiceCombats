@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Diagnostics;
+using static MudBlazor.FilterOperator;
 
 namespace DiceCombats
 {
@@ -174,6 +175,12 @@ namespace DiceCombats
 
         public List<string> GetFavoriteCombatsGuids()
         {
+            foreach (var guid in _favoriteCombats.ToArray())
+            if (GetCombatFromGUID(guid) == null)
+            {
+                // Update the list if anything has changed
+                RemoveCombatToFavoriteByGUID(guid);
+            }
             return _favoriteCombats;
         }
 

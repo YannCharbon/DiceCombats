@@ -52,6 +52,7 @@ namespace DiceCombats
                                 {
                                     diceService.SaveCreatures();
                                     diceService.SaveCombats();
+                                    diceService.SaveFavoriteCombatsListAsync();
                                 }
                             };
                         });
@@ -69,6 +70,7 @@ namespace DiceCombats
                             {
                                 diceService.SaveCreatures();
                                 diceService.SaveCombats();
+                                diceService.SaveFavoriteCombatsListAsync();
                             }
                         });
                     });
@@ -84,6 +86,12 @@ namespace DiceCombats
 
             builder.Services.AddMudServices();
             builder.Services.AddSingleton<DiceCombatsService>();
+
+#if ANDROID
+            builder.Services.AddSingleton<IFileHandler, FileHandler>();
+#elif WINDOWS
+            builder.Services.AddSingleton<IFileHandler, FileHandler>();
+#endif
 
             var app = builder.Build();
             ServiceProvider = app.Services; // Assign the root service provider

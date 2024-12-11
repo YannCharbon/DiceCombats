@@ -1,5 +1,7 @@
-﻿@inject DiceCombatsService CombatService
+﻿@using System.Text.Json
+@inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
+@inject IFileHandler FileHandler
 
 <style>
     .CreatureViewerCreature {
@@ -9,6 +11,14 @@
         background-color:#303030;
     }
 </style>
+
+<div style="padding-bottom:20px;">
+    <MudStack Row="true">
+        <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">New creature</MudButton>
+        <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large">Export creatures</MudButton>
+        <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Large">Import one or multiple creatures</MudButton>
+    </MudStack>
+</div>
 
 <div style="margin-bottom:20px;">
     <h3><span style="padding:5px;border-radius:10px;background-color:#1E867F">Creatures</span></h3>
@@ -28,8 +38,9 @@
                         <MudStack Row="true">
                                 <h4>@creature.Name</h4>
                                 <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
-                                    <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large"></MudIconButton>
-                                    <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large"></MudIconButton>
+                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
+                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
+                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
                                 </MudButtonGroup>
                         </MudStack>
                     </div>
@@ -58,8 +69,9 @@
                         <MudStack Row="true">
                             <h4>@creature.Name</h4>
                             <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
-                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large"></MudIconButton>
-                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large"></MudIconButton>
+                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
+                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
+                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
                             </MudButtonGroup>
                         </MudStack>
                     </div>
@@ -74,5 +86,94 @@
     private void Edit(DCCreature creature)
     {
         Navigation.NavigateTo($"/creatureedit/{creature.Id.ToString()}");
+    }
+
+    private async Task ExportCreature(DCCreature creature)
+    {
+        var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+        string json = JsonSerializer.Serialize(creature, options);
+
+        var fileName = $"DC_creature_{creature.Name}.json";
+        var data = System.Text.Encoding.UTF8.GetBytes(json);
+
+        await FileHandler.SaveFileAsync(fileName, data);
+    }
+
+    private async Task ExportAllCreatures()
+    {
+        var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+        string json = JsonSerializer.Serialize(CombatService.GetCreatureList(), options);
+
+        var fileName = $"DC_all_creatures.json";
+        var data = System.Text.Encoding.UTF8.GetBytes(json);
+
+        await FileHandler.SaveFileAsync(fileName, data);
+    }
+
+    private async Task ImportCreatures()
+    {
+        var fileData = await FileHandler.LoadFileAsync();
+        if (fileData != null)
+        {
+            string json = System.Text.Encoding.UTF8.GetString(fileData);
+            var options = new JsonSerializerOptions
+            {
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+            try {
+                var newCreature = JsonSerializer.Deserialize<DCCreature>(json, options);
+                if (newCreature != null)
+                {
+                    if (CombatService.GetCreatureFromGUID(newCreature.Id.ToString()) == null)
+                    {
+                        CombatService.AddCreature(newCreature);
+                        Debug.WriteLine($"Added new creature '{newCreature.Name}'");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"The creature '{newCreature.Name}' already exists.");
+                    }
+                }
+            } catch
+            {
+                try
+                {
+                    Debug.WriteLine("File does not contain a single creature. Trying a Creature list.");
+
+                    var newCreatureList = JsonSerializer.Deserialize<List<DCCreature>>(json, options);
+
+                    if (newCreatureList != null)
+                    {
+                        foreach (DCCreature creature in newCreatureList)
+                        {
+                            if (CombatService.GetCreatureFromGUID(creature.Id.ToString()) == null)
+                            {
+                                CombatService.AddCreature(creature);
+                                Debug.WriteLine($"Added new creature '{creature.Name}'");
+                            }
+                            else
+                            {
+                                Debug.WriteLine($"The creature '{creature.Name}' already exists.");
+                            }
+                        }
+                    }
+                } catch
+                {
+                    Debug.WriteLine("File does not contain any valid creature.");
+                }
+            }
+        }
+        else
+        {
+            Debug.WriteLine("File does not contain any data.");
+        }
     }
 }

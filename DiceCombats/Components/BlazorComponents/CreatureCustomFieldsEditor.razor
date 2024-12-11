@@ -1,6 +1,7 @@
 ﻿@using DiceCombats
 @using System.Collections.Generic
 @using Microsoft.AspNetCore.Components
+@inject DiceCombatsService CombatService
 
 @inject IJSRuntime JS
 
@@ -47,7 +48,11 @@
                             <MudSelectItem T="string" Value="@("CheckboxGrid")" />
                             <MudSelectItem T="string" Value="@("Text")" />
                             <MudSelectItem T="string" Value="@("Color")" />
-                            <MudSelectItem T="string" Value="@("DnD conditions")" />
+                            <MudSelectItem T="string" Value="@("DnD conditions")"></MudSelectItem>
+                            @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
+                            {
+                                <MudSelectItem T="string" Value="@(customField.Title)"><MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)</MudSelectItem>
+                            }
                         </MudSelect>
                     </MudItem>
                     <MudItem>
@@ -71,34 +76,37 @@
 
     private void AddField()
     {
-        DCCreatureCustomField newField;
+        DCCreatureCustomField? newField = null;
         switch (newFieldType)
         {
             case "HitPoints":
                 newField = new DCCreatureHitPointsField { Title = "Hit points" };
                 break;
             case "Numeric":
-                newField = new DCCreatureNumericField { Title = "New Numeric Field" };
+                newField = new DCCreatureNumericField { Title = "Numeric Field" };
                 break;
             case "Checkbox":
-                newField = new DCCreatureCheckboxField { Title = "New Checkbox Field" };
+                newField = new DCCreatureCheckboxField { Title = "Checkbox Field" };
                 break;
             case "CheckboxGrid":
-                newField = new DCCreatureCheckboxGridField { Title = "New Checkbox Grid Field" };
+                newField = new DCCreatureCheckboxGridField { Title = "Checkbox Grid Field" };
                 break;
             case "Text":
-                newField = new DCCreatureTextField { Title = "New Text Field" };
+                newField = new DCCreatureTextField { Title = "Text Field" };
                 break;
             case "Color":
-                newField = new DCCreatureColorField { Title = "New Color Field" };
+                newField = new DCCreatureColorField { Title = "Color Field" };
                 break;
             case "DnD conditions":
-                newField = new DCCreatureDnDConditionsField { Title = "New DnDConditions Field" };
+                newField = new DCCreatureDnDConditionsField { Title = "Conditions" };
                 break;
             default:
-                throw new InvalidOperationException("Unknown field type");
+                newField = CombatService.GetUserCreatureCustomFieldByName(newFieldType)?.Clone();
+                break;
         }
-        Fields.Add(newField);
+        if (newField != null) {
+            Fields.Add(newField);
+        }
     }
 
     private void RemoveField(DCCreatureCustomField field)

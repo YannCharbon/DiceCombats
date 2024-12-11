@@ -14,12 +14,14 @@ namespace DiceCombats
         private List<DCCreature> _CreatureList = new List<DCCreature>();
         private List<DCCombat> _CombatsList = new List<DCCombat>();
         private List<string> _favoriteCombats = new List<string>();
+        private List<DCCreatureCustomField> _userCreatureCustomFields = new List<DCCreatureCustomField>();
 
         public DiceCombatsService()
         {
             LoadCreatureListAsync();
             LoadCombatsListAsync();
             LoadFavoriteCombatsListAsync();
+            LoadUserCreatureCustomFieldsListAsync();
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -212,6 +214,68 @@ namespace DiceCombats
                 if (temp != null)
                 {
                     _favoriteCombats = temp;
+                }
+            }
+        }
+
+        public bool AddUserCreatureCustomField(DCCreatureCustomField customField)
+        {
+            var field = GetUserCreatureCustomFieldByName(customField.Title);
+            if (field == null)
+            {
+                _userCreatureCustomFields.Add(customField);
+                return true;
+            }
+            return false;
+        }
+
+        public void RemoveUserCreatureCustomFieldByName(string customFieldName)
+        {
+            var field = GetUserCreatureCustomFieldByName(customFieldName);
+            if (field != null)
+            {
+                _userCreatureCustomFields.Remove(field);
+            }
+        }
+
+        public List<DCCreatureCustomField> GetUserCreatureCustomFields()
+        {
+            return _userCreatureCustomFields;
+        }
+
+        public DCCreatureCustomField? GetUserCreatureCustomFieldByName(string fieldName)
+        {
+            return _userCreatureCustomFields.Find(x => x.Title == fieldName);
+        }
+
+        private static string userCreatureCustomFieldsFilePath = Path.Combine(FileSystem.AppDataDirectory, "userCreatureCustomFields.json");
+
+        public async Task SaveUserCreatureCustomFieldsListAsync()
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+            string json = JsonSerializer.Serialize(_userCreatureCustomFields, options);
+            await File.WriteAllTextAsync(userCreatureCustomFieldsFilePath, json);
+            Debug.WriteLine($"Write file to {userCreatureCustomFieldsFilePath}");
+        }
+
+        public async Task LoadUserCreatureCustomFieldsListAsync()
+        {
+            if (File.Exists(userCreatureCustomFieldsFilePath))
+            {
+                Debug.WriteLine("File exists");
+                string json = await File.ReadAllTextAsync(userCreatureCustomFieldsFilePath);
+                var options = new JsonSerializerOptions
+                {
+                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+                };
+                var temp = JsonSerializer.Deserialize<List<DCCreatureCustomField>>(json, options);
+                if (temp != null)
+                {
+                    _userCreatureCustomFields = temp;
                 }
             }
         }

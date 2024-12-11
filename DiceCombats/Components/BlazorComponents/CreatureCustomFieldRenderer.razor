@@ -1,5 +1,6 @@
 ﻿@using DiceCombats
 @using MudBlazor.Utilities
+@inject DiceCombatsService CombatService
 
 <style>
     .CreatureCustomFieldRendererFieldTitle {
@@ -18,8 +19,14 @@
         <MudItem sm="4">
             <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
         </MudItem>
-        <MudItem sm="4">
-            <MudCheckBox Label="Field is shared between all instances of this creature" Variant="Variant.Outlined" @bind-Value="Field.SharedAcrossCreatureInstances" />
+        <MudItem sm="7">
+            @if (CombatService.GetUserCreatureCustomFieldByName(Field.Title) == null)
+            {
+                <MudButton OnClick="@(() => CombatService.AddUserCreatureCustomField(Field))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">Add to custom fields</MudButton>
+            } else
+            {
+                <MudButton OnClick="@(() => CombatService.RemoveUserCreatureCustomFieldByName(Field.Title))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonRemove" Color="@Color.Error" Size="Size.Large">Remove from custom fields</MudButton>
+            }
         </MudItem>
     </MudGrid>
 

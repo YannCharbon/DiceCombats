@@ -46,6 +46,7 @@
     {
         <MudStack Row="true" style="padding-top:5px;padding-bottom:5px;">
             <MudButton OnClick="@(() => checkBoxField.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">Add option</MudButton>
+            <MudCheckBox T="bool" @bind-Value="checkBoxField.ShowTextFields" Label="Show text fields"></MudCheckBox>
         </MudStack>
         <div class="d-flex flex-wrap gap-4">
             @foreach (int i in Enumerable.Range(0, checkBoxField.Labels.Count))
@@ -53,6 +54,10 @@
                 <MudStack Row="true" Style=" padding:5px;background-color:#404040;border-radius:5px;">
                     <MudTextField Immediate="true" @bind-Value="checkBoxField.Labels[i]" Label="Option label" Variant="Variant.Outlined" />
                     <MudCheckBox Label="@checkBoxField.Labels[i]" @bind-Value="checkBoxField.SelectedOptions[i]"></MudCheckBox>
+                    @if (checkBoxField.ShowTextFields == true)
+                    {
+                        <MudTextField Immediate="true" @bind-Value="checkBoxField.TextFieldsLabels[i]" Label="Option text field label" Variant="Variant.Outlined" />
+                    }
                     <MudButton OnClick="@(() => checkBoxField.RemoveOption(checkBoxField.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
                 </MudStack>
             }
@@ -152,6 +157,10 @@ else
             @foreach (int i in Enumerable.Range(0, checkBoxField.Labels.Count))
             {
                 <MudCheckBox Label="@checkBoxField.Labels[i]" @bind-Value="checkBoxField.SelectedOptions[i]"></MudCheckBox>
+                @if (checkBoxField.ShowTextFields == true)
+                {
+                    <MudTextField AutoGrow @bind-Value="checkBoxField.TextFields[i]" Label="@checkBoxField.TextFieldsLabels[i]" Variant="Variant.Outlined" />
+                }
             }
         </MudStack>
     }

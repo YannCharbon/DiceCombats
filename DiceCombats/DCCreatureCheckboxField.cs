@@ -5,9 +5,12 @@ namespace DiceCombats
     public class DCCreatureCheckboxField : DCCreatureCustomField
     {
         public override string FieldType => "Checkbox";
-        public override string Discriminator => nameof(DCCreatureCheckboxField);        
+        public override string Discriminator => nameof(DCCreatureCheckboxField);
         public List<string> Labels { get; set; } = new List<string>(new string[1]);
         public List<bool> SelectedOptions { get; set; } = new List<bool>(new bool[1]);
+        public List<string> TextFields { get; set; } = new List<string>(new string[1]);
+        public List<string> TextFieldsLabels { get; set; } = new List<string>(new string[1]);
+        public bool ShowTextFields { get; set; } = false;
 
         public override object GetValue()
         {
@@ -21,6 +24,9 @@ namespace DiceCombats
                 Title = this.Title,
                 SelectedOptions = this.SelectedOptions,
                 Labels = this.Labels,
+                TextFieldsLabels = this.TextFieldsLabels,
+                TextFields = this.TextFields,
+                ShowTextFields = this.ShowTextFields,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }
@@ -29,6 +35,8 @@ namespace DiceCombats
         {
             Labels.Add("New option");
             SelectedOptions.Add(false);
+            TextFields.Add("");
+            TextFieldsLabels.Add("");
         }
 
         public void RemoveOption(string label)
@@ -38,6 +46,8 @@ namespace DiceCombats
             {
                 Labels.RemoveAt(idx);
                 SelectedOptions.RemoveAt(idx);
+                TextFields.RemoveAt(idx);
+                TextFieldsLabels.RemoveAt(idx);
             }
         }
     }

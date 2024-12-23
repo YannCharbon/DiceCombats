@@ -7,16 +7,23 @@
         position: fixed;
         bottom: 50px;
         right: 10px;
-        width: 350px;
+        width: 450px;
         background-color: #303030;
         border: 1px solid #505050;
         border-radius:10px;
         box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
         padding: 10px;
         z-index: 1000;
-        max-height: 350px;
+        max-height: 450px;
         overflow-y: scroll;
         overflow-x: hidden;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .CombatEditorFloatingInitiativeWindow {
+            width: calc(100% - 1rem);
+            max-height: 350px;
+        }
     }
 
     .CombatEditorCreatureBox {
@@ -94,9 +101,11 @@ window.initializeMasonry = (selector) => {
 {
     <div class="CombatEditorFloatingInitiativeWindow">
         <MudGrid Style="padding:10px;">
-            <MudItem sm="10"><h3>Initiative</h3></MudItem>
+            <MudItem><h3>Initiative</h3></MudItem>
             @if (_initiativeWindowsMaximized)
             {
+                <MudItem><MudIcon @onclick="SortCreaturesInitiativeRankByRoll" Icon="@Icons.Material.Filled.Sort" Title="Sort" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
+                <MudItem><MudIcon @onclick="CreaturesInitiativeReset" Icon="@Icons.Material.Filled.Sync" Title="Reset" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
                 <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Reduce" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
             }
             else
@@ -114,13 +123,13 @@ window.initializeMasonry = (selector) => {
                     <th>Order</th>
                     <th>Quick link</th>
                 </tr>
-                @foreach (DCCreature creature in _combat.CreaturesList)
+                @foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
                 {
                     <tr style="border-bottom:solid; border-bottom-width:1px;">
-                        <td style="padding:5px;">@creature.Name</td>
-                        <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:#A0A0A0;"></MudNumericField></td>
-                        <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:white;font-weight:bold;font-size:16pt"></MudNumericField></td>
-                        <td style="width:100px;padding:5px;">
+                        <td style="width:240px;padding:5px;">@creature.Name</td>
+                        <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:#A0A0A0;" @bind-Value="creature.InitiativeRoll"></MudNumericField></td>
+                        <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:white;font-weight:bold;font-size:16pt" @bind-Value="creature.InitiativeRank"></MudNumericField></td>
+                        <td style="width:120px;padding:5px;">
                             <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:darkcyan;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">Quick jump</a>
                         </td>
                     </tr>
@@ -254,7 +263,7 @@ window.initializeMasonry = (selector) => {
             </div>
         }
     </div>
-    <div style="height:250px">
+    <div style="height:450px">
         <!--Some margin-->
     </div>
 }
@@ -267,6 +276,8 @@ window.initializeMasonry = (selector) => {
     public bool EditionMode { get; set; } = false;
 
     private DCCombat _combat = new DCCombat("New combat");
+
+    private List<DCCreature> _initiativeWindowCreatureListCopy = new List<DCCreature>();
 
     private List<DCCreature> creatureSearchList = new List<DCCreature>();
 
@@ -292,6 +303,10 @@ window.initializeMasonry = (selector) => {
             EditionMode = true;
         }
 
+        _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
+
+        SortCreaturesInitiativeRankByRoll();
+
         base.OnInitialized();
     }
 
@@ -312,6 +327,8 @@ window.initializeMasonry = (selector) => {
         CombatService.AddCombat(_combat);
 
         CombatService.SaveCombats();
+
+        _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
 
         EditionMode = false;
     }
@@ -335,12 +352,16 @@ window.initializeMasonry = (selector) => {
         if (!_combat.CreaturesList.Contains(creature))
         {
             _combat.AddCreature((DCCreature)creature.Clone());
-        }        
+        }
+
+        _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
     }
 
     private void RemoveCreature(DCCreature creature)
     {
         _combat.RemoveCreature(creature);
+
+        _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
     }
 
     private void SyncCreatures()
@@ -354,6 +375,7 @@ window.initializeMasonry = (selector) => {
                 AddCreature(tempCreature);
             }
         }
+        _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
     }
 
     private void UpdateCreatureSearchList(string arg)
@@ -365,6 +387,33 @@ window.initializeMasonry = (selector) => {
     private void OnCustomFieldChanged()
     {
         StateHasChanged();
+    }
+
+    private void SortCreaturesInitiativeRankByRoll()
+    {
+        _initiativeWindowCreatureListCopy = _initiativeWindowCreatureListCopy.OrderByDescending(x => x.InitiativeRoll).ToList();
+
+        int lastRoll = _initiativeWindowCreatureListCopy[0].InitiativeRoll;
+        int currentRank = 1;
+
+        for (int i = 0; i < _initiativeWindowCreatureListCopy.Count(); i++)
+        {
+            if (_initiativeWindowCreatureListCopy[i].InitiativeRoll < lastRoll)
+            {
+                currentRank++;
+            }
+            _initiativeWindowCreatureListCopy[i].InitiativeRank = currentRank;
+            lastRoll = _initiativeWindowCreatureListCopy[i].InitiativeRoll;
+        }
+    }
+
+    private void CreaturesInitiativeReset()
+    {
+        foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
+        {
+            creature.InitiativeRoll = 0;
+            creature.InitiativeRank = 0;
+        }
     }
 
 }

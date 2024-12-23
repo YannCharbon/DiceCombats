@@ -23,6 +23,8 @@ namespace DiceCombats
         public List<DCCreatureCustomField> CustomFields { get; set; } = new List<DCCreatureCustomField>();
         public uint InCombatInstanceCount { get; set; } = 1;
         public bool IsPlayer { get; set; } = false;
+        public int InitiativeRank { get; set; } = 0;
+        public int InitiativeRoll { get; set; } = 0;
 
         public DCCreature(string name)
         {

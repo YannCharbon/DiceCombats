@@ -49,6 +49,7 @@
                             <MudSelectItem T="string" Value="@("Text")" />
                             <MudSelectItem T="string" Value="@("Color")" />
                             <MudSelectItem T="string" Value="@("DnD conditions")"></MudSelectItem>
+                            <MudSelectItem T="string" Value="@("Stats")"></MudSelectItem>
                             @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
                             {
                                 <MudSelectItem T="string" Value="@(customField.Title)"><MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)</MudSelectItem>
@@ -99,6 +100,9 @@
                 break;
             case "DnD conditions":
                 newField = new DCCreatureDnDConditionsField { Title = "Conditions" };
+                break;
+            case "Stats":
+                newField = new DCCreatureStatsField { Title = "Stats" };
                 break;
             default:
                 newField = CombatService.GetUserCreatureCustomFieldByName(newFieldType)?.Clone();

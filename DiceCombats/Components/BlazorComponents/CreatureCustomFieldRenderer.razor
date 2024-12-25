@@ -145,6 +145,20 @@
             }
         </div>
     }
+    else if (Field is DCCreatureStatsField statsField)
+    {
+        <MudNumericField @bind-Value="statsField.Count" Label="Stats count" Variant="Variant.Outlined" />
+        <MudCheckBox Label="Keep values editable" @bind-Value="statsField.ValuesAreEditable"></MudCheckBox>
+        <MudStack Row="true">
+            @foreach (int i in Enumerable.Range(0, statsField.Count))
+            {
+                <MudStack Row="false">
+                    <MudTextField Immediate="true" @bind-Value="statsField.StatsLabels[i]" Label="Stat label" Variant="Variant.Outlined" />
+                    <MudNumericField @bind-Value="statsField.StatsValues[i]" Label="@statsField.StatsLabels[i]" Variant="Variant.Outlined" />
+                </MudStack>
+            }
+        </MudStack>
+    }
 }
 else
 {
@@ -262,6 +276,24 @@ else
                         </MudItem>
                     }
                 }
+            }
+        </MudStack>
+    }
+    else if (Field is DCCreatureStatsField statsField)
+    {
+        <MudStack Row="true">
+            @foreach (int i in Enumerable.Range(0, statsField.Count))
+            {
+                <MudStack Row="false" Style="border-radius:5px;border-width:thin;background-color:darkcyan;">
+                    @if (statsField.ValuesAreEditable)
+                    {
+                        <MudNumericField Style="width:75px;" @bind-Value="statsField.StatsValues[i]" Label="@statsField.StatsLabels[i]" Variant="Variant.Outlined" />
+                    } else
+                    {
+                        <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@statsField.StatsValues[i]</MudItem>
+                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@statsField.StatsLabels[i]</MudItem>
+                    }
+                </MudStack>
             }
         </MudStack>
     }

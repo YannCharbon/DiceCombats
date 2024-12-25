@@ -18,6 +18,7 @@
         <MudSelect T="string" Label="Layout" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_layoutMode">
             <MudSelectItem Value="@("Local image")" />
             <MudSelectItem Value="@("aidedd.org website")" />
+            <MudSelectItem Value="@("Manual creature")" />
             <MudSelectItem Value="@("Player")" />
         </MudSelect>
     </div>
@@ -94,6 +95,21 @@
         </div>
     }
 
+    @if (_layoutMode == "Manual creature")
+    {
+        <div class="row">
+            <div class="col col-md-4">
+                <MudTextField Immediate="true" Label="Enter creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+            </div>
+            @if (_creatureName != "N/A" && _creatureName != "")
+            {
+                <div class="col col-md-2">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                </div>
+            }
+        </div>
+    }
+
     @if (_layoutMode == "Player")
     {
         <div class="row">
@@ -108,7 +124,6 @@
             }
         </div>
     }
-
 </div>
 
 @code {
@@ -170,6 +185,10 @@
         else if (_layoutMode == "aidedd.org website")
         {
             newCreature.SetHtmlSheet(_aideDDCreatureSheet);
+        }
+        else if (_layoutMode == "Manual creature")
+        {
+            newCreature.IsManual = true;
         }
         else if (_layoutMode == "Player")
         {

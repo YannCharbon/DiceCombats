@@ -1,4 +1,4 @@
-﻿@page "/combats"
+﻿@page "/combatsexplorer"
 @using System.Text.Json
 @inject NavigationManager Navigation
 @inject DiceCombatsService CombatService
@@ -86,7 +86,7 @@
 
     private void Edit(DCCombat combat)
     {
-        Navigation.NavigateTo($"/combatmanager/{combat.Id.ToString()}?EditonMode=true");
+        Navigation.NavigateTo($"/combatmanager/{combat.Id.ToString()}?EditionMode=true");
     }
 
     private async Task ExportCombat(DCCombat combat)

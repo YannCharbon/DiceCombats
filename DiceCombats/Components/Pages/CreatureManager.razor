@@ -1,4 +1,6 @@
-﻿@using System.Net
+﻿@page "/creaturemanager/{CreatureGuid}"
+
+@using System.Net
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using HtmlAgilityPack
@@ -66,7 +68,7 @@
         {
             CombatService.SaveCreatures();
         }
-        Navigation.NavigateTo($"/creatures");
+        Navigation.NavigateTo($"/creaturesexplorer");
     }
 
     private void Delete()
@@ -75,6 +77,6 @@
         {
             CombatService.DeleteCreature(creature);
         }
-        Navigation.NavigateTo($"/creatures");
+        Navigation.NavigateTo($"/creaturesexplorer");
     }
 }

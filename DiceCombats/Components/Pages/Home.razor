@@ -45,7 +45,7 @@
     else if (CombatService.GetFavoriteCombatsGuids().Count == 0)
     {
         <p>You don't have any combat added to favorites.</p>
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/combats"))"
+        <MudButton OnClick="@(() => Navigation.NavigateTo("/combatsexplorer"))"
                    Variant="Variant.Filled"
                    StartIcon="@Icons.Material.Filled.Add"
                    Color="@Color.Primary"

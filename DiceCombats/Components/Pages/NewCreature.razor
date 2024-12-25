@@ -1,7 +1,185 @@
 ﻿@page "/newcreature/"
 
-<CreatureUploader></CreatureUploader>
+@using System.Net
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using HtmlAgilityPack
+
+@inject DiceCombatsService CombatService
+@inject NavigationManager Navigation
+
+<h3>Add new creature</h3>
+
+<style>
+</style>
+
+<div class="row">
+    <div class="col col-md-2">
+        <MudSelect T="string" Label="Layout" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_layoutMode">
+            <MudSelectItem Value="@("Local image")" />
+            <MudSelectItem Value="@("aidedd.org website")" />
+            <MudSelectItem Value="@("Player")" />
+        </MudSelect>
+    </div>
+    <div class="col col-md-4">
+        @if (_layoutMode == "Local image")
+        {
+            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" MaximumFileCount="1">
+                <ActivatorContent>
+                    <MudFab Color="Color.Secondary"
+                            StartIcon="@Icons.Material.Filled.Image"
+                            Label="Load picture" />
+                </ActivatorContent>
+            </MudFileUpload>
+        }
+        else if (_layoutMode == "aidedd.org website")
+        {
+            <MudTextField DebounceInterval="500" Label="Enter URL" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
+            <MudLink Href="https://www.aidedd.org/">Visit aidedd.org</MudLink>
+        }
+    </div>
+    @if (_layoutMode == "aidedd.org website")
+    {
+        <div class="col col-md-2">
+            @if (_aideDDCreatureName != "N/A")
+            {
+                <div style="padding:10px;">
+                    <span>Found @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<div>
+
+    @if (_layoutMode == "Local image")
+    {
+        @if (!string.IsNullOrEmpty(_localImageBase64))
+        {
+            <div style="padding:20px;">
+                <img src="@_localImageBase64" height="500px" />
+            </div>
+            <div class="row">
+                <div class="col col-md-4">
+                    <MudTextField Immediate="true" Label="Enter creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                </div>
+                @if (_creatureName != "N/A" && _creatureName != "")
+                {
+                    <div class="col col-md-2">
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                    </div>
+                }
+
+            </div>
+        }
+    }
+
+    @if (_layoutMode == "aidedd.org website")
+    {
+        <div style="padding:20px;color:black;">
+            @((MarkupString)_aideDDCreatureSheet)
+        </div>
+        <div class="row">
+            <div class="col col-md-4">
+                <MudTextField Immediate="true" Label="Optional edition of creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+            </div>
+            @if (_creatureName != "N/A" && _creatureName != "")
+            {
+                <div class="col col-md-2">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                </div>
+            }
+
+        </div>
+    }
+
+    @if (_layoutMode == "Player")
+    {
+        <div class="row">
+            <div class="col col-md-4">
+                <MudTextField Immediate="true" Label="Enter player name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+            </div>
+            @if (_creatureName != "N/A" && _creatureName != "")
+            {
+                <div class="col col-md-2">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this player</MudButton>
+                </div>
+            }
+        </div>
+    }
+
+</div>
 
 @code {
+    private string _layoutMode { get; set; } = "Local image";
+    private string _aideDDCreatureUrl { get; set; } = "";
 
+    private string _creatureName = "";
+
+    private string _aideDDCreatureSheet = "";
+    private string _aideDDCreatureName = "N/A";
+
+    private string _localImageBase64 = "";
+
+
+    private async Task UploadFiles(IBrowserFile file)
+    {
+        const long maxFileSize = 1024 * 1024 * 15; // 15 MB
+
+        try
+        {
+            using (var stream = file.OpenReadStream(maxAllowedSize: maxFileSize))
+            using (var memoryStream = new MemoryStream())
+            {
+                await stream.CopyToAsync(memoryStream);
+                var bytes = memoryStream.ToArray();
+                _localImageBase64 = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error uploading file: {ex.Message}");
+        }
+
+        GC.Collect(); // Force garbage collection to free up memory
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task _getAideDDCreatureSheet(string url)
+    {
+        _aideDDCreatureUrl = url;
+
+        AideDDOrgCreaturSheetExtractor aideDDOrgCreaturSheetExtractor = new AideDDOrgCreaturSheetExtractor(_aideDDCreatureUrl);
+        _aideDDCreatureSheet = await aideDDOrgCreaturSheetExtractor.GetSheetAsHtmlString();
+        _aideDDCreatureName = aideDDOrgCreaturSheetExtractor.CreatureName;
+        _creatureName = _aideDDCreatureName;
+    }
+
+    private void _registerNewCreature()
+    {
+        DCCreature newCreature = new DCCreature(_creatureName);
+        if (_layoutMode == "Local image")
+        {
+            newCreature.SetImageSheetBase64(_localImageBase64);
+        }
+        else if (_layoutMode == "aidedd.org website")
+        {
+            newCreature.SetHtmlSheet(_aideDDCreatureSheet);
+        }
+        else if (_layoutMode == "Player")
+        {
+            newCreature.IsPlayer = true;
+        }
+        CombatService.GetCreatureList().Add(newCreature);
+
+        Debug.WriteLine(newCreature.Id.ToString());
+
+        Navigation.NavigateTo($"/creaturemanager/{newCreature.Id.ToString()}");
+    }
 }
+

@@ -1,4 +1,6 @@
-﻿@using System.Text.Json
+﻿@page "/creaturesexplorer/"
+
+@using System.Text.Json
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
 @inject IFileHandler FileHandler
@@ -6,10 +8,10 @@
 
 <style>
     .CreatureViewerCreature {
-        padding:10px;
-        margin:5px;
-        border-radius:10px;
-        background-color:#303030;
+        padding: 10px;
+        margin: 5px;
+        border-radius: 10px;
+        background-color: #303030;
     }
 </style>
 
@@ -25,7 +27,7 @@
     <h3><span style="padding:5px;border-radius:10px;background-color:#1E867F">Creatures</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
-    @for(char chr = 'a'; chr < 'z'; chr++)
+    @for (char chr = 'a'; chr < 'z'; chr++)
     {
         @if (CombatService.GetCreatureList().Find(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == false) != null)
         {
@@ -37,19 +39,19 @@
                 {
                     <div class="col col-md-3 CreatureViewerCreature">
                         <MudStack Row="true">
-                                <h4>@creature.Name</h4>
-                                <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                            <h4>@creature.Name</h4>
+                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                                 <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
                                 <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
                                 <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
-                                </MudButtonGroup>
+                            </MudButtonGroup>
                         </MudStack>
                     </div>
                 }
             </div>
-        }        
+        }
     }
-    
+
 </div>
 
 <div style="margin-top:20px;margin-bottom:20px;">
@@ -86,7 +88,7 @@
 @code {
     private void Edit(DCCreature creature)
     {
-        Navigation.NavigateTo($"/creatureedit/{creature.Id.ToString()}");
+        Navigation.NavigateTo($"/creaturemanager/{creature.Id.ToString()}");
     }
 
     private async Task ExportCreature(DCCreature creature)
@@ -130,10 +132,11 @@
         {
             string json = System.Text.Encoding.UTF8.GetString(fileData);
             var options = new JsonSerializerOptions
+                {
+                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+                };
+            try
             {
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            try {
                 var newCreature = JsonSerializer.Deserialize<DCCreature>(json, options);
                 if (newCreature != null)
                 {
@@ -148,7 +151,8 @@
                     }
                     PopupNotificationService.Show("Creature import", $"Successfully imported {newCreature.Name}", PopupNotificationService.Type.SUCCESS, 3000);
                 }
-            } catch
+            }
+            catch
             {
                 try
                 {
@@ -172,7 +176,8 @@
                         }
                         PopupNotificationService.Show("Creature import", "Successfully imported multiple creatures", PopupNotificationService.Type.SUCCESS, 3000);
                     }
-                } catch
+                }
+                catch
                 {
                     Debug.WriteLine("File does not contain any valid creature.");
                     PopupNotificationService.Show("Creature import", "File does not contain any valid creature", PopupNotificationService.Type.FAILURE, 4000);

@@ -143,16 +143,8 @@
 
         var creatures = Combat.CreaturesList;
         var creatureToMove = creatures[oldIndex];
-        creatures.RemoveAt(oldIndex);
 
-        if (newIndex < creatures.Count)
-        {
-            creatures.Insert(newIndex, creatureToMove);
-        }
-        else
-        {
-            creatures.Add(creatureToMove);
-        }
+        Combat.MoveCreature(creatureToMove, newIndex);
 
         StateHasChanged();
     }

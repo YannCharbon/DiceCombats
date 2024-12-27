@@ -57,7 +57,8 @@ namespace DiceCombats
                         InCombatCustomFieldsInstances.RemoveAt(oldIndex);
                         InCombatCustomFieldsInstances.Insert(oldIndex + 1, InCombatCustomFieldsInstance);
                     }
-                } else
+                }
+                else
                 {
                     if (oldIndex > 0)
                     {
@@ -69,6 +70,20 @@ namespace DiceCombats
                         InCombatCustomFieldsInstances.Insert(oldIndex - 1, InCombatCustomFieldsInstance);
                     }
                 }
+            }
+        }
+
+        public void MoveCreature(DCCreature creature, int newIndex)
+        {
+            int oldIndex = CreaturesList.IndexOf(creature);
+            if (oldIndex != -1)
+            {
+                CreaturesList.RemoveAt(oldIndex);
+                CreaturesList.Insert(newIndex, creature);
+
+                List<List<DCCreatureCustomField>> InCombatCustomFieldsInstance = InCombatCustomFieldsInstances[oldIndex];
+                InCombatCustomFieldsInstances.RemoveAt(oldIndex);
+                InCombatCustomFieldsInstances.Insert(newIndex, InCombatCustomFieldsInstance);
             }
         }
 

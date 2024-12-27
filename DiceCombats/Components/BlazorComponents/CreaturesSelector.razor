@@ -32,33 +32,64 @@
                 <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="Search creature" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
             </div>
             <div style="height:370px;overflow-y:scroll;overflow-x:hidden;">
-                @foreach (DCCreature creature in creatureSearchList)
+                @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.Name))
                 {
-                    <MudGrid>
-                        <MudItem sm="4">
-                            <span>@creature.Name</span>
-                        </MudItem>
-
-                        @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
-                        {
-                            <MudItem sm="3">
-                                <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
-                            </MudItem>
-                        }
-                        else
-                        {
-                            <MudItem sm="3">
-                                <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
-                            </MudItem>
+                    @if (creature.IsPlayer)
+                    {
+                        <MudGrid>
                             <MudItem sm="4">
-                                <span>Added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                                <MudIcon Icon="@Icons.Material.Filled.Person" Title="Player" />&nbsp;<span>@creature.Name</span>
                             </MudItem>
-                        }
 
-                    </MudGrid>
-                    <MudDivider />
+                            @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
+                            {
+                                <MudItem sm="3">
+                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
+                                </MudItem>
+                            }
+                            else
+                            {
+                                <MudItem sm="3">
+                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
+                                </MudItem>
+                                <MudItem sm="4">
+                                    <span>Added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                                </MudItem>
+                            }
+
+                        </MudGrid>
+                        <MudDivider />
+                    }
                 }
+                @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.Name))
+                {
+                    @if (!creature.IsPlayer)
+                    {
+                        <MudGrid>
+                            <MudItem sm="4">
+                                <span>@creature.Name</span>
+                            </MudItem>
 
+                            @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
+                            {
+                                <MudItem sm="3">
+                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
+                                </MudItem>
+                            }
+                            else
+                            {
+                                <MudItem sm="3">
+                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
+                                </MudItem>
+                                <MudItem sm="4">
+                                    <span>Added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                                </MudItem>
+                            }
+
+                        </MudGrid>
+                        <MudDivider />
+                    }
+                }
             </div>
         </div>
     </MudItem>

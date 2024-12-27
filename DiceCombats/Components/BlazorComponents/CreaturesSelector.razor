@@ -1,0 +1,157 @@
+﻿@inject DiceCombatsService CombatService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
+<style>
+    .CombatEditorCreatureBox {
+        background-color: #2A2A2A;
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        border: 1px solid #505050;
+        border-radius: 10px;
+        display: inline-block;
+        vertical-align: top;
+        white-space: normal;
+        padding: 10px;
+        margin: 10px;
+        width: 100%;
+        height: 500px;
+    }
+</style>
+
+<MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
+    <MudTextField Label="Combat name" Variant="Variant.Outlined" T="string" @bind-Value="Combat.Name"></MudTextField>
+    <MudButton OnClick="SyncCreatures" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" Title="Synchronize creatures with newest fields" Size="Size.Large">Update creatures</MudButton>
+    <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">Delete</MudButton>
+</MudStack>
+
+<MudGrid>
+    <MudItem sm="7">
+        <div class="CombatEditorCreatureBox">
+            <h2>Add/Remove creatures</h2>
+            <div style="padding-bottom:10px;">
+                <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="Search creature" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+            </div>
+            <div style="height:370px;overflow-y:scroll;overflow-x:hidden;">
+                @foreach (DCCreature creature in creatureSearchList)
+                {
+                    <MudGrid>
+                        <MudItem sm="4">
+                            <span>@creature.Name</span>
+                        </MudItem>
+
+                        @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
+                        {
+                            <MudItem sm="3">
+                                <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
+                            </MudItem>
+                        }
+                        else
+                        {
+                            <MudItem sm="3">
+                                <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
+                            </MudItem>
+                            <MudItem sm="4">
+                                <span>Added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                            </MudItem>
+                        }
+
+                    </MudGrid>
+                    <MudDivider />
+                }
+
+            </div>
+        </div>
+    </MudItem>
+    <MudItem sm="4">
+        <div class="CombatEditorCreatureBox" style="overflow-y: scroll; overflow-x: hidden;">
+            @foreach (DCCreature creature in Combat.CreaturesList.ToList())
+            {
+                <div class="row">
+                    <div class="col col-xs-1">
+                        <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Move up" OnClick="() => Combat.MoveCreature(creature, true)"></MudIconButton>
+                        <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Move down" OnClick="() => Combat.MoveCreature(creature, false)"></MudIconButton>
+                    </div>
+                    <div class="col col-xs-4">
+                        <span>@creature.Name</span>
+                    </div>
+                    <div class="col col-xs-4">
+                        <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => Combat.UpdateInstanceCount(args, creature)" Label="Instances" Variant="Variant.Outlined"></MudNumericField>
+                    </div>
+                </div>
+            }
+        </div>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter] public DCCombat Combat { get; set; } = default!;
+
+    private List<DCCreature> creatureSearchList = new List<DCCreature>();
+
+    protected override void OnInitialized()
+    {
+        creatureSearchList = CombatService.GetCreatureList();
+
+        base.OnInitialized();
+    }
+
+    private void SaveCombat()
+    {
+        var combats = CombatService.GetCombatList();
+        var combat = combats.Find(x => x.Id == Combat.Id);
+        if (combat != null)
+        {
+            CombatService.DeleteCombat(combat);
+        }
+
+        CombatService.AddCombat(Combat);
+
+        CombatService.SaveCombats();
+    }
+
+    private void DeleteCombat()
+    {
+        var combats = CombatService.GetCombatList();
+        var combat = combats.Find(x => x.Id == Combat.Id);
+        if (combat != null)
+        {
+            CombatService.DeleteCombat(combat);
+        }
+
+        CombatService.SaveCombats();
+
+        Navigation.NavigateTo("/combatsexplorer");
+    }
+
+    private void AddCreature(DCCreature creature)
+    {
+        if (!Combat.CreaturesList.Contains(creature))
+        {
+            Combat.AddCreature((DCCreature)creature.Clone());
+        }
+    }
+
+    private void RemoveCreature(DCCreature creature)
+    {
+        Combat.RemoveCreature(creature);
+    }
+
+    private void SyncCreatures()
+    {
+        foreach (DCCreature creature in Combat.CreaturesList.ToList())
+        {
+            RemoveCreature(creature);
+            DCCreature? tempCreature = CombatService.GetCreatureList().Find(x => x.Name == creature.Name);
+            if (tempCreature != null)
+            {
+                AddCreature(tempCreature);
+            }
+        }
+    }
+
+    private void UpdateCreatureSearchList(string arg)
+    {
+        var tmp = CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().Contains(arg.ToLower()));
+        creatureSearchList = tmp;
+    }
+}

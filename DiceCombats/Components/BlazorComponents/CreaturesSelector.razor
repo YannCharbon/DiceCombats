@@ -64,21 +64,22 @@
     </MudItem>
     <MudItem sm="4">
         <div class="CombatEditorCreatureBox" style="overflow-y: scroll; overflow-x: hidden;">
-            @foreach (DCCreature creature in Combat.CreaturesList.ToList())
-            {
-                <div class="row">
-                    <div class="col col-xs-1">
-                        <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Move up" OnClick="() => Combat.MoveCreature(creature, true)"></MudIconButton>
-                        <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Move down" OnClick="() => Combat.MoveCreature(creature, false)"></MudIconButton>
+            <SortableList Id="creaturesSortable" Items="Combat.CreaturesList" OnUpdate="@SortCreaturesList" Context="creature">
+                 <SortableItemTemplate>
+                    <div style="display:flex; justify-content: space-between; user-select: none; background-color:#2A2A2A; cursor: move;">
+                        <div>
+                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Move up" OnClick="() => Combat.MoveCreature(creature, true)"></MudIconButton>
+                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Move down" OnClick="() => Combat.MoveCreature(creature, false)"></MudIconButton>
+                        </div>
+                        <div>
+                            <span>@creature.Name</span>
+                        </div>
+                        <div style="width: 100px;">
+                            <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => Combat.UpdateInstanceCount(args, creature)" Label="Instances" Variant="Variant.Outlined"></MudNumericField>
+                        </div>
                     </div>
-                    <div class="col col-xs-4">
-                        <span>@creature.Name</span>
-                    </div>
-                    <div class="col col-xs-4">
-                        <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => Combat.UpdateInstanceCount(args, creature)" Label="Instances" Variant="Variant.Outlined"></MudNumericField>
-                    </div>
-                </div>
-            }
+                 </SortableItemTemplate>
+             </SortableList>
         </div>
     </MudItem>
 </MudGrid>
@@ -134,6 +135,26 @@
     private void RemoveCreature(DCCreature creature)
     {
         Combat.RemoveCreature(creature);
+    }
+
+    private void SortCreaturesList((int oldIndex, int newIndex) indices)
+    {
+        var (oldIndex, newIndex) = indices;
+
+        var creatures = Combat.CreaturesList;
+        var creatureToMove = creatures[oldIndex];
+        creatures.RemoveAt(oldIndex);
+
+        if (newIndex < creatures.Count)
+        {
+            creatures.Insert(newIndex, creatureToMove);
+        }
+        else
+        {
+            creatures.Add(creatureToMove);
+        }
+
+        StateHasChanged();
     }
 
     private void SyncCreatures()

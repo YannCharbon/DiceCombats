@@ -250,7 +250,7 @@ else
     }
     else if (Field is DCCreatureDnDConditionsField dndConditionsField)
     {
-        <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized;}">
+        <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized; NotifyParentOnChange();}">
             @if (_dndConditionsFieldMaximized == false) {
                 @if (dndConditionsField.SelectedOptions.Count(x => x == true) == 0) {
                     <MudItem><h5>Add condition&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Color="Color.Success"></MudIcon></h5></MudItem>

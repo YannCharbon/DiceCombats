@@ -288,6 +288,22 @@
     private void HandleCreaturesSelectorModalClose(bool result)
     {
         _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
+
+        SaveCombat();
+    }
+
+    private void SaveCombat()
+    {
+        var combats = CombatService.GetCombatList();
+        var combat = combats.Find(x => x.Id == _combat.Id);
+        if (combat != null)
+        {
+            CombatService.DeleteCombat(combat);
+        }
+
+        CombatService.AddCombat(_combat);
+
+        CombatService.SaveCombats();
     }
 
 }

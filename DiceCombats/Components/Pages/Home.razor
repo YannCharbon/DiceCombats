@@ -11,6 +11,10 @@
     }
 </style>
 
+<GenericModal TContent="WelcomeMessage" OnClose="HandleWelcomeMessageModalClose" @ref="WelcomeMessageModalRef">
+    <WelcomeMessage />
+</GenericModal>
+
 <div style="justify-content:center;text-align:center;padding-top:50px">
     <h3>Welcome to DiceCombats !</h3>
     
@@ -64,14 +68,34 @@
         </div>
     }
 
+    <MudDivider Style="margin-top:50px;margin-bottom:30px;"></MudDivider>
+
+    <a href="https://github.com/YannCharbon/DiceCombats" target="_blank" style="color:white;margin:10px;"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="@Size.Large" Title="GitHub" /></a>
+    <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" Title="Settings" />
+
+
 </div>
 
 @code {
+    private GenericModal<WelcomeMessage>? WelcomeMessageModalRef;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await InvokeAsync(() => StateHasChanged());
+
+            // @todo update this once a versioning system is added
+            int version = Preferences.Get("CurrentVersion", -1);
+            if (version == -1)
+            {
+                WelcomeMessageModalRef?.Show();
+            }
         }
+    }
+
+    private void HandleWelcomeMessageModalClose(bool result)
+    {
+        Preferences.Set("CurrentVersion", 0);
     }
 }

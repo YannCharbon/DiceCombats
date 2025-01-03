@@ -93,7 +93,7 @@
             _updateInfos = await CombatService.CheckUpdate();
             if (_updateInfos != null)
             {
-                if (Preferences.Get("LastShowedNewVersion", "-1") != _updateInfos?.tag_name)
+                if (Preferences.Get("LastShowedNewVersion", "-1") != _updateInfos?.tag_name && Preferences.Get("LastShowedNewVersion", "-1") != "-1")
                 {
                     _updateAvailable = (CombatService.GetVersion() != _updateInfos?.tag_name);
                 }

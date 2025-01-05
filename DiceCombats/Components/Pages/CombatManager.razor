@@ -170,7 +170,7 @@
                     @foreach (List<DCCreatureCustomField> instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
                     {
                         <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
-                            <div class="d-flex flex-wrap gap-2">
+                            <div class="d-flex flex-wrap gap-2" style="align-items:center;">
                                 @foreach (DCCreatureCustomField field in instanceCustomFields)
                                 {
                                     <div>

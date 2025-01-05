@@ -20,7 +20,7 @@
         <h3>Add additional fields to this creatures</h3>
     }
 
-    <div class="d-flex flex-wrap gap-2">
+    <div class="d-flex flex-wrap" style="align-items:center;">
         @foreach (var field in Fields)
         {
             <div class="CreatureCustomFieldsEditorCustomField">
@@ -41,7 +41,7 @@
             <div style="padding:10px;">
                 <MudStack Row="true">
                     <MudItem>
-                        <MudSelect T="string" Label="Field type" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
+                        <MudSelect Style="min-width: 200px;" T="string" Label="Field type" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
                             <MudSelectItem T="string" Value="@("HitPoints")" />
                             <MudSelectItem T="string" Value="@("Numeric")" />
                             <MudSelectItem T="string" Value="@("Checkbox")" />

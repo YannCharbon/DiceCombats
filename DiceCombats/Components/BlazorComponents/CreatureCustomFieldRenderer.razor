@@ -52,7 +52,7 @@
     }
     else if (Field is DCCreatureTextField textField)
     {
-        <MudTextField @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" />
+        <MudTextField AutoGrow @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" />
     }
     else if (Field is DCCreatureCheckboxField checkBoxField)
     {
@@ -175,7 +175,7 @@ else
     }
     else if (Field is DCCreatureTextField textField)
     {
-        <MudTextField AutoGrow @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" />
+        <MudTextField AutoGrow @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" />
     }
     else if (Field is DCCreatureCheckboxField checkBoxField)
     {

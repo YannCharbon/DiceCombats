@@ -4,10 +4,10 @@ using System.Diagnostics;
 
 namespace DiceCombats
 {
-    public class DCCreatureCheckboxGridField : DCCreatureCustomField
+    public class DCCreatureTextGridField : DCCreatureCustomField
     {
-        public override string FieldType => "CheckboxGrid";
-        public override string Discriminator => nameof(DCCreatureCheckboxGridField);
+        public override string FieldType => "TextGrid";
+        public override string Discriminator => nameof(DCCreatureTextGridField);
 
         private int rows = 3;
         private int columns = 3;
@@ -43,11 +43,13 @@ namespace DiceCombats
 
         public List<string> RowHeaders { get; set; } = new List<string>();
         public List<string> ColumnHeaders { get; set; } = new List<string>();
-        public List<List<bool>> GridState { get; set; } = new List<List<bool>>();
+        public List<List<bool>> HasTextLabels { get; set; } = new List<List<bool>>();
+        public List<List<string>> TextLabels { get; set; } = new List<List<string>>();
+        public List<List<string>> TextValues { get; set; } = new List<List<string>>();
 
-        public DCCreatureCheckboxGridField()
+        public DCCreatureTextGridField()
         {
-            Debug.WriteLine("DCCreatureCheckboxGridField");
+            Debug.WriteLine("DCCreatureTextGridField");
             InitializeGrid();
         }
 
@@ -55,7 +57,9 @@ namespace DiceCombats
         {
             for (int i = 0; i < rows; i++)
             {
-                GridState.Add(new List<bool>( new bool[columns]));
+                HasTextLabels.Add(new List<bool>(new bool[columns]));
+                TextLabels.Add(new List<string>(new string[columns]));
+                TextValues.Add(new List<string>( new string[columns]));
             }
             InitializeHeaders();
         }
@@ -71,18 +75,27 @@ namespace DiceCombats
 
         private void ResizeGrid()
         {
-            var oldGrid = GridState;
-            GridState = new List<List<bool>>();
+            var oldTextValues = TextValues;
+            var oldHasTextLabels = HasTextLabels;
+            var oldTextLabels = TextLabels;
+            HasTextLabels = new List<List<bool>>();
+            TextLabels = new List<List<string>>();
+            TextValues = new List<List<string>>();
             for (int i = 0; i < rows; i++)
             {
-                GridState.Add(new List<bool>(new bool[columns]));
+                HasTextLabels.Add(new List<bool>(new bool[columns]));
+                TextLabels.Add(new List<string>(new string[columns]));
+                TextValues.Add(new List<string>(new string[columns]));
             }
 
-            for (int i = 0; i < Math.Min(Rows, oldGrid.Count); i++)
+            for (int i = 0; i < Math.Min(Rows, oldTextValues.Count); i++)
             {
-                for (int j = 0; j < Math.Min(Columns, oldGrid[0].Count); j++)
+                for (int j = 0; j < Math.Min(Columns, oldTextValues[0].Count); j++)
                 {
-                    GridState[i][j] = oldGrid[i][j];
+                    HasTextLabels[i][j] = oldHasTextLabels[i][j];
+                    TextValues[i][j] = oldTextValues[i][j];
+                    TextLabels[i][j] = oldTextLabels[i][j];
+
                 }
             }
 
@@ -91,12 +104,12 @@ namespace DiceCombats
 
         public override object GetValue()
         {
-            return GridState;
+            return TextValues;
         }
 
         public override DCCreatureCustomField Clone()
         {
-            return new DCCreatureCheckboxGridField
+            return new DCCreatureTextGridField
             {
                 Title = this.Title,
                 Rows = this.Rows,
@@ -105,7 +118,9 @@ namespace DiceCombats
                 RowHeaders = this.RowHeaders,
                 HasColumnHeaders = this.HasColumnHeaders,
                 ColumnHeaders = this.ColumnHeaders,
-                GridState = this.GridState,
+                HasTextLabels = this.HasTextLabels,
+                TextLabels = this.TextLabels,
+                TextValues = this.TextValues,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }

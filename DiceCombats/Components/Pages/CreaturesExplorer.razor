@@ -15,7 +15,7 @@
     }
 </style>
 
-<div style="padding-bottom:20px;">
+<div style="padding-top:10px; padding-bottom:20px; display: flex; justify-content: flex-end; align-items: center;">
     <MudStack Row="true">
         <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">New creature</MudButton>
         <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large">Export creatures</MudButton>
@@ -24,7 +24,7 @@
 </div>
 
 <div style="margin-bottom:20px;">
-    <h3><span style="padding:5px;border-radius:10px;background-color:#1E867F">Creatures</span></h3>
+    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">Creatures</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
     @for (char chr = 'a'; chr < 'z'; chr++)
@@ -40,7 +40,7 @@
                     <div class="col col-md-3 CreatureViewerCreature">
                         <MudStack Row="true">
                             <h4>@creature.Name</h4>
-                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
                                 <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
                                 <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
                                 <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
@@ -55,7 +55,7 @@
 </div>
 
 <div style="margin-top:20px;margin-bottom:20px;">
-    <h3><span style="padding:5px;border-radius:10px;background-color:#1E867F">Players</span></h3>
+    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">Players</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
     @for (char chr = 'a'; chr < 'z'; chr++)
@@ -71,7 +71,7 @@
                     <div class="col col-md-3 CreatureViewerCreature">
                         <MudStack Row="true">
                             <h4>@creature.Name</h4>
-                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
                                 <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
                                 <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
                                 <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>

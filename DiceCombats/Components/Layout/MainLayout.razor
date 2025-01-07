@@ -12,7 +12,7 @@
 
 
     <main>
-        <MudThemeProvider IsDarkMode="true" />
+        <MudThemeProvider IsDarkMode="true" Theme="DCTheme" />
         <MudPopoverProvider />
         <MudDialogProvider />
         <MudSnackbarProvider />
@@ -22,3 +22,14 @@
         </article>
     </main>
 </div>
+
+@code {
+    MudTheme DCTheme = new MudTheme()
+    {
+        PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Teal.Darken1,
+                Secondary = Colors.Teal.Darken4,
+            },
+    };
+}

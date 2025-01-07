@@ -46,6 +46,7 @@
                             <MudSelectItem T="string" Value="@("Numeric")" />
                             <MudSelectItem T="string" Value="@("Checkbox")" />
                             <MudSelectItem T="string" Value="@("CheckboxGrid")" />
+                            <MudSelectItem T="string" Value="@("TextGrid")" />
                             <MudSelectItem T="string" Value="@("Text")" />
                             <MudSelectItem T="string" Value="@("Color")" />
                             <MudSelectItem T="string" Value="@("DnD conditions")"></MudSelectItem>
@@ -94,6 +95,9 @@
                 break;
             case "Text":
                 newField = new DCCreatureTextField { Title = "Text Field" };
+                break;
+            case "TextGrid":
+                newField = new DCCreatureTextGridField { Title = "Text Grid Field" };
                 break;
             case "Color":
                 newField = new DCCreatureColorField { Title = "Color Field" };

@@ -5,6 +5,7 @@
 <style>
     .CreatureCustomFieldRendererFieldTitle {
         padding:10px;
+        font-weight:700;
     }
 
     .CreatureCustomFieldRendererCheckBoxGridLabels {
@@ -23,6 +24,18 @@
         font-size: 18px;
         box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     }
+
+    .CreatureCustomFieldRendererFieldLabel label {
+        background-color: #004D40;
+        color: white;
+        padding: 2px;
+        border-radius: 4px;
+    }
+
+    .CreatureCustomFieldRendererFieldBackground {
+        background-color: #4A4A5A;
+        border-radius:4px;
+    }
 </style>
 
 @if (EditionMode)
@@ -31,14 +44,17 @@
         <MudItem sm="4">
             <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
         </MudItem>
-        <MudItem sm="7">
+        <MudItem sm="4">
             @if (CombatService.GetUserCreatureCustomFieldByName(Field.Title) == null)
             {
-                <MudButton OnClick="@(() => CombatService.AddUserCreatureCustomField(Field))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">Add to custom fields</MudButton>
+                <MudButton OnClick="@(() => CombatService.AddUserCreatureCustomField(Field))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">User field</MudButton>
             } else
             {
-                <MudButton OnClick="@(() => CombatService.RemoveUserCreatureCustomFieldByName(Field.Title))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonRemove" Color="@Color.Error" Size="Size.Large">Remove from custom fields</MudButton>
+                <MudButton OnClick="@(() => CombatService.RemoveUserCreatureCustomFieldByName(Field.Title))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonRemove" Color="@Color.Error" Size="Size.Large">User field</MudButton>
             }
+        </MudItem>
+        <MudItem sm="2">
+            <MudCheckBox @bind-Value="Field.SharedAcrossCreatureInstances" Label="Shared" Variant="Variant.Outlined" />
         </MudItem>
     </MudGrid>
 
@@ -53,6 +69,61 @@
     else if (Field is DCCreatureTextField textField)
     {
         <MudTextField AutoGrow @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" />
+    }
+    else if (Field is DCCreatureTextGridField textGridField)
+    {
+        <div class="row">
+            <div class="col col-md-2">
+                <MudNumericField @bind-Value="textGridField.Columns" Label="Horizontal" Variant="Variant.Outlined" Min="1" />
+            </div>
+            <div class="col col-md-2">
+                <MudNumericField @bind-Value="textGridField.Rows" Label="Vertical" Variant="Variant.Outlined" Min="1" />
+            </div>
+            <div class="col col-md-2">
+                <MudCheckBox T="bool" @bind-Value="textGridField.HasColumnHeaders" Label="Column labels"></MudCheckBox>
+            </div>
+            <div class="col col-md-2">
+                <MudCheckBox T="bool" @bind-Value="textGridField.HasRowHeaders" Label="Row labels"></MudCheckBox>
+            </div>
+        </div>
+
+        <div style="padding:10px;">
+            <table>
+                @if (textGridField.HasColumnHeaders)
+                {
+                    <tr>
+                        @if (textGridField.HasRowHeaders)
+                        {
+                            <td>&nbsp;</td>
+                        }
+                        @foreach (int i in Enumerable.Range(0, textGridField.ColumnHeaders.Count))
+                        {
+                            <td><MudTextField Immediate="true" @bind-Value="textGridField.ColumnHeaders[i]" Label="Edit column name" Variant="Variant.Outlined" /></td>
+                        }
+                    </tr>
+                }
+                @foreach (int i in Enumerable.Range(0, textGridField.Rows))
+                {
+                    <tr>
+                        @if (textGridField.HasRowHeaders)
+                        {
+                            <td><MudTextField Immediate="true" @bind-Value="textGridField.RowHeaders[i]" Label="Edit row name" Variant="Variant.Outlined" /></td>
+
+                        }
+                        @foreach (int j in Enumerable.Range(0, textGridField.Columns))
+                        {
+                            <td>
+                                <MudCheckBox T="bool" @bind-Value="textGridField.HasTextLabels[i][j]" Label="Show label"></MudCheckBox>
+                                @if (textGridField.HasTextLabels[i][j] == true) {
+                                    <MudTextField Immediate="true" @bind-Value="textGridField.TextLabels[i][j]" Label="Label" Variant="Variant.Outlined" />
+                                }
+                                <MudTextField AutoGrow Immediate="true" @bind-Value="textGridField.TextValues[i][j]" Label="@textGridField.TextLabels[i][j]" Variant="Variant.Outlined" />
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
     }
     else if (Field is DCCreatureCheckboxField checkBoxField)
     {
@@ -79,10 +150,10 @@
     {
         <div class="row">
             <div class="col col-md-2">
-                <MudNumericField @bind-Value="checkboxGridField.Columns" Label="Horizontal checkbox count" Variant="Variant.Outlined" Min="1" />
+                <MudNumericField @bind-Value="checkboxGridField.Columns" Label="Horizontal" Variant="Variant.Outlined" Min="1" />
             </div>
             <div class="col col-md-2">
-                <MudNumericField @bind-Value="checkboxGridField.Rows" Label="Vertical checkbox count" Variant="Variant.Outlined" Min="1" />
+                <MudNumericField @bind-Value="checkboxGridField.Rows" Label="Vertical" Variant="Variant.Outlined" Min="1" />
             </div>
             <div class="col col-md-2">
                 <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasColumnHeaders" Label="Column labels"></MudCheckBox>
@@ -166,16 +237,65 @@ else
     @if (Field is DCCreatureHitPointsField hitPointsField)
     {
         <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
-            <MudNumericField @bind-Value="hitPointsField.CurrentHP" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + hitPointsField.MaximumHP.ToString() + " HP")" />
+            <MudNumericField @bind-Value="hitPointsField.CurrentHP" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + hitPointsField.MaximumHP.ToString() + " HP")" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
         </MudStack>
     }
     else if (Field is DCCreatureNumericField numericField)
     {
-        <MudNumericField @bind-Value="numericField.Value" Label="@Field.Title" Variant="Variant.Outlined" />
+        <MudNumericField @bind-Value="numericField.Value" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     }
     else if (Field is DCCreatureTextField textField)
     {
-        <MudTextField AutoGrow @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" />
+        <MudTextField AutoGrow spellcheck="false" @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+    }
+    else if (Field is DCCreatureTextGridField textGridField)
+    {
+        <MudStack Row="false">
+            <MudItem>
+                <b><h5 class="CreatureCustomFieldRendererFieldTitle">@textGridField.Title</h5></b>
+            </MudItem>
+            <MudItem>
+                <div style="padding-bottom:10px;">
+                    <table>
+                        @if (textGridField.HasColumnHeaders)
+                        {
+                            <tr>
+                                @if (textGridField.HasRowHeaders)
+                                {
+                                    <td>&nbsp;</td>
+                                }
+                                @foreach (int i in Enumerable.Range(0, textGridField.ColumnHeaders.Count))
+                                {
+                                    <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@textGridField.ColumnHeaders[i]</span></td>
+                                }
+                            </tr>
+                        }
+                        @foreach (int i in Enumerable.Range(0, textGridField.Rows))
+                        {
+                            <tr>
+                                @if (textGridField.HasRowHeaders)
+                                {
+                                    <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@textGridField.RowHeaders[i]</span></td>
+                                }
+                                @foreach (int j in Enumerable.Range(0, textGridField.Columns))
+                                {
+                                    <td style="padding:3px;vertical-align:top;">
+                                        @if (textGridField.HasTextLabels[i][j] == true)
+                                        {
+                                            <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="textGridField.TextValues[i][j]" Label="@textGridField.TextLabels[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                        }
+                                        else
+                                        {
+                                            <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="textGridField.TextValues[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </MudItem>
+        </MudStack>
     }
     else if (Field is DCCreatureCheckboxField checkBoxField)
     {
@@ -185,14 +305,14 @@ else
                 <MudCheckBox Label="@checkBoxField.Labels[i]" @bind-Value="checkBoxField.SelectedOptions[i]"></MudCheckBox>
                 @if (checkBoxField.ShowTextFields == true)
                 {
-                    <MudTextField AutoGrow @bind-Value="checkBoxField.TextFields[i]" Label="@checkBoxField.TextFieldsLabels[i]" Variant="Variant.Outlined" />
+                    <MudTextField AutoGrow spellcheck="false" @bind-Value="checkBoxField.TextFields[i]" Label="@checkBoxField.TextFieldsLabels[i]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                 }
             }
         </MudStack>
     }
     else if (Field is DCCreatureCheckboxGridField checkboxGridField)
     {
-        <span class="CreatureCustomFieldRendererFieldTitle">@checkboxGridField.Title</span>
+        <b><span class="CreatureCustomFieldRendererFieldTitle">@checkboxGridField.Title</span></b>
         <div style="padding:10px;">
             <table>
                 @if (checkboxGridField.HasColumnHeaders)

@@ -166,12 +166,24 @@
                         <p>Could not render creature sheet</p>
                     }
                 </div>
+                @{
+                    // Prepare data for rendering
+                    var allInstanceCustomFields = _combat.GetCreatureInstancesCustomFields(creature);
+                    var sharedFields = allInstanceCustomFields.First()
+                        .Where(x => x.SharedAcrossCreatureInstances)
+                        .ToList();
+                    var nonSharedFields = allInstanceCustomFields.First()
+                        .Where(x => !x.SharedAcrossCreatureInstances)
+                        .ToList();
+                }
+
                 <div style="padding:10px;">
-                    @foreach (List<DCCreatureCustomField> instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
+                    @* Render shared fields (once for all instances) *@
+                    @if (sharedFields.Any())
                     {
-                        <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
+                        <div class="CombatEditorCustomFieldsLayout" style="border-color:#F9F9F9;padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px #FFFFFF;">
                             <div class="d-flex flex-wrap gap-2" style="align-items:center;">
-                                @foreach (DCCreatureCustomField field in instanceCustomFields)
+                                @foreach (var field in sharedFields)
                                 {
                                     <div>
                                         <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
@@ -181,6 +193,26 @@
                                 }
                             </div>
                         </div>
+                    }
+
+                    @if (nonSharedFields.Count > 0)
+                    {
+                        @* Render non-shared fields for each creature instance *@
+                        @foreach (var instanceCustomFields in allInstanceCustomFields)
+                        {
+                            <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
+                                <div class="d-flex flex-wrap gap-2" style="align-items:center;">
+                                    @foreach (var field in instanceCustomFields.Where(x => !x.SharedAcrossCreatureInstances).ToList())
+                                    {
+                                        <div>
+                                            <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
+                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                            </MudPaper>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>

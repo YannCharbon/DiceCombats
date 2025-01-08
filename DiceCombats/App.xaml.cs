@@ -1,4 +1,7 @@
-﻿namespace DiceCombats
+﻿using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
+using Application = Microsoft.Maui.Controls.Application;
+
+namespace DiceCombats
 {
     public partial class App : Application
     {
@@ -7,6 +10,8 @@
             InitializeComponent();
 
             MainPage = new MainPage();
+
+            Current.On<Microsoft.Maui.Controls.PlatformConfiguration.Android>().UseWindowSoftInputModeAdjust(WindowSoftInputModeAdjust.Resize);
         }
     }
 }

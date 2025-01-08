@@ -16,7 +16,7 @@
 </style>
 
 <div style="padding-top:10px; padding-bottom:20px; display: flex; justify-content: flex-end; align-items: center;">
-    <MudStack Row="true">
+    <MudStack Row="true" Wrap="Wrap.Wrap">
         <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">New creature</MudButton>
         <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large">Export creatures</MudButton>
         <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Large">Import one or multiple creatures</MudButton>

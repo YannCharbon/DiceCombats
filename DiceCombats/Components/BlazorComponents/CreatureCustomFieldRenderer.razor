@@ -42,7 +42,7 @@
 {
     <MudGrid>
         <MudItem sm="4">
-            <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Edit field name" Variant="Variant.Outlined" />
+            <MudTextField Immediate="true" @bind-Value="Field.Title" Label="Field name" Variant="Variant.Outlined" />
         </MudItem>
         <MudItem sm="4">
             @if (CombatService.GetUserCreatureCustomFieldByName(Field.Title) == null)
@@ -60,7 +60,7 @@
 
     @if (Field is DCCreatureHitPointsField hitPointsField)
     {
-        <MudNumericField @bind-Value="hitPointsField.MaximumHP" Label="Maximum HP" Variant="Variant.Outlined" />
+        <MudNumericField @bind-Value="hitPointsField.MaximumHP" Label="Max HP" Variant="Variant.Outlined" />
     }
     else if (Field is DCCreatureNumericField numericField)
     {
@@ -87,8 +87,8 @@
             </div>
         </div>
 
-        <div style="padding:10px;">
-            <table>
+        <div style="padding:10px;overflow-x:auto;">
+            <table style="min-width:600px;">
                 @if (textGridField.HasColumnHeaders)
                 {
                     <tr>
@@ -98,7 +98,7 @@
                         }
                         @foreach (int i in Enumerable.Range(0, textGridField.ColumnHeaders.Count))
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="textGridField.ColumnHeaders[i]" Label="Edit column name" Variant="Variant.Outlined" /></td>
+                            <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="textGridField.ColumnHeaders[i]" Label="Column name" Variant="Variant.Outlined" /></td>
                         }
                     </tr>
                 }
@@ -107,7 +107,7 @@
                     <tr>
                         @if (textGridField.HasRowHeaders)
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="textGridField.RowHeaders[i]" Label="Edit row name" Variant="Variant.Outlined" /></td>
+                            <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="textGridField.RowHeaders[i]" Label="Row name" Variant="Variant.Outlined" /></td>
 
                         }
                         @foreach (int j in Enumerable.Range(0, textGridField.Columns))
@@ -115,9 +115,9 @@
                             <td>
                                 <MudCheckBox T="bool" @bind-Value="textGridField.HasTextLabels[i][j]" Label="Show label"></MudCheckBox>
                                 @if (textGridField.HasTextLabels[i][j] == true) {
-                                    <MudTextField Immediate="true" @bind-Value="textGridField.TextLabels[i][j]" Label="Label" Variant="Variant.Outlined" />
+                                    <MudTextField style="min-width:100px;" Immediate="true" @bind-Value="textGridField.TextLabels[i][j]" Label="Label" Variant="Variant.Outlined" />
                                 }
-                                <MudTextField AutoGrow Immediate="true" @bind-Value="textGridField.TextValues[i][j]" Label="@textGridField.TextLabels[i][j]" Variant="Variant.Outlined" />
+                                <MudTextField style="min-width:100px;" AutoGrow Immediate="true" @bind-Value="textGridField.TextValues[i][j]" Label="@textGridField.TextLabels[i][j]" Variant="Variant.Outlined" />
                             </td>
                         }
                     </tr>
@@ -135,11 +135,11 @@
             @foreach (int i in Enumerable.Range(0, checkBoxField.Labels.Count))
             {
                 <MudStack Row="true" Style=" padding:5px;background-color:#404040;border-radius:5px;">
-                    <MudTextField Immediate="true" @bind-Value="checkBoxField.Labels[i]" Label="Option label" Variant="Variant.Outlined" />
+                    <MudTextField Immediate="true" @bind-Value="checkBoxField.Labels[i]" Label="Name" Variant="Variant.Outlined" />
                     <MudCheckBox Label="@checkBoxField.Labels[i]" @bind-Value="checkBoxField.SelectedOptions[i]"></MudCheckBox>
                     @if (checkBoxField.ShowTextFields == true)
                     {
-                        <MudTextField Immediate="true" @bind-Value="checkBoxField.TextFieldsLabels[i]" Label="Option text field label" Variant="Variant.Outlined" />
+                        <MudTextField Immediate="true" @bind-Value="checkBoxField.TextFieldsLabels[i]" Label="Text label" Variant="Variant.Outlined" />
                     }
                     <MudButton OnClick="@(() => checkBoxField.RemoveOption(checkBoxField.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
                 </MudStack>
@@ -163,7 +163,7 @@
             </div>
         </div>
 
-        <div style="padding:10px;">
+        <div style="padding:10px;overflow-x:auto;">
             <table>
                 @if (checkboxGridField.HasColumnHeaders)
                 {
@@ -174,7 +174,7 @@
                         }
                         @foreach (int i in Enumerable.Range(0, checkboxGridField.ColumnHeaders.Count))
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.ColumnHeaders[i]" Label="Edit column name" Variant="Variant.Outlined" /></td>
+                            <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="checkboxGridField.ColumnHeaders[i]" Label="Column name" Variant="Variant.Outlined" /></td>
                         }
                     </tr>
                 }
@@ -183,7 +183,7 @@
                     <tr>
                         @if (checkboxGridField.HasRowHeaders)
                         {
-                            <td><MudTextField Immediate="true" @bind-Value="checkboxGridField.RowHeaders[i]" Label="Edit row name" Variant="Variant.Outlined" /></td>
+                            <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="checkboxGridField.RowHeaders[i]" Label="Row name" Variant="Variant.Outlined" /></td>
 
                         }
                         @foreach (int j in Enumerable.Range(0, checkboxGridField.Columns))
@@ -220,11 +220,11 @@
     {
         <MudNumericField @bind-Value="statsField.Count" Label="Stats count" Variant="Variant.Outlined" />
         <MudCheckBox Label="Keep values editable" @bind-Value="statsField.ValuesAreEditable"></MudCheckBox>
-        <MudStack Row="true">
+        <MudStack Row="true" style="overflow:auto;">
             @foreach (int i in Enumerable.Range(0, statsField.Count))
             {
                 <MudStack Row="false">
-                    <MudTextField Immediate="true" @bind-Value="statsField.StatsLabels[i]" Label="Stat label" Variant="Variant.Outlined" />
+                    <MudTextField style="min-width:100px;" Immediate="true" @bind-Value="statsField.StatsLabels[i]" Label="Stat label" Variant="Variant.Outlined" />
                     <MudNumericField @bind-Value="statsField.StatsValues[i]" Label="@statsField.StatsLabels[i]" Variant="Variant.Outlined" />
                 </MudStack>
             }

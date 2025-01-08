@@ -117,7 +117,19 @@
 
         _version = CombatService.GetVersion();
 
-        string releaseNotesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot/RELEASE_NOTES.md");
-        _releaseNotes = Markdown.ToHtml(File.ReadAllText(releaseNotesPath));
+        string releaseNotesPath = Path.Combine(FileSystem.AppDataDirectory, "wwwroot/RELEASE_NOTES.md");
+
+        if (File.Exists(releaseNotesPath))
+        {
+            // File exists in AppDataDirectory
+            _releaseNotes = Markdown.ToHtml(File.ReadAllText(releaseNotesPath));
+        }
+        else
+        {
+            // If the file is not in AppDataDirectory, load it directly from the assembly
+            using var stream = Task.Run(() => FileSystem.OpenAppPackageFileAsync("wwwroot/RELEASE_NOTES.md")).Result;
+            using var reader = new StreamReader(stream);
+            _releaseNotes = Markdown.ToHtml(reader.ReadToEnd());
+        }
     }
 }

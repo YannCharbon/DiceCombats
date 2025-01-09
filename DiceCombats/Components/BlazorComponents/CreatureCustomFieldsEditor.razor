@@ -30,7 +30,9 @@
                 </div>
                 @if (EditionMode)
                 {
-                    <div style="padding-top:5px">
+                    <div style="display:flex; justify-content:right; padding:5px;">
+                        <MudIconButton title="Move backward" Icon="@Icons.Material.Filled.ArrowCircleLeft" @onclick="() => MoveField(field, true)" />
+                        <MudIconButton title="Move forward" Icon="@Icons.Material.Filled.ArrowCircleRight" @onclick="() => MoveField(field, false)" />
                         <MudButton style="padding-top:10px;" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="() => RemoveField(field)">Remove</MudButton>
                     </div>
                 }
@@ -121,6 +123,24 @@
     private void RemoveField(DCCreatureCustomField field)
     {
         Fields.Remove(field);
+    }
+
+    private void MoveField(DCCreatureCustomField field, bool upNotDown)
+    {
+        int idx = Fields.IndexOf(field);
+        if (idx <= 0 && upNotDown || idx + 1 >= Fields.Count && !upNotDown)
+        {
+            return;
+        }
+
+        Fields.RemoveAt(idx);
+        if (upNotDown)
+        {
+            Fields.Insert(idx - 1, field);
+        } else
+        {
+            Fields.Insert(idx + 1, field);
+        }
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)

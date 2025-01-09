@@ -1,6 +1,7 @@
 ﻿@inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject PopupNotificationService PopupNotificationService
 
 <style>
     .CombatEditorCreatureBox {
@@ -184,13 +185,17 @@
     {
         foreach (DCCreature creature in Combat.CreaturesList.ToList())
         {
+            uint backupInstanceCount = creature.InCombatInstanceCount;
             RemoveCreature(creature);
             DCCreature? tempCreature = CombatService.GetCreatureList().Find(x => x.Name == creature.Name);
             if (tempCreature != null)
             {
+                tempCreature.InCombatInstanceCount = backupInstanceCount;
                 AddCreature(tempCreature);
             }
         }
+
+        PopupNotificationService.Show("Creature synchronized", "Succesfully updated all creatures from creature tab to newest modifications", PopupNotificationService.Type.SUCCESS, 4000);
     }
 
     private void UpdateCreatureSearchList(string arg)

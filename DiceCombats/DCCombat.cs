@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace DiceCombats
 {
@@ -19,6 +20,7 @@ namespace DiceCombats
         public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; set; } = string.Empty;
         public string Notes {  get; set; } = string.Empty;
+        public int DurationCount { get; set; } = 0;
         public List<DCCreature> CreaturesList { get; set; } = new List<DCCreature>();
 
         public List<List<List<DCCreatureCustomField>>> InCombatCustomFieldsInstances { get; set; } = new List<List<List<DCCreatureCustomField>>>();

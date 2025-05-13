@@ -7,6 +7,7 @@
 *@
 
 @page "/combatmanager/{CombatGuid}"
+@using System.Timers
 
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
@@ -14,106 +15,114 @@
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
-        position: fixed;
-        bottom: 50px;
-        right: 10px;
-        width: 450px;
-        background-color: #303030;
-        border: 1px solid #505050;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        padding: 10px;
-        z-index: 1000;
-        max-height: 450px;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        zoom: 0.85;
+    position: fixed;
+    bottom: 50px;
+    right: 10px;
+    width: 450px;
+    background-color: #303030;
+    border: 1px solid #505050;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    z-index: 1000;
+    max-height: 450px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    zoom: 0.85;
     }
 
     @@media screen and (max-width: 768px) {
-        .CombatEditorFloatingInitiativeWindow {
-            width: calc(100% - 1rem);
-            max-height: 350px;
-        }
+    .CombatEditorFloatingInitiativeWindow {
+    width: calc(100% - 1rem);
+    max-height: 350px;
+    }
     }
 
     .CombatEditorCreatureLayout {
-        background-color: #303030;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        border: 1px solid #505050;
-        padding: 5px;
-        border-radius: 10px;
+    background-color: #303030;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    border: 1px solid #505050;
+    padding: 5px;
+    border-radius: 10px;
     }
 
     .CombatEditorCustomFieldsLayout {
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        border: 1px solid #505050;
-        padding: 5px;
-        border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    border: 1px solid #505050;
+    padding: 5px;
+    border-radius: 10px;
     }
 
     .NotesLabel label {
-        background-color: #004D40;
-        color: white;
-        padding: 2px;
-        border-radius: 4px;
+    background-color: #004D40;
+    color: white;
+    padding: 2px;
+    border-radius: 4px;
     }
 
     .markdown-content {
-        color: white;
+    color: white;
     }
 
-        .markdown-content table,
-        .markdown-content th,
-        .markdown-content td {
-            border: 1px solid white;
-            padding: 5px;
-        }
+    .markdown-content table,
+    .markdown-content th,
+    .markdown-content td {
+    border: 1px solid white;
+    padding: 5px;
+    }
 
-        .markdown-content th,
-        .markdown-content td {
-            background-color: #004D40;
-        }
+    .markdown-content th,
+    .markdown-content td {
+    background-color: #004D40;
+    }
 
 
     .masonry-layout {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem; /* Space between items */
-        zoom:0.85;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* Space between items */
+    zoom:0.85;
     }
 
     .masonry-item {
-        display: block;
-        width: calc(50% - 1rem); /* Adjust width for 3 items per row */
-        margin-bottom: 1rem;
+    display: block;
+    width: calc(50% - 1rem); /* Adjust width for 3 items per row */
+    margin-bottom: 1rem;
     }
 
     @@media screen and (max-width: 768px) {
-        .masonry-item {
-            width: calc(100% - 1rem); /* Adjust for smaller screens */
-        }
+    .masonry-item {
+    width: calc(100% - 1rem); /* Adjust for smaller screens */
+    }
     }
 
     @@media screen and (max-width: 480px) {
-        .masonry-item {
-            width: 100%; /* Single column for narrow screens */
-        }
+    .masonry-item {
+    width: 100%; /* Single column for narrow screens */
+    }
     }
 
+    .play-pause-stop-button {
+        border-radius: 30px;
+        border-width: 2px;
+        border-color: var(--mud-palette-primary);
+        color: var(--mud-palette-primary);
+        padding: 3px;
+        cursor: pointer;
+    }
 </style>
 
 <script>
     window.initializeMasonry = (selector) => {
-        const grid = document.querySelector(selector);
-        if (grid) {
-            new Masonry(grid, {
-                itemSelector: '.masonry-item',
-                columnWidth: '.masonry-item',
-                percentPosition: true,
-                gutter: 10
-            });
-        }
+    const grid = document.querySelector(selector);
+    if (grid) {
+    new Masonry(grid, {
+    itemSelector: '.masonry-item',
+    columnWidth: '.masonry-item',
+    percentPosition: true,
+    gutter: 10
+    });
+    }
     };
 </script>
 
@@ -160,12 +169,27 @@
     }
 </div>
 
-<MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
-    <MudStack Row="true">
-        <h1>@_combat.Name</h1>
-        <MudButton OnClick="() => CreaturesSelectorModalRef?.Show()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">Edit</MudButton>
+<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:start; padding-bottom:5px;">
+    <MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
+        <MudStack Row="true">
+            <h1>@_combat.Name</h1>
+            <MudButton OnClick="() => CreaturesSelectorModalRef?.Show()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">Edit</MudButton>
+        </MudStack>
     </MudStack>
-</MudStack>
+    <MudStack Row="true" AlignItems="AlignItems.Center">
+        @if (_timer.Enabled)
+        {
+            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="PauseTimer" Icon="@Icons.Material.Filled.Pause" />
+        }
+        else
+        {
+            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StartTimer" Icon="@Icons.Material.Filled.PlayArrow" />
+        }
+        <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StopTimer" Icon="@Icons.Material.Filled.Stop" />
+        <MudItem Style="font-size: large;">@GetDurationAsString()</MudItem>
+    </MudStack>
+</div>
+
 
 <div style="margin-top:5px;margin-bottom:10px;">
     <MudTextField AutoGrow spellcheck="false" @bind-Value="_combat.Notes" Label="Notes" Class="NotesLabel" Variant="Variant.Outlined"></MudTextField>
@@ -277,6 +301,8 @@
 
     private bool _initiativeWindowsMaximized = true;
 
+    private System.Timers.Timer _timer = new System.Timers.Timer(1000);
+
     protected override void OnInitialized()
     {
         Debug.WriteLine(CombatGuid);
@@ -377,6 +403,44 @@
         CombatService.AddCombat(_combat);
 
         CombatService.SaveCombats();
+    }
+
+    private void TimerElapsed(Object? source, ElapsedEventArgs? e)
+    {
+        if (source is null || e is null)
+        {
+            throw new ArgumentNullException(nameof(e));
+        }
+
+        _combat.DurationCount++;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void StartTimer()
+    {
+        _timer.Elapsed += TimerElapsed;
+        _timer.Start();
+        _timer.Enabled = true;
+    }
+
+    private void PauseTimer()
+    {
+        _timer.Enabled = false;
+    }
+
+    private void StopTimer()
+    {
+        _timer.Stop();
+        _timer.Enabled = false;
+        _timer.Elapsed -= TimerElapsed;
+        _combat.DurationCount = 0;
+    }
+
+    private string GetDurationAsString()
+    {
+        TimeSpan ts = TimeSpan.FromSeconds(_combat.DurationCount);
+        DateTime dt = new DateTime(ts.Ticks);
+        return dt.ToString("HH:mm:ss");
     }
 
 }

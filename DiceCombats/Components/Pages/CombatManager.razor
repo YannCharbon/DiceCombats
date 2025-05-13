@@ -59,6 +59,22 @@
         border-radius: 4px;
     }
 
+    .markdown-content {
+        color: white;
+    }
+
+        .markdown-content table,
+        .markdown-content th,
+        .markdown-content td {
+            border: 1px solid white;
+            padding: 5px;
+        }
+
+        .markdown-content th,
+        .markdown-content td {
+            background-color: #004D40;
+        }
+
 
     .masonry-layout {
         display: flex;
@@ -170,6 +186,12 @@
                     {
                         <div style="color:black">
                             @((MarkupString)creature.HtmlSheet)
+                        </div>
+                    }
+                    else if (creature.MarkdownSheet != string.Empty)
+                    {
+                        <div class="markdown-content">
+                            @((MarkupString)creature.GetMarkdownSheetAsHtml())
                         </div>
                     }
                     else if (creature.IsPlayer)

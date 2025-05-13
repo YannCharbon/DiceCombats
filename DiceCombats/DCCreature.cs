@@ -15,6 +15,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using MudBlazor;
+using Markdig;
 
 namespace DiceCombats
 {
@@ -27,6 +28,8 @@ namespace DiceCombats
         public string ImageSheetBas64 { get; private set; } = string.Empty;
         [JsonInclude]
         public string HtmlSheet { get; private set; } = string.Empty;
+        [JsonInclude]
+        public string MarkdownSheet { get; private set; } = string.Empty;
 
         public List<DCCreatureCustomField> CustomFields { get; set; } = new List<DCCreatureCustomField>();
         public uint InCombatInstanceCount { get; set; } = 1;
@@ -49,6 +52,20 @@ namespace DiceCombats
         public void SetHtmlSheet(string htmlSheet)
         {
             HtmlSheet = htmlSheet;
+        }
+
+        public void SetMarkdownSheet(string markdownSheet)
+        {
+            MarkdownSheet = markdownSheet;
+        }
+
+        public string GetMarkdownSheetAsHtml()
+        {
+            var pipeline = new MarkdownPipelineBuilder()
+                .UseAdvancedExtensions() // This includes PipeTables and more
+                .Build();
+
+            return Markdown.ToHtml(MarkdownSheet, pipeline);
         }
 
         public string SerializeToJson()

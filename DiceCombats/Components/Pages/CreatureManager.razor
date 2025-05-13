@@ -1,12 +1,51 @@
-﻿@page "/creaturemanager/{CreatureGuid}"
+﻿@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@page "/creaturemanager/{CreatureGuid}"
 
 @using System.Net
+@using Markdig
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using HtmlAgilityPack
 
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
+
+<style>
+    .markdown-content {
+    color: white;
+    }
+
+    .markdown-content table,
+    .markdown-content th,
+    .markdown-content td {
+    border: 1px solid white;
+    padding: 5px;
+    }
+
+    .markdown-content th,
+    .markdown-content td {
+    background-color: #004D40;
+    }
+
+    .one-column-item {
+    display: block;
+    width: calc(50% - 1rem); /* Adjust width for 3 items per row */
+    margin-bottom: 1rem;
+    }
+
+    @@media screen and (max-width: 480px) {
+    .one-column-item {
+    width: 95%; /* Single column for narrow screens */
+    }
+    }
+</style>
 
 @if (creature == null)
 {
@@ -31,6 +70,25 @@
                 @((MarkupString)creature.HtmlSheet)
             </div>
         }
+        else if (creature.MarkdownSheet != string.Empty)
+        {
+            if (_editionMode == true)
+            {
+                <div style="display:flex;flex-wrap:wrap;">
+                    <div class="one-column-item" style="padding:10px;">
+                        <MudTextField DebounceInterval="500" AutoGrow MaxLines="20" Label="Edit Markdown" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@creature.MarkdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
+                    </div>
+                    <div class="markdown-content one-column-item" style="padding:10px;">
+                        @((MarkupString)creature.GetMarkdownSheetAsHtml())
+                    </div>
+                </div>
+            } else
+            {
+                <div class="markdown-content">
+                    @((MarkupString)creature.GetMarkdownSheetAsHtml())
+                </div>
+            }
+        }
         else if (creature.IsPlayer)
         {
             <h3>Player</h3>
@@ -46,17 +104,6 @@
         <CreatureCustomFieldsEditor Fields="creature.CustomFields" EditionMode="_editionMode" />
     </div>
 }
-
-
-
-
-@*
- * DiceCombats - Copyright (C) 2025 Yann Charbon
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- * This file is part of DiceCombats, released under the GNU GPL v3.
- * See the LICENSE file in the repository root for details.
-*@
 
 @code {
     [Parameter]
@@ -88,5 +135,15 @@
             CombatService.DeleteCreature(creature);
         }
         Navigation.NavigateTo($"/creaturesexplorer");
+    }
+
+    private async Task _previewMarkdownSheet(string markdownSheet)
+    {
+        if (creature == null)
+        {
+            return;
+        }
+        creature.SetMarkdownSheet(markdownSheet);
+        await InvokeAsync(StateHasChanged);
     }
 }

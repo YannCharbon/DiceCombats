@@ -12,6 +12,7 @@
 @using Microsoft.AspNetCore.Components
 @using Microsoft.AspNetCore.Components.Web
 @using HtmlAgilityPack
+@using Markdig
 
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
@@ -19,20 +20,103 @@
 <h3>Add new creature</h3>
 
 <style>
+    .selected-button {
+        box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 0.9);
+        border: 2px solid #505050;
+    }
+
+    .unselected-button {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        border: 2px solid #505050;
+    }
+
+    .markdown-html-preview {
+    border-radius: 10px;
+    background-color: #404040;
+    padding:10px;
+    margin-top:10px;
+    }
+
+    .section-title-name {
+    border-radius: 60px;
+    padding: 0px 20px 0px 0px;
+    margin:10px;
+    background-color: darkcyan;
+    display: flex;
+    align-items: center;
+    }
+
+    .markdown-content {
+        color: white;
+    }
+
+        .markdown-content table,
+        .markdown-content th,
+        .markdown-content td {
+            border: 1px solid white;
+            padding: 5px;
+        }
+
+        .markdown-content th,
+        .markdown-content td {
+            background-color: #004D40;
+        }
+
+    .one-column-item {
+        display: block;
+        width: calc(50% - 1rem); /* Adjust width for 3 items per row */
+        margin-bottom: 1rem;
+    }
+
+    @@media screen and (max-width: 480px) {
+        .one-column-item {
+            width: 95%; /* Single column for narrow screens */
+        }
+    }
 </style>
 
-<div class="row">
-    <div class="col col-md-2">
-        <MudSelect T="string" Label="Layout" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="_layoutMode">
-            <MudSelectItem Value="@("Local image")" />
-            <MudSelectItem Value="@("aidedd.org website")" />
-            <MudSelectItem Value="@("Manual creature")" />
-            <MudSelectItem Value="@("Player")" />
-        </MudSelect>
-    </div>
-    <div class="col col-md-4">
-        @if (_layoutMode == "Local image")
-        {
+<div style="display:flex; flex-wrap:wrap; margin-bottom:20px;">
+    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Local image" ? "selected-button" : "unselected-button")"
+        title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Local image";})">
+        <MudStack Row="false" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Material.Filled.Image" />
+            <MudItem>Local image</MudItem>
+        </MudStack>
+    </MudButton>
+    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "aidedd.org website" ? "selected-button" : "unselected-button")"
+               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "aidedd.org website";})">
+        <MudStack Row="false" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Custom.Uncategorized.ChessRook" />
+            <MudItem>aidedd.org website</MudItem>
+        </MudStack>
+    </MudButton>
+    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Markdown" ? "selected-button" : "unselected-button")"
+               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Markdown";})">
+        <MudStack Row="false" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Material.Filled.TextSnippet" />
+            <MudItem>Markdown</MudItem>
+        </MudStack>
+    </MudButton>
+    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Manual creature" ? "selected-button" : "unselected-button")"
+               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Manual creature";})">
+        <MudStack Row="false" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Material.Filled.Architecture" />
+            <MudItem>Manual creature</MudItem>
+        </MudStack>
+    </MudButton>
+    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Player" ? "selected-button" : "unselected-button")"
+               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Player";})">
+        <MudStack Row="false" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Material.Filled.Person" />
+            <MudItem>Player</MudItem>
+        </MudStack>
+    </MudButton>
+</div>
+
+<div>
+    @if (_layoutMode == "Local image")
+    {
+        <div>
             <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" MaximumFileCount="1">
                 <ActivatorContent>
                     <MudFab Color="Color.Secondary"
@@ -40,30 +124,7 @@
                             Label="Load picture" />
                 </ActivatorContent>
             </MudFileUpload>
-        }
-        else if (_layoutMode == "aidedd.org website")
-        {
-            <MudTextField DebounceInterval="500" Label="Enter URL" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
-            <MudLink Href="https://www.aidedd.org/">Visit aidedd.org</MudLink>
-        }
-    </div>
-    @if (_layoutMode == "aidedd.org website")
-    {
-        <div class="col col-md-2">
-            @if (_aideDDCreatureName != "N/A")
-            {
-                <div style="padding:10px;">
-                    <span>Found @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
-                </div>
-            }
         </div>
-    }
-</div>
-
-<div>
-
-    @if (_layoutMode == "Local image")
-    {
         @if (!string.IsNullOrEmpty(_localImageBase64))
         {
             <div style="padding:20px;">
@@ -86,6 +147,20 @@
 
     @if (_layoutMode == "aidedd.org website")
     {
+        <div>
+            <div>
+                <MudTextField DebounceInterval="500" Label="Enter URL" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
+                <MudLink Href="https://www.aidedd.org/">Visit aidedd.org</MudLink>
+            </div>
+            <div>
+                @if (_aideDDCreatureName != "N/A")
+                {
+                    <div style="padding:10px;">
+                        <span>Found @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                    </div>
+                }
+            </div>
+        </div>
         <div style="padding:20px;color:black;">
             @((MarkupString)_aideDDCreatureSheet)
         </div>
@@ -100,6 +175,31 @@
                 </div>
             }
 
+        </div>
+    }
+
+    @if (_layoutMode == "Markdown")
+    {
+        <div class="row">
+            <div class="col col-md-4">
+                <MudTextField Immediate="true" Label="Enter creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+            </div>
+            @if (_creatureName != "N/A" && _creatureName != "")
+            {
+                <div class="col col-md-2">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                </div>
+            }
+        </div>
+        <div style="display:flex;flex-wrap:wrap;">
+            <div class="one-column-item" style="padding-right:10px;">
+                <MudTextField DebounceInterval="500" AutoGrow MaxLines="20" Label="Enter Markdown" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_markdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
+            </div>
+            <div class="markdown-html-preview one-column-item" style="padding-left:10px;">
+                <div class="markdown-content">
+                    @((MarkupString)_markdownHtmlPreview)
+                </div>
+            </div>
         </div>
     }
 
@@ -137,6 +237,7 @@
 @code {
     private string _layoutMode { get; set; } = "Local image";
     private string _aideDDCreatureUrl { get; set; } = "";
+    private string _markdownSheet { get; set; } = "";
 
     private string _creatureName = "";
 
@@ -144,6 +245,8 @@
     private string _aideDDCreatureName = "N/A";
 
     private string _localImageBase64 = "";
+
+    private string _markdownHtmlPreview = "";
 
 
     private async Task UploadFiles(IBrowserFile file)
@@ -183,12 +286,41 @@
         _creatureName = _aideDDCreatureName;
     }
 
+    private async Task _previewMarkdownSheet(string markdownSheet)
+    {
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions() // This includes PipeTables and more
+            .Build();
+
+        _markdownHtmlPreview = Markdown.ToHtml(markdownSheet, pipeline);
+        _markdownSheet = markdownSheet;
+
+        if (_creatureName == "" && markdownSheet.Contains("#"))
+        {
+            foreach (var line in markdownSheet.Split('\n'))
+            {
+                if (line.Contains('#'))
+                {
+                    var potentialName = line.Trim('#').Trim();
+                    _creatureName = potentialName;
+                    break;
+                }
+            }
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
     private void _registerNewCreature()
     {
         DCCreature newCreature = new DCCreature(_creatureName);
         if (_layoutMode == "Local image")
         {
             newCreature.SetImageSheetBase64(_localImageBase64);
+        }
+        else if (_layoutMode == "Markdown")
+        {
+            newCreature.SetMarkdownSheet(_markdownSheet);
         }
         else if (_layoutMode == "aidedd.org website")
         {

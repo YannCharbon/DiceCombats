@@ -77,7 +77,7 @@ public static class WebViewSoftInputPatch
     static int GetStatusBarHeight()
     {
         int result = 0;
-        Resources resources = Activity.Resources;
+        var resources = Activity.Resources;
         int resourceId = resources.GetIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0)
         {

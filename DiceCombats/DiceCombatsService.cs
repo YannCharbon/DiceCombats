@@ -16,6 +16,7 @@ using System.Diagnostics;
 using static MudBlazor.FilterOperator;
 using System.Reflection;
 using System.Net.Http.Headers;
+using System.Globalization;
 
 namespace DiceCombats
 {
@@ -363,6 +364,11 @@ namespace DiceCombats
             }
 
             return null; // No new release or error occurred
+        }
+
+        public bool IsCurrentCulture(string cultureCode)
+        {
+            return CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == cultureCode;
         }
     }
 

@@ -10,6 +10,7 @@
 @using System.Reflection
 
 @inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.WelcomeMessage> Loc
 
 <style>
     .welcome-header {
@@ -43,17 +44,17 @@
     <div class="welcome-header">
         @if (UpdateAvailable)
         {
-            <h2>New update available</h2>
+            <h2>@Loc["UpdateAvailable"]</h2>
         }
         else
         {
             @if (!NewVersion)
             {
-                <h2>Thank you for choosing DiceCombats!</h2>
+                <h2>@Loc["Thanks"]</h2>
             }
             else
             {
-                <h2>New version - v@_version</h2>
+                <h2>@Loc["NewVersion"] - v@_version</h2>
             }
         }
     </div>
@@ -62,20 +63,24 @@
 <div class="welcome-body">
     @if (UpdateAvailable)
     {
-        <h5>DiceCombats <b>@UpdateInfos?.tag_name</b> is available.</h5>
+        <h5>DiceCombats <b>@UpdateInfos?.tag_name</b> @Loc["IsAvailable"].</h5>
         <br />
-        <h5>Visit <a style="color:darkcyan;" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> to download the update or go to app settings if you want to do it later.</h5>
+        @if (CombatService.IsCurrentCulture("fr")) {
+            <h5>Se rendre sur <a style="color:darkcyan;" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> pour télécharger la mise à jour. Si vous souhaitez le faire plus tard, veuillez vous rendre dans les paramètres.</h5>
+        } else {
+            <h5>Visit <a style="color:darkcyan;" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> to download the update or go to app settings if you want to do it later.</h5>
+        }
     } else
     {
         @if (!NewVersion)
         {
-            <h3>Key Features</h3>
-            <p>DiceCombats is a tabletop RPG combat manager, designed to make your game mastering smooth and enjoyable.</p>
+            <h3>@Loc["KeyFeatures"]</h3>
+            <p>@Loc["KeyFeaturesDescription"]</p>
             <ul>
-                <li><strong>Flexible Creature Creation:</strong> Customize creatures and save them for reuse in any system.</li>
-                <li><strong>Modular Combat Management:</strong> Track initiative, hit points, and statuses with ease.</li>
-                <li><strong>System-Agnostic Design:</strong> Adapt the tool to your campaign's needs.</li>
-                <li><strong>Customizable Setup:</strong> Import/export data and configure settings to suit your GM style.</li>
+                <li>@((MarkupString)Loc["KeyFeature1"].Value)</li>
+                <li>@((MarkupString)Loc["KeyFeature2"].Value)</li>
+                <li>@((MarkupString)Loc["KeyFeature3"].Value)</li>
+                <li>@((MarkupString)Loc["KeyFeature4"].Value)</li>
             </ul>
         }
         else
@@ -84,14 +89,14 @@
                 @((MarkupString)_releaseNotes)
             </div>
         }
-        <h3>License</h3>
-        <p>DiceCombats is open-source software licensed under the <b>GPL-3.0 license</b>. For details, visit <a href="https://github.com/YannCharbon/DiceCombats" style="color:white;" target="_blank"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Title="GitHub" />&nbsp;GitHub</a>.</p>
-        <h3>Support the project</h3>
+        <h3>@Loc["License"]</h3>
+        <p>@((MarkupString)Loc["LicenseDescription"].Value) <a href="https://github.com/YannCharbon/DiceCombats" style="color:white;" target="_blank"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Title="GitHub" />&nbsp;GitHub</a>.</p>
+        <h3>@Loc["SupportProject"]</h3>
         <p>
-            Feel free to suggest any new feature, improvements and bug fixes on <a href="https://github.com/YannCharbon/DiceCombats" style="color:white;" target="_blank"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Title="GitHub" />&nbsp;GitHub</a>.
-            As I am developing this software on my free time, please consider that updating/bug fixing might be slow.
+            @Loc["SupportProjectDescription1"] <a href="https://github.com/YannCharbon/DiceCombats" style="color:white;" target="_blank"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Title="GitHub" />&nbsp;GitHub</a>.
+            @Loc["SupportProjectDescription2"]
         </p>
-        <p>If you enjoy using DiceCombats and want to support its development, a donation on Paypal is really appreciated.</p>
+        <p>@Loc["DonationDescription"]</p>
         <span>
             <a href="https://www.paypal.com/donate/?hosted_button_id=4X9ZURL5T4E6N" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button">
                 <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" />
@@ -101,7 +106,7 @@
         <br />
         @if (!SettingsView)
         {
-            <h4>Thanks a lot and good game!</h4>
+            <h4>@Loc["Thanks2"]</h4>
         }
     }
 </div>

@@ -8,24 +8,26 @@
 
 @page "/settings"
 
+@using System.Globalization
 @inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.Settings> Loc
 
 <style>
     .settings-group-name {
-        border-radius: 60px;
-        padding: 0px 20px 0px 0px;
-        margin:10px;
-        background-color: darkcyan;
-        display: flex;
-        align-items: center;
+    border-radius: 60px;
+    padding: 0px 20px 0px 0px;
+    margin:10px;
+    background-color: darkcyan;
+    display: flex;
+    align-items: center;
     }
 
     .settings-group {
-        margin:10px;
-        padding:10px;
-        border-radius:10px;
-        background-color:#505050;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+    margin:10px;
+    padding:10px;
+    border-radius:10px;
+    background-color:#505050;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
     }
 </style>
 
@@ -33,15 +35,15 @@
 <div class="settings-group">
     <div style="display:flex;">
         <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" Title="Settings" />
-            <h3>About</h3>
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>@Loc["TitleAbout"]</h3>
         </div>
     </div>
-    
+
     <div>
         <MudStack Row="true" AlignItems="AlignItems.Center">
             <MudItem>
-                <h5>Current software: DiceCombats @CombatService.GetVersion()</h5>
+                <h5>@Loc["CurrentSoftware"] DiceCombats @CombatService.GetVersion()</h5>
             </MudItem>
             <MudItem>
                 <h6>&copy; Copyright Yann Charbon</h6>
@@ -54,19 +56,60 @@
 <div class="settings-group">
     <div style="display:flex;">
         <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" Title="Settings" />
-            <h3>Updates</h3>
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>@Loc["TitleUpdates"]</h3>
         </div>
     </div>
 
     @if (_updateAvailable)
     {
-        <h5>DiceCombats <b>@_updateInfos?.tag_name</b> is available.</h5>
-        <br />
-        <h5>Visit <a style="color:darkcyan;" href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> to download the update.</h5>
+        @if (CombatService.IsCurrentCulture("fr"))
+        {
+            <h5>DiceCombats <b>@_updateInfos?.tag_name</b> est disponible</h5>
+            <br />
+            <h5>Se rendre sur <a style="color:darkcyan;" href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> pour télécharger la mise à jour.</h5>
+        } else
+        {
+            <h5>DiceCombats <b>@_updateInfos?.tag_name</b> is available.</h5>
+            <br />
+            <h5>Visit <a style="color:darkcyan;" href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> to download the update.</h5>
+        }
     } else
     {
-        <h5>DiceCombats is up to date.</h5>
+        @if (CombatService.IsCurrentCulture("fr"))
+        {
+            <h5>DiceCombats est à jour.</h5>
+        } else
+        {
+            <h5>DiceCombats is up to date.</h5>
+        }
+    }
+</div>
+
+<div class="settings-group" style="margin-bottom:20px;">
+    <div style="display:flex;">
+        <div class="settings-group-name">
+            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>@Loc["TitleLanguages"]</h3>
+        </div>
+    </div>
+
+    @if (CombatService.IsCurrentCulture("en"))
+    {
+        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Outlined" Disabled="true">English</MudButton>
+    }
+    else
+    {
+        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => (Application.Current as App)?.SetCultureAndReload("en"))">Switch to English</MudButton>
+    }
+    
+    @if (CombatService.IsCurrentCulture("fr"))
+    {
+        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Outlined" Disabled="true">Français</MudButton>
+    }
+    else
+    {
+        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => (Application.Current as App)?.SetCultureAndReload("fr"))">Passer au français</MudButton>
     }
 </div>
 

@@ -58,4 +58,122 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
         <PackageReference Include="MudBlazor" Version="7.3.0" />
     </ItemGroup>
+
+	<PropertyGroup>
+		<NeutralLanguage>en-US</NeutralLanguage>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+      <Compile Update="Resources\Localization\CombatManager.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CombatManager.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\CombatsExplorer.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CombatsExplorer.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\CreatureCustomFieldRenderer.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CreatureCustomFieldRenderer.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\CreatureCustomFieldsEditor.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CreatureCustomFieldsEditor.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\CreatureSelector.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CreatureSelector.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\CreaturesExplorer.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CreaturesExplorer.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\CreatureManager.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CreatureManager.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\DCNavMenu.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>DCNavMenu.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\Home.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Home.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\NewCreature.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>NewCreature.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\Settings.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Settings.resx</DependentUpon>
+      </Compile>
+      <Compile Update="Resources\Localization\WelcomeMessage.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>WelcomeMessage.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\Localization\CombatManager.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CombatManager.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\CombatsExplorer.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CombatsExplorer.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\CreatureCustomFieldRenderer.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CreatureCustomFieldRenderer.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\CreatureCustomFieldsEditor.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CreatureCustomFieldsEditor.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\CreatureSelector.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CreatureSelector.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\CreaturesExplorer.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CreaturesExplorer.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\CreatureManager.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CreatureManager.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\DCNavMenu.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>DCNavMenu.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\Home.resx">
+        <Generator>PublicResXFileCodeGenerator</Generator>
+        <LastGenOutput>Home.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\NewCreature.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>NewCreature.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\Settings.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\WelcomeMessage.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>WelcomeMessage.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
 </Project>

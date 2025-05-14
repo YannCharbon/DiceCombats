@@ -9,6 +9,9 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using MudBlazor.Services;
+using System.Globalization;
+using System.Diagnostics;
+
 
 #if WINDOWS
 using Microsoft.UI;
@@ -104,6 +107,13 @@ namespace DiceCombats
 #endif
 
             builder.Services.AddScoped<PopupNotificationService>();
+
+            builder.Services.AddLocalization();
+
+            string cultureCode = Preferences.Get("Language", CultureInfo.CurrentUICulture.Name);
+            var culture = new CultureInfo(cultureCode);
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             var app = builder.Build();
             ServiceProvider = app.Services; // Assign the root service provider

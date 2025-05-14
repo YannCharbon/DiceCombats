@@ -12,6 +12,7 @@
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
+@inject IStringLocalizer<Resources.Localization.CombatManager> Loc
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
@@ -132,16 +133,16 @@
 
 <div class="CombatEditorFloatingInitiativeWindow">
     <MudGrid Style="padding:10px;">
-        <MudItem><h3>Initiative</h3></MudItem>
+        <MudItem><h3>@Loc["InitiativeTitle"]</h3></MudItem>
         @if (_initiativeWindowsMaximized)
         {
-            <MudItem><MudIcon @onclick="SortCreaturesInitiativeRankByRoll" Icon="@Icons.Material.Filled.Sort" Title="Sort" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
-            <MudItem><MudIcon @onclick="CreaturesInitiativeReset" Icon="@Icons.Material.Filled.Sync" Title="Reset" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
-            <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Reduce" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
+            <MudItem><MudIcon @onclick="SortCreaturesInitiativeRankByRoll" Icon="@Icons.Material.Filled.Sort" Title="@Loc["InitiativeSort"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
+            <MudItem><MudIcon @onclick="CreaturesInitiativeReset" Icon="@Icons.Material.Filled.Sync" Title="@Loc["InitiativeReset"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
+            <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@Loc["InitiativeMinimize"]" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
         }
         else
         {
-            <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Maximize" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
+            <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="@Loc["InitiativeMaximize"]" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
         }
     </MudGrid>
 
@@ -149,10 +150,10 @@
     {
         <table>
             <tr style="border-bottom:solid; border-bottom-width:1px;">
-                <th>Creature</th>
-                <th>Roll</th>
-                <th>Order</th>
-                <th>Quick link</th>
+                <th>@Loc["InitiativeCreature"]</th>
+                <th>@Loc["InitiativeRoll"]</th>
+                <th>@Loc["InitiativeOrder"]</th>
+                <th>@Loc["InitiativeQuickLink"]</th>
             </tr>
             @foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
             {
@@ -161,7 +162,7 @@
                     <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:#A0A0A0;" @bind-Value="creature.InitiativeRoll"></MudNumericField></td>
                     <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:white;font-weight:bold;font-size:16pt" @bind-Value="creature.InitiativeRank"></MudNumericField></td>
                     <td style="width:120px;padding:5px;">
-                        <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:darkcyan;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">Quick jump</a>
+                        <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:darkcyan;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">@Loc["InitiativeQuickLinkBtn"]</a>
                     </td>
                 </tr>
             }
@@ -173,26 +174,26 @@
     <MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
         <MudStack Row="true">
             <h1>@_combat.Name</h1>
-            <MudButton OnClick="() => CreaturesSelectorModalRef?.Show()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">Edit</MudButton>
+            <MudButton OnClick="() => CreaturesSelectorModalRef?.Show()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">@Loc["EditBtn"]</MudButton>
         </MudStack>
     </MudStack>
     <MudStack Row="true" AlignItems="AlignItems.Center">
         @if (_timer.Enabled)
         {
-            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="PauseTimer" Icon="@Icons.Material.Filled.Pause" />
+            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="PauseTimer" Icon="@Icons.Material.Filled.Pause" Title="@Loc["PauseBtn"]" />
         }
         else
         {
-            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StartTimer" Icon="@Icons.Material.Filled.PlayArrow" />
+            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StartTimer" Icon="@Icons.Material.Filled.PlayArrow" Title="@Loc["PlayBtn"]" />
         }
-        <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StopTimer" Icon="@Icons.Material.Filled.Stop" />
+        <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StopTimer" Icon="@Icons.Material.Filled.Stop" Title="@Loc["StopBtn"]" />
         <MudItem Style="font-size: large;">@GetDurationAsString()</MudItem>
     </MudStack>
 </div>
 
 
 <div style="margin-top:5px;margin-bottom:10px;">
-    <MudTextField AutoGrow spellcheck="false" @bind-Value="_combat.Notes" Label="Notes" Class="NotesLabel" Variant="Variant.Outlined"></MudTextField>
+    <MudTextField AutoGrow spellcheck="false" @bind-Value="_combat.Notes" Label="@Loc["NotesTb"]" Class="NotesLabel" Variant="Variant.Outlined"></MudTextField>
 </div>
 
 <div id="masonry-layout" class="masonry-layout">

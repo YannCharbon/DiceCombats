@@ -13,26 +13,27 @@
 @inject NavigationManager Navigation
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
+@inject IStringLocalizer<Resources.Localization.CreaturesExplorer> Loc
 
 <style>
     .CreatureViewerCreature {
-        padding: 10px;
-        margin: 5px;
-        border-radius: 10px;
-        background-color: #303030;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+    background-color: #303030;
     }
 </style>
 
 <div style="padding-top:10px; padding-bottom:20px; display: flex; justify-content: flex-end; align-items: center;">
     <MudStack Row="true" Wrap="Wrap.Wrap">
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">New creature</MudButton>
-        <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large">Export creatures</MudButton>
-        <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Large">Import one or multiple creatures</MudButton>
+        <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["NewCreatureBtn"]</MudButton>
+        <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large">@Loc["ExportCreaturesBtn"]</MudButton>
+        <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Large">@Loc["ImportCreaturesBtn"]</MudButton>
     </MudStack>
 </div>
 
 <div style="margin-bottom:20px;">
-    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">Creatures</span></h3>
+    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">@Loc["CreaturesTitle"]</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
     @for (char chr = 'a'; chr < 'z'; chr++)
@@ -49,9 +50,9 @@
                         <MudStack Row="true">
                             <h4>@creature.Name</h4>
                             <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
-                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
-                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
+                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["EditCreatureBtn"]"></MudIconButton>
+                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["ExportCreatureBtn"]"></MudIconButton>
+                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["DeleteCreatureBtn"]"></MudIconButton>
                             </MudButtonGroup>
                         </MudStack>
                     </div>
@@ -63,7 +64,7 @@
 </div>
 
 <div style="margin-top:20px;margin-bottom:20px;">
-    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">Players</span></h3>
+    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">@Loc["PlayersTitle"]</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
     @for (char chr = 'a'; chr < 'z'; chr++)
@@ -80,9 +81,9 @@
                         <MudStack Row="true">
                             <h4>@creature.Name</h4>
                             <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
-                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
-                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
+                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["EditCreatureBtn"]"></MudIconButton>
+                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["ExportCreatureBtn"]"></MudIconButton>
+                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["DeleteCreatureBtn"]"></MudIconButton>
                             </MudButtonGroup>
                         </MudStack>
                     </div>
@@ -113,7 +114,12 @@
 
         await FileHandler.SaveFileAsync(fileName, data);
 
-        PopupNotificationService.Show("Creature export", $"Successfully exported '{creature.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
+        if (CombatService.IsCurrentCulture("fr"))
+        {
+            PopupNotificationService.Show("Exportation", $"Export de '{creature.Name}' réussi", PopupNotificationService.Type.SUCCESS, 3000);
+        } else {
+            PopupNotificationService.Show("Creature export", $"Successfully exported '{creature.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
+        }
     }
 
     private async Task ExportAllCreatures()
@@ -130,7 +136,13 @@
 
         await FileHandler.SaveFileAsync(fileName, data);
 
-        PopupNotificationService.Show("Creature export", "Successfully exported all creatures", PopupNotificationService.Type.SUCCESS, 3000);
+        if (CombatService.IsCurrentCulture("fr"))
+        {
+            PopupNotificationService.Show("Exportation", $"Export de toutes les créatures réussi", PopupNotificationService.Type.SUCCESS, 3000);
+        } else
+        {
+            PopupNotificationService.Show("Creature export", "Successfully exported all creatures", PopupNotificationService.Type.SUCCESS, 3000);
+        }
     }
 
     private async Task ImportCreatures()
@@ -157,7 +169,14 @@
                     {
                         Debug.WriteLine($"The creature '{newCreature.Name}' already exists.");
                     }
-                    PopupNotificationService.Show("Creature import", $"Successfully imported {newCreature.Name}", PopupNotificationService.Type.SUCCESS, 3000);
+
+                    if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        PopupNotificationService.Show("Importation", $"Import de '{newCreature.Name}' réussi", PopupNotificationService.Type.SUCCESS, 3000);
+                    }
+                    else {
+                        PopupNotificationService.Show("Creature import", $"Successfully imported {newCreature.Name}", PopupNotificationService.Type.SUCCESS, 3000);
+                    }
                 }
             }
             catch
@@ -182,20 +201,38 @@
                                 Debug.WriteLine($"The creature '{creature.Name}' already exists.");
                             }
                         }
-                        PopupNotificationService.Show("Creature import", "Successfully imported multiple creatures", PopupNotificationService.Type.SUCCESS, 3000);
+                        if (CombatService.IsCurrentCulture("fr"))
+                        {
+                            PopupNotificationService.Show("Importation", $"Import de créature(s) réussi", PopupNotificationService.Type.SUCCESS, 3000);
+                        } else
+                        {
+                            PopupNotificationService.Show("Creature import", "Successfully imported multiple creatures", PopupNotificationService.Type.SUCCESS, 3000);
+                        }
                     }
                 }
                 catch
                 {
                     Debug.WriteLine("File does not contain any valid creature.");
-                    PopupNotificationService.Show("Creature import", "File does not contain any valid creature", PopupNotificationService.Type.FAILURE, 4000);
+                    if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        PopupNotificationService.Show("Importation", $"Le fichier ne contient aucune créature valide", PopupNotificationService.Type.FAILURE, 4000);
+                    }
+                    else {
+                        PopupNotificationService.Show("Creature import", "File does not contain any valid creature", PopupNotificationService.Type.FAILURE, 4000);
+                    }
                 }
             }
         }
         else
         {
             Debug.WriteLine("File does not contain any data.");
-            PopupNotificationService.Show("Creature import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
+            if (CombatService.IsCurrentCulture("fr"))
+            {
+                PopupNotificationService.Show("Importation", $"Le fichier ne contient aucune donnée", PopupNotificationService.Type.FAILURE, 4000);
+            }
+            else {
+                PopupNotificationService.Show("Creature import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
+            }
         }
     }
 }

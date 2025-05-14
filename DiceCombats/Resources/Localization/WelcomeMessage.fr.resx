@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="DonationDescription" xml:space="preserve">
+    <value>Si vous aimez utiliser DiceCombats et souhaitez contribuer à son développement, un don sur Paypal est chaudement apprécié.</value>
+  </data>
+  <data name="IsAvailable" xml:space="preserve">
+    <value>est disponible</value>
+  </data>
+  <data name="KeyFeature1" xml:space="preserve">
+    <value>&lt;strong&gt;Création flexible de créatures :&lt;/strong&gt; Customisez vos créatures pour n'importe quel système avec des champs personnalisés.</value>
+  </data>
+  <data name="KeyFeature2" xml:space="preserve">
+    <value>&lt;strong&gt;Gestion modulaire des combat :&lt;/strong&gt; Suivi facilité de l'initiative, des PV, de la durée du combat, des créatures, et des status. </value>
+  </data>
+  <data name="KeyFeature3" xml:space="preserve">
+    <value>&lt;strong&gt;Design modulaire:&lt;/strong&gt; Ajuster l'outil à votre campagne et votre système.</value>
+  </data>
+  <data name="KeyFeature4" xml:space="preserve">
+    <value>&lt;strong&gt;Partage de votre travail:&lt;/strong&gt; Importer/exporter vos créatures et combats afin de les partager.</value>
+  </data>
+  <data name="KeyFeatures" xml:space="preserve">
+    <value>Fonctionnalités principales</value>
+  </data>
+  <data name="KeyFeaturesDescription" xml:space="preserve">
+    <value>DiceCombats est un gestionnaire de combat de JDR sur table, conçu pour rendre votre le déroulement de votre partie facile et agréable.</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>Licence</value>
+  </data>
+  <data name="LicenseDescription" xml:space="preserve">
+    <value>DiceCombats est un logiciel open-source sous &lt;b&gt;licence GPL-3.0&lt;/b&gt;. Pour plus de détails, voir</value>
+  </data>
+  <data name="NewVersion" xml:space="preserve">
+    <value>Nouvelle version</value>
+  </data>
+  <data name="SupportProject" xml:space="preserve">
+    <value>Supporter le projet</value>
+  </data>
+  <data name="SupportProjectDescription1" xml:space="preserve">
+    <value>N’hésitez pas à suggérer de nouvelles fonctionnalités, améliorations et corrections de bugs sur</value>
+  </data>
+  <data name="SupportProjectDescription2" xml:space="preserve">
+    <value>Comme je développe ce logiciel pendant mon temps libre, veuillez considérer que la mise à jour/correction de bugs peut être lente.</value>
+  </data>
+  <data name="Thanks" xml:space="preserve">
+    <value>Merci d'avoir choisi DiceCombats !</value>
+  </data>
+  <data name="Thanks2" xml:space="preserve">
+    <value>Merci beaucoup et bon jeu !</value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Mise à jour disponible</value>
+  </data>
+</root>

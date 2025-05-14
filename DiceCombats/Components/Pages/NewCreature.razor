@@ -16,18 +16,19 @@
 
 @inject DiceCombatsService CombatService
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Resources.Localization.NewCreature> Loc
 
-<h3>Add new creature</h3>
+<h3>@Loc["Title"]</h3>
 
 <style>
     .selected-button {
-        box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 0.9);
-        border: 2px solid #505050;
+    box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 0.9);
+    border: 2px solid #505050;
     }
 
     .unselected-button {
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        border: 2px solid #505050;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #505050;
     }
 
     .markdown-html-preview {
@@ -47,68 +48,68 @@
     }
 
     .markdown-content {
-        color: white;
+    color: white;
     }
 
-        .markdown-content table,
-        .markdown-content th,
-        .markdown-content td {
-            border: 1px solid white;
-            padding: 5px;
-        }
+    .markdown-content table,
+    .markdown-content th,
+    .markdown-content td {
+    border: 1px solid white;
+    padding: 5px;
+    }
 
-        .markdown-content th,
-        .markdown-content td {
-            background-color: var(--mud-palette-primary);
-        }
+    .markdown-content th,
+    .markdown-content td {
+    background-color: var(--mud-palette-primary);
+    }
 
     .one-column-item {
-        display: block;
-        width: calc(50% - 1rem); /* Adjust width for 3 items per row */
-        margin-bottom: 1rem;
+    display: block;
+    width: calc(50% - 1rem); /* Adjust width for 3 items per row */
+    margin-bottom: 1rem;
     }
 
     @@media screen and (max-width: 480px) {
-        .one-column-item {
-            width: 95%; /* Single column for narrow screens */
-        }
+    .one-column-item {
+    width: 95%; /* Single column for narrow screens */
+    }
     }
 </style>
 
 <div style="display:flex; flex-wrap:wrap; margin-bottom:20px;">
     <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Local image" ? "selected-button" : "unselected-button")"
-        title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Local image";})">
+    title="@Loc["TypeLocalImage"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Local image";})">
         <MudStack Row="false" AlignItems="AlignItems.Center">
             <MudIcon Icon="@Icons.Material.Filled.Image" />
-            <MudItem>Local image</MudItem>
+            <MudItem>@Loc["TypeLocalImage"]</MudItem>
         </MudStack>
     </MudButton>
     <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "aidedd.org website" ? "selected-button" : "unselected-button")"
-               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "aidedd.org website";})">
+    title="@Loc["TypeAidedd"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "aidedd.org website";})">
         <MudStack Row="false" AlignItems="AlignItems.Center">
             <MudIcon Icon="@Icons.Custom.Uncategorized.ChessRook" />
-            <MudItem>aidedd.org website</MudItem>
+            <MudItem>@Loc["TypeAidedd"]</MudItem>
         </MudStack>
     </MudButton>
     <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Markdown" ? "selected-button" : "unselected-button")"
-               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Markdown";})">
+    title="@Loc["TypeMarkdown"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Markdown";})">
         <MudStack Row="false" AlignItems="AlignItems.Center">
             <MudIcon Icon="@Icons.Material.Filled.TextSnippet" />
-            <MudItem>Markdown</MudItem>
+            <MudItem>@Loc["TypeMarkdown"]</MudItem>
         </MudStack>
     </MudButton>
     <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Manual creature" ? "selected-button" : "unselected-button")"
-               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Manual creature";})">
+    title="@Loc["TypeManual"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Manual creature";})">
         <MudStack Row="false" AlignItems="AlignItems.Center">
             <MudIcon Icon="@Icons.Material.Filled.Architecture" />
-            <MudItem>Manual creature</MudItem>
+            <MudItem>@Loc["TypeManual"]</MudItem>
         </MudStack>
     </MudButton>
     <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Player" ? "selected-button" : "unselected-button")"
-               title="Local image" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Player";})">
+    title="@Loc["TypePlayer"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Player";})">
         <MudStack Row="false" AlignItems="AlignItems.Center">
             <MudIcon Icon="@Icons.Material.Filled.Person" />
-            <MudItem>Player</MudItem>
+            <MudItem>@Loc["TypePlayer"]</MudItem>
         </MudStack>
     </MudButton>
 </div>
@@ -120,8 +121,8 @@
             <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" MaximumFileCount="1">
                 <ActivatorContent>
                     <MudFab Color="Color.Secondary"
-                            StartIcon="@Icons.Material.Filled.Image"
-                            Label="Load picture" />
+                    StartIcon="@Icons.Material.Filled.Image"
+                    Label="@Loc["LoadPictureBtnLabel"]" />
                 </ActivatorContent>
             </MudFileUpload>
         </div>
@@ -132,12 +133,12 @@
             </div>
             <div class="row">
                 <div class="col col-md-4">
-                    <MudTextField Immediate="true" Label="Enter creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                    <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
                 </div>
                 @if (_creatureName != "N/A" && _creatureName != "")
                 {
                     <div class="col col-md-2">
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]e</MudButton>
                     </div>
                 }
 
@@ -149,14 +150,27 @@
     {
         <div>
             <div>
-                <MudTextField DebounceInterval="500" Label="Enter URL" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
-                <MudLink Href="https://www.aidedd.org/">Visit aidedd.org</MudLink>
+                <MudTextField DebounceInterval="500" Label="@Loc["AideddURLtfLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
+                @if (CombatService.IsCurrentCulture("fr"))
+                {
+                    <MudLink Href="https://www.aidedd.org/">Se rendre sur aidedd.org</MudLink>
+                } else
+                {
+                    <MudLink Href="https://www.aidedd.org/en/">Visit aidedd.org</MudLink>
+                }
+
             </div>
             <div>
                 @if (_aideDDCreatureName != "N/A")
                 {
                     <div style="padding:10px;">
-                        <span>Found @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                        @if (CombatService.IsCurrentCulture("fr"))
+                        {
+                            <span>Détecté : @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                        } else
+                        {
+                            <span>Found @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                        }
                     </div>
                 }
             </div>
@@ -166,12 +180,12 @@
         </div>
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="Optional edition of creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["OptionalCreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
                 <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]</MudButton>
                 </div>
             }
 
@@ -182,18 +196,18 @@
     {
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="Enter creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
                 <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]</MudButton>
                 </div>
             }
         </div>
         <div style="display:flex;flex-wrap:wrap;">
             <div class="one-column-item" style="padding-right:10px;">
-                <MudTextField DebounceInterval="500" AutoGrow MaxLines="20" Label="Enter Markdown" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_markdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
+                <MudTextField DebounceInterval="500" AutoGrow MaxLines="20" Label="@Loc["MarkdownLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_markdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
             </div>
             <div class="markdown-html-preview one-column-item" style="padding-left:10px;">
                 <div class="markdown-content">
@@ -207,12 +221,12 @@
     {
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="Enter creature name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
                 <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this creature</MudButton>
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]</MudButton>
                 </div>
             }
         </div>
@@ -222,12 +236,12 @@
     {
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="Enter player name" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["PlayerNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
                 <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">Register this player</MudButton>
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterPlayerBtn"]</MudButton>
                 </div>
             }
         </div>

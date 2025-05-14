@@ -10,6 +10,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject PopupNotificationService PopupNotificationService
+@inject IStringLocalizer<Resources.Localization.CreatureSelector> Loc
 
 <style>
     .CombatEditorCreatureBox {
@@ -29,16 +30,16 @@
 
 <MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
     <MudTextField Label="Combat name" Variant="Variant.Outlined" T="string" @bind-Value="Combat.Name"></MudTextField>
-    <MudButton OnClick="SyncCreatures" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" Title="Synchronize creatures with newest fields" Size="Size.Large">Update creatures</MudButton>
-    <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">Delete</MudButton>
+    <MudButton OnClick="SyncCreatures" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" Title="@Loc["UpdateCreaturesBtnTitle"]" Size="Size.Large">@Loc["UpdateCreatureBtn"]</MudButton>
+    <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">@Loc["DeleteCombatBtn"]</MudButton>
 </MudStack>
 
 <MudGrid>
     <MudItem sm="7">
         <div class="CombatEditorCreatureBox">
-            <h2>Add/Remove creatures</h2>
+            <h2>@Loc["Title"]</h2>
             <div style="padding-bottom:10px;">
-                <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="Search creature" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+                <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="@Loc["SearchCreature"]" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
             </div>
             <div style="height:370px;overflow-y:scroll;overflow-x:hidden;">
                 @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.Name))
@@ -47,22 +48,22 @@
                     {
                         <MudGrid>
                             <MudItem sm="4">
-                                <MudIcon Icon="@Icons.Material.Filled.Person" Title="Player" />&nbsp;<span>@creature.Name</span>
+                                <MudIcon Icon="@Icons.Material.Filled.Person" Title="@Loc["Player"]" />&nbsp;<span>@creature.Name</span>
                             </MudItem>
 
                             @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
                             {
                                 <MudItem sm="3">
-                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
+                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">@Loc["Add"]</MudButton>
                                 </MudItem>
                             }
                             else
                             {
                                 <MudItem sm="3">
-                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
+                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">@Loc["Remove"]</MudButton>
                                 </MudItem>
                                 <MudItem sm="4">
-                                    <span>Added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                                    <span>@Loc["Added"] <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
                                 </MudItem>
                             }
 
@@ -82,16 +83,16 @@
                             @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
                             {
                                 <MudItem sm="3">
-                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">Add</MudButton>
+                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">@Loc["Add"]</MudButton>
                                 </MudItem>
                             }
                             else
                             {
                                 <MudItem sm="3">
-                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">Remove</MudButton>
+                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">@Loc["Remove"]</MudButton>
                                 </MudItem>
                                 <MudItem sm="4">
-                                    <span>Added <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                                    <span>@Loc["Added"] <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
                                 </MudItem>
                             }
 
@@ -108,14 +109,14 @@
                  <SortableItemTemplate>
                     <div style="display:flex; justify-content: space-between; user-select: none; background-color:#2A2A2A; cursor: move;">
                         <div>
-                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="Move up" OnClick="() => Combat.MoveCreature(creature, true)"></MudIconButton>
-                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="Move down" OnClick="() => Combat.MoveCreature(creature, false)"></MudIconButton>
+                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="@Loc["MoveUp"]" OnClick="() => Combat.MoveCreature(creature, true)"></MudIconButton>
+                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@Loc["MoveDown"]" OnClick="() => Combat.MoveCreature(creature, false)"></MudIconButton>
                         </div>
                         <div>
                             <span>@creature.Name</span>
                         </div>
                         <div style="width: 100px;">
-                            <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => Combat.UpdateInstanceCount(args, creature)" Label="Instances" Variant="Variant.Outlined"></MudNumericField>
+                            <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => Combat.UpdateInstanceCount(args, creature)" Label="@Loc["Instances"]" Variant="Variant.Outlined"></MudNumericField>
                         </div>
                     </div>
                  </SortableItemTemplate>
@@ -203,7 +204,11 @@
             }
         }
 
-        PopupNotificationService.Show("Creature synchronized", "Succesfully updated all creatures from creature tab to newest modifications", PopupNotificationService.Type.SUCCESS, 4000);
+        if (CombatService.IsCurrentCulture("fr")) {
+            PopupNotificationService.Show("Créatures synchronisées", "Les modifications les plus récentes ont été appliquées sur toutes les créatures", PopupNotificationService.Type.SUCCESS, 4000);
+        } else {
+            PopupNotificationService.Show("Creatures synchronized", "Succesfully updated all creatures from creature tab to newest modifications", PopupNotificationService.Type.SUCCESS, 4000);
+        }
     }
 
     private void UpdateCreatureSearchList(string arg)

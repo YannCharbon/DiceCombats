@@ -7,6 +7,8 @@
  * See the LICENSE file in the repository root for details.
 *@
 
+@inject IStringLocalizer<Resources.Localization.DCNavMenu> Loc
+
 <style>
     nav {
         display: flex;
@@ -50,9 +52,9 @@
 </style>
 
 <nav>
-    <a class="nav-link" style="color:white;" href="creaturesexplorer">Creatures</a>
+    <a class="nav-link" style="color:white;" href="creaturesexplorer">@Loc["CreaturesBtn"]</a>
     <div class="nav-logo" style="color:white;"><a href=""><img src="dicecombats_logo.svg" /></a></div>
-    <a class="nav-link" style="color:white;" href="combatsexplorer">Combats</a>
+    <a class="nav-link" style="color:white;" href="combatsexplorer">@Loc["CombatsBtn"]</a>
 </nav>
 
 

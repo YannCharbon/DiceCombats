@@ -10,6 +10,7 @@
 
 @inject NavigationManager Navigation
 @inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.Home> Loc
 
 <style>
     .favorite-container {
@@ -24,45 +25,47 @@
 </GenericModal>
 
 <div style="justify-content:center;text-align:center;padding-top:50px">
-    <h3>Welcome to DiceCombats !</h3>
+    <h3>@Loc["Title"]</h3>
     
-    <p>This TTRPG tool to help you managing creatures and combats for any type of game system.</p>
+    <p>@Loc["Description"]</p>
 </div>
 
 <div style="justify-content:center;text-align:center;padding-top:50px">
-    <h3>Your favorite combats</h3>
+    <h3>@Loc["FavoriteCombatsTitle"]</h3>
 
     @if (CombatService.GetCreatureList().Count == 0)
     {
-        <p>You don't have any creature yet which are required to create your first combat.</p>
+        <p>
+            @Loc["FavoriteCombatsNoCreatures"]</p>
         <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))"
                     Variant="Variant.Filled"
                     StartIcon="@Icons.Material.Filled.Add"
                     Color="@Color.Primary"
                     Size="Size.Large">
-            Create your first creature or player
+            @Loc["FavoriteCombatsCreateFirstCreature"]
         </MudButton>
     }
     else if (CombatService.GetCombatList().Count == 0)
     {
-        <p>You don't have any combat yet.</p>
+        <p>@Loc["FavoriteCombatsNoCombats"]</p>
         <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
                     Variant="Variant.Filled"
                     StartIcon="@Icons.Material.Filled.Add"
                     Color="@Color.Primary"
                     Size="Size.Large">
-            Create your first combat
+            @Loc["FavoriteCombatsCreateFirstCombat"]
         </MudButton>
     }
     else if (CombatService.GetFavoriteCombatsGuids().Count == 0)
     {
-        <p>You don't have any combat added to favorites.</p>
+        <p>
+            @Loc["FavoriteCombatsNoFavorite"]</p>
         <MudButton OnClick="@(() => Navigation.NavigateTo("/combatsexplorer"))"
                    Variant="Variant.Filled"
                    StartIcon="@Icons.Material.Filled.Add"
                    Color="@Color.Primary"
                    Size="Size.Large">
-            Select favorite combats
+            @Loc["FavoriteCombatsSelect"]
         </MudButton>
     } else
     {
@@ -79,7 +82,7 @@
     <MudDivider Style="margin-top:50px;margin-bottom:30px;"></MudDivider>
 
     <a href="https://github.com/YannCharbon/DiceCombats" target="_blank" style="color:white;margin:10px;"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="@Size.Large" Title="GitHub" /></a>
-    <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;cursor:pointer;" Title="Settings" @onclick="@(() => Navigation.NavigateTo("/settings"))" />
+    <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;cursor:pointer;" Title="@Loc["SettingsTitle"]" @onclick="@(() => Navigation.NavigateTo("/settings"))" />
 
 
 </div>

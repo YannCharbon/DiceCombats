@@ -12,43 +12,44 @@
 @inject DiceCombatsService CombatService
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
+@inject IStringLocalizer<Resources.Localization.CombatsExplorer> Loc
 
 <style>
     .CombatsCombatLink {
-        color:white;
-        background-color: #004547;
-        border-radius:30px;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        padding:10px;
-        margin:5px;
+    color:white;
+    background-color: #004547;
+    border-radius:30px;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    padding:10px;
+    margin:5px;
     }
 </style>
 
 <div style="padding-top:10px; padding-bottom:20px; display: flex; justify-content: flex-end; align-items: center;">
     <MudStack Row="true" Style="display: flex; gap: 10px; align-items: center;">
-        <MudSwitch @bind-Value="_showEditionButtons" Label="Show edition buttons" Color="Color.Primary" />
+        <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
         <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
-                   Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.Add"
-                   Color="@Color.Primary"
-                   Size="Size.Large">
-            New combat
+        Variant="Variant.Filled"
+        StartIcon="@Icons.Material.Filled.Add"
+        Color="@Color.Primary"
+        Size="Size.Large">
+            @Loc["NewCombatBtn"]
         </MudButton>
         <MudButton OnClick="@(() => ExportAllCombats())"
-                   Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.Upload"
-                   Color="@Color.Primary"
-                   Size="Size.Large"
-                   title="Export all combats">
-            Export combats
+        Variant="Variant.Filled"
+        StartIcon="@Icons.Material.Filled.Upload"
+        Color="@Color.Primary"
+        Size="Size.Large"
+        title="@Loc["ExportAllCombatsBtnTitle"]">
+            @Loc["ExportAllCombatsBtn"]
         </MudButton>
         <MudButton OnClick="@(() => ImportCombats())"
-                   Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.Download"
-                   Color="@Color.Primary"
-                   Size="Size.Large"
-                   title="Import one or multiple combats">
-            Import combats
+        Variant="Variant.Filled"
+        StartIcon="@Icons.Material.Filled.Download"
+        Color="@Color.Primary"
+        Size="Size.Large"
+        title="@Loc["ImportCombatsBtnTitle"]">
+            @Loc["ImportCombatsBtn"]
         </MudButton>
     </MudStack>
 </div>
@@ -67,19 +68,19 @@
                     <div class="col col-md-4">
                         <MudStack Row="true">
                             <h4><a href="/combatmanager/@combat.Id.ToString()">@combat.Name</a></h4>
-                                @if (CombatService.IsCombatFavorite(combat.Id.ToString()))
-                                {
+                            @if (CombatService.IsCombatFavorite(combat.Id.ToString()))
+                            {
                                 <MudIconButton OnClick="() => {CombatService.RemoveCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Warning" Size="Size.Large"></MudIconButton>
-                                } else
-                                {
-                                    <MudIconButton OnClick="() => {CombatService.AddCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Secondary" Size="Size.Large"></MudIconButton>
-                                }
-                                @if (_showEditionButtons)
-                                {
-                                    <MudIconButton OnClick="() => Edit(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="Edit"></MudIconButton>
-                                    <MudIconButton OnClick="() => ExportCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="Export to file"></MudIconButton>
-                                    <MudIconButton OnClick="() => CombatService.DeleteCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="Delete"></MudIconButton>
-                                }
+                            } else
+                            {
+                                <MudIconButton OnClick="() => {CombatService.AddCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Secondary" Size="Size.Large"></MudIconButton>
+                            }
+                            @if (_showEditionButtons)
+                            {
+                                <MudIconButton OnClick="() => Edit(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["CombatEditBtn"]"></MudIconButton>
+                                <MudIconButton OnClick="() => ExportCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["CombatExportBtn"]"></MudIconButton>
+                                <MudIconButton OnClick="() => CombatService.DeleteCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["CombatDeleteBtn"]"></MudIconButton>
+                            }
                         </MudStack>
                     </div>
                 }
@@ -111,7 +112,13 @@
 
         await FileHandler.SaveFileAsync(fileName, data);
 
-        PopupNotificationService.Show("Combat export", $"Successfully exported '{combat.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
+        if (CombatService.IsCurrentCulture("fr"))
+        {
+            PopupNotificationService.Show("Exportation", $"Combat '{combat.Name}' exporté avec succès", PopupNotificationService.Type.SUCCESS, 3000);
+        } else
+        {
+            PopupNotificationService.Show("Combat export", $"Successfully exported '{combat.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
+        }
     }
 
     private async Task ExportAllCombats()
@@ -128,7 +135,13 @@
 
         await FileHandler.SaveFileAsync(fileName, data);
 
-        PopupNotificationService.Show("Combat export", "Successfully exported all combats", PopupNotificationService.Type.SUCCESS, 3000);
+        if (CombatService.IsCurrentCulture("fr"))
+        {
+            PopupNotificationService.Show("Exportation", "Tous les combats exportés avec succès", PopupNotificationService.Type.SUCCESS, 3000);
+        } else
+        {
+            PopupNotificationService.Show("Combat export", "Successfully exported all combats", PopupNotificationService.Type.SUCCESS, 3000);
+        }
     }
 
     private async Task ImportCombats()
@@ -158,7 +171,14 @@
                                 Debug.WriteLine($"Add '{creature.Name}' creature");
                             }
                         }
-                        PopupNotificationService.Show("Combat import", $"Successfully imported '{newCombat.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
+
+                        if (CombatService.IsCurrentCulture("fr"))
+                        {
+                            PopupNotificationService.Show("Importation", $"Combat '{newCombat.Name}' importé avec succès", PopupNotificationService.Type.SUCCESS, 3000);
+                        } else
+                        {
+                            PopupNotificationService.Show("Combat import", $"Successfully imported '{newCombat.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
+                        }
                     }
                     else
                     {
@@ -191,7 +211,14 @@
                                         Debug.WriteLine($"Add '{creature.Name}' creature");
                                     }
                                 }
-                                PopupNotificationService.Show("Combat import", "Successfully imported multiple combats", PopupNotificationService.Type.SUCCESS, 3000);
+
+                                if (CombatService.IsCurrentCulture("fr"))
+                                {
+                                    PopupNotificationService.Show("Importation", "Import de combat(s) réussi", PopupNotificationService.Type.SUCCESS, 3000);
+                                } else
+                                {
+                                    PopupNotificationService.Show("Combat import", "Successfully imported multiple combats", PopupNotificationService.Type.SUCCESS, 3000);
+                                }
                             }
                             else
                             {
@@ -204,14 +231,27 @@
                 {
                     Debug.WriteLine(ex1.Message);
                     Debug.WriteLine("File does not contain any valid combat.");
-                    PopupNotificationService.Show("Combat import", "File does not contain any valid combat", PopupNotificationService.Type.FAILURE, 4000);
+                    if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        PopupNotificationService.Show("Importation", "Le fichier ne contient aucun combat valide", PopupNotificationService.Type.FAILURE, 4000);
+                    } else
+                    {
+                        PopupNotificationService.Show("Combat import", "File does not contain any valid combat", PopupNotificationService.Type.FAILURE, 4000);
+                    }
                 }
             }
         }
         else
         {
             Debug.WriteLine("File does not contain any data.");
-            PopupNotificationService.Show("Combat import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
+            if (CombatService.IsCurrentCulture("fr"))
+            {
+                PopupNotificationService.Show("Importation", "Le fichier ne contient aucune donnée", PopupNotificationService.Type.FAILURE, 4000);
+            }
+            else
+            {
+                PopupNotificationService.Show("Combat import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
+            }
         }
     }
 }

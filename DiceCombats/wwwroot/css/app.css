@@ -1,5 +1,20 @@
 ﻿html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.page {
+    /* This config avoids the scroll bar to appear over the NavBar */
+    margin-top: 50px; /* height of nav */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    max-height: calc(100vh - 50px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 a, .btn-link {

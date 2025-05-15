@@ -12,12 +12,12 @@
 
 <PopupNotification></PopupNotification>
 
+<DCNavMenu />
+
 <div class="page">
     <!--<div class="sidebar">
         <NavMenu />
     </div>-->
-    <DCNavMenu />
-
 
     <main>
         <MudThemeProvider IsDarkMode="true" Theme="DCTheme" />
@@ -25,7 +25,7 @@
         <MudDialogProvider />
         <MudSnackbarProvider />
 
-        <article class="content px-4" style="padding-top:70px;" id="mainpagebody">
+        <article class="content px-4" id="mainpagebody">
             @Body
         </article>
     </main>

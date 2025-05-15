@@ -25,33 +25,34 @@
     }
 </style>
 
-<div style="padding-top:10px; padding-bottom:20px; display: flex; justify-content: flex-end; align-items: center;">
-    <MudStack Row="true" Style="display: flex; gap: 10px; align-items: center;">
-        <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
+<div style="padding-top:10px; padding-bottom:20px; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
+    <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
+    <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
         Variant="Variant.Filled"
         StartIcon="@Icons.Material.Filled.Add"
         Color="@Color.Primary"
-        Size="Size.Large">
+        Size="Size.Large"
+        Style="margin:2px;">
             @Loc["NewCombatBtn"]
-        </MudButton>
-        <MudButton OnClick="@(() => ExportAllCombats())"
+    </MudButton>
+    <MudButton OnClick="@(() => ExportAllCombats())"
         Variant="Variant.Filled"
         StartIcon="@Icons.Material.Filled.Upload"
         Color="@Color.Primary"
         Size="Size.Large"
+        Style="margin:2px;"
         title="@Loc["ExportAllCombatsBtnTitle"]">
             @Loc["ExportAllCombatsBtn"]
-        </MudButton>
-        <MudButton OnClick="@(() => ImportCombats())"
+    </MudButton>
+    <MudButton OnClick="@(() => ImportCombats())"
         Variant="Variant.Filled"
         StartIcon="@Icons.Material.Filled.Download"
         Color="@Color.Primary"
         Size="Size.Large"
+        Style="margin:2px;"
         title="@Loc["ImportCombatsBtnTitle"]">
             @Loc["ImportCombatsBtn"]
-        </MudButton>
-    </MudStack>
+    </MudButton>
 </div>
 
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
@@ -62,12 +63,14 @@
             <div style="border-bottom:solid; border-bottom-width:1px; border-bottom-color:grey;">
                 <h4>@chr.ToString().ToUpper()</h4>
             </div>
-            <div class="row">
+            <div style="display:flex; flex-wrap:wrap;">
                 @foreach (DCCombat combat in CombatService.GetCombatList().FindAll(x => x.Name.ToLower().StartsWith(chr)))
                 {
-                    <div class="col col-md-4">
-                        <MudStack Row="true">
+                    <div style="display:flex; flex-wrap:nowrap; align-items:start; margin:5px; border-radius:5px; background-color:#303030;">
+                        <div style="margin:5px; max-width:350px;">
                             <h4><a href="/combatmanager/@combat.Id.ToString()">@combat.Name</a></h4>
+                        </div>
+                        <div style="margin:5px;">
                             @if (CombatService.IsCombatFavorite(combat.Id.ToString()))
                             {
                                 <MudIconButton OnClick="() => {CombatService.RemoveCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Warning" Size="Size.Large"></MudIconButton>
@@ -75,13 +78,15 @@
                             {
                                 <MudIconButton OnClick="() => {CombatService.AddCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Secondary" Size="Size.Large"></MudIconButton>
                             }
+                        </div>
+                        <div style="margin:5px;">
                             @if (_showEditionButtons)
                             {
                                 <MudIconButton OnClick="() => Edit(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["CombatEditBtn"]"></MudIconButton>
                                 <MudIconButton OnClick="() => ExportCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["CombatExportBtn"]"></MudIconButton>
                                 <MudIconButton OnClick="() => CombatService.DeleteCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["CombatDeleteBtn"]"></MudIconButton>
                             }
-                        </MudStack>
+                        </div>
                     </div>
                 }
             </div>

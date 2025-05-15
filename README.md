@@ -1,3 +1,7 @@
+<p align="center">
+   <img src="DiceCombats/wwwroot/dicecombats_logo.svg" alt="DiceCombats" width="150" height="auto" />
+</p>
+
 # DiceCombats
 
 DiceCombats is an open-source, system-agnostic tabletop RPG combat management tool designed to make game mastering seamless, modular, and enjoyable. It is aimed at frustrated GMs who have struggled to find the right tool for managing combats effectively due to organizational challenges, missing fields, or tags to track specific information. The keyword here is **customization**.
@@ -11,6 +15,7 @@ DiceCombats is an open-source, system-agnostic tabletop RPG combat management to
 - **System-Agnostic Design**: Adaptable to any RPG system, giving you maximum flexibility for your campaigns.
 - **Customizable Setup**: Import and export data to share with other GMs. Configure settings to match your unique game-mastering style.
 - **For D&D Players**: Compatibility with [aidedd.org](https://www.aidedd.org/en/) to easily import any existing creature.
+- **Multi-language Support**: Currently available languages are **English** and **French**
 
 ---
 

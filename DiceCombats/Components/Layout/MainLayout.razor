@@ -14,17 +14,17 @@
 
 <DCNavMenu />
 
+<MudThemeProvider IsDarkMode="true" Theme="DCTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
 <div class="page">
     <!--<div class="sidebar">
         <NavMenu />
     </div>-->
 
     <main>
-        <MudThemeProvider IsDarkMode="true" Theme="DCTheme" />
-        <MudPopoverProvider />
-        <MudDialogProvider />
-        <MudSnackbarProvider />
-
         <article class="content px-4" id="mainpagebody">
             @Body
         </article>

@@ -200,7 +200,7 @@
             if (tempCreature != null)
             {
                 tempCreature.InCombatInstanceCount = backupInstanceCount;
-                AddCreature(tempCreature);
+                AddCreature((DCCreature)tempCreature.Clone());
             }
         }
 

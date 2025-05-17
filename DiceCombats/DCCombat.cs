@@ -33,11 +33,17 @@ namespace DiceCombats
 
         public void AddCreature(DCCreature creature)
         {
-            CreaturesList.Add(creature);
+            var creatureClone = (DCCreature)creature.Clone();
+            CreaturesList.Add(creatureClone);
             List<List<DCCreatureCustomField>> tmp = new List<List<DCCreatureCustomField>>();
-            for (int i = 0; i < creature.InCombatInstanceCount; i++)
+            for (int i = 0; i < creatureClone.InCombatInstanceCount; i++)
             {
-                tmp.Add(creature.CustomFields.Select(item => item.Clone()).ToList());
+                List<DCCreatureCustomField> fields = new List<DCCreatureCustomField>();
+                foreach (var field in creatureClone.CustomFields)
+                {
+                    fields.Add(field.Clone());
+                }
+                tmp.Add(fields);
             }
             InCombatCustomFieldsInstances.Add(tmp);
         }

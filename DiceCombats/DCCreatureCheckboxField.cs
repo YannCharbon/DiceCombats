@@ -18,6 +18,7 @@ namespace DiceCombats
         public List<bool> SelectedOptions { get; set; } = new List<bool>(new bool[1]);
         public List<string> TextFields { get; set; } = new List<string>(new string[1]);
         public List<string> TextFieldsLabels { get; set; } = new List<string>(new string[1]);
+        public bool ShowFieldName { get; set; } = true;
         public bool ShowTextFields { get; set; } = false;
 
         public override object GetValue()
@@ -34,6 +35,7 @@ namespace DiceCombats
                 Labels = this.Labels,
                 TextFieldsLabels = this.TextFieldsLabels,
                 TextFields = this.TextFields,
+                ShowFieldName = this.ShowFieldName,
                 ShowTextFields = this.ShowTextFields,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };

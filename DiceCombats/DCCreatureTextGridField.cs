@@ -123,12 +123,12 @@ namespace DiceCombats
                 Rows = this.Rows,
                 Columns = this.Columns,
                 HasRowHeaders = this.HasRowHeaders,
-                RowHeaders = this.RowHeaders,
+                RowHeaders = new List<string>(this.RowHeaders),
                 HasColumnHeaders = this.HasColumnHeaders,
-                ColumnHeaders = this.ColumnHeaders,
+                ColumnHeaders = new List<string>(this.ColumnHeaders),
                 HasTextLabels = this.HasTextLabels,
-                TextLabels = this.TextLabels,
-                TextValues = this.TextValues,
+                TextLabels = new List<List<string>>(this.TextLabels),
+                TextValues = new List<List<string>>(this.TextValues),
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }

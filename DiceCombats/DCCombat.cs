@@ -125,13 +125,19 @@ namespace DiceCombats
 
         public void UpdateInstanceCount(uint instanceCount, DCCreature creature)
         {
+            var creatureClone = (DCCreature)creature.Clone();
             int creatureIdx = CreaturesList.IndexOf(creature);
             if (creatureIdx != -1)
             {
                 InCombatCustomFieldsInstances[creatureIdx].Clear();
                 for (int i = 0; i < instanceCount; i++)
                 {
-                    InCombatCustomFieldsInstances[creatureIdx].Add(creature.CustomFields.Select(item => item.Clone()).ToList());
+                    List<DCCreatureCustomField> fields = new List<DCCreatureCustomField>();
+                    foreach (var field in creatureClone.CustomFields)
+                    {
+                        fields.Add(field.Clone());
+                    }
+                    InCombatCustomFieldsInstances[creatureIdx].Add(fields);
                 }
                 creature.InCombatInstanceCount = instanceCount;
             }

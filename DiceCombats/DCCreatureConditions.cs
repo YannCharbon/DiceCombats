@@ -27,8 +27,8 @@ namespace DiceCombats
             return new DCCreatureConditionsField
             {
                 Title = this.Title,
-                SelectedOptions = this.SelectedOptions,
-                Labels = this.Labels,
+                SelectedOptions = new List<bool>(this.SelectedOptions),
+                Labels = new List<string>(this.Labels),
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }

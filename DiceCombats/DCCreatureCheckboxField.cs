@@ -31,10 +31,10 @@ namespace DiceCombats
             return new DCCreatureCheckboxField
             {
                 Title = this.Title,
-                SelectedOptions = this.SelectedOptions,
-                Labels = this.Labels,
-                TextFieldsLabels = this.TextFieldsLabels,
-                TextFields = this.TextFields,
+                SelectedOptions = new List<bool>(this.SelectedOptions),
+                Labels = new List<string>(this.Labels),
+                TextFieldsLabels = new List<string>(this.TextFieldsLabels),
+                TextFields = new List<string>(this.TextFields),
                 ShowFieldName = this.ShowFieldName,
                 ShowTextFields = this.ShowTextFields,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances

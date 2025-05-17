@@ -110,10 +110,10 @@ namespace DiceCombats
                 Rows = this.Rows,
                 Columns = this.Columns,
                 HasRowHeaders = this.HasRowHeaders,
-                RowHeaders = this.RowHeaders,
+                RowHeaders = new List<string>(this.RowHeaders),
                 HasColumnHeaders = this.HasColumnHeaders,
-                ColumnHeaders = this.ColumnHeaders,
-                GridState = this.GridState,
+                ColumnHeaders = new List<string>(this.ColumnHeaders),
+                GridState = new List<List<bool>>(this.GridState),
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }

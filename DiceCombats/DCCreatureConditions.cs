@@ -10,10 +10,10 @@ using System.Collections.Generic;
 
 namespace DiceCombats
 {
-    public class DCCreatureDnDConditionsField : DCCreatureCustomField
+    public class DCCreatureConditionsField : DCCreatureCustomField
     {
         public override string FieldType => "DnDConditions";
-        public override string Discriminator => nameof(DCCreatureDnDConditionsField);
+        public override string Discriminator => nameof(DCCreatureConditionsField);
         public List<string> Labels { get; set; } = new List<string>{"Blinded", "Charmed", "Deafened", "Frightened", "Grappled", "Incapacitated", "Invisible", "Paralyzed", "Petrified", "Poisoned", "Prone", "Restrained", "Stunned", "Unconscious"};
         public List<bool> SelectedOptions { get; set; } = new List<bool>(new bool[14]);
 
@@ -24,13 +24,29 @@ namespace DiceCombats
 
         public override DCCreatureCustomField Clone()
         {
-            return new DCCreatureDnDConditionsField
+            return new DCCreatureConditionsField
             {
                 Title = this.Title,
                 SelectedOptions = this.SelectedOptions,
                 Labels = this.Labels,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
+        }
+
+        public void AddOption()
+        {
+            Labels.Add("New option");
+            SelectedOptions.Add(false);
+        }
+
+        public void RemoveOption(string label)
+        {
+            int idx = Labels.IndexOf(label);
+            if (idx != -1)
+            {
+                Labels.RemoveAt(idx);
+                SelectedOptions.RemoveAt(idx);
+            }
         }
     }
 }

@@ -211,10 +211,10 @@
     {
         <MudColorPicker Variant="Variant.Outlined" ColorPickerView="ColorPickerView.GridCompact" Label="@Loc["ColorPickerName"]" @bind-Text="colorField.Value" Style="@($"color: {colorField.Value};")" Placeholder="Select Color" />
     }
-    else if (Field is DCCreatureDnDConditionsField dndConditionsField)
+    else if (Field is DCCreatureConditionsField dndConditionsField)
     {
         <MudStack Row="true" style="padding-top:5px;padding-bottom:5px;">
-            <p>@Loc["NonEditableField"]</p>
+            <MudButton OnClick="@(() => dndConditionsField.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["CBFieldAddOption"]</MudButton>
         </MudStack>
         <div class="d-flex flex-wrap gap-4">
             @foreach (int i in Enumerable.Range(0, dndConditionsField.Labels.Count))
@@ -223,6 +223,7 @@
                     <MudTextField Immediate="true" @bind-Value="dndConditionsField.Labels[i]" Label="@Loc["OptionLabel"]" Variant="Variant.Outlined" />
                     <MudCheckBox Label="@dndConditionsField.Labels[i]" @bind-Value="dndConditionsField.SelectedOptions[i]"></MudCheckBox>
                 </MudStack>
+                <MudButton OnClick="@(() => dndConditionsField.RemoveOption(dndConditionsField.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
             }
         </div>
     }
@@ -382,7 +383,7 @@ else
 
             </MudStack>
     }
-    else if (Field is DCCreatureDnDConditionsField dndConditionsField)
+    else if (Field is DCCreatureConditionsField dndConditionsField)
     {
         <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized; NotifyParentOnChange();}">
             @if (_dndConditionsFieldMaximized == false) {

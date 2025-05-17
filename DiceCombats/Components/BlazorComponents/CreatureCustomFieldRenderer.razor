@@ -13,37 +13,37 @@
 
 <style>
     .CreatureCustomFieldRendererFieldTitle {
-        padding:10px;
-        font-weight:700;
+    padding:10px;
+    font-weight:700;
     }
 
     .CreatureCustomFieldRendererCheckBoxGridLabels {
-        font-size:10pt;
-        padding: 4px;
+    font-size:10pt;
+    padding: 4px;
     }
 
     .DnDConditionsFieldItem {
-        border-radius: 100px;
-        padding: 5px;
-        display: flex; /* Enables Flexbox */
-        align-items: center; /* Aligns content vertically */
-        justify-content: center; /* Aligns content horizontally (optional) */
-        text-align: center;
-        font-weight: 400;
-        font-size: 18px;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    padding: 5px;
+    display: flex; /* Enables Flexbox */
+    align-items: center; /* Aligns content vertically */
+    justify-content: center; /* Aligns content horizontally (optional) */
+    text-align: center;
+    font-weight: 400;
+    font-size: 18px;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     }
 
     .CreatureCustomFieldRendererFieldLabel label {
-        background-color: #004D40;
-        color: white;
-        padding: 2px;
-        border-radius: 4px;
+    background-color: #004D40;
+    color: white;
+    padding: 2px;
+    border-radius: 4px;
     }
 
     .CreatureCustomFieldRendererFieldBackground {
-        background-color: #4A4A5A;
-        border-radius:4px;
+    background-color: #4A4A5A;
+    border-radius:4px;
     }
 </style>
 
@@ -138,6 +138,7 @@
     {
         <MudStack Row="true" style="padding-top:5px;padding-bottom:5px;">
             <MudButton OnClick="@(() => checkBoxField.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["CBFieldAddOption"]</MudButton>
+            <MudCheckBox T="bool" @bind-Value="checkBoxField.ShowFieldName" Label="@Loc["CBFieldShowFieldName"]"></MudCheckBox>
             <MudCheckBox T="bool" @bind-Value="checkBoxField.ShowTextFields" Label="@Loc["CBFieldShowTextFields"]"></MudCheckBox>
         </MudStack>
         <div class="d-flex flex-wrap gap-4">
@@ -227,7 +228,7 @@
     }
     else if (Field is DCCreatureStatsField statsField)
     {
-        <MudNumericField @bind-Value="statsField.Count" Label="@Loc["CreatureStatsCount"]" Variant="Variant.Outlined" />
+        <MudNumericField @bind-Value="statsField.Count" Label="@Loc["CreatureStatsCount"]" style="max-width:200px;" Variant="Variant.Outlined" />
         <MudCheckBox Label="@Loc["CreatureStatsKeepValuesEditable"]" @bind-Value="statsField.ValuesAreEditable"></MudCheckBox>
         <MudStack Row="true" style="overflow:auto;">
             @foreach (int i in Enumerable.Range(0, statsField.Count))
@@ -255,7 +256,7 @@ else
     }
     else if (Field is DCCreatureTextField textField)
     {
-        <MudTextField AutoGrow spellcheck="false" @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudTextField AutoGrow spellcheck="false" @bind-Value="textField.Text" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:350px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     }
     else if (Field is DCCreatureTextGridField textGridField)
     {
@@ -308,6 +309,10 @@ else
     }
     else if (Field is DCCreatureCheckboxField checkBoxField)
     {
+        @if (checkBoxField.ShowFieldName)
+        {
+            <b><span class="CreatureCustomFieldRendererFieldTitle">@checkBoxField.Title</span></b>
+        }
         <MudStack Row="true">
             @foreach (int i in Enumerable.Range(0, checkBoxField.Labels.Count))
             {
@@ -416,7 +421,8 @@ else
                 <MudStack Row="false" Style="border-radius:5px;border-width:thin;background-color:darkcyan;">
                     @if (statsField.ValuesAreEditable)
                     {
-                        <MudNumericField Style="width:75px;" @bind-Value="statsField.StatsValues[i]" Label="@statsField.StatsLabels[i]" Variant="Variant.Outlined" />
+                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@statsField.StatsLabels[i]</MudItem>
+                        <MudNumericField @bind-Value="statsField.StatsValues[i]" style="max-width:90px;" Variant="Variant.Outlined" />
                     } else
                     {
                         <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@statsField.StatsValues[i]</MudItem>

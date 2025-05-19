@@ -6,7 +6,8 @@ export function init(id, group, pull, put, sort, handle, filter, component, forc
             pull: pull || true,
             put: put
         },
-        filter: filter || undefined,
+        filter: 'input, button, select, textarea, .no-drag',  // prevents drag when touching these
+        preventOnFilter: false,  // allow focus and typing in input fields
         sort: sort,
         forceFallback: forceFallback,
         handle: handle || undefined,

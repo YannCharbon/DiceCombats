@@ -67,7 +67,7 @@
     <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">@Loc["PlayersTitle"]</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
-    @for (char chr = 'a'; chr < 'z'; chr++)
+    @for (char chr = 'a'; chr <= 'z'; chr++)
     {
         @if (CombatService.GetCreatureList().Find(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == true) != null)
         {

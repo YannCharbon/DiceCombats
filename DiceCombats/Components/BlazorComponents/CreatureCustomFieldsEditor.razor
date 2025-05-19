@@ -16,11 +16,30 @@
 
 <style>
     .CreatureCustomFieldsEditorCustomField{
-        padding:10px;
-        margin:15px;
-        background-color:#505050;
-        border-radius:10px;
-        max-width:100%;
+    padding:10px;
+    margin:15px;
+    background-color:#505050;
+    border-radius:10px;
+    max-width:100%;
+    }
+
+    @@keyframes ImageFadeIn {
+    from {
+    opacity: 0;
+    transform: scale(0.95);
+    }
+
+    to {
+    opacity: 1;
+    transform: scale(1);
+    }
+    }
+
+    .image-reveal {
+    max-width: 350px;
+    animation: ImageFadeIn 1s ease-out;
+    position: relative;
+    padding-bottom: 10px;
     }
 </style>
 
@@ -28,6 +47,38 @@
     @if (EditionMode)
     {
         <h3>@Loc["AddAdditionalFieldsTitle"]</h3>
+
+        <MudExpansionPanel Expanded="false" Elevation="1">
+            <TitleContent>
+                <div class="d-flex">
+                    <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
+                    <MudText class="mr-3">Assistance</MudText>
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <p>
+                    @Loc["AssitanceGeneral1"]
+                </p>
+                <h4>@Loc["AssistanceGeneralSharedFieldsTitle"]</h4>
+                <MudCheckBox T="bool" Label="@Loc["SharedField"]" Variant="Variant.Outlined" />
+                <p>
+                    @((MarkupString)Loc["AssistanceGeneralSharedFieldsDesc"].Value)
+                </p>
+                <h4>@Loc["AssistanceUserCustomFieldTitle"]</h4>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
+                <p>
+                    @((MarkupString)Loc["AssistanceUserCustomFieldDesc"].Value)
+                </p>
+                <h4>@Loc["AssistanceGeneralExamplesTitle"]</h4>
+                <p>
+                    @((MarkupString)Loc["AssistanceGeneralExamplesDesc"].Value)
+                </p>
+                <div style="display:flex;flex-wrap:wrap;">
+                    <img class="image-reveal" style="width:300px;padding:5px;" src="img/creatures_examples/aidedd_example_1.png" />
+                    <img class="image-reveal" style="width:300px;padding:5px;" src="img/creatures_examples/manual_creature_example_2.png" />
+                </div>
+            </ChildContent>
+        </MudExpansionPanel>
     }
 
     <div class="d-flex flex-wrap" style="align-items:center;">
@@ -50,31 +101,131 @@
 
         @if (EditionMode)
         {
-            <div style="padding:10px;">
-                <MudStack Row="true">
-                    <MudItem>
-                        <MudSelect Style="min-width: 200px;" T="string" Label="@Loc["FieldType"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
-                            <MudSelectItem T="string" Value="@("HitPoints")" />
-                            <MudSelectItem T="string" Value="@("Numeric")" />
-                            <MudSelectItem T="string" Value="@("Checkbox")" />
-                            <MudSelectItem T="string" Value="@("CheckboxGrid")" />
-                            <MudSelectItem T="string" Value="@("TextGrid")" />
-                            <MudSelectItem T="string" Value="@("Text")" />
-                            <MudSelectItem T="string" Value="@("Color")" />
-                            <MudSelectItem T="string" Value="@("DnD conditions")"></MudSelectItem>
-                            <MudSelectItem T="string" Value="@("Stats")"></MudSelectItem>
-                            @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
+            <div style="display:flex; flex-wrap:wrap; max-width:500px;">
+                <div style="padding:10px;">
+                    <MudStack Row="true">
+                        <MudItem>
+                            <MudSelect Style="min-width: 200px;" T="string" Label="@Loc["FieldType"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
+                                <MudSelectItem T="string" Value="@("Hit Points")" />
+                                <MudSelectItem T="string" Value="@("Numeric")" />
+                                <MudSelectItem T="string" Value="@("Checkbox")" />
+                                <MudSelectItem T="string" Value="@("Checkbox Grid")" />
+                                <MudSelectItem T="string" Value="@("Text Grid")" />
+                                <MudSelectItem T="string" Value="@("Text")" />
+                                <MudSelectItem T="string" Value="@("Color")" />
+                                <MudSelectItem T="string" Value="@("Conditions")"></MudSelectItem>
+                                <MudSelectItem T="string" Value="@("Stats")"></MudSelectItem>
+                                @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
+                                {
+                                    <MudSelectItem T="string" Value="@(customField.Title)"><MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem>
+                            <div style="padding-top:5px">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddField">@Loc["AddField"]</MudButton>
+                            </div>
+                        </MudItem>
+                    </MudStack>
+                </div>
+                <div>
+                    <MudExpansionPanel Expanded="@_fieldHelpExpanded" Elevation="1" ExpandedChanged="() => _fieldHelpExpanded = !_fieldHelpExpanded">
+                        <TitleContent>
+                            <div class="d-flex">
+                                <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
+                                <MudText class="mr-3">@newFieldType @Loc["AssistanceFieldTitle"]</MudText>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            @switch (newFieldType)
                             {
-                                <MudSelectItem T="string" Value="@(customField.Title)"><MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)</MudSelectItem>
+                                case "Hit Points":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceHitPointsField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:150px;" src="img/fields_examples/hitpointsfield_example_1.png" />
+                                    break;
+                                case "Numeric":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceNumericField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:200px;" src="img/fields_examples/numericfield_example_1.png" />
+                                    break;
+                                case "Checkbox":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceCheckboxField"]
+                                        </p>
+                                    </div>
+                                    <p>@Loc["AssistanceCheckboxField2"]</p>
+                                    <img class="image-reveal" style="width:200px;" src="img/fields_examples/checkboxfield_example_2.png" />
+                                    <p>@Loc["AssistanceCheckboxField3"]</p>
+                                    <img class="image-reveal" style="width:350px;" src="img/fields_examples/checkboxfield_example_1.png" />
+                                    break;
+                                case "Checkbox Grid":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceCheckboxGridField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:250px;" src="img/fields_examples/checkboxgridfield_example_1.png" />
+                                    <p>@Loc["AssistanceCheckboxGridField2"]</p>
+                                    <img class="image-reveal" style="width:250px;" src="img/fields_examples/checkboxgridfield_example_2.png" />
+                                    break;
+                                case "Text Grid":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceTextGridField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:300px;" src="img/fields_examples/textgridfield_example_1.png" />
+                                    break;
+                                case "Text":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceTextField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:300px;" src="img/fields_examples/textfield_example_1.png" />
+                                    break;
+                                case "Color":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceColorField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:350px;" src="img/fields_examples/colorfield_example_1.png" />
+                                    break;
+                                case "Conditions":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceConditionsField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:350px;" src="img/fields_examples/conditions_example_2.png" />
+                                    <p>@Loc["AssistanceConditionsField2"]</p>
+                                    <img class="image-reveal" style="width:200px;" src="img/fields_examples/conditions_example_1.png" />
+                                    break;
+                                case "Stats":
+                                    <div>
+                                        <p>
+                                            @Loc["AssistanceStatsField"]
+                                        </p>
+                                    </div>
+                                    <img class="image-reveal" style="width:200px;" src="img/fields_examples/statsfield_example_1.png" />
+                                    <p>@Loc["AssistanceStatsField2"]</p>
+                                    <img class="image-reveal" style="width:150px;" src="img/fields_examples/statsfield_example_2.png" />
+                                    break;
+                                default:
+                                    break;
                             }
-                        </MudSelect>
-                    </MudItem>
-                    <MudItem>
-                        <div style="padding-top:5px">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddField">@Loc["AddField"]</MudButton>
-                        </div>
-                    </MudItem>
-                </MudStack>
+                        </ChildContent>
+                    </MudExpansionPanel>
+                </div>
             </div>
         }
     </div>
@@ -86,14 +237,25 @@
     [Parameter]
     public bool EditionMode { get; set; } = true;
 
-    private string newFieldType = "HitPoints";
+    private string newFieldType = "Hit Points";
+
+    private bool _fieldHelpExpanded {
+        get
+        {
+            return Preferences.Get("AssistanceField", true);
+        }
+        set
+        {
+            Preferences.Set("AssistanceField", value);
+        }
+    }
 
     private void AddField()
     {
         DCCreatureCustomField? newField = null;
         switch (newFieldType)
         {
-            case "HitPoints":
+            case "Hit Points":
                 newField = new DCCreatureHitPointsField { Title = "Hit points" };
                 break;
             case "Numeric":
@@ -102,20 +264,20 @@
             case "Checkbox":
                 newField = new DCCreatureCheckboxField { Title = "Checkbox Field" };
                 break;
-            case "CheckboxGrid":
+            case "Checkbox Grid":
                 newField = new DCCreatureCheckboxGridField { Title = "Checkbox Grid Field" };
                 break;
             case "Text":
                 newField = new DCCreatureTextField { Title = "Text Field" };
                 break;
-            case "TextGrid":
+            case "Text Grid":
                 newField = new DCCreatureTextGridField { Title = "Text Grid Field" };
                 break;
             case "Color":
                 newField = new DCCreatureColorField { Title = "Color Field" };
                 break;
-            case "DnD conditions":
-                newField = new DCCreatureDnDConditionsField { Title = "Conditions" };
+            case "Conditions":
+                newField = new DCCreatureConditionsField { Title = "Conditions" };
                 break;
             case "Stats":
                 newField = new DCCreatureStatsField { Title = "Stats" };

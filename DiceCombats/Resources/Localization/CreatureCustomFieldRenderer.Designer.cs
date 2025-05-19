@@ -70,6 +70,15 @@ namespace DiceCombats.Resources.Localization {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Show field name.
+        /// </summary>
+        internal static string CBFieldShowFieldName {
+            get {
+                return ResourceManager.GetString("CBFieldShowFieldName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Show text fields.
         /// </summary>
         internal static string CBFieldShowTextFields {

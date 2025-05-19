@@ -123,6 +123,78 @@
   <data name="AddField" xml:space="preserve">
     <value>Ajouter ce champ</value>
   </data>
+  <data name="AssistanceCheckboxField" xml:space="preserve">
+    <value>Une ou plusieurs option binaires que l'utilisateur peut basculer. Particulièrement utile pour gérer des états simples, des effets, des flags.</value>
+  </data>
+  <data name="AssistanceCheckboxField2" xml:space="preserve">
+    <value>Ce premier exemple illustre un exemple basique</value>
+  </data>
+  <data name="AssistanceCheckboxField3" xml:space="preserve">
+    <value>Il est possible d'afficher un champ textuel éditable pour associer la bascule avec une valeur spécifique</value>
+  </data>
+  <data name="AssistanceCheckboxGridField" xml:space="preserve">
+    <value>Une grille de bascules arrangées en ligne/colonne.
+Idéale pour effectuer le suivi de munitions, charges, dommages, ou des facultés.</value>
+  </data>
+  <data name="AssistanceCheckboxGridField2" xml:space="preserve">
+    <value>Il est possible d'afficher/masquer les étiquettes (labels) des lignes et/ou des colonnes</value>
+  </data>
+  <data name="AssistanceColorField" xml:space="preserve">
+    <value>Un sélecteur de couleur permettant d'identifier une créature visuellement en fonction d'un rôle, d'une faction, ou toute autre logique basée sur un code couleur.
+Particulièrement utile lorsque l'on joue avec de véritables figurines disposant d'une base colorée permettant de l'identifier formellement sur le champ de bataille. Le rendu en mode combat ressemble à l'exemple suivant :</value>
+  </data>
+  <data name="AssistanceConditionsField" xml:space="preserve">
+    <value>Un champ flexible permettant d'effectuer le suivi des états et des conditions (p.ex. charmé, empoisonné, etc.). Il y a deux vues possibles qui peuvent être basculées en mode combat.</value>
+  </data>
+  <data name="AssistanceConditionsField2" xml:space="preserve">
+    <value>La vue peut être réduite afin d'avoir un simple aperçu</value>
+  </data>
+  <data name="AssistanceFieldTitle" xml:space="preserve">
+    <value>: Assistance et exemples</value>
+  </data>
+  <data name="AssistanceGeneralExamplesDesc" xml:space="preserve">
+    <value>Voici quelques exemples de créatures utilisant des champs personnalisés, et leur rendu en mode combat.</value>
+  </data>
+  <data name="AssistanceGeneralExamplesTitle" xml:space="preserve">
+    <value>Exemples</value>
+  </data>
+  <data name="AssistanceGeneralSharedFieldsDesc" xml:space="preserve">
+    <value>Chaque champ d’une créature peut être marqué comme &lt;b&gt;Partagé&lt;/b&gt;. En mode combat, vous pouvez déclarer un nombre d’instances pour chaque créature (par exemple, 5 gobelins). La fonctionnalité &lt;b&gt;Partagé&lt;/b&gt; signifie que le champ est commun à toutes les instances et ne sera affiché qu’une seule fois. &lt;i&gt; Par exemple, vous ne souhaitez probablement pas que les compétences des gobelins soient réaffichées pour chaque instance, mais en revanche, vous voudrez sans doute suivre les points de vie individuellement pour chacun. &lt;/i&gt;</value>
+  </data>
+  <data name="AssistanceGeneralSharedFieldsTitle" xml:space="preserve">
+    <value>Champs partagés</value>
+  </data>
+  <data name="AssistanceHitPointsField" xml:space="preserve">
+    <value>Un simple compteur de PV</value>
+  </data>
+  <data name="AssistanceNumericField" xml:space="preserve">
+    <value>Un simple champ numérique pouvant être utilisé pour effectuer le suivi d'éléments tels que l'XP, l'initiative, ou n'importe quel paramètre numérique</value>
+  </data>
+  <data name="AssistanceStatsField" xml:space="preserve">
+    <value>Un ensemble de valeurs numérique pouvant représenter des compétences (telles que FOR, DEX, INT, etc.). Peut être configuré pour correspondre n'importe quel système de compétences.</value>
+  </data>
+  <data name="AssistanceStatsField2" xml:space="preserve">
+    <value>Le champ peut être laissé comme éditable en mode combat</value>
+  </data>
+  <data name="AssistanceTextField" xml:space="preserve">
+    <value>Un champ de texte multiligne basique, adapté pour prendre des notes ou définir des descriptions par rapport à la créature.</value>
+  </data>
+  <data name="AssistanceTextGridField" xml:space="preserve">
+    <value>Un champ permettant de définir une grille de zones de texte. Adapté pour gérer des capacités, des compétences, des inventaires, des sorts, ou encore des notes structurées.
+Des étiquettes (labels) de lignes/colonnes peuvent être ajoutés.</value>
+  </data>
+  <data name="AssistanceUserCustomFieldDesc" xml:space="preserve">
+    <value>Vous pouvez enregistrer n’importe quel champ que vous avez personnalisé comme modèle dans vos champs personnalisés utilisateur. Ces modèles seront ensuite disponibles dans le sélecteur de champs. Cela est particulièrement pratique si plusieurs de vos créatures nécessitent la même fonctionnalité et/ou mise en page, car vous n’aurez pas à tout recommencer l'édition à chaque fois.</value>
+  </data>
+  <data name="AssistanceUserCustomFieldTitle" xml:space="preserve">
+    <value>Champs personnalisés</value>
+  </data>
+  <data name="AssitanceGeneral1" xml:space="preserve">
+    <value>Cet éditeur vous permet d’enrichir vos créatures avec des champs personnalisés adaptés à vos besoins en jeu. Vous pouvez choisir parmi différents types de champs tels que des compteurs de vie, des statistiques numériques, des cases à cocher, des états, et bien plus encore. Chaque champ est entièrement configurable et sera affiché de manière dynamique en mode combat. Vous pouvez ajouter plusieurs champs, les réorganiser ou les supprimer à tout moment. Pour chaque type, un exemple visuel et une courte description sont fournis pour vous guider.</value>
+  </data>
+  <data name="CustomFieldBtn" xml:space="preserve">
+    <value>Champ personnalisé</value>
+  </data>
   <data name="FieldRemove" xml:space="preserve">
     <value>Retirer</value>
   </data>
@@ -134,5 +206,8 @@
   </data>
   <data name="MoveForward" xml:space="preserve">
     <value>Déplacer en avant</value>
+  </data>
+  <data name="SharedField" xml:space="preserve">
+    <value>Partagé</value>
   </data>
 </root>

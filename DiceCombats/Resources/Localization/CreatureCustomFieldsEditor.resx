@@ -123,6 +123,87 @@
   <data name="AddField" xml:space="preserve">
     <value>Add field</value>
   </data>
+  <data name="AssistanceCheckboxField" xml:space="preserve">
+    <value>One or more boolean options the user can toggle. Useful for simple conditions, status effects, toggles, or flags.</value>
+  </data>
+  <data name="AssistanceCheckboxField2" xml:space="preserve">
+    <value>This first example illustrates a basic example</value>
+  </data>
+  <data name="AssistanceCheckboxField3" xml:space="preserve">
+    <value>It is possible to show an additional numeric field to store a specific value</value>
+  </data>
+  <data name="AssistanceCheckboxGridField" xml:space="preserve">
+    <value>A grid of checkboxes arranged in rows and columns.
+Ideal for tracking ammunition, charges, cooldowns, damages, or usage of limited abilities.</value>
+  </data>
+  <data name="AssistanceCheckboxGridField2" xml:space="preserve">
+    <value>It is possible to add/hide rows and columns labels</value>
+  </data>
+  <data name="AssistanceColorField" xml:space="preserve">
+    <value>A color picker field. Use it to tag creatures visually by role, alignment, faction, or custom logic based on colour codes. Especially useful when
+playing with real miniature having a color base which allows to easily identify them. This will render as follows in combat mode.</value>
+  </data>
+  <data name="AssistanceConditionsField" xml:space="preserve">
+    <value>A flexible field to track states and conditions (e.g. charmed, poisoned, etc.). There are two possible views that can be switched dynamically in combat mode.</value>
+  </data>
+  <data name="AssistanceConditionsField2" xml:space="preserve">
+    <value>The view can be minimized to have a summary</value>
+  </data>
+  <data name="AssistanceFieldTitle" xml:space="preserve">
+    <value>field assitance and examples</value>
+  </data>
+  <data name="AssistanceGeneralExamplesDesc" xml:space="preserve">
+    <value>Here are some examples of creatures using custom fields and how they render in combat mode</value>
+  </data>
+  <data name="AssistanceGeneralExamplesTitle" xml:space="preserve">
+    <value>Examples</value>
+  </data>
+  <data name="AssistanceGeneralSharedFieldsDesc" xml:space="preserve">
+    <value>Each field of the creature can be marked as &lt;b&gt;Shared&lt;/b&gt;. In combat mode, you can declare a number
+of instances for each creature (e.g. 5 goblins). The &lt;b&gt;Shared&lt;/b&gt; feature means that the field is shared
+between all instances and will be only rendered once.
+&lt;i&gt;
+For example, you probably don't want the competences of the globlins to be re-rendered for each instance of
+goblins, but in the other hand, you might want to track hit points individually for each instance.
+&lt;/i&gt;</value>
+  </data>
+  <data name="AssistanceGeneralSharedFieldsTitle" xml:space="preserve">
+    <value>Shared fields</value>
+  </data>
+  <data name="AssistanceHitPointsField" xml:space="preserve">
+    <value>A simple hit points tracking counter.</value>
+  </data>
+  <data name="AssistanceNumericField" xml:space="preserve">
+    <value>A simple number field. Use it for values like initiative, XP, counters, or any custom numeric attribute.</value>
+  </data>
+  <data name="AssistanceStatsField" xml:space="preserve">
+    <value>A set of labeled numeric values, typically representing core abilities like STR, DEX, INT, etc. Can be configured to match any stat system.</value>
+  </data>
+  <data name="AssistanceStatsField2" xml:space="preserve">
+    <value>Fields can remain editable in combat mode</value>
+  </data>
+  <data name="AssistanceTextField" xml:space="preserve">
+    <value>A basic multi-line text field. Best suited for notes, conditions, reminders, or any descriptive data you want to attach to a creature.</value>
+  </data>
+  <data name="AssistanceTextGridField" xml:space="preserve">
+    <value>A table-like field with editable text cells. Useful for managing spell slots, inventory, abilities or structured notes.
+Optional row and column headers can be added.</value>
+  </data>
+  <data name="AssistanceUserCustomFieldDesc" xml:space="preserve">
+    <value>You can save any field that you have customized as a template in the user custom fields.</value>
+  </data>
+  <data name="AssistanceUserCustomFieldTitle" xml:space="preserve">
+    <value>User custom fields</value>
+  </data>
+  <data name="AssitanceGeneral1" xml:space="preserve">
+    <value>This editor allows you to enrich your creatures with custom fields tailored to your gameplay needs.
+You can choose from various field types such as health bars, numerical stats, checkboxes, status conditions, and more.
+Each field is fully configurable and will be rendered consistently in both combat and creature views.
+You can add multiple fields, reorder them, or remove them at any time. For each type, a visual example and short description is provided below to help you decide.</value>
+  </data>
+  <data name="CustomFieldBtn" xml:space="preserve">
+    <value>Custom field</value>
+  </data>
   <data name="FieldRemove" xml:space="preserve">
     <value>Remove</value>
   </data>
@@ -134,5 +215,8 @@
   </data>
   <data name="MoveForward" xml:space="preserve">
     <value>Move forward</value>
+  </data>
+  <data name="SharedField" xml:space="preserve">
+    <value>Shared</value>
   </data>
 </root>

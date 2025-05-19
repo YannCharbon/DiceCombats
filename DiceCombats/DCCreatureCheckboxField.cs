@@ -18,7 +18,7 @@ namespace DiceCombats
         public List<bool> SelectedOptions { get; set; } = new List<bool>(new bool[1]);
         public List<string> TextFields { get; set; } = new List<string>(new string[1]);
         public List<string> TextFieldsLabels { get; set; } = new List<string>(new string[1]);
-        public bool ShowFieldName { get; set; } = true;
+        public bool ShowFieldName { get; set; } = false;
         public bool ShowTextFields { get; set; } = false;
 
         public override object GetValue()

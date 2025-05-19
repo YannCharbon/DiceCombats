@@ -120,6 +120,9 @@
   <data name="CBFieldAddOption" xml:space="preserve">
     <value>Add option</value>
   </data>
+  <data name="CBFieldShowFieldName" xml:space="preserve">
+    <value>Show field name</value>
+  </data>
   <data name="CBFieldShowTextFields" xml:space="preserve">
     <value>Show text fields</value>
   </data>

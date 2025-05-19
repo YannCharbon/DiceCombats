@@ -79,6 +79,225 @@ namespace DiceCombats.Resources.Localization {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à One or more boolean options the user can toggle. Useful for simple conditions, status effects, toggles, or flags..
+        /// </summary>
+        internal static string AssistanceCheckboxField {
+            get {
+                return ResourceManager.GetString("AssistanceCheckboxField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This first example illustrates a basic example.
+        /// </summary>
+        internal static string AssistanceCheckboxField2 {
+            get {
+                return ResourceManager.GetString("AssistanceCheckboxField2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à It is possible to show an additional numeric field to store a specific value.
+        /// </summary>
+        internal static string AssistanceCheckboxField3 {
+            get {
+                return ResourceManager.GetString("AssistanceCheckboxField3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A grid of checkboxes arranged in rows and columns.
+        ///Ideal for tracking ammunition, charges, cooldowns, damages, or usage of limited abilities..
+        /// </summary>
+        internal static string AssistanceCheckboxGridField {
+            get {
+                return ResourceManager.GetString("AssistanceCheckboxGridField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à It is possible to add/hide rows and columns labels.
+        /// </summary>
+        internal static string AssistanceCheckboxGridField2 {
+            get {
+                return ResourceManager.GetString("AssistanceCheckboxGridField2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A color picker field. Use it to tag creatures visually by role, alignment, faction, or custom logic based on colour codes. Especially useful when
+        ///playing with real miniature having a color base which allows to easily identify them. This will render as follows in combat mode..
+        /// </summary>
+        internal static string AssistanceColorField {
+            get {
+                return ResourceManager.GetString("AssistanceColorField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A flexible field to track states and conditions (e.g. charmed, poisoned, etc.). There are two possible views that can be switched dynamically in combat mode..
+        /// </summary>
+        internal static string AssistanceConditionsField {
+            get {
+                return ResourceManager.GetString("AssistanceConditionsField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The view can be minimized to have a summary.
+        /// </summary>
+        internal static string AssistanceConditionsField2 {
+            get {
+                return ResourceManager.GetString("AssistanceConditionsField2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à field assitance and examples.
+        /// </summary>
+        internal static string AssistanceFieldTitle {
+            get {
+                return ResourceManager.GetString("AssistanceFieldTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Here are some examples of creatures using custom fields and how they render in combat mode.
+        /// </summary>
+        internal static string AssistanceGeneralExamplesDesc {
+            get {
+                return ResourceManager.GetString("AssistanceGeneralExamplesDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Examples.
+        /// </summary>
+        internal static string AssistanceGeneralExamplesTitle {
+            get {
+                return ResourceManager.GetString("AssistanceGeneralExamplesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Each field of the creature can be marked as &lt;b&gt;Shared&lt;/b&gt;. In combat mode, you can declare a number
+        ///of instances for each creature (e.g. 5 goblins). The &lt;b&gt;Shared&lt;/b&gt; feature means that the field is shared
+        ///between all instances and will be only rendered once.
+        ///&lt;i&gt;
+        ///For example, you probably don&apos;t want the competences of the globlins to be re-rendered for each instance of
+        ///goblins, but in the other hand, you might want to track hit points individually for each instance.
+        ///&lt;/i&gt;.
+        /// </summary>
+        internal static string AssistanceGeneralSharedFieldsDesc {
+            get {
+                return ResourceManager.GetString("AssistanceGeneralSharedFieldsDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Shared fields.
+        /// </summary>
+        internal static string AssistanceGeneralSharedFieldsTitle {
+            get {
+                return ResourceManager.GetString("AssistanceGeneralSharedFieldsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A simple hit points tracking counter..
+        /// </summary>
+        internal static string AssistanceHitPointsField {
+            get {
+                return ResourceManager.GetString("AssistanceHitPointsField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A simple number field. Use it for values like initiative, XP, counters, or any custom numeric attribute..
+        /// </summary>
+        internal static string AssistanceNumericField {
+            get {
+                return ResourceManager.GetString("AssistanceNumericField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A set of labeled numeric values, typically representing core abilities like STR, DEX, INT, etc. Can be configured to match any stat system..
+        /// </summary>
+        internal static string AssistanceStatsField {
+            get {
+                return ResourceManager.GetString("AssistanceStatsField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Fields can remain editable in combat mode.
+        /// </summary>
+        internal static string AssistanceStatsField2 {
+            get {
+                return ResourceManager.GetString("AssistanceStatsField2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A basic multi-line text field. Best suited for notes, conditions, reminders, or any descriptive data you want to attach to a creature..
+        /// </summary>
+        internal static string AssistanceTextField {
+            get {
+                return ResourceManager.GetString("AssistanceTextField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A table-like field with editable text cells. Useful for managing spell slots, inventory, abilities or structured notes.
+        ///Optional row and column headers can be added..
+        /// </summary>
+        internal static string AssistanceTextGridField {
+            get {
+                return ResourceManager.GetString("AssistanceTextGridField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à You can save any field that you have customized as a template in the user custom fields..
+        /// </summary>
+        internal static string AssistanceUserCustomFieldDesc {
+            get {
+                return ResourceManager.GetString("AssistanceUserCustomFieldDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User custom fields.
+        /// </summary>
+        internal static string AssistanceUserCustomFieldTitle {
+            get {
+                return ResourceManager.GetString("AssistanceUserCustomFieldTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This editor allows you to enrich your creatures with custom fields tailored to your gameplay needs.
+        ///You can choose from various field types such as health bars, numerical stats, checkboxes, status conditions, and more.
+        ///Each field is fully configurable and will be rendered consistently in both combat and creature views.
+        ///You can add multiple fields, reorder them, or remove them at any time. For each type, a visual example and short description is provided below to help you decide..
+        /// </summary>
+        internal static string AssitanceGeneral1 {
+            get {
+                return ResourceManager.GetString("AssitanceGeneral1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Custom field.
+        /// </summary>
+        internal static string CustomFieldBtn {
+            get {
+                return ResourceManager.GetString("CustomFieldBtn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Remove.
         /// </summary>
         internal static string FieldRemove {
@@ -111,6 +330,15 @@ namespace DiceCombats.Resources.Localization {
         internal static string MoveForward {
             get {
                 return ResourceManager.GetString("MoveForward", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Shared.
+        /// </summary>
+        internal static string SharedField {
+            get {
+                return ResourceManager.GetString("SharedField", resourceCulture);
             }
         }
     }

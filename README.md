@@ -17,6 +17,15 @@ DiceCombats is an open-source, system-agnostic tabletop RPG combat management to
 - **For D&D Players**: Compatibility with [aidedd.org](https://www.aidedd.org/en/) to easily import any existing creature.
 - **Multi-language Support**: Currently available languages are **English** and **French**
 
+<div style="display:flex;">
+<div style="width:45%;padding:8px;">
+<img src="DiceCombats/wwwroot/img/app_examples/DiceCombats_example_1.png" />
+</div>
+<div style="width:45%;padding:8px;">
+<img src="DiceCombats/wwwroot/img/app_examples/DiceCombats_example_2.png" />
+</div>
+</div>
+
 ---
 
 ## Installation

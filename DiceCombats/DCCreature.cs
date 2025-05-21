@@ -21,6 +21,7 @@ namespace DiceCombats
 {
     public class DCCreature : ICloneable
     {
+        public DCJsonMitigatorId JsonMitigatorId { get; set; } = DCJsonMitigatorId.CREATURE;
         public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; private set; } = string.Empty;
 

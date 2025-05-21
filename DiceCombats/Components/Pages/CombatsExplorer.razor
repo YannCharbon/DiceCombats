@@ -28,30 +28,30 @@
 <div style="padding-top:10px; padding-bottom:20px; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
     <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
     <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
-        Variant="Variant.Filled"
-        StartIcon="@Icons.Material.Filled.Add"
-        Color="@Color.Primary"
-        Size="Size.Large"
-        Style="margin:2px;">
-            @Loc["NewCombatBtn"]
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Add"
+    Color="@Color.Primary"
+    Size="Size.Large"
+    Style="margin:2px;">
+        @Loc["NewCombatBtn"]
     </MudButton>
     <MudButton OnClick="@(() => ExportAllCombats())"
-        Variant="Variant.Filled"
-        StartIcon="@Icons.Material.Filled.Upload"
-        Color="@Color.Primary"
-        Size="Size.Large"
-        Style="margin:2px;"
-        title="@Loc["ExportAllCombatsBtnTitle"]">
-            @Loc["ExportAllCombatsBtn"]
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Upload"
+    Color="@Color.Primary"
+    Size="Size.Large"
+    Style="margin:2px;"
+    title="@Loc["ExportAllCombatsBtnTitle"]">
+        @Loc["ExportAllCombatsBtn"]
     </MudButton>
     <MudButton OnClick="@(() => ImportCombats())"
-        Variant="Variant.Filled"
-        StartIcon="@Icons.Material.Filled.Download"
-        Color="@Color.Primary"
-        Size="Size.Large"
-        Style="margin:2px;"
-        title="@Loc["ImportCombatsBtnTitle"]">
-            @Loc["ImportCombatsBtn"]
+    Variant="Variant.Filled"
+    StartIcon="@Icons.Material.Filled.Download"
+    Color="@Color.Primary"
+    Size="Size.Large"
+    Style="margin:2px;"
+    title="@Loc["ImportCombatsBtnTitle"]">
+        @Loc["ImportCombatsBtn"]
     </MudButton>
 </div>
 
@@ -164,6 +164,18 @@
                 var newCombat = JsonSerializer.Deserialize<DCCombat>(json, options);
                 if (newCombat != null)
                 {
+                    if (newCombat.JsonMitigatorId != DCJsonMitigatorId.COMBAT)
+                    {
+                        if (CombatService.IsCurrentCulture("fr"))
+                        {
+                            PopupNotificationService.Show("Importation", "Ce fichier ne contient pas de combat", PopupNotificationService.Type.FAILURE, 4000);
+                        }
+                        else
+                        {
+                            PopupNotificationService.Show("Combat import", "This file does not contain combats", PopupNotificationService.Type.FAILURE, 4000);
+                        }
+                        throw new InvalidDataException("JSON does not contain a combat");
+                    }
                     if (CombatService.GetCombatFromGUID(newCombat.Id.ToString()) == null)
                     {
                         CombatService.AddCombat(newCombat);
@@ -202,6 +214,17 @@
 
                     if (newCombatList != null)
                     {
+                        if (newCombatList.Count > 0 && newCombatList[0].JsonMitigatorId != DCJsonMitigatorId.COMBAT) {
+                            if (CombatService.IsCurrentCulture("fr"))
+                            {
+                                PopupNotificationService.Show("Importation", "Ce fichier ne contient pas de combat", PopupNotificationService.Type.FAILURE, 4000);
+                            }
+                            else
+                            {
+                                PopupNotificationService.Show("Combat import", "This file does not contain combats", PopupNotificationService.Type.FAILURE, 4000);
+                            }
+                            throw new InvalidDataException("JSON does not contain combats");
+                        }
                         foreach (DCCombat combat in newCombatList)
                         {
                             if (CombatService.GetCombatFromGUID(combat.Id.ToString()) == null)

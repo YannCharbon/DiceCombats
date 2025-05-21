@@ -36,7 +36,7 @@
     <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">@Loc["CreaturesTitle"]</span></h3>
 </div>
 <div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
-    @for (char chr = 'a'; chr < 'z'; chr++)
+    @for (char chr = 'a'; chr <= 'z'; chr++)
     {
         @if (CombatService.GetCreatureList().Find(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == false) != null)
         {
@@ -160,6 +160,18 @@
                 var newCreature = JsonSerializer.Deserialize<DCCreature>(json, options);
                 if (newCreature != null)
                 {
+                    if (newCreature.JsonMitigatorId != DCJsonMitigatorId.CREATURE)
+                    {
+                        if (CombatService.IsCurrentCulture("fr"))
+                        {
+                            PopupNotificationService.Show("Importation", "Ce fichier ne contient pas de créature", PopupNotificationService.Type.FAILURE, 4000);
+                        }
+                        else
+                        {
+                            PopupNotificationService.Show("Combat import", "This file does not contain creatures", PopupNotificationService.Type.FAILURE, 4000);
+                        }
+                        throw new InvalidDataException("JSON does not contain a creature");
+                    }
                     if (CombatService.GetCreatureFromGUID(newCreature.Id.ToString()) == null)
                     {
                         CombatService.AddCreature(newCreature);
@@ -189,6 +201,18 @@
 
                     if (newCreatureList != null)
                     {
+                        if (newCreatureList.Count > 0 && newCreatureList[0].JsonMitigatorId != DCJsonMitigatorId.CREATURE)
+                        {
+                            if (CombatService.IsCurrentCulture("fr"))
+                            {
+                                PopupNotificationService.Show("Importation", "Ce fichier ne contient pas de créature", PopupNotificationService.Type.FAILURE, 4000);
+                            }
+                            else
+                            {
+                                PopupNotificationService.Show("Combat import", "This file does not contain creatures", PopupNotificationService.Type.FAILURE, 4000);
+                            }
+                            throw new InvalidDataException("JSON does not contain creatues");
+                        }
                         foreach (DCCreature creature in newCreatureList)
                         {
                             if (CombatService.GetCreatureFromGUID(creature.Id.ToString()) == null)

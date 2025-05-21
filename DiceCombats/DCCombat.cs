@@ -17,6 +17,7 @@ namespace DiceCombats
 {
     public class DCCombat
     {
+        public DCJsonMitigatorId JsonMitigatorId { get; set; } = DCJsonMitigatorId.COMBAT;
         public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; set; } = string.Empty;
         public string Notes {  get; set; } = string.Empty;

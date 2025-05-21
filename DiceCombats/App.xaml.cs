@@ -13,7 +13,11 @@ namespace DiceCombats
 
             MainPage = new MainPage();
 
-            Current.On<Microsoft.Maui.Controls.PlatformConfiguration.Android>().UseWindowSoftInputModeAdjust(WindowSoftInputModeAdjust.Resize);
+            var currentApp = Application.Current;
+            if (currentApp != null)
+            {
+                currentApp.On<Microsoft.Maui.Controls.PlatformConfiguration.Android>().UseWindowSoftInputModeAdjust(WindowSoftInputModeAdjust.Resize);
+            }
         }
 
         public void SetCultureAndReload(string cultureCode)

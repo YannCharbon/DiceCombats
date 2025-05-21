@@ -63,8 +63,8 @@ namespace DiceCombats
                                 {
                                     diceService.SaveCreatures();
                                     diceService.SaveCombats();
-                                    diceService.SaveFavoriteCombatsListAsync();
-                                    diceService.SaveUserCreatureCustomFieldsListAsync();
+                                    _ = diceService.SaveFavoriteCombatsListAsync();
+                                    _ = diceService.SaveUserCreatureCustomFieldsListAsync();
                                 }
                             };
                         });
@@ -82,8 +82,8 @@ namespace DiceCombats
                             {
                                 diceService.SaveCreatures();
                                 diceService.SaveCombats();
-                                diceService.SaveFavoriteCombatsListAsync();
-                                diceService.SaveUserCreatureCustomFieldsListAsync();
+                                _ = diceService.SaveFavoriteCombatsListAsync();
+                                _ = diceService.SaveUserCreatureCustomFieldsListAsync();
                             }
                         });
                     });

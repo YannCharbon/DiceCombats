@@ -29,10 +29,10 @@ namespace DiceCombats
 
         public DiceCombatsService()
         {
-            LoadCreatureListAsync();
-            LoadCombatsListAsync();
-            LoadFavoriteCombatsListAsync();
-            LoadUserCreatureCustomFieldsListAsync();
+            _ = LoadCreatureListAsync();
+            _ = LoadCombatsListAsync();
+            _ = LoadFavoriteCombatsListAsync();
+            _ = LoadUserCreatureCustomFieldsListAsync();
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -64,7 +64,7 @@ namespace DiceCombats
             string json = JsonSerializer.Serialize(_CreatureList, options);
             Debug.WriteLine(json);
 
-            SaveCreatureListAsync(_CreatureList);
+            _ = SaveCreatureListAsync(_CreatureList);
         }
 
         private static string creatureFilePath = Path.Combine(FileSystem.AppDataDirectory, "creatures.json");
@@ -128,7 +128,7 @@ namespace DiceCombats
             string json = JsonSerializer.Serialize(_CombatsList, options);
             Debug.WriteLine(json);
 
-            SaveCombatsListAsync(_CombatsList);
+            _ = SaveCombatsListAsync(_CombatsList);
         }
 
         private static string combatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "combats.json");
@@ -168,7 +168,7 @@ namespace DiceCombats
             if (_favoriteCombats.Contains(guid) == false)
             {
                 _favoriteCombats.Add(guid);
-                SaveFavoriteCombatsListAsync();
+                _ = SaveFavoriteCombatsListAsync();
             }
         }
 
@@ -177,7 +177,7 @@ namespace DiceCombats
             if (_favoriteCombats.Contains(guid) == true)
             {
                 _favoriteCombats.Remove(guid);
-                SaveFavoriteCombatsListAsync();
+                _ = SaveFavoriteCombatsListAsync();
             }
         }
 

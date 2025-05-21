@@ -26,7 +26,11 @@ namespace DiceCombats
             picker.FileTypeChoices.Add("All Files", new[] { "." });
             picker.SuggestedFileName = fileName;
 
-            var hwnd = ((MauiWinUIWindow)App.Current.Windows[0].Handler.PlatformView).WindowHandle;
+            var winuiWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView as MauiWinUIWindow;
+            if (winuiWindow == null)
+                return;
+
+            var hwnd = winuiWindow.WindowHandle;
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var file = await picker.PickSaveFileAsync();
@@ -47,7 +51,11 @@ namespace DiceCombats
 
             picker.FileTypeFilter.Add("*");
 
-            var hwnd = ((MauiWinUIWindow)App.Current.Windows[0].Handler.PlatformView).WindowHandle;
+            var winuiWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView as MauiWinUIWindow;
+            if (winuiWindow == null)
+                return new byte[0];
+
+            var hwnd = winuiWindow.WindowHandle;
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
 
             var file = await picker.PickSingleFileAsync();
@@ -63,7 +71,7 @@ namespace DiceCombats
                 }
             }
 
-            return null;
+            return new byte[0];
         }
     }
 }

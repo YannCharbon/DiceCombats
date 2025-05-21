@@ -116,7 +116,7 @@
 
         if (CombatService.IsCurrentCulture("fr"))
         {
-            PopupNotificationService.Show("Exportation", $"Export de '{creature.Name}' réussi", PopupNotificationService.Type.SUCCESS, 3000);
+            PopupNotificationService.Show("Exportation", $"Créature '{creature.Name}' exportée avec succès", PopupNotificationService.Type.SUCCESS, 3000);
         } else {
             PopupNotificationService.Show("Creature export", $"Successfully exported '{creature.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
         }
@@ -138,7 +138,7 @@
 
         if (CombatService.IsCurrentCulture("fr"))
         {
-            PopupNotificationService.Show("Exportation", $"Export de toutes les créatures réussi", PopupNotificationService.Type.SUCCESS, 3000);
+            PopupNotificationService.Show("Exportation", $"Toutes les créatures exportées avec succès", PopupNotificationService.Type.SUCCESS, 3000);
         } else
         {
             PopupNotificationService.Show("Creature export", "Successfully exported all creatures", PopupNotificationService.Type.SUCCESS, 3000);
@@ -172,7 +172,7 @@
 
                     if (CombatService.IsCurrentCulture("fr"))
                     {
-                        PopupNotificationService.Show("Importation", $"Import de '{newCreature.Name}' réussi", PopupNotificationService.Type.SUCCESS, 3000);
+                        PopupNotificationService.Show("Importation", $"Créature '{newCreature.Name}' importée avec succès", PopupNotificationService.Type.SUCCESS, 3000);
                     }
                     else {
                         PopupNotificationService.Show("Creature import", $"Successfully imported {newCreature.Name}", PopupNotificationService.Type.SUCCESS, 3000);
@@ -203,7 +203,7 @@
                         }
                         if (CombatService.IsCurrentCulture("fr"))
                         {
-                            PopupNotificationService.Show("Importation", $"Import de créature(s) réussi", PopupNotificationService.Type.SUCCESS, 3000);
+                            PopupNotificationService.Show("Importation", $"Créature(s) importée(s) avec succès", PopupNotificationService.Type.SUCCESS, 3000);
                         } else
                         {
                             PopupNotificationService.Show("Creature import", "Successfully imported multiple creatures", PopupNotificationService.Type.SUCCESS, 3000);

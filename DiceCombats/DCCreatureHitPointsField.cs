@@ -11,7 +11,7 @@ namespace DiceCombats
     public class DCCreatureHitPointsField : DCCreatureCustomField
     {
         public override string FieldType => "HitPoints";
-        public uint CurrentHP { get; set; } = 0;
+        public uint CurrentHP { get; set; } = uint.MaxValue;
         private uint _maxHP = 0;
         public uint MaximumHP
         {
@@ -19,7 +19,10 @@ namespace DiceCombats
             set
             {
                 _maxHP = value;
-                CurrentHP = _maxHP;
+                if (CurrentHP == uint.MaxValue)
+                {
+                    CurrentHP = _maxHP;
+                }
             }
         }
 

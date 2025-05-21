@@ -60,8 +60,8 @@ namespace DiceCombats
             {
                 Title = this.Title,
                 Count = this.Count,
-                StatsLabels = this.StatsLabels,
-                StatsValues = this.StatsValues,
+                StatsLabels = new List<string>(this.StatsLabels),
+                StatsValues = new List<int>(this.StatsValues),
                 ValuesAreEditable = this.ValuesAreEditable,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };

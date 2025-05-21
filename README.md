@@ -16,6 +16,7 @@ DiceCombats is an open-source, system-agnostic tabletop RPG combat management to
 - **Customizable Setup**: Import and export data to share with other GMs. Configure settings to match your unique game-mastering style.
 - **For D&D Players**: Compatibility with [aidedd.org](https://www.aidedd.org/en/) to easily import any existing creature.
 - **Multi-language Support**: Currently available languages are **English** and **French**
+- **Experimental Android Support**: Application is also available on Android.
 
 <div style="display:flex;">
 <div style="width:45%;padding:8px;">
@@ -33,7 +34,7 @@ DiceCombats is an open-source, system-agnostic tabletop RPG combat management to
 You can find the latest pre-compiled DiceCombats app here: [![Latest Release](https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge)](https://github.com/YannCharbon/DiceCombats/releases/latest).
 
 - **Windows Users**: Simply extract the ZIP archive to any location on your PC and run `DiceCombats.exe`. For quick access, you can create a shortcut on your Desktop or pin it to the Start menu.
-- **Android Users**: Download the APK and follow the installation process.
+- **Android Users**: Download the APK and follow the installation process. **Note that the Android app is experimental *(rendering might have some issues)***
 
 ## Manual Build
 

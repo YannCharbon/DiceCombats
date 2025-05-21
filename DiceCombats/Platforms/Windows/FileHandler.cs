@@ -23,7 +23,7 @@ namespace DiceCombats
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary
             };
 
-            picker.FileTypeChoices.Add("All Files", new[] { "." });
+            picker.FileTypeChoices.Add("JSON File", new List<string> { ".json" });
             picker.SuggestedFileName = fileName;
 
             var winuiWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView as MauiWinUIWindow;
@@ -49,7 +49,7 @@ namespace DiceCombats
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary
             };
 
-            picker.FileTypeFilter.Add("*");
+            picker.FileTypeFilter.Add(".json");
 
             var winuiWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView as MauiWinUIWindow;
             if (winuiWindow == null)

@@ -81,19 +81,11 @@
     }
     else if (Field is DCCreatureTextGridField textGridField)
     {
-        <div class="row">
-            <div class="col col-md-2">
-                <MudNumericField @bind-Value="textGridField.Columns" Label="@Loc["TextGridHorizontal"]" Variant="Variant.Outlined" Min="1" />
-            </div>
-            <div class="col col-md-2">
-                <MudNumericField @bind-Value="textGridField.Rows" Label="@Loc["TextGridVertical"]" Variant="Variant.Outlined" Min="1" />
-            </div>
-            <div class="col col-md-2">
-                <MudCheckBox T="bool" @bind-Value="textGridField.HasColumnHeaders" Label="@Loc["TextGridColumnLabels"]"></MudCheckBox>
-            </div>
-            <div class="col col-md-2">
-                <MudCheckBox T="bool" @bind-Value="textGridField.HasRowHeaders" Label="@Loc["TextGridRowLabels"]"></MudCheckBox>
-            </div>
+        <div class="d-flex flex-wrap gap-2">
+            <MudNumericField Style="max-width:150px;" @bind-Value="textGridField.Columns" Label="@Loc["TextGridHorizontal"]" Variant="Variant.Outlined" Min="1" />
+            <MudNumericField Style="max-width:150px;" @bind-Value="textGridField.Rows" Label="@Loc["TextGridVertical"]" Variant="Variant.Outlined" Min="1" />
+            <MudCheckBox T="bool" @bind-Value="textGridField.HasColumnHeaders" Label="@Loc["TextGridColumnLabels"]"></MudCheckBox>
+            <MudCheckBox T="bool" @bind-Value="textGridField.HasRowHeaders" Label="@Loc["TextGridRowLabels"]"></MudCheckBox>
         </div>
 
         <div style="padding:10px;overflow-x:auto;">
@@ -136,15 +128,15 @@
     }
     else if (Field is DCCreatureCheckboxField checkBoxField)
     {
-        <MudStack Row="true" style="padding-top:5px;padding-bottom:5px;">
+        <div class="d-flex flex-wrap" style="padding-top:5px;padding-bottom:5px;">
             <MudButton OnClick="@(() => checkBoxField.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["CBFieldAddOption"]</MudButton>
             <MudCheckBox T="bool" @bind-Value="checkBoxField.ShowFieldName" Label="@Loc["CBFieldShowFieldName"]"></MudCheckBox>
             <MudCheckBox T="bool" @bind-Value="checkBoxField.ShowTextFields" Label="@Loc["CBFieldShowTextFields"]"></MudCheckBox>
-        </MudStack>
-        <div class="d-flex flex-wrap gap-4">
+        </div>
+        <div class="d-flex flex-wrap gap-3">
             @foreach (int i in Enumerable.Range(0, checkBoxField.Labels.Count))
             {
-                <MudStack Row="true" Style=" padding:5px;background-color:#404040;border-radius:5px;">
+                <div class="d-flex flex-wrap gap-4" style="padding:5px;background-color:#404040;border-radius:5px;">
                     <MudTextField Immediate="true" @bind-Value="checkBoxField.Labels[i]" Label="Name" Variant="Variant.Outlined" />
                     <MudCheckBox Label="@checkBoxField.Labels[i]" @bind-Value="checkBoxField.SelectedOptions[i]"></MudCheckBox>
                     @if (checkBoxField.ShowTextFields == true)
@@ -152,25 +144,17 @@
                         <MudTextField Immediate="true" @bind-Value="checkBoxField.TextFieldsLabels[i]" Label="Text label" Variant="Variant.Outlined" />
                     }
                     <MudButton OnClick="@(() => checkBoxField.RemoveOption(checkBoxField.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
-                </MudStack>
+                </div>
             }
         </div>
     }
     else if (Field is DCCreatureCheckboxGridField checkboxGridField)
     {
-        <div class="row">
-            <div class="col col-md-2">
-                <MudNumericField @bind-Value="checkboxGridField.Columns" Label="@Loc["CBGridHorizontal"]" Variant="Variant.Outlined" Min="1" />
-            </div>
-            <div class="col col-md-2">
-                <MudNumericField @bind-Value="checkboxGridField.Rows" Label="@Loc["CBGridVertical"]" Variant="Variant.Outlined" Min="1" />
-            </div>
-            <div class="col col-md-2">
-                <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasColumnHeaders" Label="@Loc["CBGridColumnLabels"]"></MudCheckBox>
-            </div>
-            <div class="col col-md-2">
-                <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasRowHeaders" Label="@Loc["CBGridRowLabels"]"></MudCheckBox>
-            </div>
+        <div class="d-flex flex-wrap gap-2">
+            <MudNumericField Style="max-width:150px;" @bind-Value="checkboxGridField.Columns" Label="@Loc["CBGridHorizontal"]" Variant="Variant.Outlined" Min="1" />
+            <MudNumericField Style="max-width:150px;" @bind-Value="checkboxGridField.Rows" Label="@Loc["CBGridVertical"]" Variant="Variant.Outlined" Min="1" />
+            <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasColumnHeaders" Label="@Loc["CBGridColumnLabels"]"></MudCheckBox>
+            <MudCheckBox T="bool" @bind-Value="checkboxGridField.HasRowHeaders" Label="@Loc["CBGridRowLabels"]"></MudCheckBox>
         </div>
 
         <div style="padding:10px;overflow-x:auto;">

@@ -1,3 +1,3 @@
 # Release notes
 
-Initial version.
+First public version.

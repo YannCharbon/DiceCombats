@@ -18,42 +18,52 @@ namespace DiceCombats
     {
         public async Task SaveFileAsync(string fileName, byte[] data)
         {
-            var context = Android.App.Application.Context;
-            var externalPath = context.GetExternalFilesDir(null).AbsolutePath;
-            var filePath = Path.Combine(externalPath, fileName);
-
-            await File.WriteAllBytesAsync(filePath, data);
-
-            var fileUri = AndroidX.Core.Content.FileProvider.GetUriForFile(context, context.PackageName + ".fileprovider", new Java.IO.File(filePath));
-            var intent = new Intent(Intent.ActionSend);
-            intent.SetType("*/*");
-            intent.PutExtra(Intent.ExtraStream, fileUri);
-            intent.AddFlags(ActivityFlags.GrantReadUriPermission);
-
-            var chooser = Intent.CreateChooser(intent, "Share File");
-            chooser.SetFlags(ActivityFlags.NewTask);
-
             var activity = MainActivity.Instance;
             if (activity == null)
                 throw new InvalidOperationException("Current activity is not available.");
 
+            var intent = new Intent(Intent.ActionCreateDocument);
+            intent.AddCategory(Intent.CategoryOpenable);
+            intent.SetType("application/json");
+            intent.PutExtra(Intent.ExtraTitle, fileName); // Suggest default file name
+
             var taskCompletionSource = new TaskCompletionSource<bool>();
 
-            MainActivity.ActivityResult += OnActivityResult;
-
-            activity.StartActivityForResult(chooser, 2000);
-
-            await taskCompletionSource.Task;
-
-            void OnActivityResult(int requestCode, Result resultCode, Intent data)
+            void OnActivityResult(int requestCode, Result resultCode, Intent? resultData)
             {
                 if (requestCode == 2000)
                 {
                     MainActivity.ActivityResult -= OnActivityResult;
-                    taskCompletionSource.SetResult(resultCode == Result.Ok);
+
+                    if (resultCode == Result.Ok && resultData?.Data != null)
+                    {
+                        try
+                        {
+                            var uri = resultData.Data;
+                            using var outputStream = activity?.ContentResolver?.OpenOutputStream(uri);
+                            outputStream?.Write(data, 0, data.Length);
+                            outputStream?.Flush();
+                            taskCompletionSource.SetResult(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Error saving file: {ex}");
+                            taskCompletionSource.SetResult(false);
+                        }
+                    }
+                    else
+                    {
+                        taskCompletionSource.SetResult(false);
+                    }
                 }
             }
+
+            MainActivity.ActivityResult += OnActivityResult;
+            activity.StartActivityForResult(intent, 2000);
+
+            await taskCompletionSource.Task;
         }
+
 
         public async Task<byte[]> LoadFileAsync()
         {
@@ -73,7 +83,7 @@ namespace DiceCombats
 
             return await taskCompletionSource.Task;
 
-            void OnActivityResult(int requestCode, Result resultCode, Intent data)
+            void OnActivityResult(int requestCode, Result resultCode, Intent? data)
             {
                 if (requestCode == 1000)
                 {
@@ -82,17 +92,17 @@ namespace DiceCombats
                     if (resultCode == Result.Ok && data?.Data != null)
                     {
                         var uri = data.Data;
-                        var stream = activity.ContentResolver.OpenInputStream(uri);
+                        var stream = activity?.ContentResolver?.OpenInputStream(uri);
 
                         using (var memoryStream = new MemoryStream())
                         {
-                            stream.CopyTo(memoryStream);
+                            stream?.CopyTo(memoryStream);
                             taskCompletionSource.SetResult(memoryStream.ToArray());
                         }
                     }
                     else
                     {
-                        taskCompletionSource.SetResult(null);
+                        taskCompletionSource.SetResult(new byte[0]);
                     }
                 }
             }

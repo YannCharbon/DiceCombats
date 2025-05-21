@@ -67,7 +67,7 @@ If you prefer to build manually from the source code, follow these steps:
 
 - **Issues and feature requests**: Report issues and suggest features here [![GitHub Issues](https://img.shields.io/github/issues/YannCharbon/DiceCombats?style=for-the-badge)](https://github.com/YannCharbon/DiceCombats/issues).
 - **Contribution**: Contributions are welcome! Ensure all pull requests are well-documented and follow best coding practices. [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/YannCharbon/DiceCombats?style=for-the-badge)](https://github.com/YannCharbon/DiceCombats/pulls)
-- **License**: This project is licensed under Apache 2.0, so you can use and modify the code as needed.
+- **License**: This project is licensed under GPL-3.0.
 
 ---
 

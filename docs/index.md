@@ -13,6 +13,8 @@ DiceCombats is an open-source, system-agnostic tabletop RPG combat management to
 
 ---
 
+The full source code, issue tracker, and latest releases are available on the project’s official GitHub repository [github.com/YannCharbon/DiceCombats](https://github.com/YannCharbon/DiceCombats)
+
 ## Key Features
 
 - **Flexible Creature Creation**: Customize creatures with attributes, abilities, and information to suit any RPG system. Save them for reuse in future campaigns.

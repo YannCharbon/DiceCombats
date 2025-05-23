@@ -1,0 +1,8 @@
+title: DiceCombats
+description: A system-agnostic open-source TTRPG combat manager
+baseurl: "/DiceCombats" # IMPORTANT for GitHub Pages
+url: "https://yanncharbon.github.io"
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag

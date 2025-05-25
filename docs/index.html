@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DiceCombats - Open-Source TTRPG Combat Manager</title>
+  <meta name="description" content="DiceCombats is a flexible, system-agnostic tool to manage tabletop RPG combats with full customization and real-time tracking." />
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="icon" href="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/dicecombats_logo.svg" type="image/svg">
+
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "DiceCombats",
+    "applicationCategory": "GameApplication",
+    "operatingSystem": "Windows, Android",
+    "description": "DiceCombats is a flexible, system-agnostic tool to manage tabletop RPG combats with full customization and real-time tracking.",
+    "url": "https://yanncharbon.github.io/DiceCombats/",
+    "downloadUrl": "https://github.com/YannCharbon/DiceCombats/releases/latest",
+    "image": "https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/dicecombats_logo.svg",
+    "author": {
+        "@type": "Person",
+        "name": "Yann Charbon"
+    }
+    }
+    </script>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <div>
+            <a class="nav-link" href="https://github.com/YannCharbon/DiceCombats/">
+                <img src="github-mark-white.svg" alt="GitHub logo" style="height: 20px; width: auto; transform: translateY(3px);" />
+                GitHub repository
+            </a>
+            </div>
+            <div class="nav-logo">
+                <a href=""><img src="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/dicecombats_logo.svg" /></a>
+            </div>
+            <div>
+                <a class="nav-link" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">
+                    <img src="download-minimalistic-svgrepo-com.svg" alt="Download logo" style="height: 20px; width: auto; transform: translateY(3px);" />
+                    Download
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <h1>DiceCombats</h1>
+
+        <p>
+            DiceCombats is an open-source, system-agnostic tabletop RPG combat management tool designed to make game mastering seamless, modular, and enjoyable.
+            It is aimed at frustrated GMs who have struggled to find the right tool for managing combats effectively due to organizational challenges, missing fields,
+            or tags to track specific information. The keyword here is <strong>customization</strong>.
+        </p>
+
+        <hr>
+
+        <h2>Key Features</h2>
+
+        <ul>
+            <li><strong>Flexible Creature Creation</strong>: Customize creatures with attributes, abilities, and information to suit any RPG system. Save them for reuse in future campaigns.</li>
+            <li><strong>Modular Combat Management</strong>: Efficiently track initiative, hit points, status effects, and any custom-defined information in real-time.</li>
+            <li><strong>System-Agnostic Design</strong>: Adaptable to any RPG system, giving you maximum flexibility for your campaigns.</li>
+            <li><strong>Customizable Setup</strong>: Import and export data to share with other GMs. Configure settings to match your unique game-mastering style.</li>
+            <li><strong>For D&D Players</strong>: Compatibility with <a href="https://www.aidedd.org/en/">aidedd.org</a> to easily import any existing creature.</li>
+            <li><strong>Multi-language Support</strong>: Currently available languages are <strong>English</strong> and <strong>French</strong></li>
+            <li><strong>Experimental Android Support</strong>: Application is also available on Android.</li>
+        </ul>
+
+        <div style="display:flex; align-items: center; justify-content: center;">
+            <div style="width:45%;padding:8px;">
+                <img src="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/img/app_examples/DiceCombats_example_1.png" alt="Example 1" />
+            </div>
+            <div style="width:45%;padding:8px;">
+                <img src="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/img/app_examples/DiceCombats_example_2.png" alt="Example 2" />
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>Installation</h2>
+
+        <p>
+            You can find the latest pre-compiled DiceCombats app here:
+            <a href="https://github.com/YannCharbon/DiceCombats/releases/latest" title="Latest release"><img src="https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge" alt="Relase badge" /></a>
+        </p>
+
+        <ul>
+            <li><strong>Windows Users</strong>: Simply extract the ZIP archive to any location on your PC and run <span class="code-style">DiceCombats.exe</span>. For quick access, you can create a shortcut on your Desktop or pin it to the Start menu.</li>
+            <li><strong>Android Users</strong>: Download the APK and follow the installation process. <strong>Note that the Android app is experimental <i>(rendering might have some issues)</i></strong></li>
+        </ul>
+
+
+
+        <h2>Manual Build</h2>
+
+        <p>If you prefer to build manually from the source code, follow these steps:</p>
+
+        <h2>Prerequisites</h2>
+
+        <ul>
+            <il>Ensure you have the .NET SDK installed. <a href="https://dotnet.microsoft.com/download">Download .NET SDK</a></il>
+            <il>For mobile platforms, ensure you have a compatible environment for building MAUI applications.</il>
+            <il>You can also open the solution in Visual Studio and build it from there.</il>
+        </ul>
+
+
+        <h2>Steps</h2>
+        <ul>
+            <li>1. Clone the repository:</li>
+            <div class="code-zone">
+                git clone https://github.com/YannCharbon/DiceCombats.git
+            </div>
+            <li>2. Navigate to the project directory:</li>
+            <div class="code-zone">
+                cd DiceCombats
+            </div>
+            <li>3. Build:</li>
+            <div class="code-zone">
+                dotnet build DiceCombats.sln -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:IncludeAllContentForSelfExtract=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
+            </div>
+            <li>4. Locate binary:</li>
+            The produced binaries can be found at <span class="code-style">DiceCombats/bin/Release/</span>.
+        </ul>
+
+
+        <hr>
+
+        <h2>Development Guide</h2>
+
+        <ul>
+            <li><strong>Issues and feature requests</strong>: Report issues and suggest features here <a href="https://github.com/YannCharbon/DiceCombats/issues/" title="Github issues"><img src="https://img.shields.io/github/issues/YannCharbon/DiceCombats?style=for-the-badge" alt="Issues badge" /></a>
+            <li><strong>Contribution</strong>: Contributions are welcome! Ensure all pull requests are well-documented and follow best coding practices. <a href="https://github.com/YannCharbon/DiceCombats/pulls/" title="Github Pull Requests"><img src="https://img.shields.io/github/issues-pr/YannCharbon/DiceCombats?style=for-the-badge" alt="Issues badge" /></a>
+            <li><strong>License</strong>: This project is licensed under GPL-3.0.
+        </ul>
+
+        <hr>
+
+        <h2>Support the Project</h2>
+
+        <p>
+            As this is a free and open-source project developed in my free time, updates and bug fixes may take time. If you enjoy using DiceCombats and wish to support its development, please consider donating via PayPal
+        </p>
+
+        <a href="https://www.paypal.com/donate/?hosted_button_id=4X9ZURL5T4E6N" title="Support on Paypal"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Paypal donation button" /></a>
+
+        <hr>
+
+        <p>Thank you for choosing DiceCombats! Happy gaming!</p>
+    </main>
+</body>
+</html>

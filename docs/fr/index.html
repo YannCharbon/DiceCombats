@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DiceCombats - Open-Source TTRPG Combat Manager</title>
+  <meta name="description" content="DiceCombats is a flexible, system-agnostic tool to manage tabletop RPG combats with full customization and real-time tracking." />
+  <link rel="stylesheet" href="../style.css" />
+  <link rel="icon" href="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/dicecombats_logo.svg" type="image/svg">
+  <script type="application/ld+json">
+  {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DiceCombats",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Windows, Android",
+  "description": "DiceCombats est un outil flexible, indépendant du système, pour gérer les combats de JDR sur table avec une personnalisation et un suivi en temps réel.",
+  "url": "https://yanncharbon.github.io/DiceCombats/fr/",
+  "downloadUrl": "https://github.com/YannCharbon/DiceCombats/releases/latest",
+  "image": "https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/dicecombats_logo.svg",
+  "author": {
+      "@type": "Person",
+      "name": "Yann Charbon"
+  }
+  }
+  </script>
+  <link rel="alternate" href="https://yanncharbon.github.io/DiceCombats/fr/" hreflang="fr" />
+  <link rel="alternate" href="https://yanncharbon.github.io/DiceCombats/" hreflang="en" />
+</head>
+<body>
+    <nav>
+        <a class="nav-link" href="https://github.com/YannCharbon/DiceCombats/">
+            <img src="../github-mark-white.svg" alt="GitHub logo" style="height: 20px; width: auto; transform: translateY(3px);" />
+            Projet GitHub
+        </a>
+        <a class="nav-logo" href=""><img src="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/dicecombats_logo.svg" alt="DiceCombat logo" /></a>
+        <a class="nav-link" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">
+            <img src="../download-minimalistic-svgrepo-com.svg" alt="Download logo" style="height: 20px; width: auto; transform: translateY(3px);" />
+            Téléchargements
+        </a>
+    </nav>
+    <main>
+        <div style="display: flex; justify-content: space-between;">
+            <h1>DiceCombats</h1>
+            <div>
+                <a class="nav-link" href="/DiceCombats/" title="Language">
+                <img src="../language-svgrepo-com.svg" alt="Logo langue" style="height: 20px; width: auto; transform: translateY(3px);" />
+                EN
+                </a>
+            </div>
+        </div>
+
+        <p>
+            DiceCombats est un gestionnaire de combat de JDR sur table, conçu pour rendre le déroulement de vos parties facile et agréable.
+            Il vise les MJ frustrés qui n'ont pas encore trouvé le bon outil pour gérer efficacement les combats. L'objectif ici est la <strong>personnalisation</strong>.
+        </p>
+
+        <hr>
+
+        <h2>Fonctionnalités principales</h2>
+
+        <ul>
+            <li><strong>Création flexible de créatures</strong> : Customisez vos créatures pour n'importe quel système avec des champs personnalisés. Enregistrez-les pour vos futures campagnes.</li>
+            <li><strong>Gestion modulaire des combats</strong> : Suivi facilité de l'initiative, des PV, des effets de statut, et de toute autre information définie par l'utilisateur en temps réel.</li>
+            <li><strong>Design système-agnostique</strong> : Adaptable à tout système de JDR, pour une flexibilité maximale dans vos campagnes.</li>
+            <li><strong>Configuration personnalisable</strong> : Importez et exportez des données pour partager avec d'autres MJ. Adaptez l'outil à votre manière de jouer.</li>
+            <li><strong>Pour les joueurs de D&D</strong> : Compatibilité avec <a href="https://www.aidedd.org/">aidedd.org</a> pour importer facilement des créatures existantes.</li>
+            <li><strong>Support multilingue</strong> : Langues actuellement disponibles : <strong>Anglais</strong> et <strong>Français</strong></li>
+            <li><strong>Support Android expérimental</strong> : L'application est également disponible sur Android.</li>
+        </ul>
+
+        <div style="display:flex; align-items: center; justify-content: center;">
+            <div style="width:45%;padding:8px;">
+                <img src="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/img/app_examples/DiceCombats_example_1.png" alt="Exemple 1" />
+            </div>
+            <div style="width:45%;padding:8px;">
+                <img src="https://raw.githubusercontent.com/YannCharbon/DiceCombats/main/DiceCombats/wwwroot/img/app_examples/DiceCombats_example_2.png" alt="Exemple 2" />
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>Installation</h2>
+
+        <p>
+            Vous pouvez télécharger la dernière version précompilée ici :
+            <a href="https://github.com/YannCharbon/DiceCombats/releases/latest" title="Dernière version"><img src="https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge" alt="Badge version" /></a>
+        </p>
+
+        <ul>
+            <li><strong>Utilisateurs Windows</strong> : Extrayez simplement l'archive ZIP à l'emplacement souhaité puis exécutez <span class="code-style">DiceCombats.exe</span>. Vous pouvez créer un raccourci ou l'épingler.</li>
+            <li><strong>Utilisateurs Android</strong> : Téléchargez l'APK et suivez le processus d'installation. <strong>Note : l'application est expérimentale <i>(le rendu peut comporter des défauts)</i></strong></li>
+        </ul>
+
+        <h2>Compilation manuelle</h2>
+
+        <p>Si vous préférez compiler le projet manuellement, suivez les étapes ci-dessous :</p>
+
+        <h2>Prérequis</h2>
+
+        <ul>
+            <li>Assurez-vous que le SDK .NET est installé. <a href="https://dotnet.microsoft.com/download">Télécharger le SDK .NET</a></li>
+            <li>Pour Android, installez un environnement compatible avec MAUI.</li>
+            <li>Vous pouvez également ouvrir la solution dans Visual Studio.</li>
+        </ul>
+
+        <h2>Étapes</h2>
+        <ul>
+            <li>1. Cloner le dépôt :</li>
+            <div class="code-zone">
+                git clone https://github.com/YannCharbon/DiceCombats.git
+            </div>
+            <li>2. Aller dans le dossier du projet :</li>
+            <div class="code-zone">
+                cd DiceCombats
+            </div>
+            <li>3. Compiler :</li>
+            <div class="code-zone">
+                dotnet build DiceCombats.sln -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:IncludeAllContentForSelfExtract=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
+            </div>
+            <li>4. Le fichier exécutable généré est récupérable dans <span class="code-style">DiceCombats/bin/Release/</span></li>
+        </ul>
+
+        <hr>
+
+        <h2>Guide développeur</h2>
+
+        <ul>
+            <li><strong>Problèmes et suggestions</strong> : Rendez-vous sur <a href="https://github.com/YannCharbon/DiceCombats/issues/" title="Github issues"><img src="https://img.shields.io/github/issues/YannCharbon/DiceCombats?style=for-the-badge" alt="Issues badge" /></a></li>
+            <li><strong>Contributions</strong> : Celle-ci sont bienvenues ! Veuillez proposer des pull requests bien documentées. <a href="https://github.com/YannCharbon/DiceCombats/pulls/" title="Github Pull Requests"><img src="https://img.shields.io/github/issues-pr/YannCharbon/DiceCombats?style=for-the-badge" alt="Issues badge" /></a></li>
+            <li><strong>Licence</strong> : Ce projet est sous licence GPL-3.0.</li>
+        </ul>
+
+        <hr>
+
+        <h2>Soutenir le projet</h2>
+
+        <p>
+            Comme DiceCombats est un projet open-source développé sur mon temps libre, de ce fait les mises à jour peuvent être lentes. Si vous appréciez l'application, pensez à faire un don pour me soutenir :
+        </p>
+
+        <a href="https://www.paypal.com/donate/?hosted_button_id=4X9ZURL5T4E6N" title="Soutenir sur Paypal"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Bouton don Paypal" /></a>
+
+        <hr>
+
+        <p>Merci d’avoir choisi DiceCombats ! Bon jeu !</p>
+    </main>
+</body>
+</html>

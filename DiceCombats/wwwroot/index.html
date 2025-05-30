@@ -31,16 +31,23 @@
 
     <script>
         function scrollToBottom() {
-            window.scrollTo(0, document.body.scrollHeight);
+            const page = document.querySelector('.page');
+            if (page) {
+                page.scrollTo({
+                    top: page.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         function scrollToElementById(id) {
-            var element = document.getElementById(id);
-            if (element) {
-                var elementPosition = element.getBoundingClientRect().top + window.scrollY;
-                var offsetPosition = elementPosition - 150;
+            const page = document.querySelector('.page');
+            const element = document.getElementById(id);
+            if (page && element) {
+                const elementPosition = element.getBoundingClientRect().top + page.scrollTop;
+                const offsetPosition = elementPosition - 150;
 
-                window.scrollTo({
+                page.scrollTo({
                     top: offsetPosition,
                     behavior: 'smooth'
                 });

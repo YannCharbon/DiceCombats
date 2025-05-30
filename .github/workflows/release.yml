@@ -24,7 +24,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Install .NET MAUI Workloads
-      run: dotnet workload install maui-android maui-windows maui-ios
+      run: dotnet workload install maui-android maui-windows maui-ios maui-maccatalyst
 
     - name: Determine AssemblyVersion
       id: version

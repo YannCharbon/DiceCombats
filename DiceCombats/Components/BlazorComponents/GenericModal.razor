@@ -10,49 +10,59 @@
 
 <style>
     .generic-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        position: fixed; /* stays relative to viewport */
+        inset: 0; /* shorthand for top/right/bottom/left: 0 */
+        width: 100vw;
+        height: 100vh;
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 2000;
         transition: opacity 1.0s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
+    /* modal content container */
     .generic-modal-content {
         position: relative;
+        display: flex; /* vertical layout: header/body/footer */
+        flex-direction: column;
         padding-top: 60px;
         padding-left: 20px;
         padding-right: 20px;
-        padding-bottom: 20px;
+        padding-bottom: 0; /* footer handles its own padding */
         background-color: #2D2D2D;
         box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
         border-radius: 10px;
         z-index: 2010;
     }
 
+    /* outer margin + sizing constraints */
     .generic-modal-content-margins {
         margin: 7% auto;
         max-width: 90%;
-        max-height: 86%;
-        overflow-y: auto;
-        overflow-x: hidden;
+        max-height: 86vh; /* use viewport height for consistent sizing */
+        overflow: hidden; /* clip overflowing content */
     }
 
-    @@media screen and (max-width: 768px) {
-        .generic-modal-content-margins {
-            margin: 0;
-            width: 100%;
-            height:100%;
-            max-width: 100%;
-            max-height: 100%;
-            zoom: 0.85;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
+    /* scrollable content area */
+    .generic-modal-body {
+        overflow: auto; /* scroll here */
+        padding-bottom: 12px; /* breathing room above footer */
+        flex: 1 1 auto; /* take remaining height */
+        min-height: 0; /* required for scroll to work in flex */
     }
 
+    /* footer anchored at bottom (not sticky needed) */
+    .generic-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        padding: 12px 20px;
+        background: #2D2D2D;
+        border-top: 1px solid #444;
+    }
+
+    /* close button (top-right corner) */
     .generic-modal-close {
         position: absolute;
         top: 10px;
@@ -61,19 +71,59 @@
         background: none;
         font-size: 28px;
         cursor: pointer;
+        color: #fff;
+        transition: color 0.2s ease;
+    }
+
+        .generic-modal-close:hover {
+            color: #ccc;
+        }
+
+    /* hidden modal state */
+    .hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .generic-modal-content-margins {
+            margin: 0;
+            width: 100%;
+            height: 100vh; /* full screen modal on mobile */
+            max-width: 100%;
+            max-height: 100vh;
+            overflow: hidden;
+            border-radius: 0; /* edge-to-edge look on small screens */
+        }
+
+        .generic-modal-content {
+            padding-top: 50px; /* smaller top padding */
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        .generic-modal-body {
+            padding-bottom: 10px;
+        }
+
+        .generic-modal-footer {
+            padding: 10px 16px;
+        }
     }
 </style>
 
 <div class="generic-modal @ModalClass" style="@ModalStyle" @onclick="OnBackgroundClick">
-    <div class="generic-modal-content generic-modal-content-margins" @onclick:stopPropagation="true">
+    <div class="generic-modal-content generic-modal-content-margins" @onclick:stopPropagation="true" @ref="_contentRef">
         <button class="generic-modal-close" @onclick="() => CloseModal(false)">×</button>
-        <div>
+
+        <div class="generic-modal-body">
             @if (ChildContent != null)
             {
                 @ChildContent(ChildContentInstance!)
             }
         </div>
-        <div style="display: flex; justify-content: flex-end; padding-top: 15px;">
+
+        <div class="generic-modal-footer">
             <MudButton OnClick="() => CloseModal(true)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" IconColor="Color.Success" Size="Size.Large">OK</MudButton>
         </div>
     </div>
@@ -88,6 +138,9 @@
     private string ModalClass { get; set; } = "hide";
     private string ModalStyle { get; set; } = "display: none;";
 
+    private ElementReference _contentRef;
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
     public void Show()
     {
         ChildContentInstance = Activator.CreateInstance<TContent>();
@@ -101,6 +154,30 @@
         ModalStyle = "display: none;";
         ModalClass = "hide";
         StateHasChanged();
+    }
+
+    public async Task ShowAsync()
+    {
+        // Phase 1: show the shell (no child yet)
+        ChildContentInstance = default;
+        ModalStyle = "display: block;";
+        ModalClass = "";
+        await InvokeAsync(StateHasChanged);
+
+        // Phase 2: now create the child (it will render while visible)
+        ChildContentInstance = Activator.CreateInstance<TContent>();
+        await InvokeAsync(StateHasChanged);
+
+        // Phase 3: AFTER layout, force initial autogrow once
+        await JS.InvokeVoidAsync("dcAutoGrowTextareas", _contentRef);
+    }
+
+    public async Task HideAsync()
+    {
+        ModalStyle = "display: none;";
+        ModalClass = "hide";
+        ChildContentInstance = default;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task CloseModal(bool success)

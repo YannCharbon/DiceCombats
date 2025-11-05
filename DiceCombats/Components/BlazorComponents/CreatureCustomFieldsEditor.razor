@@ -115,6 +115,7 @@
                                 <MudSelectItem T="string" Value="@("Color")" />
                                 <MudSelectItem T="string" Value="@("Conditions")"></MudSelectItem>
                                 <MudSelectItem T="string" Value="@("Stats")"></MudSelectItem>
+                                <MudSelectItem T="string" Value="@("DetailedPopup")"></MudSelectItem>
                                 @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
                                 {
                                     <MudSelectItem T="string" Value="@(customField.Title)"><MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)</MudSelectItem>
@@ -220,6 +221,11 @@
                                     <p>@Loc["AssistanceStatsField2"]</p>
                                     <img class="image-reveal" style="width:150px;" src="img/fields_examples/statsfield_example_2.png" />
                                     break;
+                                case "DetailedPopup":
+                                    <div>
+                                        TODO
+                                    </div>
+                                    break;
                                 default:
                                     break;
                             }
@@ -281,6 +287,9 @@
                 break;
             case "Stats":
                 newField = new DCCreatureStatsField { Title = "Stats" };
+                break;
+            case "DetailedPopup":
+                newField = new DCCreatureDetailedPopupField { Title = "DetailedPopup" };
                 break;
             default:
                 newField = CombatService.GetUserCreatureCustomFieldByName(newFieldType)?.Clone();

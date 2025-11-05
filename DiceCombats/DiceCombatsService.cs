@@ -85,7 +85,7 @@ namespace DiceCombats
         {
             if (File.Exists(creatureFilePath))
             {
-                Debug.WriteLine("File exists");
+                Debug.WriteLine($"File {creatureFilePath} exists");
                 string json = await File.ReadAllTextAsync(creatureFilePath);
                 var options = new JsonSerializerOptions
                 {
@@ -149,7 +149,7 @@ namespace DiceCombats
         {
             if (File.Exists(combatsFilePath))
             {
-                Debug.WriteLine("File exists");
+                Debug.WriteLine($"File {combatsFilePath} exists");
                 string json = await File.ReadAllTextAsync(combatsFilePath);
                 var options = new JsonSerializerOptions
                 {

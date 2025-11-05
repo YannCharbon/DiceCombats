@@ -225,6 +225,23 @@
             }
         </MudStack>
     }
+    else if (Field is DCCreatureDetailedPopupField detailedPopupField)
+    {
+        <GenericModal TContent="DetailedPopupFieldPopup" OnClose="() => {}" @ref="_modal">
+            <DetailedPopupFieldPopup DetailedPopupField="detailedPopupField" EditionMode="true" />
+        </GenericModal>
+
+        <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit fields</MudButton>
+
+        <MudStack Row="true">
+            @foreach (DCCreatureDetailedPopupField.SubField subField in detailedPopupField.SubFields)
+            {
+                @if (subField.Name != string.Empty) {
+                    <span style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@subField.Name</span>
+                }
+            }
+        </MudStack>
+    }
 }
 else
 {
@@ -352,11 +369,11 @@ else
             {
                 <div @onclick="() => {_showColorPicker = false; NotifyParentOnChange();}">
                     <MudColorPicker
-                        PickerVariant="PickerVariant.Static"
-                        ColorPickerView="ColorPickerView.GridCompact"
-                                    Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
-                        @bind-Text="colorField.Value"
-                        Style="@($"color: {colorField.Value ?? ""};")" Placeholder="Select Color" />
+                    PickerVariant="PickerVariant.Static"
+                    ColorPickerView="ColorPickerView.GridCompact"
+                    Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
+                    @bind-Text="colorField.Value"
+                    Style="@($"color: {colorField.Value ?? ""};")" Placeholder="Select Color" />
                 </div>                
                 <span style="@($"cursor:pointer;background-color:{colorField.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;Close&nbsp;</span>
             } else
@@ -365,7 +382,7 @@ else
                 <span style="@($"cursor:pointer;background-color:{colorField.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             }
 
-            </MudStack>
+        </MudStack>
     }
     else if (Field is DCCreatureConditionsField dndConditionsField)
     {
@@ -417,6 +434,14 @@ else
             }
         </MudStack>
     }
+    else if (Field is DCCreatureDetailedPopupField detailedPopupField)
+    {
+        <GenericModal TContent="DetailedPopupFieldPopup" OnClose="() => {}" @ref="_modal">
+            <DetailedPopupFieldPopup DetailedPopupField="detailedPopupField" />
+        </GenericModal>
+
+        <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@detailedPopupField.Title</MudButton>
+    }
 }
 
 @code {
@@ -430,6 +455,8 @@ else
     private bool _showColorPicker = false;
 
     private bool _dndConditionsFieldMaximized = false;
+
+    private GenericModal<DetailedPopupFieldPopup>? _modal;
 
     private void NotifyParentOnChange()
     {

@@ -53,6 +53,18 @@
                 });
             }
         }
+
+        window.dcAutoGrowTextareas = (root) => {
+            if (!root) return;
+            // Trigger Mud's logic by dispatching input, AND set height directly (belt + suspenders)
+            const areas = root.querySelectorAll('textarea');
+            areas.forEach(a => {
+                a.style.overflowY = 'hidden';
+                a.style.height = 'auto';
+                a.style.height = a.scrollHeight + 'px';
+                a.dispatchEvent(new Event('input', { bubbles: true })); // nudge Mud's handler
+            });
+        };
     </script>
 
     <div class="status-bar-safe-area"></div>

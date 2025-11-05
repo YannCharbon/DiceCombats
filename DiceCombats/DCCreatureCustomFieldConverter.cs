@@ -32,6 +32,7 @@ namespace DiceCombats
                         nameof(DCCreatureColorField) => JsonSerializer.Deserialize<DCCreatureColorField>(doc.RootElement.GetRawText(), options),
                         nameof(DCCreatureConditionsField) => JsonSerializer.Deserialize<DCCreatureConditionsField>(doc.RootElement.GetRawText(), options),
                         nameof(DCCreatureStatsField) => JsonSerializer.Deserialize<DCCreatureStatsField>(doc.RootElement.GetRawText(), options),
+                        nameof(DCCreatureDetailedPopupField) => JsonSerializer.Deserialize<DCCreatureDetailedPopupField>(doc.RootElement.GetRawText(), options),
                         _ => throw new JsonException($"Unknown discriminator: {discriminator}")
                     };
                 }

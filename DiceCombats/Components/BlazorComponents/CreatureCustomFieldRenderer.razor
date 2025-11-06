@@ -231,16 +231,16 @@
             <DetailedPopupFieldPopup DetailedPopupField="detailedPopupField" EditionMode="true" />
         </GenericModal>
 
-        <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit fields</MudButton>
+        <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit subfields</MudButton>
 
-        <MudStack Row="true">
+        <div style="display:flex; flex-wrap:wrap; margin-top:5px;">
             @foreach (DCCreatureDetailedPopupField.SubField subField in detailedPopupField.SubFields)
             {
                 @if (subField.Name != string.Empty) {
-                    <span style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@subField.Name</span>
+                    <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@subField.Name</div>
                 }
             }
-        </MudStack>
+        </div>
     }
 }
 else

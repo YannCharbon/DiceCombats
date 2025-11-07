@@ -1,0 +1,72 @@
+﻿@using DiceCombats
+@using MudBlazor.Utilities
+@inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+@if (EditionMode)
+{
+    <MudStack Row="true" style="padding-top:5px;padding-bottom:5px;">
+        <MudButton OnClick="@(() => Field.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["CBFieldAddOption"]</MudButton>
+    </MudStack>
+    <div class="d-flex flex-wrap gap-4">
+        @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+        {
+            <MudStack Row="true" Style="padding:5px;background-color:#404040;border-radius:5px;">
+                <MudTextField Immediate="true" @bind-Value="Field.Labels[i]" Label="@Loc["OptionLabel"]" Variant="Variant.Outlined" />
+                <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+            </MudStack>
+            <MudButton OnClick="@(() => Field.RemoveOption(Field.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
+        }
+    </div>
+}
+else
+{
+    <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized; NotifyParentOnChange();}">
+        @if (_dndConditionsFieldMaximized == false)
+        {
+            @if (Field.SelectedOptions.Count(x => x == true) == 0) {
+                <MudItem><h5>@Loc["DnDConditionAddCondition"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Color="Color.Success"></MudIcon></h5></MudItem>
+            }
+            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+            {
+                @if (Field.SelectedOptions[i] == true) {
+                    <MudItem class="DnDConditionsFieldItem" style="background-color:#9A7A00;">@Field.Labels[i]</MudItem>
+                }
+            }
+        } else {
+            <MudItem style="padding:5px;border-radius:5px;border-color:grey;border-width:thin;"><h5>@Loc["DnDConditionMinimize"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" Color="Color.Success"></MudIcon></h5></MudItem>
+            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+            {
+                @if (Field.SelectedOptions[i] == true)
+                {
+                    <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
+                        <MudCheckBox style="color:#BAAA00;" Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                    </MudItem>
+                } else {
+                    <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
+                        <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                    </MudItem>
+                }
+            }
+        }
+    </MudStack>
+}
+
+@code {
+    [Parameter]
+    public DCCreatureConditionsField Field { get; set; } = default!;
+    [Parameter]
+    public bool EditionMode { get; set; } = false;
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private bool _dndConditionsFieldMaximized = false;
+
+    private void NotifyParentOnChange()
+    {
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync();
+        }
+    }
+}

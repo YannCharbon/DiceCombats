@@ -1,0 +1,50 @@
+﻿@using DiceCombats
+@using MudBlazor.Utilities
+@inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+@if (EditionMode)
+{
+    <GenericModal TContent="DetailedPopupFieldPopup" OnClose="() => {}" @ref="_modal">
+        <DetailedPopupFieldPopup DetailedPopupField="Field" EditionMode="true" />
+    </GenericModal>
+
+    <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit subfields</MudButton>
+
+    <div style="display:flex; flex-wrap:wrap; margin-top:5px;">
+        @foreach (DCCreatureDetailedPopupField.SubField subField in Field.SubFields)
+        {
+            @if (subField.Name != string.Empty)
+            {
+                <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@subField.Name</div>
+            }
+        }
+    </div>
+}
+else
+{
+    <GenericModal TContent="DetailedPopupFieldPopup" OnClose="() => {}" @ref="_modal">
+        <DetailedPopupFieldPopup DetailedPopupField="Field" />
+    </GenericModal>
+
+    <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@Field.Title</MudButton>
+}
+
+@code {
+    [Parameter]
+    public DCCreatureDetailedPopupField Field { get; set; } = default!;
+    [Parameter]
+    public bool EditionMode { get; set; } = false;
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private GenericModal<DetailedPopupFieldPopup>? _modal;
+
+    private void NotifyParentOnChange()
+    {
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync();
+        }
+    }
+}

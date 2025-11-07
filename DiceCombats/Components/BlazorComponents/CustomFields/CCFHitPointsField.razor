@@ -1,0 +1,32 @@
+﻿@using DiceCombats
+@using MudBlazor.Utilities
+@inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+@if (EditionMode)
+{
+    <MudNumericField @bind-Value="Field.MaximumHP" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" />
+}
+else
+{
+    <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
+        <MudNumericField @bind-Value="Field.CurrentHP" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+    </MudStack>
+}
+
+@code {
+    [Parameter]
+    public DCCreatureHitPointsField Field { get; set; } = default!;
+    [Parameter]
+    public bool EditionMode { get; set; } = false;
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private void NotifyParentOnChange()
+    {
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync();
+        }
+    }
+}

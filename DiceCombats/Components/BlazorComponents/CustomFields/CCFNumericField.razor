@@ -1,0 +1,30 @@
+﻿@using DiceCombats
+@using MudBlazor.Utilities
+@inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+@if (EditionMode)
+{
+    <MudNumericField @bind-Value="Field.Value" Label="@Field.Title" Variant="Variant.Outlined" />
+}
+else
+{
+    <MudNumericField @bind-Value="Field.Value" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+}
+
+@code {
+    [Parameter]
+    public DCCreatureNumericField Field { get; set; } = default!;
+    [Parameter]
+    public bool EditionMode { get; set; } = false;
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private void NotifyParentOnChange()
+    {
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync();
+        }
+    }
+}

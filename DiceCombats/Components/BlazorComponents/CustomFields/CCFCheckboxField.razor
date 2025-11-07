@@ -1,0 +1,61 @@
+﻿@using DiceCombats
+@using MudBlazor.Utilities
+@inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+@if (EditionMode)
+{
+    <div class="d-flex flex-wrap" style="padding-top:5px;padding-bottom:5px;">
+        <MudButton OnClick="@(() => Field.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["CBFieldAddOption"]</MudButton>
+        <MudCheckBox T="bool" @bind-Value="Field.ShowFieldName" Label="@Loc["CBFieldShowFieldName"]"></MudCheckBox>
+        <MudCheckBox T="bool" @bind-Value="Field.ShowTextFields" Label="@Loc["CBFieldShowTextFields"]"></MudCheckBox>
+    </div>
+    <div class="d-flex flex-wrap gap-3">
+        @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+        {
+            <div class="d-flex flex-wrap gap-4" style="padding:5px;background-color:#404040;border-radius:5px;">
+                <MudTextField Immediate="true" @bind-Value="Field.Labels[i]" Label="Name" Variant="Variant.Outlined" />
+                <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                @if (Field.ShowTextFields == true)
+                {
+                    <MudTextField Immediate="true" @bind-Value="Field.TextFieldsLabels[i]" Label="Text label" Variant="Variant.Outlined" />
+                }
+                <MudButton OnClick="@(() => Field.RemoveOption(Field.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
+            </div>
+        }
+    </div>
+}
+else
+{
+    @if (Field.ShowFieldName)
+    {
+        <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
+    }
+    <MudStack Row="true">
+        @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+        {
+            <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+            @if (Field.ShowTextFields == true)
+            {
+                <MudTextField AutoGrow spellcheck="false" @bind-Value="Field.TextFields[i]" Label="@Field.TextFieldsLabels[i]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+            }
+        }
+    </MudStack>
+}
+
+@code {
+    [Parameter]
+    public DCCreatureCheckboxField Field { get; set; } = default!;
+    [Parameter]
+    public bool EditionMode { get; set; } = false;
+    [Parameter]
+    public EventCallback OnChange { get; set; }
+
+    private void NotifyParentOnChange()
+    {
+        if (OnChange.HasDelegate)
+        {
+            OnChange.InvokeAsync();
+        }
+    }
+}

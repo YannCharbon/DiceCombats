@@ -39,6 +39,7 @@ namespace DiceCombats
         }
 
         public List<SubField> SubFields { get; set; } = new List<SubField>();
+        public bool RenderModeGridEnabled { get; set; } = false;
 
         public DCCreatureDetailedPopupField()
         {
@@ -56,6 +57,7 @@ namespace DiceCombats
             {
                 Title = this.Title,
                 SubFields = this.SubFields,
+                RenderModeGridEnabled = this.RenderModeGridEnabled,
             };
         }
 

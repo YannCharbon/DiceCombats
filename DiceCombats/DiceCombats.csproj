@@ -49,7 +49,9 @@
 
     <!-- NuGet packages -->
     <ItemGroup>
+        <PackageReference Include="AngleSharp" Version="1.4.0" />
         <PackageReference Include="BootstrapBlazor" Version="8.7.3" />
+        <PackageReference Include="Handlebars.Net" Version="2.1.6" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
         <PackageReference Include="Markdig" Version="0.41.1" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
@@ -57,6 +59,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
         <PackageReference Include="MudBlazor" Version="8.13.0" />
+        <PackageReference Include="PdfPig" Version="0.1.12" />
     </ItemGroup>
 
 	<PropertyGroup>

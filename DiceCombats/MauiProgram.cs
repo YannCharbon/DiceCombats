@@ -12,6 +12,9 @@ using MudBlazor.Services;
 using System.Globalization;
 using System.Diagnostics;
 
+using DiceCombats.Rendering;                   // <— ADD
+using DiceCombats.Rendering.Contracts;        // <— ADD
+using DiceCombats.Rendering.Renderers;        // <— ADD
 
 #if WINDOWS
 using Microsoft.UI;
@@ -109,6 +112,15 @@ namespace DiceCombats
             builder.Services.AddScoped<PopupNotificationService>();
 
             builder.Services.AddLocalization();
+
+            // ==================== RENDERING DI ====================
+            // Register all renderers and the registry (constructor-injected)
+            builder.Services.AddSingleton<IRenderer, TextRenderer>();
+            builder.Services.AddSingleton<IRenderer, MarkdownRenderer>();
+            builder.Services.AddSingleton<IRenderer, HtmlTemplateRenderer>();
+            builder.Services.AddSingleton<IRenderer, PdfRenderer>();
+            builder.Services.AddSingleton<RendererRegistry>();
+            // ======================================================
 
             string cultureCode = Preferences.Get("Language", CultureInfo.CurrentUICulture.Name);
             var culture = new CultureInfo(cultureCode);

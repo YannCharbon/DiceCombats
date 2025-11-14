@@ -6,11 +6,13 @@
  * See the LICENSE file in the repository root for details.
  */
 
-using Android.App;
-using Android.Content;
-using DiceCombats;
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using Android.App;
+using Android.Content;
+using Android.Database;
+using Android.Provider;
 
 namespace DiceCombats
 {
@@ -25,9 +27,9 @@ namespace DiceCombats
             var intent = new Intent(Intent.ActionCreateDocument);
             intent.AddCategory(Intent.CategoryOpenable);
             intent.SetType("application/json");
-            intent.PutExtra(Intent.ExtraTitle, fileName); // Suggest default file name
+            intent.PutExtra(Intent.ExtraTitle, fileName);
 
-            var taskCompletionSource = new TaskCompletionSource<bool>();
+            var tcs = new TaskCompletionSource<bool>();
 
             void OnActivityResult(int requestCode, Result resultCode, Intent? resultData)
             {
@@ -40,20 +42,20 @@ namespace DiceCombats
                         try
                         {
                             var uri = resultData.Data;
-                            using var outputStream = activity?.ContentResolver?.OpenOutputStream(uri);
+                            using var outputStream = activity.ContentResolver?.OpenOutputStream(uri);
                             outputStream?.Write(data, 0, data.Length);
                             outputStream?.Flush();
-                            taskCompletionSource.SetResult(true);
+                            tcs.SetResult(true);
                         }
                         catch (Exception ex)
                         {
                             System.Diagnostics.Debug.WriteLine($"Error saving file: {ex}");
-                            taskCompletionSource.SetResult(false);
+                            tcs.SetResult(false);
                         }
                     }
                     else
                     {
-                        taskCompletionSource.SetResult(false);
+                        tcs.SetResult(false);
                     }
                 }
             }
@@ -61,9 +63,8 @@ namespace DiceCombats
             MainActivity.ActivityResult += OnActivityResult;
             activity.StartActivityForResult(intent, 2000);
 
-            await taskCompletionSource.Task;
+            await tcs.Task;
         }
-
 
         public async Task<byte[]> LoadFileAsync()
         {
@@ -75,13 +76,7 @@ namespace DiceCombats
             if (activity == null)
                 throw new InvalidOperationException("Current activity is not available.");
 
-            var taskCompletionSource = new TaskCompletionSource<byte[]>();
-
-            MainActivity.ActivityResult += OnActivityResult;
-
-            activity.StartActivityForResult(intent, 1000);
-
-            return await taskCompletionSource.Task;
+            var tcs = new TaskCompletionSource<byte[]>();
 
             void OnActivityResult(int requestCode, Result resultCode, Intent? data)
             {
@@ -92,20 +87,85 @@ namespace DiceCombats
                     if (resultCode == Result.Ok && data?.Data != null)
                     {
                         var uri = data.Data;
-                        var stream = activity?.ContentResolver?.OpenInputStream(uri);
-
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            stream?.CopyTo(memoryStream);
-                            taskCompletionSource.SetResult(memoryStream.ToArray());
-                        }
+                        using var stream = activity.ContentResolver?.OpenInputStream(uri);
+                        using var memoryStream = new MemoryStream();
+                        stream?.CopyTo(memoryStream);
+                        tcs.SetResult(memoryStream.ToArray());
                     }
                     else
                     {
-                        taskCompletionSource.SetResult(new byte[0]);
+                        tcs.SetResult(Array.Empty<byte>());
                     }
                 }
             }
+
+            MainActivity.ActivityResult += OnActivityResult;
+            activity.StartActivityForResult(intent, 1000);
+
+            return await tcs.Task;
+        }
+
+        public async Task<(string path, byte[] data)> PickFileAsync()
+        {
+            var intent = new Intent(Intent.ActionGetContent);
+            intent.SetType("*/*");
+            intent.AddCategory(Intent.CategoryOpenable);
+
+            var activity = MainActivity.Instance;
+            if (activity == null)
+                throw new InvalidOperationException("Current activity is not available.");
+
+            var tcs = new TaskCompletionSource<(string path, byte[] data)>();
+
+            void OnActivityResult(int requestCode, Result resultCode, Intent? data)
+            {
+                if (requestCode == 1500)
+                {
+                    MainActivity.ActivityResult -= OnActivityResult;
+
+                    if (resultCode == Result.Ok && data?.Data != null)
+                    {
+                        var uri = data.Data;
+
+                        string displayName = TryGetDisplayName(activity, uri) ?? (uri.LastPathSegment ?? string.Empty);
+
+                        using var stream = activity.ContentResolver?.OpenInputStream(uri);
+                        using var memoryStream = new MemoryStream();
+                        stream?.CopyTo(memoryStream);
+
+                        tcs.SetResult((displayName, memoryStream.ToArray()));
+                    }
+                    else
+                    {
+                        tcs.SetResult((string.Empty, Array.Empty<byte>()));
+                    }
+                }
+            }
+
+            MainActivity.ActivityResult += OnActivityResult;
+            activity.StartActivityForResult(intent, 1500);
+
+            return await tcs.Task;
+        }
+
+        private static string? TryGetDisplayName(Activity activity, Android.Net.Uri uri)
+        {
+            try
+            {
+                // Use the new Android.Provider.IOpenableColumns projection to avoid deprecation warnings.
+                string[] projection = { Android.Provider.IOpenableColumns.DisplayName };
+                using ICursor? cursor = activity.ContentResolver?.Query(uri, projection, null, null, null);
+                if (cursor != null && cursor.MoveToFirst())
+                {
+                    int nameIndex = cursor.GetColumnIndex(Android.Provider.IOpenableColumns.DisplayName);
+                    if (nameIndex >= 0)
+                    {
+                        return cursor.GetString(nameIndex);
+                    }
+                }
+            }
+            catch { /* ignore */ }
+            return null;
         }
     }
 }

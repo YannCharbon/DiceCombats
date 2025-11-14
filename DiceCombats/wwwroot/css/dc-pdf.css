@@ -1,0 +1,67 @@
+/*
+ * DiceCombats - Copyright (C) 2025 Yann
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+ */
+
+.pdf-doc {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pdf-page {
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 8px;
+    background: #222;
+}
+
+.pdf-page-header {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+/* Toolbar */
+.dc-pdf-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.dc-pdf-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dc-pdf-btn {
+    background: #333;
+    color: #fff;
+    border: 1px solid #666;
+    border-radius: 6px;
+    padding: 2px 8px;
+    cursor: pointer;
+}
+
+    .dc-pdf-btn:hover {
+        background: #3a3a3a;
+    }
+
+.dc-pdf-zoom-label {
+    opacity: 0.8;
+}
+
+/* Try to keep canvas crisp */
+.dc-pdf-canvas {
+    image-rendering: optimizeQuality;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    display: block;
+    margin: 0 auto;
+    background: #111;
+    border-radius: 4px;
+}

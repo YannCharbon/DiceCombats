@@ -6,12 +6,9 @@
  * See the LICENSE file in the repository root for details.
  */
 
-using BootstrapBlazor.Components;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Markdig;
-using MudBlazor;
 
 namespace DiceCombats
 {
@@ -20,25 +17,38 @@ namespace DiceCombats
         public override string FieldType => "DetailedPopup";
         public override string Discriminator => nameof(DCCreatureDetailedPopupField);
 
-        public class SubField
+        public class ContentEntry
         {
             public string Name { get; set; } = string.Empty;
-            public string Content { get; set; } = string.Empty;
-            public bool IsEditable { get; set; } = true;
-            public bool IsMarkdown { get; set; } = false;
+
+            // "text", "markdown", "html", "pdf", "image" (future)
+            public string Kind { get; set; } = "text";
+
+            // Inline content. For "text"/"markdown"/"html" this is the main source.
+            public string? Inline { get; set; }
+
+            // Optional file path (if user picked a file). Used for "pdf" or large html.
+            public string? FilePath { get; set; }
+
+            // Optional blob content (loaded from FilePath or elsewhere).
+            public byte[]? Blob { get; set; }
+
+            public bool ReadOnly { get; set; } = false;
+
+            // Maximum visual height for renderers that can constrain height (0 = auto).
             public int MaxHeight { get; set; } = 0;
 
-            public string GetMarkdownContentAsHtml()
-            {
-                var pipeline = new MarkdownPipelineBuilder()
-                    .UseAdvancedExtensions() // This includes PipeTables and more
-                    .Build();
-
-                return Markdown.ToHtml(Content, pipeline);
-            }
+            // Simple and robust metadata bag (string->string) to configure renderers.
+            // Typical keys for HTML template renderer:
+            //   "selector": ".someClass"
+            //   "template": "<div class='card'>{{title}}...</div>"
+            //   "css": ".card{...}"
+            //   "map.json": "{\"title\":\"h1\",\"field1\":\".myField1\"}"
+            public Dictionary<string, string> Meta { get; set; } = new();
         }
 
-        public List<SubField> SubFields { get; set; } = new List<SubField>();
+        public List<ContentEntry> Contents { get; set; } = new List<ContentEntry>();
+
         public bool RenderModeGridEnabled { get; set; } = false;
 
         public DCCreatureDetailedPopupField()
@@ -46,24 +56,21 @@ namespace DiceCombats
             Debug.WriteLine("DCCreatureDetailedPopupField");
         }
 
-        public override object GetValue()
-        {
-            return SubFields;
-        }
+        public override object GetValue() => Contents;
 
         public override DCCreatureCustomField Clone()
         {
             return new DCCreatureDetailedPopupField
             {
                 Title = this.Title,
-                SubFields = this.SubFields,
-                RenderModeGridEnabled = this.RenderModeGridEnabled,
+                Contents = this.Contents, // shallow copy (OK for current usage)
+                RenderModeGridEnabled = this.RenderModeGridEnabled
             };
         }
 
-        public void AddNewField()
+        public void AddNewContent()
         {
-            SubFields.Add(new SubField { });
+            Contents.Add(new ContentEntry { });
         }
     }
 }

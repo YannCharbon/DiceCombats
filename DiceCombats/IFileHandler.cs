@@ -7,9 +7,6 @@
  * See the LICENSE file in the repository root for details.
  */
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DiceCombats
@@ -18,6 +15,9 @@ namespace DiceCombats
     {
         Task SaveFileAsync(string fileName, byte[] data);
         Task<byte[]> LoadFileAsync();
-    }
 
+        // New: used by DetailedPopup to let the user choose any file and read its bytes.
+        // Returns (a best-effort display path/name, and the file bytes). Empty values if cancelled.
+        Task<(string path, byte[] data)> PickFileAsync();
+    }
 }

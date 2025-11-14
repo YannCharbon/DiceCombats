@@ -6,44 +6,61 @@
  * See the LICENSE file in the repository root for details.
 *@
 
+@using DiceCombats
+@using DiceCombats.Rendering
+@using DiceCombats.Rendering.Contracts
 @inject DiceCombatsService CombatService
-@inject NavigationManager Navigation
-@inject IJSRuntime JSRuntime
+@inject RendererRegistry Renderers
 @inject IStringLocalizer<Resources.Localization.CreatureSelector> Loc
+@inject IFileHandler FileHandler
+@inject IJSRuntime JSRuntime
 
 <style>
     .DetailedPopupSubFieldBox {
-    background-color: #2A2A2A;
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-    border: 1px solid #808080;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 10px;
+        background-color: #2A2A2A;
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        border: 1px solid #808080;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 10px;
     }
 
     .masonry-layout {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem; /* Space between items */
-    zoom: 0.85;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        zoom: 0.85;
     }
 
     .masonry-item {
-    display: block;
-    width: calc(50% - 1rem); /* Adjust width for 3 items per row */
-    margin-bottom: 1rem;
+        display: block;
+        width: calc(50% - 1rem);
+        margin-bottom: 1rem;
     }
 
     @@media screen and (max-width: 768px) {
-    .masonry-item {
-    width: calc(100% - 1rem); /* Adjust for smaller screens */
-    }
+        .masonry-item {
+            width: calc(100% - 1rem);
+        }
     }
 
     @@media screen and (max-width: 480px) {
-    .masonry-item {
-    width: 100%; /* Single column for narrow screens */
+        .masonry-item {
+            width: 100%;
+        }
     }
+
+    .chip {
+        padding: 5px;
+        margin-bottom: 5px;
+        background-color: darkcyan;
+        border-radius: 10px;
+    }
+
+    .group-title {
+        margin: 14px 6px 4px 6px;
+        font-weight: 700;
+        opacity: .85;
     }
 </style>
 
@@ -61,140 +78,369 @@
     };
 </script>
 
+@if (!string.IsNullOrWhiteSpace(_combinedCss))
+{
+    <style>
+        @_combinedCss
+    </style>
+}
+
 <h4 style="text-align:center;margin-bottom:20px;">@DetailedPopupField.Title</h4>
 <hr />
 
 @if (EditionMode)
 {
-    @foreach (DCCreatureDetailedPopupField.SubField subField in DetailedPopupField.SubFields)
+    @foreach (var entry in DetailedPopupField.Contents)
     {
         <div class="DetailedPopupSubFieldBox">
-            <MudStack Row="true">
-                <MudTextField @bind-Value="subField.Name" Label="Sub field name (optional)" Variant="Variant.Outlined" />
-                <MudCheckBox Label="Editable" @bind-Value="subField.IsEditable"></MudCheckBox>
-                <MudCheckBox Label="Markdown" @bind-Value="subField.IsMarkdown"></MudCheckBox>
-                <MudNumericField @bind-Value="subField.MaxHeight" Lable="Maximum height (0 = auto)" Min="0" Variant="Variant.Outlined"></MudNumericField>
+            <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                <MudTextField @bind-Value="entry.Name" Label="Content name (optional)" Variant="Variant.Outlined" />
+                <MudSelect @bind-Value="entry.Kind" Label="Kind" Variant="Variant.Outlined" Class="kind-select">
+                    <MudSelectItem Value="@("text")">text</MudSelectItem>
+                    <MudSelectItem Value="@("markdown")">markdown</MudSelectItem>
+                    <MudSelectItem Value="@("html")">html (templated)</MudSelectItem>
+                    <MudSelectItem Value="@("pdf")">pdf</MudSelectItem>
+                </MudSelect>
             </MudStack>
-            <div>
-                <MudTextField @bind-Value="subField.Content" Label="Sub field content" Variant="Variant.Outlined" AutoGrow MaxLines="15" />
-            </div>
-        </div>
-    }
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="() => DetailedPopupField.AddNewField()">Add new sub field</MudButton>
-}
-else
-{
-    <div style="display:flex;flex-direction:row; margin-bottom:10px;">
-        <MudIconButton
-        Style="margin:3px;"
-        Variant="Variant.Filled"
-        Color="Color.Dark"
-        Icon="@(DetailedPopupField.RenderModeGridEnabled ? Icons.Material.Filled.GridView : Icons.Material.Filled.FormatListBulleted)"
-        OnClick="() => {DetailedPopupField.RenderModeGridEnabled = !DetailedPopupField.RenderModeGridEnabled; UpdateMasonryGridLayout();}">
-        </MudIconButton>
-    </div>
-    @if (DetailedPopupField.RenderModeGridEnabled)
-    {
-        <div id="masonry-layout-detailed-popup" class="masonry-layout">
-            @foreach (DCCreatureDetailedPopupField.SubField subField in DetailedPopupField.SubFields)
+
+            @* === TEXT === *@
+            @if (entry.Kind == "text")
             {
-                <div class="masonry-item">
-                    <div class="DetailedPopupSubFieldBox">
-                        @if (subField.Name != string.Empty)
-                        {
-                            <h5 style="margin-top:5px;"><span style="padding:5px;margin-bottom:5px;background-color:darkcyan;border-radius:10px;">@subField.Name</span></h5>
-                            <hr />
-                        }
-                        <div>
-                            @if (subField.IsMarkdown)
-                            {
-
-                                if (subField.IsEditable)
-                                {
-                                    <MudSwitch @bind-value="_markdownEdition">Edit</MudSwitch>
-                                }
-                                if (_markdownEdition == false)
-                                {
-                                    @((MarkupString)subField.GetMarkdownContentAsHtml())
-                                }
-                                else
-                                {
-                                    <MudTextField spellcheck="false" Variant="Variant.Outlined" Lines="15" @bind-value="subField.Content"></MudTextField>
-                                }
-                            }
-                            else
-                            {
-
-                                <MudTextField spellcheck="false" Variant="Variant.Text" MaxLines="subField.MaxHeight > 0 ? subField.MaxHeight : -1" AutoGrow ReadOnly="!subField.IsEditable" @bind-value="subField.Content"></MudTextField>
-                            }
-                        </div>
-                    </div>
-                </div>
+                <MudTextField @bind-Value="entry.Inline" Label="Content" Variant="Variant.Outlined" AutoGrow MaxLines="20" />
             }
-        </div>
-    }
-    else
-    {
-        @foreach (DCCreatureDetailedPopupField.SubField subField in DetailedPopupField.SubFields)
-        {
-            <div class="DetailedPopupSubFieldBox">
-                @if (subField.Name != string.Empty)
-                {
-                    <h5 style="margin-top:5px;"><span style="padding:5px;margin-bottom:5px;background-color:darkcyan;border-radius:10px;">@subField.Name</span></h5>
-                    <hr />
-                }
-                <div>
-                    @if (subField.IsMarkdown)
-                    {
+            @* === MARKDOWN === *@
+            else if (entry.Kind == "markdown")
+            {
+                <MudTextField @bind-Value="entry.Inline" Label="Markdown content" Variant="Variant.Outlined" AutoGrow MaxLines="20" />
+            }
+            @* === HTML (templated) === *@
+            else if (entry.Kind == "html")
+            {
+                <MudGrid Class="mt-2">
+                    <MudItem xs="12" md="6">
+                        <MudTextField Value="@(GetMeta(entry, "selector"))"
+                                      ValueChanged="@( (string? v) => SetMeta(entry, "selector", v) )"
+                                      Label="selector" Variant="Variant.Outlined" />
+                    </MudItem>
 
-                        if (subField.IsEditable)
-                        {
-                            <MudSwitch @bind-value="_markdownEdition">Edit</MudSwitch>
-                        }
-                        if (_markdownEdition == false)
-                        {
-                            @((MarkupString)subField.GetMarkdownContentAsHtml())
-                        }
-                        else
-                        {
-                            <MudTextField spellcheck="false" Variant="Variant.Outlined" Lines="15" @bind-value="subField.Content"></MudTextField>
-                        }
+                    <MudItem xs="12" md="6">
+                        <MudRadioGroup T="string"
+                                       SelectedOption="@GetHtmlSource(entry)"
+                                       SelectedOptionChanged="@( (string? v) => SetHtmlSource(entry, v) )"
+                                       Row="true">
+                            <MudRadio T="string" Option="inline">Paste HTML</MudRadio>
+                            <MudRadio T="string" Option="file">Pick file</MudRadio>
+                        </MudRadioGroup>
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudTextField Value="@(GetMeta(entry, "template"))"
+                                      ValueChanged="@( (string? v) => SetMeta(entry, "template", v) )"
+                                      Label="template" Variant="Variant.Outlined" AutoGrow MaxLines="20" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudTextField Value="@(GetMeta(entry, "css"))"
+                                      ValueChanged="@( (string? v) => SetMeta(entry, "css", v) )"
+                                      Label="css" Variant="Variant.Outlined" AutoGrow MaxLines="16" />
+                    </MudItem>
+
+                    <MudItem xs="12">
+                        <MudTextField Value="@(GetMeta(entry, "map.json"))"
+                                      ValueChanged="@( (string? v) => SetMeta(entry, "map.json", v) )"
+                                      Label="map.json" Variant="Variant.Outlined" AutoGrow MaxLines="16" />
+                    </MudItem>
+
+                    @if (GetHtmlSource(entry) == "inline")
+                    {
+                        <MudItem xs="12">
+                            <MudTextField @bind-Value="entry.Inline" Label="HTML content" Variant="Variant.Outlined" AutoGrow MaxLines="25" />
+                        </MudItem>
                     }
                     else
                     {
-
-                        <MudTextField spellcheck="false" Variant="Variant.Text" MaxLines="subField.MaxHeight > 0 ? subField.MaxHeight : -1" AutoGrow ReadOnly="!subField.IsEditable" @bind-value="subField.Content"></MudTextField>
+                        <MudItem xs="12" md="9">
+                            <MudTextField @bind-Value="entry.FilePath" Label="File path" ReadOnly="true" Variant="Variant.Outlined" />
+                        </MudItem>
+                        <MudItem xs="12" md="3" Class="pick-btn-cell">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile" OnClick="() => PickFileAsync(entry)">
+                                Pick file
+                            </MudButton>
+                            @if (entry.Blob is { Length: > 0 })
+                            {
+                                <MudText Typo="Typo.caption">Loaded @entry.Blob.Length bytes</MudText>
+                            }
+                        </MudItem>
                     }
-                </div>
+                </MudGrid>
+            }
+            @* === PDF === *@
+            else if (entry.Kind == "pdf")
+            {
+                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="mt-2">
+                    <MudTextField @bind-Value="entry.FilePath" Label="File path" ReadOnly="true" Variant="Variant.Outlined" />
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.UploadFile" OnClick="() => PickFileAsync(entry)">
+                        Pick file
+                    </MudButton>
+                    @if (entry.Blob is { Length: > 0 })
+                    {
+                        <MudText Typo="Typo.caption">Loaded @entry.Blob.Length bytes</MudText>
+                    }
+                </MudStack>
+            }
+        </div>
+    }
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="() => DetailedPopupField.AddNewContent()">
+        Add new content
+    </MudButton>
+}
+else
+{
+    <div style="display:flex;flex-direction:row; margin-bottom:10px; gap:6px;">
+        <MudIconButton Variant="Variant.Filled" Color="Color.Dark"
+                       Icon="@(DetailedPopupField.RenderModeGridEnabled ? Icons.Material.Filled.GridView : Icons.Material.Filled.FormatListBulleted)"
+                       OnClick="ToggleGrid" />
+        <MudTextField @bind-Value="Query" Placeholder="Search…"
+                      Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" Immediate="true" DebounceInterval="1000" />
+    </div>
+
+    @if (DetailedPopupField.RenderModeGridEnabled)
+    {
+        @foreach (var g in _visibleGroups)
+        {
+            <div class="group-title">@g.Title</div>
+            <div id="masonry-layout-detailed-popup" class="masonry-layout">
+                @foreach (var p in g.Pieces)
+                {
+                    <div class="masonry-item">
+                        <div class="DetailedPopupSubFieldBox">
+                            @if (!string.IsNullOrWhiteSpace(p.ParentName))
+                            {
+                                <hr />
+                            }
+                            @p.UI
+                        </div>
+                    </div>
+                }
             </div>
         }
     }
+    else
+    {
+        @foreach (var g in _visibleGroups)
+        {
+            <div class="chip">@g.Title</div>
+            @foreach (var p in g.Pieces)
+            {
+                <div class="DetailedPopupSubFieldBox">
+                    @p.UI
+                </div>
+            }
+        }
+    }
 }
-
 
 @code {
     [Parameter] public DCCreatureDetailedPopupField DetailedPopupField { get; set; } = default!;
     [Parameter] public bool EditionMode { get; set; } = false;
 
-    private bool _markdownEdition = false;
+    private record PieceVM(string? ParentName, string Kind, RenderFragment UI, IIndexedText Index, string? Key);
+    private record GroupVM(string Title, string Kind, List<PieceVM> Pieces);
 
+    private readonly List<PieceVM> _allPieces = new();
+    private List<GroupVM> _allGroups = new();
+    private List<GroupVM> _visibleGroups = new();
 
-    protected override void OnInitialized()
+    private string _query = string.Empty;
+    private string _combinedCss = string.Empty;
+
+    private string Query
     {
-
-        base.OnInitialized();
+        get => _query;
+        set
+        {
+            var v = value ?? string.Empty;
+            if (_query == v) return;
+            _query = v;
+            _visibleGroups = FilterGroups(_allGroups, _query);
+            StateHasChanged();
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (DetailedPopupField.RenderModeGridEnabled)
+        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup");
+    }
+
+    #region View mode building + grouping
+    protected override void OnParametersSet()
+    {
+        if (EditionMode) return;
+
+        _allPieces.Clear();
+        _allGroups.Clear();
+        _combinedCss = BuildCombinedCss(DetailedPopupField.Contents);
+
+        // Build pieces
+        foreach (var e in DetailedPopupField.Contents)
         {
-            await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout");
+            var item = ToContentItem(e);
+            var pieces = Renderers.RenderMany(item);
+            foreach (var piece in pieces)
+            {
+                _allPieces.Add(new PieceVM(
+                    ParentName: string.IsNullOrWhiteSpace(e.Name) ? null : e.Name,
+                    Kind: e.Kind ?? string.Empty,
+                    UI: piece.UI,
+                    Index: piece.Index,
+                    Key: piece.Key
+                ));
+            }
+        }
+
+        // Group by (Kind + ParentName) for clear delimitation
+        var groupMap = new Dictionary<string, GroupVM>();
+        foreach (var p in _allPieces)
+        {
+            var groupTitle = !string.IsNullOrWhiteSpace(p.ParentName)
+                ? $"{p.ParentName}"
+                : p.Kind.ToUpperInvariant();
+
+            var key = $"{p.Kind}||{p.ParentName}";
+            if (!groupMap.TryGetValue(key, out var g))
+            {
+                g = new GroupVM(groupTitle, p.Kind, new List<PieceVM>());
+                groupMap[key] = g;
+            }
+            g.Pieces.Add(p);
+        }
+        _allGroups = groupMap.Values.ToList();
+
+        _visibleGroups = FilterGroups(_allGroups, _query);
+    }
+
+    private static DiceCombats.Rendering.BasicContentItem ToContentItem(DCCreatureDetailedPopupField.ContentEntry e)
+    {
+        var meta = e.Meta as IReadOnlyDictionary<string, string>;
+        return new DiceCombats.Rendering.BasicContentItem(
+            e.Kind, e.Name, e.Blob, e.Inline, e.FilePath, meta);
+    }
+
+    private static string BuildCombinedCss(IEnumerable<DCCreatureDetailedPopupField.ContentEntry> contents)
+    {
+        var sb = new System.Text.StringBuilder();
+        foreach (var c in contents)
+        {
+            if (!"html".Equals(c.Kind, System.StringComparison.OrdinalIgnoreCase)) continue;
+            if (c.Meta.TryGetValue("css", out var css) && !string.IsNullOrWhiteSpace(css))
+                sb.AppendLine(css);
+        }
+        return sb.ToString();
+    }
+
+    private static List<GroupVM> FilterGroups(List<GroupVM> groups, string q)
+    {
+        if (string.IsNullOrWhiteSpace(q)) return groups;
+
+        var n = Normalize(q);
+        var outList = new List<GroupVM>();
+        foreach (var g in groups)
+        {
+            var keepPieces = new List<PieceVM>();
+
+            // Match the group title itself
+            if (Normalize(g.Title).Contains(n))
+            {
+                keepPieces.AddRange(g.Pieces);
+            }
+            else
+            {
+                foreach (var p in g.Pieces)
+                {
+                    // Match parent name / key
+                    if ((!string.IsNullOrWhiteSpace(p.ParentName) && Normalize(p.ParentName).Contains(n)) ||
+                        (!string.IsNullOrWhiteSpace(p.Key) && Normalize(p.Key).Contains(n)))
+                    {
+                        keepPieces.Add(p);
+                        continue;
+                    }
+
+                    // Search in indexed texts
+                    foreach (var (_, text) in p.Index.EnumerateDocuments())
+                    {
+                        if (Normalize(text).Contains(n))
+                        {
+                            keepPieces.Add(p);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (keepPieces.Count > 0)
+                outList.Add(new GroupVM(g.Title, g.Kind, keepPieces));
+        }
+        return outList;
+    }
+
+    private static string Normalize(string s)
+    {
+        if (string.IsNullOrEmpty(s)) return string.Empty;
+        var form = s.Normalize(System.Text.NormalizationForm.FormD);
+        var sb = new System.Text.StringBuilder(form.Length);
+        foreach (var ch in form)
+        {
+            var cat = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch);
+            if (cat != System.Globalization.UnicodeCategory.NonSpacingMark)
+                sb.Append(ch);
+        }
+        return sb.ToString().Normalize(System.Text.NormalizationForm.FormC).ToLowerInvariant();
+    }
+
+    private void ToggleGrid()
+    {
+        DetailedPopupField.RenderModeGridEnabled = !DetailedPopupField.RenderModeGridEnabled;
+        StateHasChanged();
+    }
+    #endregion
+
+    #region Meta helpers + file picker
+    private static string GetMeta(DCCreatureDetailedPopupField.ContentEntry entry, string key)
+        => entry.Meta.TryGetValue(key, out var v) ? v ?? string.Empty : string.Empty;
+
+    private static void SetMeta(DCCreatureDetailedPopupField.ContentEntry entry, string key, string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            if (entry.Meta.ContainsKey(key)) entry.Meta.Remove(key);
+        }
+        else
+        {
+            entry.Meta[key] = value;
         }
     }
 
-    void UpdateMasonryGridLayout()
+    private static string GetHtmlSource(DCCreatureDetailedPopupField.ContentEntry entry)
     {
-        JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup");
+        var v = GetMeta(entry, "source");
+        return (v == "file" || v == "inline") ? v : "inline";
     }
+
+    private static void SetHtmlSource(DCCreatureDetailedPopupField.ContentEntry entry, string? v)
+    {
+        SetMeta(entry, "source", string.IsNullOrWhiteSpace(v) ? "inline" : v);
+    }
+
+    private async Task PickFileAsync(DCCreatureDetailedPopupField.ContentEntry entry)
+    {
+        try
+        {
+            var (path, bytes) = await FileHandler.PickFileAsync();
+            if (!string.IsNullOrWhiteSpace(path)) entry.FilePath = path;
+            if (bytes is { Length: > 0 }) entry.Blob = bytes;
+        }
+        catch { /* ignore */ }
+    }
+    #endregion
 }

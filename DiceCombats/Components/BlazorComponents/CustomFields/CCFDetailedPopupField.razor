@@ -1,5 +1,12 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+﻿@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
@@ -9,14 +16,14 @@
         <DetailedPopupFieldPopup DetailedPopupField="Field" EditionMode="true" />
     </GenericModal>
 
-    <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit subfields</MudButton>
+    <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit contents</MudButton>
 
     <div style="display:flex; flex-wrap:wrap; margin-top:5px;">
-        @foreach (DCCreatureDetailedPopupField.SubField subField in Field.SubFields)
+        @foreach (var c in Field.Contents)
         {
-            @if (subField.Name != string.Empty)
+            @if (!string.IsNullOrWhiteSpace(c.Name))
             {
-                <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@subField.Name</div>
+                <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@c.Name</div>
             }
         }
     </div>
@@ -31,15 +38,11 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureDetailedPopupField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureDetailedPopupField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
 
     private GenericModal<DetailedPopupFieldPopup>? _modal;
-
 
     private void NotifyParentOnChange()
     {

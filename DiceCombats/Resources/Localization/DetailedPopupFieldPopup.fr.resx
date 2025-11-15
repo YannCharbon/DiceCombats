@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- Microsoft ResX Schema ... trimmed for brevity -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <data name="DetailedPopupShowEditorHelp" xml:space="preserve">
+    <value>Afficher l'aide d'édition</value>
+  </data>
+
+  <data name="DetailedPopupOverviewTitle" xml:space="preserve">
+    <value>Vue d'ensemble</value>
+  </data>
+  <data name="DetailedPopupOverviewBody" xml:space="preserve">
+    <value><![CDATA[
+<p>
+Ajoutez une ou plusieurs <b>entrées de contenu</b>. Chaque entrée possède un <i>Type</i> qui définit son rendu :
+<span class="kbd">text</span>, <span class="kbd">markdown</span>, <span class="kbd">html (templated)</span> ou <span class="kbd">pdf</span>.
+Utilisez le <i>Nom</i> pour regrouper visuellement les éléments au sein de la popup.
+</p>
+<ul>
+  <li><b>Recherche</b> filtre les résultats par titre de groupe, nom/clé d'entrée et texte indexé.</li>
+  <li>Le basculement <b>Grille/Liste</b> change la mise en page ; le mode grille utilise une disposition en maçonnerie.</li>
+</ul>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupTextTitle" xml:space="preserve">
+    <value>text</value>
+  </data>
+  <data name="DetailedPopupTextBody" xml:space="preserve">
+    <value><![CDATA[
+<p>
+Utilisez la zone <b>Contenu</b> pour saisir du texte brut. Il sera rendu sous forme de paragraphes simples (avec les retours à la ligne)
+et indexé comme un seul bloc pour la recherche.
+</p>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupMarkdownTitle" xml:space="preserve">
+    <value>markdown</value>
+  </data>
+  <data name="DetailedPopupMarkdownBody" xml:space="preserve">
+    <value><![CDATA[
+<p>
+Le Markdown est converti en HTML à l'aide de la bibliothèque <b>Markdig</b> (extensions avancées activées).
+Le markdown brut est conservé et indexé, ce qui permet à la recherche de fonctionner sur le texte d'origine.
+</p>
+<p>
+Idéal pour les descriptions bénéficiant de titres, listes, emphases ou tableaux, tout en restant faciles à modifier.
+</p>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupPdfTitle" xml:space="preserve">
+    <value>pdf</value>
+  </data>
+  <data name="DetailedPopupPdfBody" xml:space="preserve">
+    <value><![CDATA[
+<p>
+Sélectionnez un fichier PDF. Le moteur crée <b>un élément par page</b> en utilisant <code>pdf.js</code> pour l'affichage.
+Lorsque l'extraction de texte est possible, chaque page est également indexée pour la recherche.
+</p>
+<ul>
+  <li>Les gros PDF sont supportés ; le premier affichage peut être légèrement plus long.</li>
+  <li>En cas d'échec de l'analyse, les pages restent visibles mais la recherche sur le contenu est désactivée.</li>
+</ul>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupHtmlHowItWorksTitle" xml:space="preserve">
+    <value>html (templated) — fonctionnement</value>
+  </data>
+  <data name="DetailedPopupHtmlHowItWorksBody" xml:space="preserve">
+    <value><![CDATA[
+<ol>
+  <li><b>Source</b> : choisissez <span class="kbd">Paste HTML</span> ou <span class="kbd">Pick file</span>.</li>
+  <li><b>selector</b> : sélecteur CSS qui correspond à <i>plusieurs</i> nœuds ; chaque correspondance devient un élément rendu.</li>
+  <li><b>template</b> : template de style Handlebars appliqué à chaque nœud sélectionné.</li>
+  <li><b>map.json</b> : JSON optionnel mappant des clés → sélecteurs CSS évalués dans le nœud courant.</li>
+  <li><b>css</b> : CSS optionnel injecté une seule fois pour la popup entière, utilisé par le template.</li>
+</ol>
+<p>
+Variables par défaut toujours disponibles :
+<span class="kbd">{{{html}}}</span> (HTML interne) et <span class="kbd">{{text}}</span> (texte interne).
+</p>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupHtmlTipsTitle" xml:space="preserve">
+    <value>html (templated) — conseils sur template &amp; map.json</value>
+  </data>
+  <data name="DetailedPopupHtmlTipsBody" xml:space="preserve">
+    <value><![CDATA[
+<ul>
+  <li><b>Triple accolades</b> <span class="kbd">{{{key}}}</span> : rend du HTML brut ; <span class="kbd">{{key}}</span> est échappé.</li>
+  <li><b>Helpers</b> comme <span class="kbd">{{#if key}}</span> et <span class="kbd">{{#each list}}</span> sont supportés.</li>
+  <li>
+    <b>map.json</b> :
+    <ul>
+      <li>Les clés deviennent des variables dans le template.</li>
+      <li><span class="kbd">rows</span> (spécial) : si le sélecteur retourne plusieurs nœuds, vous obtenez un tableau (pour <span class="kbd">{{#each}}</span>).</li>
+      <li>Raccourcis : <span class="kbd">~selfHtml</span> → HTML interne du nœud, tout autre <span class="kbd">~quelqueChose</span> → texte du nœud.</li>
+      <li>Les champs <span class="kbd">html</span> et <span class="kbd">text</span> sont ajoutés automatiquement s'ils manquent.</li>
+    </ul>
+  </li>
+  <li><b>Collisions CSS</b> : préfixez vos classes (par ex. <span class="kbd">dc-card</span>) pour éviter les conflits avec les styles globaux.</li>
+</ul>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupHtmlQuickStartTitle" xml:space="preserve">
+    <value>html (templated) — exemple rapide</value>
+  </data>
+  <data name="DetailedPopupHtmlQuickStartBody" xml:space="preserve">
+    <value><![CDATA[
+<p>
+Un modèle minimal pour valider votre pipeline (<b>selector</b> → <b>map.json</b> → <b>template</b> → <b>CSS</b>).
+Chaque élément correspondant au sélecteur devient une “carte” rendue.
+</p>
+<ul>
+  <li>
+    <p><b>selector</b> : <span class="kbd">.card</span></p>
+    <p>
+      Sélectionne chaque <span class="kbd">&lt;div class="card"&gt;...&lt;/div&gt;</span> de votre HTML. Pour chaque correspondance,
+      le moteur construit un modèle de données (via <b>map.json</b>) et le passe au template Handlebars.
+    </p>
+  </li>
+  <li>
+    <p><b>template</b> (Handlebars) :</p>
+    <pre class="kbd" style="white-space:pre-wrap">
+&lt;div class="dc-card"&gt;
+  &lt;h4&gt;{{{title}}}&lt;/h4&gt;
+  {{#if props}}&lt;ul&gt;{{#each props}}&lt;li&gt;{{{this}}}&lt;/li&gt;{{/each}}&lt;/ul&gt;{{/if}}
+  {{#if body}}&lt;div class="dc-body"&gt;{{{body}}}&lt;/div&gt;{{/if}}
+&lt;/div&gt;
+</pre>
+    <p style="margin-top:6px">
+      Remarques :
+      <br />• <span class="kbd">{{{title}}}</span> et <span class="kbd">{{{body}}}</span> autorisent le HTML non échappé.
+      <br />• <span class="kbd">{{#if props}}…{{/if}}</span> affiche le bloc uniquement si le tableau existe et n'est pas vide.
+      <br />• <span class="kbd">{{#each props}}…{{/each}}</span> boucle sur le tableau issu de <b>map.json</b>.
+    </p>
+    <p style="margin-top:6px">
+      Documentation Handlebars :
+      <a style="color:darkcyan" href="https://handlebarsjs.com/guide/" target="_blank" rel="noopener">handlebarsjs.com/guide</a>
+    </p>
+  </li>
+  <li>
+    <p><b>css</b> (dans le champ “css” du contenu) :</p>
+    <pre class="kbd" style="white-space:pre-wrap">
+.dc-card{background:#2b2e3a;border:1px solid #666;border-radius:10px;padding:12px;margin:8px 0;}
+.dc-card h4{margin:0 0 6px 0;font-weight:800;}
+.dc-card ul{margin:6px 0 0 18px;padding:0;}
+.dc-body{margin-top:6px;line-height:1.35;}
+</pre>
+    <p style="margin-top:6px">
+      Astuce : gardez le CSS ici plutôt que dans le HTML. La popup agrège tous les CSS des entrées “html (templated)”
+      et les injecte une seule fois pour éviter les doublons.
+    </p>
+  </li>
+  <li>
+    <p><b>map.json</b> (sélecteurs résolus <i>dans chaque .card</i>) :</p>
+    <pre class="kbd" style="white-space:pre-wrap">
+{"title":"h3","body":".content","props":".props li"}
+</pre>
+    <p style="margin-top:6px">
+      • <span class="kbd">"title":"h3"</span> → récupère le HTML du premier <span class="kbd">&lt;h3&gt;</span>.<br />
+      • <span class="kbd">"body":".content"</span> → récupère le HTML du bloc <span class="kbd">.content</span>.<br />
+      • <span class="kbd">"props":".props li"</span> → collecte tous les éléments de liste dans un tableau.
+    </p>
+  </li>
+  <li>
+    <p><b>HTML brut</b> :</p>
+    <pre class="kbd" style="white-space:pre-wrap">
+&lt;div class="card"&gt;
+  &lt;h3&gt;Magic Missile&lt;/h3&gt;
+  &lt;ul class="props"&gt;
+    &lt;li&gt;Casting Time: 1 action&lt;/li&gt;
+    &lt;li&gt;Range: 36 m&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div class="content"&gt;You create three glowing darts of magical force...&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class="card"&gt;
+  &lt;h3&gt;Shield&lt;/h3&gt;
+  &lt;ul class="props"&gt;
+    &lt;li&gt;Casting Time: 1 reaction&lt;/li&gt;
+    &lt;li&gt;Duration: 1 round&lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div class="content"&gt;An invisible barrier of magical force appears and protects you...&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+    <p style="margin-top:6px">
+      Avec le sélecteur <span class="kbd">.card</span>, cela produit deux éléments (un par carte).
+      Si rien ne s'affiche, vérifiez d'abord que le sélecteur correspond bien à votre HTML.
+    </p>
+  </li>
+</ul>
+<p>
+<b>Rendu :</b> chaque <span class="kbd">&lt;div class="card"&gt;…&lt;/div&gt;</span> devient un élément.
+Le mappeur prend <span class="kbd">h3</span> → <span class="kbd">{{{title}}}</span>,
+chaque <span class="kbd">.props li</span> → tableau <span class="kbd">props</span>,
+et <span class="kbd">.content</span> → <span class="kbd">{{{body}}}</span>.
+</p>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupTroubleshootingTitle" xml:space="preserve">
+    <value>Résolution de problèmes</value>
+  </data>
+  <data name="DetailedPopupTroubleshootingBody" xml:space="preserve">
+    <value><![CDATA[
+<ul>
+  <li><b>Aucune carte&#xA0;?</b> Vérifiez que votre <i>selector</i> correspond bien à des éléments dans le HTML fourni.</li>
+  <li><b>Valeurs manquantes&#xA0;?</b> Assurez-vous que la clé existe dans <i>map.json</i> et que le sélecteur CSS correspond à un enfant.</li>
+  <li><b>Mise en page cassée&#xA0;?</b> Gardez un CSS spécifique et évitez les règles trop génériques.</li>
+  <li><b>Recherche incomplète&#xA0;?</b> L’index provient du champ <span class="kbd">text</span> (ou des champs mappés) par élément, plus les titres de groupe et les clés.</li>
+</ul>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupInlineHelpHtml" xml:space="preserve">
+    <value><![CDATA[
+Entrée <b>html (templated)</b> :
+<ul style="margin:6px 0;">
+  <li>Définissez <span class="kbd">selector</span> pour cibler des nœuds répétés (un élément par correspondance).</li>
+  <li>Écrivez un <span class="kbd">template</span> de style Handlebars en utilisant les clés définies dans <span class="kbd">map.json</span>.</li>
+  <li><span class="kbd">css</span> (optionnel) s’applique à tous les éléments (injecté une seule fois dans la popup).</li>
+  <li><span class="kbd">source</span> : choisissez entre <i>Paste HTML</i> et <i>Pick file</i> ci-dessous.</li>
+</ul>
+]]></value>
+  </data>
+
+  <data name="DetailedPopupDeleteTooltip" xml:space="preserve">
+    <value>Supprimer ce contenu</value>
+  </data>
+  <data name="DetailedPopupDeleteButton" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+
+  <data name="DetailedPopupContentNameLabel" xml:space="preserve">
+    <value>Nom du contenu (optionnel)</value>
+  </data>
+  <data name="DetailedPopupKindLabel" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="DetailedPopupKindTextLabel" xml:space="preserve">
+    <value>text</value>
+  </data>
+  <data name="DetailedPopupKindMarkdownLabel" xml:space="preserve">
+    <value>markdown</value>
+  </data>
+  <data name="DetailedPopupKindHtmlLabel" xml:space="preserve">
+    <value>html (templated)</value>
+  </data>
+  <data name="DetailedPopupKindPdfLabel" xml:space="preserve">
+    <value>pdf</value>
+  </data>
+
+  <data name="DetailedPopupTextContentLabel" xml:space="preserve">
+    <value>Contenu</value>
+  </data>
+  <data name="DetailedPopupMarkdownContentLabel" xml:space="preserve">
+    <value>Contenu markdown</value>
+  </data>
+
+  <data name="DetailedPopupSelectorLabel" xml:space="preserve">
+    <value>selector</value>
+  </data>
+  <data name="DetailedPopupTemplateLabel" xml:space="preserve">
+    <value>template</value>
+  </data>
+  <data name="DetailedPopupCssLabel" xml:space="preserve">
+    <value>css</value>
+  </data>
+  <data name="DetailedPopupMapJsonLabel" xml:space="preserve">
+    <value>map.json</value>
+  </data>
+
+  <data name="DetailedPopupHtmlSourceInlineLabel" xml:space="preserve">
+    <value>Coller le HTML</value>
+  </data>
+  <data name="DetailedPopupHtmlSourceFileLabel" xml:space="preserve">
+    <value>Choisir un fichier</value>
+  </data>
+
+  <data name="DetailedPopupHtmlContentLabel" xml:space="preserve">
+    <value>Contenu HTML</value>
+  </data>
+  <data name="DetailedPopupFilePathLabel" xml:space="preserve">
+    <value>Chemin du fichier</value>
+  </data>
+  <data name="DetailedPopupPickFileButton" xml:space="preserve">
+    <value>Choisir un fichier</value>
+  </data>
+
+  <data name="DetailedPopupLoadedBytesCaption" xml:space="preserve">
+    <value>{0} octets chargés</value>
+  </data>
+
+  <data name="DetailedPopupPdfInlineHelp" xml:space="preserve">
+    <value>Chargez un fichier PDF. Chaque page devient un élément (recherchable si l'extraction de texte est possible).</value>
+  </data>
+
+  <data name="DetailedPopupSearchPlaceholder" xml:space="preserve">
+    <value>Chercher…</value>
+  </data>
+  <data name="DetailedPopupToggleGridTooltip" xml:space="preserve">
+    <value>Bascule vue grille/liste</value>
+  </data>
+
+  <data name="DetailedPopupDeleteDialogTitle" xml:space="preserve">
+    <value>Supprimer le contenu</value>
+  </data>
+  <data name="DetailedPopupDeleteDialogMessage" xml:space="preserve">
+    <value>Cette action est irréversible.&lt;br/&gt;Voulez-vous vraiment supprimer ce contenu&#xA0;?</value>
+  </data>
+  <data name="DetailedPopupDeleteDialogYes" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="DetailedPopupDeleteDialogCancel" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+
+  <data name="DetailedPopupAddNewContentButton" xml:space="preserve">
+    <value>Ajouter un contenu</value>
+  </data>
+</root>

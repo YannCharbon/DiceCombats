@@ -15,31 +15,49 @@
 @inject IJSRuntime JS
 
 <style>
-    .CreatureCustomFieldsEditorCustomField{
-    padding:10px;
-    margin:15px;
-    background-color:#505050;
-    border-radius:10px;
-    max-width:100%;
+    .CreatureCustomFieldsEditorCustomField {
+        padding: 10px;
+        margin: 15px;
+        background-color: #505050;
+        border-radius: 10px;
+        max-width: 100%;
     }
 
     @@keyframes ImageFadeIn {
-    from {
-    opacity: 0;
-    transform: scale(0.95);
-    }
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
 
-    to {
-    opacity: 1;
-    transform: scale(1);
-    }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
     .image-reveal {
-    max-width: 350px;
-    animation: ImageFadeIn 1s ease-out;
-    position: relative;
-    padding-bottom: 10px;
+        max-width: 350px;
+        animation: ImageFadeIn 1s ease-out;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .assist-box {
+        background: #3d3d46;
+        border: 1px solid #5f5f6d;
+        border-radius: 10px;
+        padding: 14px;
+        margin: 10px 0;
+    }
+
+    .kbd {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #2d2d34;
+        border: 1px solid #666;
+        font-family: monospace;
+        font-size: 90%;
     }
 </style>
 
@@ -101,11 +119,11 @@
 
         @if (EditionMode)
         {
-            <div style="display:flex; flex-wrap:wrap; max-width:500px;">
+            <div style="display:flex; flex-wrap:wrap; max-width:900px;">
                 <div style="padding:10px;">
                     <MudStack Row="true">
                         <MudItem>
-                            <MudSelect Style="min-width: 200px;" T="string" Label="@Loc["FieldType"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
+                            <MudSelect Style="min-width: 220px;" T="string" Label="@Loc["FieldType"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
                                 <MudSelectItem T="string" Value="@("Hit Points")" />
                                 <MudSelectItem T="string" Value="@("Numeric")" />
                                 <MudSelectItem T="string" Value="@("Checkbox")" />
@@ -118,7 +136,9 @@
                                 <MudSelectItem T="string" Value="@("DetailedPopup")"></MudSelectItem>
                                 @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
                                 {
-                                    <MudSelectItem T="string" Value="@(customField.Title)"><MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)</MudSelectItem>
+                                    <MudSelectItem T="string" Value="@(customField.Title)">
+                                        <MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)
+                                    </MudSelectItem>
                                 }
                             </MudSelect>
                         </MudItem>
@@ -129,7 +149,8 @@
                         </MudItem>
                     </MudStack>
                 </div>
-                <div>
+
+                <div style="flex:1 1 500px;">
                     <MudExpansionPanel Expanded="@_fieldHelpExpanded" Elevation="1" ExpandedChanged="() => _fieldHelpExpanded = !_fieldHelpExpanded">
                         <TitleContent>
                             <div class="d-flex">
@@ -142,90 +163,68 @@
                             {
                                 case "Hit Points":
                                     <div>
-                                        <p>
-                                            @Loc["AssistanceHitPointsField"]
-                                        </p>
+                                        <p>@Loc["AssistanceHitPointsField"]</p>
                                     </div>
                                     <img class="image-reveal" style="width:150px;" src="img/fields_examples/hitpointsfield_example_1.png" />
                                     break;
+
                                 case "Numeric":
                                     <div>
-                                        <p>
-                                            @Loc["AssistanceNumericField"]
-                                        </p>
+                                        <p>@Loc["AssistanceNumericField"]</p>
                                     </div>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/numericfield_example_1.png" />
                                     break;
+
                                 case "Checkbox":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceCheckboxField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceCheckboxField"]</p></div>
                                     <p>@Loc["AssistanceCheckboxField2"]</p>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/checkboxfield_example_2.png" />
                                     <p>@Loc["AssistanceCheckboxField3"]</p>
                                     <img class="image-reveal" style="width:350px;" src="img/fields_examples/checkboxfield_example_1.png" />
                                     break;
+
                                 case "Checkbox Grid":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceCheckboxGridField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceCheckboxGridField"]</p></div>
                                     <img class="image-reveal" style="width:250px;" src="img/fields_examples/checkboxgridfield_example_1.png" />
                                     <p>@Loc["AssistanceCheckboxGridField2"]</p>
                                     <img class="image-reveal" style="width:250px;" src="img/fields_examples/checkboxgridfield_example_2.png" />
                                     break;
+
                                 case "Text Grid":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceTextGridField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceTextGridField"]</p></div>
                                     <img class="image-reveal" style="width:300px;" src="img/fields_examples/textgridfield_example_1.png" />
                                     break;
+
                                 case "Text":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceTextField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceTextField"]</p></div>
                                     <img class="image-reveal" style="width:300px;" src="img/fields_examples/textfield_example_1.png" />
                                     break;
+
                                 case "Color":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceColorField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceColorField"]</p></div>
                                     <img class="image-reveal" style="width:350px;" src="img/fields_examples/colorfield_example_1.png" />
                                     break;
+
                                 case "Conditions":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceConditionsField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceConditionsField"]</p></div>
                                     <img class="image-reveal" style="width:350px;" src="img/fields_examples/conditions_example_2.png" />
                                     <p>@Loc["AssistanceConditionsField2"]</p>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/conditions_example_1.png" />
                                     break;
+
                                 case "Stats":
-                                    <div>
-                                        <p>
-                                            @Loc["AssistanceStatsField"]
-                                        </p>
-                                    </div>
+                                    <div><p>@Loc["AssistanceStatsField"]</p></div>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/statsfield_example_1.png" />
                                     <p>@Loc["AssistanceStatsField2"]</p>
                                     <img class="image-reveal" style="width:150px;" src="img/fields_examples/statsfield_example_2.png" />
                                     break;
+
                                 case "DetailedPopup":
                                     <div>
-                                        TODO
+                                        @((MarkupString)Loc["AssistanceDetailedPopupField"].Value)
                                     </div>
                                     break;
+
                                 default:
                                     break;
                             }
@@ -245,15 +244,10 @@
 
     private string newFieldType = "Hit Points";
 
-    private bool _fieldHelpExpanded {
-        get
-        {
-            return Preferences.Get("AssistanceField", true);
-        }
-        set
-        {
-            Preferences.Set("AssistanceField", value);
-        }
+    private bool _fieldHelpExpanded
+    {
+        get => Preferences.Get("AssistanceField", true);
+        set => Preferences.Set("AssistanceField", value);
     }
 
     private void AddField()
@@ -261,74 +255,36 @@
         DCCreatureCustomField? newField = null;
         switch (newFieldType)
         {
-            case "Hit Points":
-                newField = new DCCreatureHitPointsField { Title = "Hit points" };
-                break;
-            case "Numeric":
-                newField = new DCCreatureNumericField { Title = "Numeric Field" };
-                break;
-            case "Checkbox":
-                newField = new DCCreatureCheckboxField { Title = "Checkbox Field" };
-                break;
-            case "Checkbox Grid":
-                newField = new DCCreatureCheckboxGridField { Title = "Checkbox Grid Field" };
-                break;
-            case "Text":
-                newField = new DCCreatureTextField { Title = "Text Field" };
-                break;
-            case "Text Grid":
-                newField = new DCCreatureTextGridField { Title = "Text Grid Field" };
-                break;
-            case "Color":
-                newField = new DCCreatureColorField { Title = "Color Field" };
-                break;
-            case "Conditions":
-                newField = new DCCreatureConditionsField { Title = "Conditions" };
-                break;
-            case "Stats":
-                newField = new DCCreatureStatsField { Title = "Stats" };
-                break;
-            case "DetailedPopup":
-                newField = new DCCreatureDetailedPopupField { Title = "DetailedPopup" };
-                break;
-            default:
-                newField = CombatService.GetUserCreatureCustomFieldByName(newFieldType)?.Clone();
-                break;
+            case "Hit Points": newField = new DCCreatureHitPointsField { Title = "Hit points" }; break;
+            case "Numeric": newField = new DCCreatureNumericField { Title = "Numeric Field" }; break;
+            case "Checkbox": newField = new DCCreatureCheckboxField { Title = "Checkbox Field" }; break;
+            case "Checkbox Grid": newField = new DCCreatureCheckboxGridField { Title = "Checkbox Grid Field" }; break;
+            case "Text": newField = new DCCreatureTextField { Title = "Text Field" }; break;
+            case "Text Grid": newField = new DCCreatureTextGridField { Title = "Text Grid Field" }; break;
+            case "Color": newField = new DCCreatureColorField { Title = "Color Field" }; break;
+            case "Conditions": newField = new DCCreatureConditionsField { Title = "Conditions" }; break;
+            case "Stats": newField = new DCCreatureStatsField { Title = "Stats" }; break;
+            case "DetailedPopup": newField = new DCCreatureDetailedPopupField { Title = "DetailedPopup" }; break;
+            default: newField = CombatService.GetUserCreatureCustomFieldByName(newFieldType)?.Clone(); break;
         }
-        if (newField != null) {
-            Fields.Add(newField);
-        }
+        if (newField != null) Fields.Add(newField);
     }
 
-    private void RemoveField(DCCreatureCustomField field)
-    {
-        Fields.Remove(field);
-    }
+    private void RemoveField(DCCreatureCustomField field) => Fields.Remove(field);
 
     private void MoveField(DCCreatureCustomField field, bool upNotDown)
     {
         int idx = Fields.IndexOf(field);
-        if (idx <= 0 && upNotDown || idx + 1 >= Fields.Count && !upNotDown)
-        {
-            return;
-        }
+        if ((idx <= 0 && upNotDown) || (idx + 1 >= Fields.Count && !upNotDown)) return;
 
         Fields.RemoveAt(idx);
-        if (upNotDown)
-        {
-            Fields.Insert(idx - 1, field);
-        } else
-        {
-            Fields.Insert(idx + 1, field);
-        }
+        if (upNotDown) Fields.Insert(idx - 1, field);
+        else Fields.Insert(idx + 1, field);
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
-        {
-            JS.InvokeVoidAsync("scrollToBottom");
-        }
+        if (!firstRender) JS.InvokeVoidAsync("scrollToBottom");
         return base.OnAfterRenderAsync(firstRender);
     }
 }

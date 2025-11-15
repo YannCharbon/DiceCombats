@@ -16,7 +16,9 @@
         <DetailedPopupFieldPopup DetailedPopupField="Field" EditionMode="true" />
     </GenericModal>
 
-    <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit contents</MudButton>
+    <MudButton OnClick="@(() => _modal?.ShowAsync() ?? Task.CompletedTask)" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">
+        @Loc["DetailedPopupEditButton"]
+    </MudButton>
 
     <div style="display:flex; flex-wrap:wrap; margin-top:10px;">
         @foreach (var c in Field.Contents)
@@ -38,7 +40,7 @@ else
         <DetailedPopupFieldPopup DetailedPopupField="Field" />
     </GenericModal>
 
-    <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@Field.Title</MudButton>
+    <MudButton OnClick="@(() => _modal?.ShowAsync() ?? Task.CompletedTask)" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@Field.Title</MudButton>
 }
 
 @code {

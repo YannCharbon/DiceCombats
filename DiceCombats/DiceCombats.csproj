@@ -108,6 +108,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>DCNavMenu.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Localization\DetailedPopupFieldPopup.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>DetailedPopupFieldPopup.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Localization\Home.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -161,6 +166,10 @@
       <EmbeddedResource Update="Resources\Localization\DCNavMenu.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>DCNavMenu.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\DetailedPopupFieldPopup.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>DetailedPopupFieldPopup.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Localization\Home.resx">
         <Generator>PublicResXFileCodeGenerator</Generator>

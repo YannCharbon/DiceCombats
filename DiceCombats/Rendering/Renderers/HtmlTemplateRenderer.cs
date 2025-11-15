@@ -1,15 +1,8 @@
-﻿/*
- * DiceCombats - Copyright (C) 2025 Yann Charbon
- * SPDX-License-Identifier: GPL-3.0-or-later
- *
- * This file is part of DiceCombats, released under the GNU GPL v3.
- * See the LICENSE file in the repository root for details.
- */
-
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNetCore.Components;
 using AngleSharp;
 using DiceCombats.Rendering.Contracts;
@@ -28,18 +21,74 @@ namespace DiceCombats.Rendering.Renderers
 
         public IEnumerable<RenderPiece> RenderMany(IContentItem item)
         {
-            var html = item.Text ?? (item.Data != null ? Encoding.UTF8.GetString(item.Data) : string.Empty);
-            var selector = item.Meta.TryGetValue("selector", out var s) ? s : "body";
-            var template = item.Meta.TryGetValue("template", out var t) ? t : "{{{html}}}";
-
-            Dictionary<string, string>? mapSelectors = null;
-            if (item.Meta.TryGetValue("map.json", out var mapJson) && !string.IsNullOrWhiteSpace(mapJson))
+            // 1) Inline text wins
+            if (!string.IsNullOrEmpty(item.Text))
             {
-                try { mapSelectors = JsonSerializer.Deserialize<Dictionary<string, string>>(mapJson); }
-                catch { mapSelectors = null; }
+                return TransformHtmlToPieces(
+                    item.Text,
+                    GetSelector(item),
+                    GetTemplate(item),
+                    GetMapSelectors(item)
+                );
             }
 
-            return TransformHtmlToPieces(html, selector, template, mapSelectors);
+            // 2) Blob / Data (what PickFileAsync fills)
+            if (item.Data is { Length: > 0 })
+            {
+                var htmlFromBytes = Encoding.UTF8.GetString(item.Data);
+                return TransformHtmlToPieces(
+                    htmlFromBytes,
+                    GetSelector(item),
+                    GetTemplate(item),
+                    GetMapSelectors(item)
+                );
+            }
+
+            // 3) Path to file (html / htm / txt)
+            if (!string.IsNullOrWhiteSpace(item.Path) &&
+                File.Exists(item.Path) &&
+                IsSupportedHtmlFile(item.Path))
+            {
+                var htmlFromFile = File.ReadAllText(item.Path, Encoding.UTF8);
+                return TransformHtmlToPieces(
+                    htmlFromFile,
+                    GetSelector(item),
+                    GetTemplate(item),
+                    GetMapSelectors(item)
+                );
+            }
+
+            // 4) Fallback: nothing to render
+            return System.Linq.Enumerable.Empty<RenderPiece>();
+        }
+
+        private static string GetSelector(IContentItem item)
+            => item.Meta.TryGetValue("selector", out var s) ? s : "body";
+
+        private static string GetTemplate(IContentItem item)
+            => item.Meta.TryGetValue("template", out var t) ? t : "{{{html}}}";
+
+        private static Dictionary<string, string>? GetMapSelectors(IContentItem item)
+        {
+            if (item.Meta.TryGetValue("map.json", out var mapJson) &&
+                !string.IsNullOrWhiteSpace(mapJson))
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<Dictionary<string, string>>(mapJson);
+                }
+                catch
+                {
+                    // ignore invalid map.json
+                }
+            }
+            return null;
+        }
+
+        private static bool IsSupportedHtmlFile(string path)
+        {
+            var ext = Path.GetExtension(path)?.ToLowerInvariant();
+            return ext == ".html" || ext == ".htm" || ext == ".txt";
         }
 
         private static IEnumerable<RenderPiece> TransformHtmlToPieces(
@@ -98,7 +147,9 @@ namespace DiceCombats.Rendering.Renderers
 
                 if (sel.StartsWith("~"))
                 {
-                    m[key] = sel.Equals("~selfHtml") ? (node.InnerHtml ?? string.Empty) : (node.TextContent ?? string.Empty);
+                    m[key] = sel.Equals("~selfHtml")
+                        ? (node.InnerHtml ?? string.Empty)
+                        : (node.TextContent ?? string.Empty);
                     continue;
                 }
 

@@ -18,12 +18,16 @@
 
     <MudButton OnClick="@(() => _modal?.ShowAsync())" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">Edit contents</MudButton>
 
-    <div style="display:flex; flex-wrap:wrap; margin-top:5px;">
+    <div style="display:flex; flex-wrap:wrap; margin-top:10px;">
         @foreach (var c in Field.Contents)
         {
             @if (!string.IsNullOrWhiteSpace(c.Name))
             {
                 <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@c.Name</div>
+            }
+            else
+            {
+                <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@c.Kind</div>
             }
         }
     </div>

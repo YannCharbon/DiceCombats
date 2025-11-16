@@ -360,10 +360,10 @@ else
 
     @if (DetailedPopupField.RenderModeGridEnabled)
     {
-        @foreach (var g in _visibleGroups)
+        @foreach (var g in _visibleGroups.Where(g => g.Kind == "html" || g.Kind == "pdf"))
         {
             <div style="margin:10px;"><span class="chip">@g.Title</span></div>
-            <div id="masonry-layout-detailed-popup" class="masonry-layout">
+            <div id="masonry-layout-detailed-popup-1" class="masonry-layout" data-kind="@g.Kind">
                 @foreach (var p in g.Pieces)
                 {
                     <div class="masonry-item">
@@ -374,6 +374,32 @@ else
                             }
                             @p.UI
                         </div>
+                    </div>
+                }
+            </div>
+        }
+
+        var tmGroups = _visibleGroups.Where(g => g.Kind != "html" && g.Kind != "pdf").ToList();
+
+        @if (tmGroups.Count > 0)
+        {
+            <div id="masonry-layout-detailed-popup-2" class="masonry-layout" data-kind="text-markdown">
+
+                @foreach (var g in tmGroups)
+                {
+                    <div class="masonry-item">
+                        <div style="margin:10px;"><span class="chip">@g.Title</span></div>
+
+                        @foreach (var p in g.Pieces)
+                        {
+                            <div class="DetailedPopupSubFieldBox">
+                                @if (!string.IsNullOrWhiteSpace(p.ParentName))
+                                {
+                                    <hr />
+                                }
+                                @p.UI
+                            </div>
+                        }
                     </div>
                 }
             </div>
@@ -424,7 +450,8 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup");
+        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup-1");
+        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup-2");
     }
 
     protected override void OnParametersSet()

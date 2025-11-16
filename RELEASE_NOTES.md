@@ -2,6 +2,10 @@
 
 ## Detailed popups and richer creature notes
 
+### Fixes
+
+Fix of the masonry layout when rendering Detailed popup sub-contents with kind "text" or "markdown".
+
 ### New
 
 - **“Detailed popup” custom field for creatures**  

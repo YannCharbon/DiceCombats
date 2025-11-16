@@ -12,6 +12,13 @@ namespace DiceCombats.Resources.Localization {
     using System;
     
     
+    /// <summary>
+    ///   Une classe de ressource fortement typée destinée, entre autres, à la consultation des chaînes localisées.
+    /// </summary>
+    // Cette classe a été générée automatiquement par la classe StronglyTypedResourceBuilder
+    // à l'aide d'un outil, tel que ResGen ou Visual Studio.
+    // Pour ajouter ou supprimer un membre, modifiez votre fichier .ResX, puis réexécutez ResGen
+    // avec l'option /str ou régénérez votre projet VS.
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -25,6 +32,9 @@ namespace DiceCombats.Resources.Localization {
         internal DetailedPopupFieldPopup() {
         }
         
+        /// <summary>
+        ///   Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
+        /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
@@ -36,6 +46,10 @@ namespace DiceCombats.Resources.Localization {
             }
         }
         
+        /// <summary>
+        ///   Remplace la propriété CurrentUICulture du thread actuel pour toutes
+        ///   les recherches de ressources à l'aide de cette classe de ressource fortement typée.
+        /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture {
             get {
@@ -45,52 +59,490 @@ namespace DiceCombats.Resources.Localization {
                 resourceCulture = value;
             }
         }
-
-        internal static string DetailedPopupShowEditorHelp => ResourceManager.GetString("DetailedPopupShowEditorHelp", resourceCulture);
-        internal static string DetailedPopupOverviewTitle => ResourceManager.GetString("DetailedPopupOverviewTitle", resourceCulture);
-        internal static string DetailedPopupOverviewBody => ResourceManager.GetString("DetailedPopupOverviewBody", resourceCulture);
-        internal static string DetailedPopupTextTitle => ResourceManager.GetString("DetailedPopupTextTitle", resourceCulture);
-        internal static string DetailedPopupTextBody => ResourceManager.GetString("DetailedPopupTextBody", resourceCulture);
-        internal static string DetailedPopupMarkdownTitle => ResourceManager.GetString("DetailedPopupMarkdownTitle", resourceCulture);
-        internal static string DetailedPopupMarkdownBody => ResourceManager.GetString("DetailedPopupMarkdownBody", resourceCulture);
-        internal static string DetailedPopupPdfTitle => ResourceManager.GetString("DetailedPopupPdfTitle", resourceCulture);
-        internal static string DetailedPopupPdfBody => ResourceManager.GetString("DetailedPopupPdfBody", resourceCulture);
-        internal static string DetailedPopupHtmlHowItWorksTitle => ResourceManager.GetString("DetailedPopupHtmlHowItWorksTitle", resourceCulture);
-        internal static string DetailedPopupHtmlHowItWorksBody => ResourceManager.GetString("DetailedPopupHtmlHowItWorksBody", resourceCulture);
-        internal static string DetailedPopupHtmlTipsTitle => ResourceManager.GetString("DetailedPopupHtmlTipsTitle", resourceCulture);
-        internal static string DetailedPopupHtmlTipsBody => ResourceManager.GetString("DetailedPopupHtmlTipsBody", resourceCulture);
-        internal static string DetailedPopupHtmlQuickStartTitle => ResourceManager.GetString("DetailedPopupHtmlQuickStartTitle", resourceCulture);
-        internal static string DetailedPopupHtmlQuickStartBody => ResourceManager.GetString("DetailedPopupHtmlQuickStartBody", resourceCulture);
-        internal static string DetailedPopupTroubleshootingTitle => ResourceManager.GetString("DetailedPopupTroubleshootingTitle", resourceCulture);
-        internal static string DetailedPopupTroubleshootingBody => ResourceManager.GetString("DetailedPopupTroubleshootingBody", resourceCulture);
-        internal static string DetailedPopupInlineHelpHtml => ResourceManager.GetString("DetailedPopupInlineHelpHtml", resourceCulture);
-        internal static string DetailedPopupDeleteTooltip => ResourceManager.GetString("DetailedPopupDeleteTooltip", resourceCulture);
-        internal static string DetailedPopupDeleteButton => ResourceManager.GetString("DetailedPopupDeleteButton", resourceCulture);
-        internal static string DetailedPopupContentNameLabel => ResourceManager.GetString("DetailedPopupContentNameLabel", resourceCulture);
-        internal static string DetailedPopupKindLabel => ResourceManager.GetString("DetailedPopupKindLabel", resourceCulture);
-        internal static string DetailedPopupKindTextLabel => ResourceManager.GetString("DetailedPopupKindTextLabel", resourceCulture);
-        internal static string DetailedPopupKindMarkdownLabel => ResourceManager.GetString("DetailedPopupKindMarkdownLabel", resourceCulture);
-        internal static string DetailedPopupKindHtmlLabel => ResourceManager.GetString("DetailedPopupKindHtmlLabel", resourceCulture);
-        internal static string DetailedPopupKindPdfLabel => ResourceManager.GetString("DetailedPopupKindPdfLabel", resourceCulture);
-        internal static string DetailedPopupTextContentLabel => ResourceManager.GetString("DetailedPopupTextContentLabel", resourceCulture);
-        internal static string DetailedPopupMarkdownContentLabel => ResourceManager.GetString("DetailedPopupMarkdownContentLabel", resourceCulture);
-        internal static string DetailedPopupSelectorLabel => ResourceManager.GetString("DetailedPopupSelectorLabel", resourceCulture);
-        internal static string DetailedPopupTemplateLabel => ResourceManager.GetString("DetailedPopupTemplateLabel", resourceCulture);
-        internal static string DetailedPopupCssLabel => ResourceManager.GetString("DetailedPopupCssLabel", resourceCulture);
-        internal static string DetailedPopupMapJsonLabel => ResourceManager.GetString("DetailedPopupMapJsonLabel", resourceCulture);
-        internal static string DetailedPopupHtmlSourceInlineLabel => ResourceManager.GetString("DetailedPopupHtmlSourceInlineLabel", resourceCulture);
-        internal static string DetailedPopupHtmlSourceFileLabel => ResourceManager.GetString("DetailedPopupHtmlSourceFileLabel", resourceCulture);
-        internal static string DetailedPopupHtmlContentLabel => ResourceManager.GetString("DetailedPopupHtmlContentLabel", resourceCulture);
-        internal static string DetailedPopupFilePathLabel => ResourceManager.GetString("DetailedPopupFilePathLabel", resourceCulture);
-        internal static string DetailedPopupPickFileButton => ResourceManager.GetString("DetailedPopupPickFileButton", resourceCulture);
-        internal static string DetailedPopupLoadedBytesCaption => ResourceManager.GetString("DetailedPopupLoadedBytesCaption", resourceCulture);
-        internal static string DetailedPopupPdfInlineHelp => ResourceManager.GetString("DetailedPopupPdfInlineHelp", resourceCulture);
-        internal static string DetailedPopupSearchPlaceholder => ResourceManager.GetString("DetailedPopupSearchPlaceholder", resourceCulture);
-        internal static string DetailedPopupToggleGridTooltip => ResourceManager.GetString("DetailedPopupToggleGridTooltip", resourceCulture);
-        internal static string DetailedPopupDeleteDialogTitle => ResourceManager.GetString("DetailedPopupDeleteDialogTitle", resourceCulture);
-        internal static string DetailedPopupDeleteDialogMessage => ResourceManager.GetString("DetailedPopupDeleteDialogMessage", resourceCulture);
-        internal static string DetailedPopupDeleteDialogYes => ResourceManager.GetString("DetailedPopupDeleteDialogYes", resourceCulture);
-        internal static string DetailedPopupDeleteDialogCancel => ResourceManager.GetString("DetailedPopupDeleteDialogCancel", resourceCulture);
-        internal static string DetailedPopupAddNewContentButton => ResourceManager.GetString("DetailedPopupAddNewContentButton", resourceCulture);
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add new content.
+        /// </summary>
+        internal static string DetailedPopupAddNewContentButton {
+            get {
+                return ResourceManager.GetString("DetailedPopupAddNewContentButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Content name (optional).
+        /// </summary>
+        internal static string DetailedPopupContentNameLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupContentNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à css.
+        /// </summary>
+        internal static string DetailedPopupCssLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupCssLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Delete.
+        /// </summary>
+        internal static string DetailedPopupDeleteButton {
+            get {
+                return ResourceManager.GetString("DetailedPopupDeleteButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cancel.
+        /// </summary>
+        internal static string DetailedPopupDeleteDialogCancel {
+            get {
+                return ResourceManager.GetString("DetailedPopupDeleteDialogCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This action cannot be undone.&lt;br/&gt;Do you want to delete this content?.
+        /// </summary>
+        internal static string DetailedPopupDeleteDialogMessage {
+            get {
+                return ResourceManager.GetString("DetailedPopupDeleteDialogMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Delete content.
+        /// </summary>
+        internal static string DetailedPopupDeleteDialogTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupDeleteDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Delete.
+        /// </summary>
+        internal static string DetailedPopupDeleteDialogYes {
+            get {
+                return ResourceManager.GetString("DetailedPopupDeleteDialogYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Delete this content.
+        /// </summary>
+        internal static string DetailedPopupDeleteTooltip {
+            get {
+                return ResourceManager.GetString("DetailedPopupDeleteTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à File path.
+        /// </summary>
+        internal static string DetailedPopupFilePathLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupFilePathLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à HTML content.
+        /// </summary>
+        internal static string DetailedPopupHtmlContentLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlContentLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;ol&gt;
+        ///  &lt;li&gt;&lt;b&gt;Source&lt;/b&gt;: choose &lt;span class=&quot;kbd&quot;&gt;Paste HTML&lt;/span&gt; or &lt;span class=&quot;kbd&quot;&gt;Pick file&lt;/span&gt;.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;selector&lt;/b&gt;: CSS selector that matches &lt;i&gt;multiple&lt;/i&gt; nodes; each match becomes one rendered piece.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;template&lt;/b&gt;: Handlebars-style template that renders each matched node.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;map.json&lt;/b&gt;: optional JSON mapping keys → CSS selectors evaluated within the matched node.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;css&lt;/b&gt;: optional CSS injected once for the entire popup, used by your temp [le reste de la chaîne a été tronqué]&quot;;.
+        /// </summary>
+        internal static string DetailedPopupHtmlHowItWorksBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlHowItWorksBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à html (templated) — how it works.
+        /// </summary>
+        internal static string DetailedPopupHtmlHowItWorksTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlHowItWorksTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;p&gt;
+        ///A minimal end-to-end pattern to validate your pipeline (&lt;b&gt;selector&lt;/b&gt; → &lt;b&gt;map.json&lt;/b&gt; → &lt;b&gt;template&lt;/b&gt; → &lt;b&gt;CSS&lt;/b&gt;).
+        ///Each element matched by the selector is turned into one rendered “piece”.
+        ///&lt;/p&gt;
+        ///&lt;ul&gt;
+        ///  &lt;li&gt;
+        ///    &lt;p&gt;&lt;b&gt;selector&lt;/b&gt;: &lt;span class=&quot;kbd&quot;&gt;.card&lt;/span&gt;&lt;/p&gt;
+        ///    &lt;p&gt;
+        ///      This selects every &lt;span class=&quot;kbd&quot;&gt;&amp;lt;div class=&quot;card&quot;&amp;gt;...&amp;lt;/div&amp;gt;&lt;/span&gt; in your HTML. For each match,
+        ///      the renderer builds a data model (from &lt;b&gt;map.json&lt;/b&gt;) and feeds it to the Handlebars &lt;b&gt; [le reste de la chaîne a été tronqué]&quot;;.
+        /// </summary>
+        internal static string DetailedPopupHtmlQuickStartBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlQuickStartBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à html (templated) — quick starter example.
+        /// </summary>
+        internal static string DetailedPopupHtmlQuickStartTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlQuickStartTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Pick file.
+        /// </summary>
+        internal static string DetailedPopupHtmlSourceFileLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlSourceFileLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Paste HTML.
+        /// </summary>
+        internal static string DetailedPopupHtmlSourceInlineLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlSourceInlineLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;ul&gt;
+        ///  &lt;li&gt;&lt;b&gt;Triple braces&lt;/b&gt; &lt;span class=&quot;kbd&quot;&gt;{{{key}}}&lt;/span&gt; render raw HTML; &lt;span class=&quot;kbd&quot;&gt;{{key}}&lt;/span&gt; is HTML-escaped.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;Helpers&lt;/b&gt; like &lt;span class=&quot;kbd&quot;&gt;{{#if key}}&lt;/span&gt; and &lt;span class=&quot;kbd&quot;&gt;{{#each list}}&lt;/span&gt; are supported.&lt;/li&gt;
+        ///  &lt;li&gt;
+        ///    &lt;b&gt;map.json&lt;/b&gt;:
+        ///    &lt;ul&gt;
+        ///      &lt;li&gt;Keys become variables in the template.&lt;/li&gt;
+        ///      &lt;li&gt;&lt;span class=&quot;kbd&quot;&gt;rows&lt;/span&gt; (special): when the selector returns multiple nodes, you get an array (for &lt;span class=&quot;kbd&quot;&gt;{{#each}}&lt;/sp [le reste de la chaîne a été tronqué]&quot;;.
+        /// </summary>
+        internal static string DetailedPopupHtmlTipsBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlTipsBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à html (templated) — template &amp; map.json tips.
+        /// </summary>
+        internal static string DetailedPopupHtmlTipsTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupHtmlTipsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;b&gt;html (templated)&lt;/b&gt; entry:
+        ///&lt;ul style=&quot;margin:6px 0;&quot;&gt;
+        ///  &lt;li&gt;Set &lt;span class=&quot;kbd&quot;&gt;selector&lt;/span&gt; to pick repeated nodes (one piece per match).&lt;/li&gt;
+        ///  &lt;li&gt;Write a Handlebars-style &lt;span class=&quot;kbd&quot;&gt;template&lt;/span&gt; using keys from &lt;span class=&quot;kbd&quot;&gt;map.json&lt;/span&gt;.&lt;/li&gt;
+        ///  &lt;li&gt;Optional &lt;span class=&quot;kbd&quot;&gt;css&lt;/span&gt; applies to all pieces (injected once in the popup).&lt;/li&gt;
+        ///  &lt;li&gt;&lt;span class=&quot;kbd&quot;&gt;source&lt;/span&gt;: choose &lt;i&gt;Paste HTML&lt;/i&gt; or &lt;i&gt;Pick file&lt;/i&gt; below.&lt;/li&gt;
+        ///&lt;/ul&gt;
+        ///.
+        /// </summary>
+        internal static string DetailedPopupInlineHelpHtml {
+            get {
+                return ResourceManager.GetString("DetailedPopupInlineHelpHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à html (templated).
+        /// </summary>
+        internal static string DetailedPopupKindHtmlLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupKindHtmlLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Kind.
+        /// </summary>
+        internal static string DetailedPopupKindLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupKindLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à markdown.
+        /// </summary>
+        internal static string DetailedPopupKindMarkdownLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupKindMarkdownLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à pdf.
+        /// </summary>
+        internal static string DetailedPopupKindPdfLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupKindPdfLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à text.
+        /// </summary>
+        internal static string DetailedPopupKindTextLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupKindTextLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Loaded {0} bytes.
+        /// </summary>
+        internal static string DetailedPopupLoadedBytesCaption {
+            get {
+                return ResourceManager.GetString("DetailedPopupLoadedBytesCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à map.json.
+        /// </summary>
+        internal static string DetailedPopupMapJsonLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupMapJsonLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;p&gt;
+        ///Markdown is converted to HTML using the &lt;b&gt;Markdig&lt;/b&gt; pipeline (advanced extensions enabled).
+        ///The raw markdown is stored and indexed so that search works on the original text.
+        ///&lt;/p&gt;
+        ///&lt;p&gt;
+        ///This is useful for descriptions that benefit from headings, lists, emphasis, or tables while remaining easy to edit.
+        ///&lt;/p&gt;
+        ///.
+        /// </summary>
+        internal static string DetailedPopupMarkdownBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupMarkdownBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Markdown content.
+        /// </summary>
+        internal static string DetailedPopupMarkdownContentLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupMarkdownContentLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à markdown.
+        /// </summary>
+        internal static string DetailedPopupMarkdownTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupMarkdownTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;p&gt;
+        ///Add one or more &lt;b&gt;content entries&lt;/b&gt;. Each entry has a &lt;i&gt;Kind&lt;/i&gt; that defines how it renders:
+        ///&lt;span class=&quot;kbd&quot;&gt;text&lt;/span&gt;, &lt;span class=&quot;kbd&quot;&gt;markdown&lt;/span&gt;, &lt;span class=&quot;kbd&quot;&gt;html (templated)&lt;/span&gt;, or &lt;span class=&quot;kbd&quot;&gt;pdf&lt;/span&gt;.
+        ///Use the &lt;i&gt;Name&lt;/i&gt; to group pieces visually within the popup.
+        ///&lt;/p&gt;
+        ///&lt;ul&gt;
+        ///  &lt;li&gt;&lt;b&gt;Search&lt;/b&gt; filters results by group title, entry name/key, and indexed text.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;Grid/List&lt;/b&gt; toggle changes the layout; grid uses a masonry layout.&lt;/li&gt;
+        ///&lt;/ul&gt;
+        ///.
+        /// </summary>
+        internal static string DetailedPopupOverviewBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupOverviewBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Overview.
+        /// </summary>
+        internal static string DetailedPopupOverviewTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupOverviewTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;p&gt;
+        ///Pick a PDF file. The renderer will create &lt;b&gt;one piece per page&lt;/b&gt; using &lt;code&gt;pdf.js&lt;/code&gt; for visual rendering.
+        ///When text extraction is possible, each page is also indexed for search.
+        ///&lt;/p&gt;
+        ///&lt;ul&gt;
+        ///  &lt;li&gt;Large PDFs are supported; the first render may take a bit longer.&lt;/li&gt;
+        ///  &lt;li&gt;If parsing fails, you still see the pages visually, but search on page contents is disabled.&lt;/li&gt;
+        ///&lt;/ul&gt;
+        ///.
+        /// </summary>
+        internal static string DetailedPopupPdfBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupPdfBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Load a PDF file. Each page becomes a searchable piece (when text extraction is possible)..
+        /// </summary>
+        internal static string DetailedPopupPdfInlineHelp {
+            get {
+                return ResourceManager.GetString("DetailedPopupPdfInlineHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à pdf.
+        /// </summary>
+        internal static string DetailedPopupPdfTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupPdfTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Pick file.
+        /// </summary>
+        internal static string DetailedPopupPickFileButton {
+            get {
+                return ResourceManager.GetString("DetailedPopupPickFileButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Search….
+        /// </summary>
+        internal static string DetailedPopupSearchPlaceholder {
+            get {
+                return ResourceManager.GetString("DetailedPopupSearchPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à selector.
+        /// </summary>
+        internal static string DetailedPopupSelectorLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupSelectorLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Show editing help.
+        /// </summary>
+        internal static string DetailedPopupShowEditorHelp {
+            get {
+                return ResourceManager.GetString("DetailedPopupShowEditorHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à template.
+        /// </summary>
+        internal static string DetailedPopupTemplateLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupTemplateLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;p&gt;
+        ///Use the &lt;b&gt;Content&lt;/b&gt; box to write plain text. It will be rendered as simple paragraphs (with preserved line breaks)
+        ///and indexed as a single block for search.
+        ///&lt;/p&gt;
+        ///.
+        /// </summary>
+        internal static string DetailedPopupTextBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupTextBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Content.
+        /// </summary>
+        internal static string DetailedPopupTextContentLabel {
+            get {
+                return ResourceManager.GetString("DetailedPopupTextContentLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à text.
+        /// </summary>
+        internal static string DetailedPopupTextTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupTextTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Toggle grid/list view.
+        /// </summary>
+        internal static string DetailedPopupToggleGridTooltip {
+            get {
+                return ResourceManager.GetString("DetailedPopupToggleGridTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à 
+        ///&lt;ul&gt;
+        ///  &lt;li&gt;&lt;b&gt;No cards?&lt;/b&gt; Verify your &lt;i&gt;selector&lt;/i&gt; matches elements in the provided HTML.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;Missing values?&lt;/b&gt; Ensure the key exists in &lt;i&gt;map.json&lt;/i&gt; and the CSS selector matches a child element.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;Broken layout?&lt;/b&gt; Keep your CSS specific and avoid very generic rules.&lt;/li&gt;
+        ///  &lt;li&gt;&lt;b&gt;Search misses content?&lt;/b&gt; The index comes from &lt;span class=&quot;kbd&quot;&gt;text&lt;/span&gt; (or mapped fields) per piece, plus group titles and keys.&lt;/li&gt;
+        ///&lt;/ul&gt;
+        ///.
+        /// </summary>
+        internal static string DetailedPopupTroubleshootingBody {
+            get {
+                return ResourceManager.GetString("DetailedPopupTroubleshootingBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Troubleshooting.
+        /// </summary>
+        internal static string DetailedPopupTroubleshootingTitle {
+            get {
+                return ResourceManager.GetString("DetailedPopupTroubleshootingTitle", resourceCulture);
+            }
+        }
     }
 }

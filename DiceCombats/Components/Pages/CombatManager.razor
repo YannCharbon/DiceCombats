@@ -111,6 +111,31 @@
     padding: 3px;
     cursor: pointer;
     }
+
+    .current-initiative-creature {
+        background: linear-gradient( -45deg, #8a8a8a 0%, /* dark cyan-ish */
+        #005f5f 50%, /* dark grey */
+        #8a8a8a 100% /* back to dark cyan-ish */
+        );
+        background-size: 200% 200%;
+        animation: gradient 8s ease-in-out infinite;
+        padding: 5px;
+    }
+
+    @@keyframes gradient {
+    0% {
+    background-position: 0% 50%;
+    }
+
+    50% {
+    background-position: 100% 50%;
+    }
+
+    100% {
+    background-position: 0% 50%; /* same as 0% → no jump */
+    }
+    }
+
 </style>
 
 <script>
@@ -138,6 +163,7 @@
         {
             <MudItem><MudIcon @onclick="SortCreaturesInitiativeRankByRoll" Icon="@Icons.Material.Filled.Sort" Title="@Loc["InitiativeSort"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
             <MudItem><MudIcon @onclick="CreaturesInitiativeReset" Icon="@Icons.Material.Filled.Sync" Title="@Loc["InitiativeReset"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
+            <MudItem><MudIcon @onclick="MoveToNextCreatureInInitiative" Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Title="" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
             <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@Loc["InitiativeMinimize"]" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
         }
         else
@@ -157,7 +183,8 @@
             </tr>
             @foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
             {
-                <tr style="border-bottom:solid; border-bottom-width:1px;">
+                <tr style="border-bottom:solid; border-bottom-width:1px;"
+                class="@(creature.Name == _currentInitiativeCreature.Name ? "current-initiative-creature" : "")">
                     <td style="width:240px;padding:5px;">@creature.Name</td>
                     <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:#A0A0A0;" @bind-Value="creature.InitiativeRoll"></MudNumericField></td>
                     <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:white;font-weight:bold;font-size:16pt" @bind-Value="creature.InitiativeRank"></MudNumericField></td>
@@ -200,89 +227,92 @@
     @foreach (DCCreature creature in _combat.CreaturesList)
     {
         <div class="masonry-item">
-            <div class="CombatEditorCreatureLayout">
-                <div style="padding:10px" id="@creature.Id.ToString()">
-                    @if (creature.ImageSheetBas64 != string.Empty)
-                    {
-                        <h1>@creature.Name</h1>
-                        <img src="@creature.ImageSheetBas64" height="500px" />
-                    }
-                    else if (creature.HtmlSheet != string.Empty)
-                    {
-                        <div style="color:black">
-                            @((MarkupString)creature.HtmlSheet)
-                        </div>
-                    }
-                    else if (creature.MarkdownSheet != string.Empty)
-                    {
-                        <div class="markdown-content">
-                            @((MarkupString)creature.GetMarkdownSheetAsHtml())
-                        </div>
-                    }
-                    else if (creature.IsPlayer)
-                    {
-                        <h1>@creature.Name</h1>
-                    }
-                    else if (creature.IsManual)
-                    {
-                        <h1>@creature.Name</h1>
-                    }
-                    else
-                    {
-                        <p>Could not render creature sheet</p>
-                    }
-                </div>
-                @{
-                    // Prepare data for rendering
-                    var allInstanceCustomFields = _combat.GetCreatureInstancesCustomFields(creature);
-                    var sharedFields = allInstanceCustomFields.First()
-                        .Where(x => x.SharedAcrossCreatureInstances)
-                        .ToList();
-                    var nonSharedFields = allInstanceCustomFields.First()
-                        .Where(x => !x.SharedAcrossCreatureInstances)
-                        .ToList();
-                }
-
-                <div style="padding:10px;">
-                    @* Render shared fields (once for all instances) *@
-                    @if (sharedFields.Any())
-                    {
-                        <div class="CombatEditorCustomFieldsLayout" style="border-color:#F9F9F9;padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px #FFFFFF;">
-                            <div class="d-flex flex-wrap gap-2" style="align-items:center;">
-                                @foreach (var field in sharedFields)
-                                {
-                                    <div>
-                                        <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                            <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
-                                        </MudPaper>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-
-                    @if (nonSharedFields.Count > 0)
-                    {
-                        @* Render non-shared fields for each creature instance *@
-                        @foreach (var instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
+            <div class="@(creature.Name == _currentInitiativeCreature.Name ? "current-initiative-creature-border" : "CombatEditorCreatureLayout")"
+                style="padding:8px;">
+                <div style="background-color:#303030; padding: 4px; border-radius: 5px;">
+                    <div id="@creature.Id.ToString()">
+                        @if (creature.ImageSheetBas64 != string.Empty)
                         {
-                            <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
+                            <h1>@creature.Name</h1>
+                            <img src="@creature.ImageSheetBas64" height="500px" />
+                        }
+                        else if (creature.HtmlSheet != string.Empty)
+                        {
+                            <div style="color:black">
+                                @((MarkupString)creature.HtmlSheet)
+                            </div>
+                        }
+                        else if (creature.MarkdownSheet != string.Empty)
+                        {
+                            <div class="markdown-content">
+                                @((MarkupString)creature.GetMarkdownSheetAsHtml())
+                            </div>
+                        }
+                        else if (creature.IsPlayer)
+                        {
+                            <h1>@creature.Name</h1>
+                        }
+                        else if (creature.IsManual)
+                        {
+                            <h1>@creature.Name</h1>
+                        }
+                        else
+                        {
+                            <p>Could not render creature sheet</p>
+                        }
+                    </div>
+                    @{
+                        // Prepare data for rendering
+                        var allInstanceCustomFields = _combat.GetCreatureInstancesCustomFields(creature);
+                        var sharedFields = allInstanceCustomFields.First()
+                            .Where(x => x.SharedAcrossCreatureInstances)
+                            .ToList();
+                        var nonSharedFields = allInstanceCustomFields.First()
+                            .Where(x => !x.SharedAcrossCreatureInstances)
+                            .ToList();
+                    }
+
+                    <div style="padding:10px;">
+                        @* Render shared fields (once for all instances) *@
+                        @if (sharedFields.Any())
+                        {
+                            <div class="CombatEditorCustomFieldsLayout" style="border-color:#F9F9F9;padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px #FFFFFF;">
                                 <div class="d-flex flex-wrap gap-2" style="align-items:center;">
-                                    @foreach (DCCreatureCustomField field in instanceCustomFields)
+                                    @foreach (var field in sharedFields)
                                     {
-                                        @if (field.SharedAcrossCreatureInstances == false)
-                                        {
-                                            <div>
-                                                <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                    <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
-                                                </MudPaper>
-                                            </div>
-                                        }
+                                        <div>
+                                            <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
+                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                            </MudPaper>
+                                        </div>
                                     }
                                 </div>
                             </div>
                         }
-                    }
+
+                        @if (nonSharedFields.Count > 0)
+                        {
+                            @* Render non-shared fields for each creature instance *@
+                            @foreach (var instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
+                            {
+                                <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
+                                    <div class="d-flex flex-wrap gap-2" style="align-items:center;">
+                                        @foreach (DCCreatureCustomField field in instanceCustomFields)
+                                        {
+                                            @if (field.SharedAcrossCreatureInstances == false)
+                                            {
+                                                <div>
+                                                    <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
+                                                        <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                                    </MudPaper>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -306,6 +336,8 @@
     private bool _initiativeWindowsMaximized = true;
 
     private System.Timers.Timer _timer = new System.Timers.Timer(1000);
+
+    private DCCreature _currentInitiativeCreature = new DCCreature("Default");
 
     protected override void OnInitialized()
     {
@@ -372,6 +404,8 @@
             _initiativeWindowCreatureListCopy[i].InitiativeRank = currentRank;
             lastRoll = _initiativeWindowCreatureListCopy[i].InitiativeRoll;
         }
+
+        _currentInitiativeCreature = _initiativeWindowCreatureListCopy.FirstOrDefault();
     }
 
     private void CreaturesInitiativeReset()
@@ -381,6 +415,23 @@
             creature.InitiativeRoll = 0;
             creature.InitiativeRank = 0;
         }
+    }
+
+    private void MoveToNextCreatureInInitiative()
+    {
+        int idx = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
+        if (idx >= 0)
+        {
+            if (idx < _initiativeWindowCreatureListCopy.Count - 1)
+            {
+                _currentInitiativeCreature = _initiativeWindowCreatureListCopy[idx + 1];
+            }
+            else
+            {
+                _currentInitiativeCreature = _initiativeWindowCreatureListCopy[0];
+            }
+        }
+        JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
     }
 
     private void OpenCreaturesSelectorModal()

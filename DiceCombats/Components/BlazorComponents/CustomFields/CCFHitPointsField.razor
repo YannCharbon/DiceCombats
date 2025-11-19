@@ -9,9 +9,11 @@
 }
 else
 {
-    <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
-        <MudNumericField @bind-Value="Field.CurrentHP" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
-    </MudStack>
+    <div style="zoom: 0.85;">
+        <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
+            <MudNumericField @bind-Value="Field.CurrentHP" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        </MudStack>
+    </div>
 }
 
 @code {

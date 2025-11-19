@@ -27,20 +27,22 @@
 }
 else
 {
-    @if (Field.ShowFieldName)
-    {
-        <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
-    }
-    <MudStack Row="true">
-        @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+    <div style="zoom:0.85">
+        @if (Field.ShowFieldName)
         {
-            <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
-            @if (Field.ShowTextFields == true)
-            {
-                <MudTextField AutoGrow spellcheck="false" @bind-Value="Field.TextFields[i]" Label="@Field.TextFieldsLabels[i]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
-            }
+            <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
         }
-    </MudStack>
+        <MudStack Row="true">
+            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+            {
+                <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                @if (Field.ShowTextFields == true)
+                {
+                    <MudTextField AutoGrow spellcheck="false" @bind-Value="Field.TextFields[i]" Label="@Field.TextFieldsLabels[i]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                }
+            }
+        </MudStack>
+    </div>
 }
 
 @code {

@@ -19,23 +19,25 @@
 }
 else
 {
-    <MudStack Row="true">
-        @foreach (int i in Enumerable.Range(0, Field.Count))
-        {
-            <MudStack Row="false" Style="border-radius:5px;border-width:thin;background-color:darkcyan;">
-                @if (Field.ValuesAreEditable)
-                {
-                    <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[i]</MudItem>
-                    <MudNumericField @bind-Value="Field.StatsValues[i]" style="max-width:90px;" Variant="Variant.Outlined" />
-                }
-                else
-                {
-                    <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@Field.StatsValues[i]</MudItem>
-                    <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[i]</MudItem>
-                }
-            </MudStack>
-        }
-    </MudStack>
+    <div style="zoom: 0.85;">
+        <MudStack Row="true">
+            @foreach (int i in Enumerable.Range(0, Field.Count))
+            {
+                <MudStack Row="false" Style="border-radius:5px;border-width:thin;background-color:darkcyan;">
+                    @if (Field.ValuesAreEditable)
+                    {
+                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[i]</MudItem>
+                        <MudNumericField @bind-Value="Field.StatsValues[i]" style="max-width:90px;" Variant="Variant.Outlined" />
+                    }
+                    else
+                    {
+                        <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@Field.StatsValues[i]</MudItem>
+                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[i]</MudItem>
+                    }
+                </MudStack>
+            }
+        </MudStack>
+    </div>
 }
 
 @code {

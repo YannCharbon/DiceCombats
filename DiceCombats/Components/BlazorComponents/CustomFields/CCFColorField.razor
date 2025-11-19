@@ -9,25 +9,27 @@
 }
 else
 {
-    <MudStack Row="true" Wrap="Wrap.Wrap">
-        @if (_showColorPicker)
-        {
-            <div @onclick="() => {_showColorPicker = false; NotifyParentOnChange();}">
-                <MudColorPicker PickerVariant="PickerVariant.Static"
-                                ColorPickerView="ColorPickerView.GridCompact"
-                                Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
-                                @bind-Text="Field.Value"
-                                Style="@($"color: {Field.Value ?? ""};")" Placeholder="Select Color" />
-            </div>
-            <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;Close&nbsp;</span>
-        }
-        else
-        {
-            <span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span>
-            <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        }
+    <div style="zoom: 0.85;">
+        <MudStack Row="true" Wrap="Wrap.Wrap">
+            @if (_showColorPicker)
+            {
+                <div @onclick="() => {_showColorPicker = false; NotifyParentOnChange();}">
+                    <MudColorPicker PickerVariant="PickerVariant.Static"
+                                    ColorPickerView="ColorPickerView.GridCompact"
+                                    Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
+                                    @bind-Text="Field.Value"
+                                    Style="@($"color: {Field.Value ?? ""};")" Placeholder="Select Color" />
+                </div>
+                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;Close&nbsp;</span>
+            }
+            else
+            {
+                <span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span>
+                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            }
 
-    </MudStack>
+        </MudStack>
+    </div>
 }
 
 @code {

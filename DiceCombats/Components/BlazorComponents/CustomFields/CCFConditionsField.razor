@@ -21,35 +21,37 @@
 }
 else
 {
-    <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized; NotifyParentOnChange();}">
-        @if (_dndConditionsFieldMaximized == false)
-        {
-            @if (Field.SelectedOptions.Count(x => x == true) == 0) {
-                <MudItem><h5>@Loc["DnDConditionAddCondition"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Color="Color.Success"></MudIcon></h5></MudItem>
-            }
-            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+    <div style="zoom: 0.85;">
+        <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized; NotifyParentOnChange();}">
+            @if (_dndConditionsFieldMaximized == false)
             {
-                @if (Field.SelectedOptions[i] == true) {
-                    <MudItem class="DnDConditionsFieldItem" style="background-color:#9A7A00;">@Field.Labels[i]</MudItem>
+                @if (Field.SelectedOptions.Count(x => x == true) == 0) {
+                    <MudItem><h5>@Loc["DnDConditionAddCondition"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Color="Color.Success"></MudIcon></h5></MudItem>
                 }
-            }
-        } else {
-            <MudItem style="padding:5px;border-radius:5px;border-color:grey;border-width:thin;"><h5>@Loc["DnDConditionMinimize"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" Color="Color.Success"></MudIcon></h5></MudItem>
-            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
-            {
-                @if (Field.SelectedOptions[i] == true)
+                @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
                 {
-                    <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
-                        <MudCheckBox style="color:#BAAA00;" Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
-                    </MudItem>
-                } else {
-                    <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
-                        <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
-                    </MudItem>
+                    @if (Field.SelectedOptions[i] == true) {
+                        <MudItem class="DnDConditionsFieldItem" style="background-color:#9A7A00;">@Field.Labels[i]</MudItem>
+                    }
+                }
+            } else {
+                <MudItem style="padding:5px;border-radius:5px;border-color:grey;border-width:thin;"><h5>@Loc["DnDConditionMinimize"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" Color="Color.Success"></MudIcon></h5></MudItem>
+                @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+                {
+                    @if (Field.SelectedOptions[i] == true)
+                    {
+                        <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
+                            <MudCheckBox style="color:#BAAA00;" Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                        </MudItem>
+                    } else {
+                        <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
+                            <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                        </MudItem>
+                    }
                 }
             }
-        }
-    </MudStack>
+        </MudStack>
+    </div>
 }
 
 @code {

@@ -48,38 +48,40 @@
 }
 else
 {
-    <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
-    <div style="padding:10px;">
-        <table>
-            @if (Field.HasColumnHeaders)
-            {
-                <tr>
-                    @if (Field.HasRowHeaders)
-                    {
-                        <td>&nbsp;</td>
-                    }
-                    @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
-                    {
-                        <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.ColumnHeaders[i]</span></td>
-                    }
-                </tr>
-            }
-            @foreach (int i in Enumerable.Range(0, Field.Rows))
-            {
-                <tr>
-                    @if (Field.HasRowHeaders)
-                    {
-                        <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[i]</span></td>
-                    }
-                    @foreach (int j in Enumerable.Range(0, Field.Columns))
-                    {
-                        <td style="padding:3px;">
-                            <input type="checkbox" @bind="Field.GridState[i][j]" />
-                        </td>
-                    }
-                </tr>
-            }
-        </table>
+    <div style="zoom: 0.85;">
+        <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
+        <div style="padding:10px;">
+            <table>
+                @if (Field.HasColumnHeaders)
+                {
+                    <tr>
+                        @if (Field.HasRowHeaders)
+                        {
+                            <td>&nbsp;</td>
+                        }
+                        @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
+                        {
+                            <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.ColumnHeaders[i]</span></td>
+                        }
+                    </tr>
+                }
+                @foreach (int i in Enumerable.Range(0, Field.Rows))
+                {
+                    <tr>
+                        @if (Field.HasRowHeaders)
+                        {
+                            <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[i]</span></td>
+                        }
+                        @foreach (int j in Enumerable.Range(0, Field.Columns))
+                        {
+                            <td style="padding:3px;">
+                                <input type="checkbox" @bind="Field.GridState[i][j]" />
+                            </td>
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
     </div>
 }
 

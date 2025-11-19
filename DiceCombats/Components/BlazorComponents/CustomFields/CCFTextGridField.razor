@@ -53,52 +53,54 @@
 }
 else
 {
-    <MudStack Row="false">
-        <MudItem>
-            <b><h5 class="CreatureCustomFieldRendererFieldTitle">@Field.Title</h5></b>
-        </MudItem>
-        <MudItem>
-            <div style="padding-bottom:10px;">
-                <table>
-                    @if (Field.HasColumnHeaders)
-                    {
-                        <tr>
-                            @if (Field.HasRowHeaders)
-                            {
-                                <td>&nbsp;</td>
-                            }
-                            @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
-                            {
-                                <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.ColumnHeaders[i]</span></td>
-                            }
-                        </tr>
-                    }
-                    @foreach (int i in Enumerable.Range(0, Field.Rows))
-                    {
-                        <tr>
-                            @if (Field.HasRowHeaders)
-                            {
-                                <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[i]</span></td>
-                            }
-                            @foreach (int j in Enumerable.Range(0, Field.Columns))
-                            {
-                                <td style="padding:3px;vertical-align:top;">
-                                    @if (Field.HasTextLabels[i][j] == true)
-                                    {
-                                        <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="Field.TextValues[i][j]" Label="@Field.TextLabels[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
-                                    }
-                                    else
-                                    {
-                                        <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="Field.TextValues[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
-                                    }
-                                </td>
-                            }
-                        </tr>
-                    }
-                </table>
-            </div>
-        </MudItem>
-    </MudStack>
+    <div style="zoom: 0.85;">
+        <MudStack Row="false">
+            <MudItem>
+                <b><h5 class="CreatureCustomFieldRendererFieldTitle">@Field.Title</h5></b>
+            </MudItem>
+            <MudItem>
+                <div style="padding-bottom:10px;">
+                    <table>
+                        @if (Field.HasColumnHeaders)
+                        {
+                            <tr>
+                                @if (Field.HasRowHeaders)
+                                {
+                                    <td>&nbsp;</td>
+                                }
+                                @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
+                                {
+                                    <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.ColumnHeaders[i]</span></td>
+                                }
+                            </tr>
+                        }
+                        @foreach (int i in Enumerable.Range(0, Field.Rows))
+                        {
+                            <tr>
+                                @if (Field.HasRowHeaders)
+                                {
+                                    <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[i]</span></td>
+                                }
+                                @foreach (int j in Enumerable.Range(0, Field.Columns))
+                                {
+                                    <td style="padding:3px;vertical-align:top;">
+                                        @if (Field.HasTextLabels[i][j] == true)
+                                        {
+                                            <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="Field.TextValues[i][j]" Label="@Field.TextLabels[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                        }
+                                        else
+                                        {
+                                            <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="Field.TextValues[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </MudItem>
+        </MudStack>
+    </div>
 }
 
 @code {

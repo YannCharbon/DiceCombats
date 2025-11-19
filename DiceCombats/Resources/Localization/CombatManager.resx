@@ -129,6 +129,9 @@
   <data name="InitiativeMinimize" xml:space="preserve">
     <value>Minimize</value>
   </data>
+  <data name="InitiativeNext" xml:space="preserve">
+    <value>Move to next creature in initiative order</value>
+  </data>
   <data name="InitiativeOrder" xml:space="preserve">
     <value>Order</value>
   </data>

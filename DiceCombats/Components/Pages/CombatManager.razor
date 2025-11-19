@@ -162,7 +162,7 @@
         {
             <MudItem><MudIcon @onclick="SortCreaturesInitiativeRankByRoll" Icon="@Icons.Material.Filled.Sort" Title="@Loc["InitiativeSort"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
             <MudItem><MudIcon @onclick="CreaturesInitiativeReset" Icon="@Icons.Material.Filled.Sync" Title="@Loc["InitiativeReset"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
-            <MudItem><MudIcon @onclick="MoveToNextCreatureInInitiative" Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Title="" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
+            <MudItem><MudIcon @onclick="MoveToNextCreatureInInitiative" Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Title="@Loc["InitiativeNext"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
             <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@Loc["InitiativeMinimize"]" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
         }
         else
@@ -404,7 +404,7 @@
             lastRoll = _initiativeWindowCreatureListCopy[i].InitiativeRoll;
         }
 
-        _currentInitiativeCreature = _initiativeWindowCreatureListCopy.FirstOrDefault();
+        _currentInitiativeCreature = _initiativeWindowCreatureListCopy.First();
     }
 
     private void CreaturesInitiativeReset()

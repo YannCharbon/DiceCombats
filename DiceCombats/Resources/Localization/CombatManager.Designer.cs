@@ -97,6 +97,15 @@ namespace DiceCombats.Resources.Localization {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Move to next creature in initiative order.
+        /// </summary>
+        internal static string InitiativeNext {
+            get {
+                return ResourceManager.GetString("InitiativeNext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Order.
         /// </summary>
         internal static string InitiativeOrder {

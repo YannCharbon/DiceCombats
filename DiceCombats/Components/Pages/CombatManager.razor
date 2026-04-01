@@ -135,6 +135,10 @@
     }
     }
 
+    #markdown-rendered-div a:link {
+        color: #00B0B0;
+    }
+
 </style>
 
 <script>
@@ -243,7 +247,7 @@
                         }
                         else if (creature.MarkdownSheet != string.Empty)
                         {
-                            <div class="markdown-content">
+                            <div id="markdown-rendered-div" class="markdown-content">
                                 @((MarkupString)creature.GetMarkdownSheetAsHtml())
                             </div>
                         }

@@ -56,7 +56,7 @@ If you prefer to build manually from the source code, follow these steps:
    ```
 3. Build:
    ```bash
-   dotnet build DiceCombats.sln -f net8.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:IncludeAllContentForSelfExtract=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
+   dotnet build DiceCombats.sln -f net10.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:IncludeAllContentForSelfExtract=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true
    ```
 4. Locate binary:
    The produced binaries can be found at `DiceCombats/bin/Release/`.

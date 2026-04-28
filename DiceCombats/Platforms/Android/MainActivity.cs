@@ -10,6 +10,7 @@ using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using AndroidX.Core.View;
 
 namespace DiceCombats
 {
@@ -21,6 +22,11 @@ namespace DiceCombats
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            // .NET 10 / recent Android defaults may render edge-to-edge.
+            // Keep system insets applied so the status bar/cutout does not overlap app content.
+            WindowCompat.SetDecorFitsSystemWindows(Window!, true);
+
             Instance = this; // Set the current instance
         }
 

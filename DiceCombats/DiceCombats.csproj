@@ -54,6 +54,7 @@
         <PackageReference Include="Handlebars.Net" Version="2.1.6" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
         <PackageReference Include="Markdig" Version="0.41.1" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
         <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />

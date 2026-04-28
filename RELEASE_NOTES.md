@@ -7,7 +7,7 @@
 
 ### Improvements
 
-- Nothing
+- **Migrate to latest .NET framework**
 
 ### Bug fixes
 

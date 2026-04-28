@@ -21,7 +21,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '10.0.x'
 
     - name: Install .NET MAUI Workloads
       run: dotnet workload install maui-android maui-windows maui-ios maui-maccatalyst
@@ -55,7 +55,7 @@ jobs:
 
     - name: Build for Windows
       run: |
-        dotnet publish DiceCombats.sln -f net8.0-windows10.0.19041.0 -c Release `
+        dotnet publish DiceCombats.sln -f net10.0-windows10.0.19041.0 -c Release `
           -p:RuntimeIdentifierOverride=win10-x64 `
           -p:WindowsPackageType=None `
           -p:IncludeAllContentForSelfExtract=true `
@@ -102,7 +102,7 @@ jobs:
 
     - name: Build for Android
       run: |
-        dotnet publish DiceCombats/DiceCombats.csproj -f net8.0-android -c Release -o ./publish/android
+        dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-android -c Release -o ./publish/android
 
     - name: Find APK File
       id: find_apk

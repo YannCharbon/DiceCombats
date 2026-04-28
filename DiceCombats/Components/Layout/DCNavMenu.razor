@@ -12,7 +12,8 @@
 <style>
     nav {
         display: flex;
-        height: 50px;
+        height: calc(50px + var(--dc-safe-area-top));
+        padding-top: var(--dc-safe-area-top);
         align-items: center;
         justify-content: center;
         background-color: rgba(10,30,30,1.0);

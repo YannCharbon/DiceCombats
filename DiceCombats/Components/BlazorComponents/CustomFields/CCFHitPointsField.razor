@@ -5,13 +5,13 @@
 
 @if (EditionMode)
 {
-    <MudNumericField Value="Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" />
+    <MudNumericField T="uint" Value="Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
         <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
-            <MudNumericField Value="Field.CurrentHP" ValueChanged="OnCurrentHpChanged" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+            <MudNumericField T="uint" Value="Field.CurrentHP" ValueChanged="OnCurrentHpChanged" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
         </MudStack>
     </div>
 }

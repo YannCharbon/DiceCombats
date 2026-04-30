@@ -5,12 +5,12 @@
 
 @if (EditionMode)
 {
-    <MudNumericField Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudNumericField T="int" Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudNumericField Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudNumericField T="int" Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     </div>
 }
 

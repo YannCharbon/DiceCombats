@@ -36,10 +36,10 @@ else
             @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
             {
                 var index = i;
-                <MudCheckBox Label="@Field.Labels[index]" Value="Field.SelectedOptions[index]" ValueChanged="@(v => OnOptionChanged(index, v))"></MudCheckBox>
+                <MudCheckBox T="bool" Label="@Field.Labels[index]" Value="Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
                 @if (Field.ShowTextFields == true)
                 {
-                    <MudTextField AutoGrow spellcheck="false" Value="Field.TextFields[index]" ValueChanged="@(v => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                    <MudTextField T="string" AutoGrow spellcheck="false" Value="Field.TextFields[index]" ValueChanged="@((string v) => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                 }
             }
         </MudStack>

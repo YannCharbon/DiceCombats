@@ -34,7 +34,7 @@
             </MudSelect>
 
             <MudPaper Class="pa-2 my-2">
-                <MudSwitch @bind-Value="_conditionEnabled[binding.Id]" Label="Enable condition" />
+                <MudSwitch T="bool" Value="@_conditionEnabled.GetValueOrDefault(binding.Id)" ValueChanged="@(v => _conditionEnabled[binding.Id] = v)" Label="Enable condition" />
                 @if (_conditionEnabled.GetValueOrDefault(binding.Id))
                 {
                     binding.Condition ??= new EventCondition();
@@ -47,8 +47,8 @@
                     @if (binding.Condition.TriggerOnlyOnCrossing)
                     {
                         <MudSelect T="string" @bind-Value="binding.Condition.CrossingDirection" Label="Crossing direction">
-                            <MudSelectItem Value="Below">Below</MudSelectItem>
-                            <MudSelectItem Value="Above">Above</MudSelectItem>
+                            <MudSelectItem Value="@(\"Below\")">Below</MudSelectItem>
+                            <MudSelectItem Value="@(\"Above\")">Above</MudSelectItem>
                         </MudSelect>
                     }
                 }
@@ -56,7 +56,7 @@
             </MudPaper>
 
             <MudText Typo="Typo.subtitle2">Template placeholders for selected event</MudText>
-            @foreach (var ph in GetPlaceholders(binding.EventType)) { <MudChip Class="ma-1">@ph</MudChip> }
+            @foreach (var ph in GetPlaceholders(binding.EventType)) { <MudChip T="string" Class="ma-1">@ph</MudChip> }
 
             <MudButton OnClick="() => AddHttp(binding)">Add HTTP Request</MudButton>
             <MudButton OnClick="() => AddDelay(binding)">Add Delay</MudButton>
@@ -78,7 +78,7 @@
                         <MudTextField @bind-Value="http.Url" Label="URL or relative path" />
                         <MudTextField @bind-Value="http.BodyTemplate" Label="Body template" Lines="3" />
                         <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="Timeout (ms)" />
-                        <MudTextField Value="@GetHeadersText(http.Headers)" ValueChanged="@(v => SetHeadersFromText(http, v ?? string.Empty))" Label="Headers (one per line: Name: value)" Lines="4" />
+                        <MudTextField T="string" Value="@GetHeadersText(http.Headers)" ValueChanged="@((string v) => SetHeadersFromText(http, v ?? string.Empty))" Label="Headers (one per line: Name: value)" Lines="4" />
                     }
                     else if (action is DelayActionDefinition delay)
                     {

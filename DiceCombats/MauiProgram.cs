@@ -15,6 +15,8 @@ using System.Diagnostics;
 using DiceCombats.Rendering;                   // <— ADD
 using DiceCombats.Rendering.Contracts;        // <— ADD
 using DiceCombats.Rendering.Renderers;        // <— ADD
+using DiceCombats.Automations;
+using DiceCombats.Integrations;
 
 #if WINDOWS
 using Microsoft.UI;
@@ -102,6 +104,12 @@ namespace DiceCombats
 
             builder.Services.AddMudServices();
             builder.Services.AddSingleton<DiceCombatsService>();
+            builder.Services.AddHttpClient();
+            builder.Services.AddSingleton<IAutomationStorage, MauiAutomationStorage>();
+            builder.Services.AddSingleton<AutomationConfigurationService>();
+            builder.Services.AddSingleton<EventTemplateRenderer>();
+            builder.Services.AddSingleton<EventConditionEvaluator>();
+            builder.Services.AddSingleton<IDiceEventPublisher, DiceEventDispatcher>();
 
 #if ANDROID
             builder.Services.AddSingleton<IFileHandler, FileHandler>();

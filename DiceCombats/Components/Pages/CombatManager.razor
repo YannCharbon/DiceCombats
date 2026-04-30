@@ -13,6 +13,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<Resources.Localization.CombatManager> Loc
+@inject DiceCombats.Automations.IDiceEventPublisher EventPublisher
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
@@ -360,7 +361,7 @@
 
         _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
 
-        SortCreaturesInitiativeRankByRoll();
+        _ = SortCreaturesInitiativeRankByRoll();
 
         base.OnInitialized();
     }
@@ -381,12 +382,13 @@
         }
     }
 
-    private void OnCustomFieldChanged()
+    private Task OnCustomFieldChanged()
     {
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
-    private void SortCreaturesInitiativeRankByRoll()
+    private async Task SortCreaturesInitiativeRankByRoll()
     {
         _initiativeWindowCreatureListCopy = _initiativeWindowCreatureListCopy.OrderByDescending(x => x.InitiativeRoll).ToList();
 
@@ -409,19 +411,28 @@
         }
 
         _currentInitiativeCreature = _initiativeWindowCreatureListCopy.First();
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
+        {
+            Type = DiceCombats.Automations.DiceEventTypes.InitiativeSorted,
+            Category = "Initiative",
+            DisplayName = "Initiative sorted",
+            Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name }
+        });
     }
 
-    private void CreaturesInitiativeReset()
+    private async Task CreaturesInitiativeReset()
     {
         foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
         {
             creature.InitiativeRoll = 0;
             creature.InitiativeRank = 0;
         }
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeReset, Category = "Initiative", DisplayName = "Initiative reset", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name } });
     }
 
-    private void MoveToNextCreatureInInitiative()
+    private async Task MoveToNextCreatureInInitiative()
     {
+        var previous = _currentInitiativeCreature;
         int idx = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
         if (idx >= 0)
         {
@@ -434,7 +445,8 @@
                 _currentInitiativeCreature = _initiativeWindowCreatureListCopy[0];
             }
         }
-        JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
+        await JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["previousCreatureId"] = previous.Id, ["previousCreatureName"] = previous.Name, ["currentCreatureId"] = _currentInitiativeCreature.Id, ["currentCreatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature) } });
     }
 
     private void OpenCreaturesSelectorModal()
@@ -474,24 +486,27 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void StartTimer()
+    private async Task StartTimer()
     {
         _timer.Elapsed += TimerElapsed;
         _timer.Start();
         _timer.Enabled = true;
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerStarted, Category = "Timer", DisplayName = "Timer started", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 
-    private void PauseTimer()
+    private async Task PauseTimer()
     {
         _timer.Enabled = false;
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerPaused, Category = "Timer", DisplayName = "Timer paused", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 
-    private void StopTimer()
+    private async Task StopTimer()
     {
         _timer.Stop();
         _timer.Enabled = false;
         _timer.Elapsed -= TimerElapsed;
         _combat.DurationCount = 0;
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerStopped, Category = "Timer", DisplayName = "Timer stopped", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 
     private string GetDurationAsString()

@@ -62,6 +62,9 @@
         <PackageReference Include="MudBlazor" Version="8.13.0" />
         <PackageReference Include="PdfPig" Version="0.1.12" />
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\DiceCombats.Automations\DiceCombats.Automations.csproj" />
+    </ItemGroup>
 
 	<PropertyGroup>
 		<NeutralLanguage>en-US</NeutralLanguage>

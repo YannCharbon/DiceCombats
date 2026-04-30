@@ -1,0 +1,64 @@
+@page "/automations"
+@using DiceCombats.Automations
+@inject AutomationConfigurationService ConfigService
+@inject IDiceEventPublisher EventPublisher
+
+<MudText Typo="Typo.h4">Automations</MudText>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDiceTimerExample">Add DiceTimer example</MudButton>
+
+@foreach (var app in _config.ExternalApps)
+{
+    <MudPaper Class="pa-2 my-2">
+        <MudTextField @bind-Value="app.Name" Label="App name" />
+        <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
+    </MudPaper>
+}
+<MudButton OnClick="AddExternalApp">Add app</MudButton>
+
+@foreach (var binding in _config.Bindings)
+{
+    <MudExpansionPanels>
+        <MudExpansionPanel Text="@binding.Name">
+            <MudTextField @bind-Value="binding.Name" Label="Automation name" />
+            <MudSwitch @bind-Value="binding.IsEnabled" Label="Enabled" />
+            <MudSelect T="string" @bind-Value="binding.EventType" Label="When">
+                @foreach (var ev in DiceEventCatalog.Entries)
+                {
+                    <MudSelectItem Value="@ev.Type">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
+                }
+            </MudSelect>
+            <MudButton OnClick="() => AddHttp(binding)">Add HTTP Request</MudButton>
+            <MudButton OnClick="() => AddDelay(binding)">Add Delay</MudButton>
+        </MudExpansionPanel>
+    </MudExpansionPanels>
+}
+
+<MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+<MudButton OnClick="AddBinding">Add automation</MudButton>
+
+@code {
+    private AutomationConfiguration _config = new();
+    protected override async Task OnInitializedAsync() => _config = await ConfigService.GetConfigurationAsync();
+    private void AddExternalApp() => _config.ExternalApps.Add(new ExternalAppDefinition { Name = "New app", BaseUrl = "http://localhost:5000" });
+    private void AddBinding() => _config.Bindings.Add(new EventActionBinding { Name = "New automation", EventType = DiceEventTypes.InitiativeNext });
+    private void AddHttp(EventActionBinding b) => b.Actions.Add(new HttpRequestActionDefinition { Name = "HTTP", Type = "HttpRequest", Method = "POST", Url = "/api/action" });
+    private void AddDelay(EventActionBinding b) => b.Actions.Add(new DelayActionDefinition { Name = "Delay", Type = "Delay", Milliseconds = 100 });
+    private async Task Save() => await ConfigService.SaveAsync();
+
+    private void AddDiceTimerExample()
+    {
+        var app = _config.ExternalApps.FirstOrDefault(x => x.Name == "DiceTimer") ?? new ExternalAppDefinition { Name = "DiceTimer", BaseUrl = "http://localhost:5087" };
+        if (!_config.ExternalApps.Any(x => x.Id == app.Id)) _config.ExternalApps.Add(app);
+        _config.Bindings.Add(new EventActionBinding
+        {
+            Name = "Restart DiceTimer on next turn",
+            EventType = DiceEventTypes.InitiativeNext,
+            Actions =
+            [
+                new HttpRequestActionDefinition { Name = "Stop timer", Type = "HttpRequest", Method = "POST", ExternalAppId = app.Id, Url = "/api/timer/stop" },
+                new DelayActionDefinition { Name = "Delay", Type = "Delay", Milliseconds = 100 },
+                new HttpRequestActionDefinition { Name = "Start timer", Type = "HttpRequest", Method = "POST", ExternalAppId = app.Id, Url = "/api/timer/start" }
+            ]
+        });
+    }
+}

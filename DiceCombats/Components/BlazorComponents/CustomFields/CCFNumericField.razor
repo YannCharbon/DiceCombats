@@ -5,28 +5,28 @@
 
 @if (EditionMode)
 {
-    <MudNumericField @bind-Value="Field.Value" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudNumericField Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudNumericField @bind-Value="Field.Value" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudNumericField Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     </div>
 }
 
 @code {
-    [Parameter]
-    public DCCreatureNumericField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureNumericField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnValueChanged(int value)
     {
+        var oldValue = Field.Value;
+        Field.Value = value;
+        if (OnFieldChanged.HasDelegate)
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo { Field = Field, OldValue = oldValue, NewValue = value });
         if (OnChange.HasDelegate)
-        {
-            OnChange.InvokeAsync();
-        }
+            await OnChange.InvokeAsync();
     }
 }

@@ -286,7 +286,7 @@
                                     {
                                         <div>
                                             <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" OnFieldChanged="@(info => OnCustomFieldChanged(creature, 0, info))" />
                                             </MudPaper>
                                         </div>
                                     }
@@ -297,8 +297,10 @@
                         @if (nonSharedFields.Count > 0)
                         {
                             @* Render non-shared fields for each creature instance *@
-                            @foreach (var instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
+                            @{ var creatureInstancesCustomFields = _combat.GetCreatureInstancesCustomFields(creature); }
+                            @for (int instanceIndex = 0; instanceIndex < creatureInstancesCustomFields.Count; instanceIndex++)
                             {
+                                var instanceCustomFields = creatureInstancesCustomFields[instanceIndex];
                                 <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
                                     <div class="d-flex flex-wrap gap-2" style="align-items:center;">
                                         @foreach (DCCreatureCustomField field in instanceCustomFields)
@@ -307,7 +309,7 @@
                                             {
                                                 <div>
                                                     <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                        <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                                        <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" OnFieldChanged="@(info => OnCustomFieldChanged(creature, instanceIndex, info))" />
                                                     </MudPaper>
                                                 </div>
                                             }
@@ -386,6 +388,42 @@
     {
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+
+    private async Task OnCustomFieldChanged(DCCreature creature, int instanceIndex, CustomFieldChangeInfo info)
+    {
+        StateHasChanged();
+
+        var data = new Dictionary<string, object?>
+        {
+            ["combatId"] = _combat.Id,
+            ["combatName"] = _combat.Name,
+            ["creatureId"] = creature.Id,
+            ["creatureName"] = creature.Name,
+            ["instanceIndex"] = instanceIndex,
+            ["fieldTitle"] = info.Field.Title,
+            ["fieldType"] = info.Field.FieldType,
+            ["oldValue"] = info.OldValue,
+            ["newValue"] = info.NewValue
+        };
+
+        if (info.Field is DCCreatureHitPointsField hp && hp.MaximumHP > 0)
+        {
+            var oldHp = Convert.ToDouble(info.OldValue ?? hp.CurrentHP);
+            var newHp = Convert.ToDouble(info.NewValue ?? hp.CurrentHP);
+            data["maximumValue"] = hp.MaximumHP;
+            data["oldPercentage"] = oldHp * 100d / hp.MaximumHP;
+            data["percentage"] = newHp * 100d / hp.MaximumHP;
+        }
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
+        {
+            Type = DiceCombats.Automations.DiceEventTypes.CustomFieldChanged,
+            Category = "Custom fields",
+            DisplayName = "Custom field changed",
+            Data = data
+        });
     }
 
     private async Task SortCreaturesInitiativeRankByRoll()
@@ -488,6 +526,7 @@
 
     private async Task StartTimer()
     {
+        _timer.Elapsed -= TimerElapsed;
         _timer.Elapsed += TimerElapsed;
         _timer.Start();
         _timer.Enabled = true;

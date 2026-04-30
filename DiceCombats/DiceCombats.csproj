@@ -192,12 +192,4 @@
         <LastGenOutput>WelcomeMessage.Designer.cs</LastGenOutput>
       </EmbeddedResource>
     </ItemGroup>
-
-    <Target Name="DeleteCorruptedStaticWebAssetsCache" BeforeTargets="DefineStaticWebAssets">
-      <ItemGroup>
-        <_CorruptedStaticWebAssetsCache Include="$(BaseIntermediateOutputPath)**\*.json"
-                                         Condition="$([System.String]::Copy('%(Filename)%(Extension)').Contains('staticwebassets')) and Exists('%(Identity)') and $([System.IO.FileInfo]::new('%(Identity)').Length) == 0" />
-      </ItemGroup>
-      <Delete Files="@(_CorruptedStaticWebAssetsCache)" />
-    </Target>
 </Project>

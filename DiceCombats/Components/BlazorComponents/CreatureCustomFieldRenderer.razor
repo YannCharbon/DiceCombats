@@ -70,11 +70,11 @@
 
 @if (Field is DCCreatureHitPointsField hitPointsField)
 {
-    <CCFHitPointsField Field="hitPointsField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFHitPointsField Field="hitPointsField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureNumericField numericField)
 {
-    <CCFNumericField Field="numericField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFNumericField Field="numericField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureTextField textField)
 {
@@ -86,7 +86,7 @@ else if (Field is DCCreatureTextGridField textGridField)
 }
 else if (Field is DCCreatureCheckboxField checkBoxField)
 {
-    <CCFCheckboxField Field="checkBoxField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFCheckboxField Field="checkBoxField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureCheckboxGridField checkboxGridField)
 {
@@ -116,12 +116,27 @@ else if (Field is DCCreatureDetailedPopupField detailedPopupField)
     public bool EditionMode { get; set; } = false;
     [Parameter]
     public EventCallback OnChange { get; set; }
+    [Parameter]
+    public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task NotifyParentOnChange()
     {
         if (OnChange.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnChange.InvokeAsync();
+        }
+    }
+
+    private async Task NotifyParentOnFieldChanged(CustomFieldChangeInfo info)
+    {
+        if (OnFieldChanged.HasDelegate)
+        {
+            await OnFieldChanged.InvokeAsync(info);
+        }
+
+        if (OnChange.HasDelegate)
+        {
+            await OnChange.InvokeAsync();
         }
     }
 

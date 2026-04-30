@@ -35,10 +35,11 @@ else
         <MudStack Row="true">
             @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
             {
-                <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                var index = i;
+                <MudCheckBox Label="@Field.Labels[index]" Value="Field.SelectedOptions[index]" ValueChanged="@(v => OnOptionChanged(index, v))"></MudCheckBox>
                 @if (Field.ShowTextFields == true)
                 {
-                    <MudTextField AutoGrow spellcheck="false" @bind-Value="Field.TextFields[i]" Label="@Field.TextFieldsLabels[i]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                    <MudTextField AutoGrow spellcheck="false" Value="Field.TextFields[index]" ValueChanged="@(v => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                 }
             }
         </MudStack>
@@ -46,18 +47,30 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureCheckboxField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureCheckboxField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnOptionChanged(int index, bool newValue)
     {
+        var oldValue = Field.SelectedOptions[index];
+        Field.SelectedOptions[index] = newValue;
+        await RaiseChanged(oldValue, newValue);
+    }
+
+    private async Task OnTextChanged(int index, string newValue)
+    {
+        var oldValue = Field.TextFields[index];
+        Field.TextFields[index] = newValue;
+        await RaiseChanged(oldValue, newValue);
+    }
+
+    private async Task RaiseChanged(object? oldValue, object? newValue)
+    {
+        if (OnFieldChanged.HasDelegate)
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo { Field = Field, OldValue = oldValue, NewValue = newValue });
         if (OnChange.HasDelegate)
-        {
-            OnChange.InvokeAsync();
-        }
+            await OnChange.InvokeAsync();
     }
 }

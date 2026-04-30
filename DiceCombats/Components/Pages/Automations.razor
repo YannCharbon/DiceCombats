@@ -9,11 +9,14 @@
 <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
 
 <MudText Typo="Typo.h5" Class="mt-4">External apps</MudText>
-@for (int appIndex = 0; appIndex < _config.ExternalApps.Count; appIndex++)
+@foreach (var app in _config.ExternalApps.ToList())
 {
-    var app = _config.ExternalApps[appIndex];
     <MudPaper Class="pa-2 my-2">
-        <MudStack Row="true" Justify="Justify.SpaceBetween"><MudText Typo="Typo.h6">@app.Name</MudText><MudButton Color="Color.Error" OnClick="() => RemoveExternalApp(appIndex)">Delete</MudButton></MudStack>
+        <MudStack Row="true" Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.h6">@app.Name</MudText>
+            <MudButton Color="Color.Error" OnClick="@(() => RemoveExternalApp(app))">Delete</MudButton>
+        </MudStack>
+
         <MudTextField @bind-Value="app.Name" Label="App name" />
         <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
         <MudSwitch @bind-Value="app.IsEnabled" Label="Enabled" />
@@ -21,64 +24,100 @@
 }
 
 <MudText Typo="Typo.h5" Class="mt-4">Automations</MudText>
-@for (int bindingIndex = 0; bindingIndex < _config.Bindings.Count; bindingIndex++)
+@foreach (var binding in _config.Bindings.ToList())
 {
-    var binding = _config.Bindings[bindingIndex];
     <MudExpansionPanels>
         <MudExpansionPanel Text="@(string.IsNullOrWhiteSpace(binding.Name) ? "Automation" : binding.Name)">
-            <MudButton Color="Color.Error" OnClick="() => RemoveBinding(bindingIndex)">Delete automation</MudButton>
+            <MudButton Color="Color.Error" OnClick="@(() => RemoveBinding(binding))">Delete automation</MudButton>
+
             <MudTextField @bind-Value="binding.Name" Label="Automation name" />
             <MudSwitch @bind-Value="binding.IsEnabled" Label="Enabled" />
+
             <MudSelect T="string" @bind-Value="binding.EventType" Label="When">
-                @foreach (var ev in DiceEventCatalog.Entries) { <MudSelectItem Value="@ev.Type">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem> }
+                @foreach (var ev in DiceEventCatalog.Entries)
+                {
+                    <MudSelectItem T="string" Value="@ev.Type">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
+                }
             </MudSelect>
 
             <MudPaper Class="pa-2 my-2">
-                <MudSwitch T="bool" Value="@_conditionEnabled.GetValueOrDefault(binding.Id)" ValueChanged="@(v => _conditionEnabled[binding.Id] = v)" Label="Enable condition" />
-                @if (_conditionEnabled.GetValueOrDefault(binding.Id))
+                <MudSwitch T="bool"
+                           Value="@GetConditionEnabled(binding)"
+                           ValueChanged="@((bool value) => SetConditionEnabled(binding, value))"
+                           Label="Enable condition" />
+
+                @if (GetConditionEnabled(binding))
                 {
-                    binding.Condition ??= new EventCondition();
-                    <MudTextField @bind-Value="binding.Condition.Left" Label="Left value (ex: Data.percentage)" />
-                    <MudSelect T="string" @bind-Value="binding.Condition.Operator" Label="Operator">
-                        @foreach (var op in _operators) { <MudSelectItem Value="@op">@op</MudSelectItem> }
+                    var condition = EnsureCondition(binding);
+
+                    <MudTextField @bind-Value="condition.Left" Label="Left value (ex: Data.percentage)" />
+
+                    <MudSelect T="string" @bind-Value="condition.Operator" Label="Operator">
+                        @foreach (var op in _operators)
+                        {
+                            <MudSelectItem T="string" Value="@op">@op</MudSelectItem>
+                        }
                     </MudSelect>
-                    <MudTextField @bind-Value="binding.Condition.Right" Label="Right value" />
-                    <MudSwitch @bind-Value="binding.Condition.TriggerOnlyOnCrossing" Label="Trigger only when crossing threshold" />
-                    @if (binding.Condition.TriggerOnlyOnCrossing)
+
+                    <MudTextField @bind-Value="condition.Right" Label="Right value" />
+                    <MudSwitch @bind-Value="condition.TriggerOnlyOnCrossing" Label="Trigger only when crossing threshold" />
+
+                    @if (condition.TriggerOnlyOnCrossing)
                     {
-                        <MudSelect T="string" @bind-Value="binding.Condition.CrossingDirection" Label="Crossing direction">
-                            <MudSelectItem Value="@(\"Below\")">Below</MudSelectItem>
-                            <MudSelectItem Value="@(\"Above\")">Above</MudSelectItem>
+                        <MudSelect T="string" @bind-Value="condition.CrossingDirection" Label="Crossing direction">
+                            <MudSelectItem T="string" Value="@("Below")">Below</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("Above")">Above</MudSelectItem>
                         </MudSelect>
                     }
                 }
-                else { binding.Condition = null; }
             </MudPaper>
 
             <MudText Typo="Typo.subtitle2">Template placeholders for selected event</MudText>
-            @foreach (var ph in GetPlaceholders(binding.EventType)) { <MudChip T="string" Class="ma-1">@ph</MudChip> }
-
-            <MudButton OnClick="() => AddHttp(binding)">Add HTTP Request</MudButton>
-            <MudButton OnClick="() => AddDelay(binding)">Add Delay</MudButton>
-
-            @for (int actionIndex = 0; actionIndex < binding.Actions.Count; actionIndex++)
+            @foreach (var ph in GetPlaceholders(binding.EventType))
             {
-                var action = binding.Actions[actionIndex];
+                <MudChip T="string" Class="ma-1">@ph</MudChip>
+            }
+
+            <MudButton OnClick="@(() => AddHttp(binding))">Add HTTP Request</MudButton>
+            <MudButton OnClick="@(() => AddDelay(binding))">Add Delay</MudButton>
+
+            @foreach (var action in binding.Actions.ToList())
+            {
                 <MudPaper Class="pa-2 my-2">
-                    <MudStack Row="true"><MudButton OnClick="() => MoveActionUp(binding, actionIndex)">↑</MudButton><MudButton OnClick="() => MoveActionDown(binding, actionIndex)">↓</MudButton><MudButton Color="Color.Error" OnClick="() => RemoveAction(binding, actionIndex)">Delete action</MudButton></MudStack>
+                    <MudStack Row="true">
+                        <MudButton OnClick="@(() => MoveActionUp(binding, action))">↑</MudButton>
+                        <MudButton OnClick="@(() => MoveActionDown(binding, action))">↓</MudButton>
+                        <MudButton Color="Color.Error" OnClick="@(() => RemoveAction(binding, action))">Delete action</MudButton>
+                    </MudStack>
+
                     <MudTextField @bind-Value="action.Name" Label="Action name" />
                     <MudSwitch @bind-Value="action.ContinueOnFailure" Label="Continue on failure" />
+
                     @if (action is HttpRequestActionDefinition http)
                     {
                         <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="External app (optional)">
-                            <MudSelectItem Value="@( (Guid?)null)">None (use absolute URL)</MudSelectItem>
-                            @foreach (var app in _config.ExternalApps) { <MudSelectItem Value="@app.Id">@app.Name</MudSelectItem> }
+                            <MudSelectItem T="Guid?" Value="@((Guid?)null)">None (use absolute URL)</MudSelectItem>
+                            @foreach (var app in _config.ExternalApps)
+                            {
+                                <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
+                            }
                         </MudSelect>
-                        <MudSelect T="string" @bind-Value="http.Method" Label="Method">@foreach (var method in _methods) { <MudSelectItem Value="@method">@method</MudSelectItem> }</MudSelect>
+
+                        <MudSelect T="string" @bind-Value="http.Method" Label="Method">
+                            @foreach (var method in _methods)
+                            {
+                                <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
+                            }
+                        </MudSelect>
+
                         <MudTextField @bind-Value="http.Url" Label="URL or relative path" />
                         <MudTextField @bind-Value="http.BodyTemplate" Label="Body template" Lines="3" />
                         <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="Timeout (ms)" />
-                        <MudTextField T="string" Value="@GetHeadersText(http.Headers)" ValueChanged="@((string v) => SetHeadersFromText(http, v ?? string.Empty))" Label="Headers (one per line: Name: value)" Lines="4" />
+                        <MudTextField T="string"
+                                      Value="@GetHeadersText(http.Headers)"
+                                      ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
+                                      Label="Headers (one per line: Name: value)"
+                                      Lines="4" />
                     }
                     else if (action is DelayActionDefinition delay)
                     {
@@ -95,7 +134,14 @@
 {
     @foreach (var log in dispatcher.Logs)
     {
-        <MudPaper Class="pa-2 my-1"><b>@log.Timestamp.ToLocalTime()</b> | @log.AutomationName | @log.EventType | @(log.Success ? "Success" : "Failed") | @log.StatusCode | @log.ErrorMessage</MudPaper>
+        <MudPaper Class="pa-2 my-1">
+            <b>@log.Timestamp.ToLocalTime()</b> |
+            @log.AutomationName |
+            @log.EventType |
+            @(log.Success ? "Success" : "Failed") |
+            @log.StatusCode |
+            @log.ErrorMessage
+        </MudPaper>
     }
 }
 
@@ -108,20 +154,135 @@
     protected override async Task OnInitializedAsync()
     {
         _config = await ConfigService.GetConfigurationAsync();
-        foreach (var binding in _config.Bindings) _conditionEnabled[binding.Id] = binding.Condition is not null;
+
+        foreach (var binding in _config.Bindings)
+        {
+            _conditionEnabled[binding.Id] = binding.Condition is not null;
+        }
     }
 
-    private void AddExternalApp() => _config.ExternalApps.Add(new ExternalAppDefinition { Name = "New app" });
-    private void RemoveExternalApp(int index) => _config.ExternalApps.RemoveAt(index);
-    private void AddBinding() { var b = new EventActionBinding { Name = "New automation", EventType = DiceEventTypes.InitiativeNext }; _config.Bindings.Add(b); _conditionEnabled[b.Id] = false; }
-    private void RemoveBinding(int index) => _config.Bindings.RemoveAt(index);
-    private void AddHttp(EventActionBinding b) => b.Actions.Add(new HttpRequestActionDefinition { Name = "HTTP request", Type = "HttpRequest", Method = "POST", Url = "https://example.local/api" });
-    private void AddDelay(EventActionBinding b) => b.Actions.Add(new DelayActionDefinition { Name = "Delay", Type = "Delay", Milliseconds = 100 });
-    private void RemoveAction(EventActionBinding b, int i) => b.Actions.RemoveAt(i);
-    private void MoveActionUp(EventActionBinding b, int i) { if (i <= 0) return; (b.Actions[i - 1], b.Actions[i]) = (b.Actions[i], b.Actions[i - 1]); }
-    private void MoveActionDown(EventActionBinding b, int i) { if (i >= b.Actions.Count - 1) return; (b.Actions[i + 1], b.Actions[i]) = (b.Actions[i], b.Actions[i + 1]); }
-    private static IReadOnlyList<string> GetPlaceholders(string type) => DiceEventCatalog.Entries.FirstOrDefault(x => x.Type == type)?.CommonPlaceholders ?? [];
-    private static string GetHeadersText(Dictionary<string, string> headers) => string.Join("\n", headers.Select(h => $"{h.Key}: {h.Value}"));
+    private void AddExternalApp()
+    {
+        _config.ExternalApps.Add(new ExternalAppDefinition { Name = "New app" });
+    }
+
+    private void RemoveExternalApp(ExternalAppDefinition app)
+    {
+        _config.ExternalApps.Remove(app);
+
+        foreach (var binding in _config.Bindings)
+        {
+            foreach (var action in binding.Actions.OfType<HttpRequestActionDefinition>())
+            {
+                if (action.ExternalAppId == app.Id)
+                {
+                    action.ExternalAppId = null;
+                }
+            }
+        }
+    }
+
+    private void AddBinding()
+    {
+        var binding = new EventActionBinding
+        {
+            Name = "New automation",
+            EventType = DiceEventTypes.InitiativeNext
+        };
+
+        _config.Bindings.Add(binding);
+        _conditionEnabled[binding.Id] = false;
+    }
+
+    private void RemoveBinding(EventActionBinding binding)
+    {
+        _config.Bindings.Remove(binding);
+        _conditionEnabled.Remove(binding.Id);
+    }
+
+    private void AddHttp(EventActionBinding binding)
+    {
+        binding.Actions.Add(new HttpRequestActionDefinition
+        {
+            Name = "HTTP request",
+            Type = "HttpRequest",
+            Method = "POST",
+            Url = "https://example.local/api"
+        });
+    }
+
+    private void AddDelay(EventActionBinding binding)
+    {
+        binding.Actions.Add(new DelayActionDefinition
+        {
+            Name = "Delay",
+            Type = "Delay",
+            Milliseconds = 100
+        });
+    }
+
+    private void RemoveAction(EventActionBinding binding, ActionDefinition action)
+    {
+        binding.Actions.Remove(action);
+    }
+
+    private void MoveActionUp(EventActionBinding binding, ActionDefinition action)
+    {
+        int index = binding.Actions.IndexOf(action);
+        if (index <= 0)
+        {
+            return;
+        }
+
+        (binding.Actions[index - 1], binding.Actions[index]) = (binding.Actions[index], binding.Actions[index - 1]);
+    }
+
+    private void MoveActionDown(EventActionBinding binding, ActionDefinition action)
+    {
+        int index = binding.Actions.IndexOf(action);
+        if (index < 0 || index >= binding.Actions.Count - 1)
+        {
+            return;
+        }
+
+        (binding.Actions[index + 1], binding.Actions[index]) = (binding.Actions[index], binding.Actions[index + 1]);
+    }
+
+    private bool GetConditionEnabled(EventActionBinding binding)
+    {
+        return _conditionEnabled.GetValueOrDefault(binding.Id, binding.Condition is not null);
+    }
+
+    private void SetConditionEnabled(EventActionBinding binding, bool enabled)
+    {
+        _conditionEnabled[binding.Id] = enabled;
+
+        if (enabled)
+        {
+            binding.Condition ??= new EventCondition();
+        }
+        else
+        {
+            binding.Condition = null;
+        }
+    }
+
+    private static EventCondition EnsureCondition(EventActionBinding binding)
+    {
+        binding.Condition ??= new EventCondition();
+        return binding.Condition;
+    }
+
+    private static IReadOnlyList<string> GetPlaceholders(string type)
+    {
+        return DiceEventCatalog.Entries.FirstOrDefault(x => x.Type == type)?.CommonPlaceholders ?? [];
+    }
+
+    private static string GetHeadersText(Dictionary<string, string> headers)
+    {
+        return string.Join("\n", headers.Select(header => $"{header.Key}: {header.Value}"));
+    }
+
     private static void SetHeadersFromText(HttpRequestActionDefinition action, string value)
     {
         action.Headers = value.Split('\n', StringSplitOptions.RemoveEmptyEntries)
@@ -129,5 +290,9 @@
             .Where(parts => parts.Length == 2 && !string.IsNullOrWhiteSpace(parts[0]))
             .ToDictionary(parts => parts[0], parts => parts[1]);
     }
-    private async Task Save() => await ConfigService.SaveAsync();
+
+    private async Task Save()
+    {
+        await ConfigService.SaveAsync();
+    }
 }

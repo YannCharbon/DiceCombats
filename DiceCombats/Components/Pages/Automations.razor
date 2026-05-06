@@ -3,147 +3,298 @@
 @inject AutomationConfigurationService ConfigService
 @inject IDiceEventPublisher EventPublisher
 
-<MudText Typo="Typo.h4">Automations</MudText>
-<MudButton OnClick="AddExternalApp">Add external app</MudButton>
-<MudButton OnClick="AddBinding">Add automation</MudButton>
-<MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+<style>
+    .settings-group-name {
+    border-radius: 60px;
+    padding: 0px 20px 0px 0px;
+    margin:10px;
+    background-color: darkcyan;
+    display: flex;
+    align-items: center;
+    }
 
-<MudText Typo="Typo.h5" Class="mt-4">External apps</MudText>
-@foreach (var app in _config.ExternalApps.ToList())
-{
-    <MudPaper Class="pa-2 my-2">
-        <MudStack Row="true" Justify="Justify.SpaceBetween">
-            <MudText Typo="Typo.h6">@app.Name</MudText>
-            <MudButton Color="Color.Error" OnClick="@(() => RemoveExternalApp(app))">Delete</MudButton>
-        </MudStack>
+    .settings-group {
+    margin:10px;
+    padding:10px;
+    border-radius:10px;
+    background-color:#505050;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+    }
 
-        <MudTextField @bind-Value="app.Name" Label="App name" />
-        <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
-        <MudSwitch @bind-Value="app.IsEnabled" Label="Enabled" />
-    </MudPaper>
-}
+    .automation-app-item {
+        padding-top: 10px;
+        padding-right: 10px;
+        min-width: 30%;
+        max-width: 30%;
+    }
 
-<MudText Typo="Typo.h5" Class="mt-4">Automations</MudText>
-@foreach (var binding in _config.Bindings.ToList())
-{
-    <MudExpansionPanels>
-        <MudExpansionPanel Text="@(string.IsNullOrWhiteSpace(binding.Name) ? "Automation" : binding.Name)">
-            <MudButton Color="Color.Error" OnClick="@(() => RemoveBinding(binding))">Delete automation</MudButton>
+    @@media screen and (max-width: 768px) {
+        .automation-app-item {
+            min-width: 100%; /* Adjust for smaller screens */
+            max-width: 100%;
+        }
+    }
 
-            <MudTextField @bind-Value="binding.Name" Label="Automation name" />
-            <MudSwitch @bind-Value="binding.IsEnabled" Label="Enabled" />
+    .automation-item {
+        padding-top: 10px;
+        padding-right: 10px;
+        min-width: 30%;
+        max-width: 50%;
+    }
 
-            <MudSelect T="string" @bind-Value="binding.EventType" Label="When">
-                @foreach (var ev in DiceEventCatalog.Entries)
-                {
-                    <MudSelectItem T="string" Value="@ev.Type">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
-                }
-            </MudSelect>
+    @@media screen and (max-width: 768px) {
+        .automation-item {
+            min-width: 100%; /* Adjust for smaller screens */
+            max-width: 100%;
+        }
+    }
+</style>
 
-            <MudPaper Class="pa-2 my-2">
-                <MudSwitch T="bool"
-                           Value="@GetConditionEnabled(binding)"
-                           ValueChanged="@((bool value) => SetConditionEnabled(binding, value))"
-                           Label="Enable condition" />
+<div class="settings-group">
+    <div style="display:flex;align-items:center;">
+        <div class="settings-group-name">
+            <MudIcon Icon="@Icons.Material.Filled.AutoFixHigh" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>Automations</h3>
+        </div>
+        <div>
+            <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+        </div>
+    </div>
+    <div>
 
-                @if (GetConditionEnabled(binding))
-                {
-                    var condition = EnsureCondition(binding);
+        <div style="display:flex;align-items:center;">
+            <div style="margin:15px;">
+                <h4>External apps</h4>
+            </div>
+            <div>
+                <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddExternalApp">Add external app</MudButton>
+            </div>
+        </div>
+        @foreach (var app in _config.ExternalApps.ToList())
+        {
+            <MudPaper Class="pa-2 my-2 automation-app-item">
+                <MudStack Row="true" Justify="Justify.SpaceBetween">
+                    <MudText Typo="Typo.h6">@app.Name</MudText>
+                    <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveExternalApp(app))">Delete</MudButton>
+                </MudStack>
 
-                    <MudTextField @bind-Value="condition.Left" Label="Left value (ex: Data.percentage)" />
-
-                    <MudSelect T="string" @bind-Value="condition.Operator" Label="Operator">
-                        @foreach (var op in _operators)
-                        {
-                            <MudSelectItem T="string" Value="@op">@op</MudSelectItem>
-                        }
-                    </MudSelect>
-
-                    <MudTextField @bind-Value="condition.Right" Label="Right value" />
-                    <MudSwitch @bind-Value="condition.TriggerOnlyOnCrossing" Label="Trigger only when crossing threshold" />
-
-                    @if (condition.TriggerOnlyOnCrossing)
-                    {
-                        <MudSelect T="string" @bind-Value="condition.CrossingDirection" Label="Crossing direction">
-                            <MudSelectItem T="string" Value="@("Below")">Below</MudSelectItem>
-                            <MudSelectItem T="string" Value="@("Above")">Above</MudSelectItem>
-                        </MudSelect>
-                    }
-                }
+                <MudTextField @bind-Value="app.Name" Label="App name" />
+                <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
+                <MudSwitch @bind-Value="app.IsEnabled" Color="Color.Primary" Label="@(app.IsEnabled == true ? "Enabled" : "Disabled")" />
             </MudPaper>
+        }
 
-            <MudText Typo="Typo.subtitle2">Template placeholders for selected event</MudText>
-            @foreach (var ph in GetPlaceholders(binding.EventType))
+        <div style="display:flex;align-items:center;">
+            <div style="margin:15px;">
+                <h4>Automations</h4>
+            </div>
+            <div>
+                <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">Add automation</MudButton>
+            </div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap">
+            @foreach (var binding in _config.Bindings.ToList())
             {
-                <MudChip T="string" Class="ma-1">@ph</MudChip>
+                <MudExpansionPanels Class="automation-item">
+                    <MudExpansionPanel>
+                        <TitleContent>
+                            <div style="display:flex;">
+                                <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" class="mr-3"
+                                         Color="@(binding.IsEnabled == true ? Color.Primary : Color.Dark)"></MudIcon>
+                                <MudText Style="font-size: 20px; font-weight:700;">@(string.IsNullOrWhiteSpace(binding.Name) ? "Automation" : binding.Name)</MudText>
+                            </div>
+                        </TitleContent>
+                        <ChildContent>
+                            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveBinding(binding))">Delete automation</MudButton>
+
+                            <MudTextField @bind-Value="binding.Name" Label="Automation name" />
+                            <MudSwitch @bind-Value="binding.IsEnabled" Color="Color.Primary" Label="@(binding.IsEnabled == true ? "Enabled" : "Disabled")" />
+
+                            <MudSelect T="string" @bind-Value="binding.EventType" Label="When">
+                                @foreach (var ev in DiceEventCatalog.Entries)
+                                {
+                                    <MudSelectItem T="string" Value="@ev.Type">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
+                                }
+                            </MudSelect>
+
+                            <MudPaper Class="pa-2 my-2">
+                                <MudSwitch T="bool"
+                                           Value="@GetConditionEnabled(binding)"
+                                           ValueChanged="@((bool value) => SetConditionEnabled(binding, value))"
+                                           Label="Enable condition"
+                                           Color="Color.Primary" />
+
+                                @if (GetConditionEnabled(binding))
+                                {
+                                    var condition = EnsureCondition(binding);
+
+                                    <MudTextField @bind-Value="condition.Left" Label="Left value (ex: Data.percentage)" />
+
+                                    <MudSelect T="string" @bind-Value="condition.Operator" Label="Operator">
+                                        @foreach (var op in _operators)
+                                        {
+                                            <MudSelectItem T="string" Value="@op">@op</MudSelectItem>
+                                        }
+                                    </MudSelect>
+
+                                    <MudTextField @bind-Value="condition.Right" Label="Right value" />
+                                    <MudSwitch @bind-Value="condition.TriggerOnlyOnCrossing" Color="Color.Primary" Label="Trigger only when crossing threshold" />
+
+                                    @if (condition.TriggerOnlyOnCrossing)
+                                    {
+                                        <MudSelect T="string" @bind-Value="condition.CrossingDirection" Label="Crossing direction">
+                                            <MudSelectItem T="string" Value="@("Below")">Below</MudSelectItem>
+                                            <MudSelectItem T="string" Value="@("Above")">Above</MudSelectItem>
+                                        </MudSelect>
+                                    }
+                                }
+                            </MudPaper>
+
+                            <MudText Typo="Typo.subtitle2">Template placeholders for selected event</MudText>
+                            @foreach (var ph in GetPlaceholders(binding.EventType))
+                            {
+                                <MudChip T="string" Class="ma-1">@ph</MudChip>
+                            }
+
+                            <MudText Typo="Typo.h6" Class="mt-4">Actions sequence</MudText>
+
+                            <div style="display:flex; padding:20px; overflow-x: scroll;">
+                                <div style="padding:10px; border-radius:30px; height:80px; width:120px; min-width:120px; background-color:deeppink; font-weight:700; text-align:center; font-size:12px;">
+                                    <div style="justify-content:center;">
+                                        <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Title="Event" />
+                                    </div>
+                                    <div style="justify-content:center;">
+                                        @binding.Name
+                                    </div>
+                                </div>
+                                <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
+                                    - - - - >
+                                </div>
+                                @foreach (var action in binding.Actions.ToList())
+                                {
+                                    @if (action is HttpRequestActionDefinition http)
+                                    {
+                                        <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:teal; font-weight:700; text-align:center; font-size:14px;">
+                                            <div style="justify-content:center;">
+                                                <MudIcon Icon="@Icons.Material.Filled.RocketLaunch" Title="Action" />
+                                            </div>
+                                            <div style="justify-content:center;">
+                                                @http.Name
+                                            </div>
+
+                                        </div>
+                                    }
+                                    else if (action is DelayActionDefinition delay)
+                                    {
+                                        <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:darkgoldenrod; font-weight:700; text-align:center; font-size:14px;">
+                                            <div style="justify-content:center;">
+                                                <MudIcon Icon="@Icons.Material.Filled.AccessTime" Title="Action" />
+                                            </div>
+                                            <div style="justify-content:center;">
+                                                @delay.Milliseconds
+                                            </div>
+                                        </div>
+                                    }
+                                    <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
+                                        - - - - >
+                                    </div>
+                                }
+                                <div style="padding:10px; border-radius:30px; height:80px; width:60px; min-width:60px; background-color:deeppink; font-weight:700; text-align:center; font-size:14px;">
+                                    <div style="justify-content:center;">
+                                        <MudIcon Icon="@Icons.Material.Filled.Stop" Title="End" />
+                                    </div>
+                                    <div style="justify-content:center;">
+                                        End
+                                    </div>
+                                </div>
+                            </div>
+
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Launch" OnClick="@(() => AddHttp(binding))">Add HTTP Request</MudButton>
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AccessTime" OnClick="@(() => AddDelay(binding))">Add Delay</MudButton>
+
+                            @foreach (var action in binding.Actions.ToList())
+                            {
+                                <MudPaper Class="pa-2 my-2" Style="padding:10px;background-color:#202020;border-radius:10px;">
+                                    <MudStack Row="true">
+                                        <MudButton OnClick="@(() => MoveActionUp(binding, action))">↑</MudButton>
+                                        <MudButton OnClick="@(() => MoveActionDown(binding, action))">↓</MudButton>
+                                        <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveAction(binding, action))">Delete action</MudButton>
+                                    </MudStack>
+
+                                    <MudTextField @bind-Value="action.Name" Label="Action name" />
+                                    <MudSwitch @bind-Value="action.ContinueOnFailure" Color="Color.Primary" Label="Continue on failure" />
+
+                                    @if (action is HttpRequestActionDefinition http)
+                                    {
+                                        <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="External app (optional)">
+                                            <MudSelectItem T="Guid?" Value="@((Guid?)null)">None (use absolute URL)</MudSelectItem>
+                                            @foreach (var app in _config.ExternalApps)
+                                            {
+                                                <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
+                                            }
+                                        </MudSelect>
+
+                                        <MudSelect T="string" @bind-Value="http.Method" Label="Method">
+                                            @foreach (var method in _methods)
+                                            {
+                                                <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
+                                            }
+                                        </MudSelect>
+
+                                        <MudTextField @bind-Value="http.Url" Label="@(http.ExternalAppId == null ? "Endpoint absolute URL" : "Endpoint relative path")" />
+                                        <MudTextField @bind-Value="http.BodyTemplate" Label="Body template" Lines="3" />
+                                        <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="Timeout (ms)" />
+                                        <MudTextField T="string"
+                                                      Value="@GetHeadersText(http.Headers)"
+                                                      ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
+                                                      Label="Headers (one per line: Name: value)"
+                                                      Lines="4" />
+                                    }
+                                    else if (action is DelayActionDefinition delay)
+                                    {
+                                        <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="Delay milliseconds" />
+                                    }
+                                </MudPaper>
+                            }
+                        </ChildContent>
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
             }
+        </div>
+    </div>
+</div>
 
-            <MudButton OnClick="@(() => AddHttp(binding))">Add HTTP Request</MudButton>
-            <MudButton OnClick="@(() => AddDelay(binding))">Add Delay</MudButton>
 
-            @foreach (var action in binding.Actions.ToList())
+
+
+<div class="settings-group">
+    <div style="display:flex;">
+        <div class="settings-group-name">
+            <MudIcon Icon="@Icons.Material.Filled.Dvr" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>Delivery logs</h3>
+        </div>
+    </div>
+    <div>
+
+        @if (EventPublisher is DiceEventDispatcher dispatcher)
+        {
+            @foreach (var log in dispatcher.Logs)
             {
-                <MudPaper Class="pa-2 my-2">
-                    <MudStack Row="true">
-                        <MudButton OnClick="@(() => MoveActionUp(binding, action))">↑</MudButton>
-                        <MudButton OnClick="@(() => MoveActionDown(binding, action))">↓</MudButton>
-                        <MudButton Color="Color.Error" OnClick="@(() => RemoveAction(binding, action))">Delete action</MudButton>
-                    </MudStack>
-
-                    <MudTextField @bind-Value="action.Name" Label="Action name" />
-                    <MudSwitch @bind-Value="action.ContinueOnFailure" Label="Continue on failure" />
-
-                    @if (action is HttpRequestActionDefinition http)
-                    {
-                        <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="External app (optional)">
-                            <MudSelectItem T="Guid?" Value="@((Guid?)null)">None (use absolute URL)</MudSelectItem>
-                            @foreach (var app in _config.ExternalApps)
-                            {
-                                <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
-                            }
-                        </MudSelect>
-
-                        <MudSelect T="string" @bind-Value="http.Method" Label="Method">
-                            @foreach (var method in _methods)
-                            {
-                                <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
-                            }
-                        </MudSelect>
-
-                        <MudTextField @bind-Value="http.Url" Label="URL or relative path" />
-                        <MudTextField @bind-Value="http.BodyTemplate" Label="Body template" Lines="3" />
-                        <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="Timeout (ms)" />
-                        <MudTextField T="string"
-                                      Value="@GetHeadersText(http.Headers)"
-                                      ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
-                                      Label="Headers (one per line: Name: value)"
-                                      Lines="4" />
-                    }
-                    else if (action is DelayActionDefinition delay)
-                    {
-                        <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="Delay milliseconds" />
-                    }
+                <MudPaper Class="pa-2 my-1">
+                    <b>@log.Timestamp.ToLocalTime()</b> |
+                    @log.AutomationName |
+                    @log.EventType |
+                    @(log.Success ? "Success" : "Failed") |
+                    @log.StatusCode |
+                    @log.ErrorMessage
                 </MudPaper>
             }
-        </MudExpansionPanel>
-    </MudExpansionPanels>
-}
+        }
+    </div>
+</div>
 
-<MudText Typo="Typo.h5" Class="mt-4">Delivery log</MudText>
-@if (EventPublisher is DiceEventDispatcher dispatcher)
-{
-    @foreach (var log in dispatcher.Logs)
-    {
-        <MudPaper Class="pa-2 my-1">
-            <b>@log.Timestamp.ToLocalTime()</b> |
-            @log.AutomationName |
-            @log.EventType |
-            @(log.Success ? "Success" : "Failed") |
-            @log.StatusCode |
-            @log.ErrorMessage
-        </MudPaper>
-    }
-}
+
 
 @code {
     private AutomationConfiguration _config = new();

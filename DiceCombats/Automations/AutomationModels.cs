@@ -56,6 +56,7 @@ public static class EventTriggerKinds
     public const string NumericIncreased = "NumericIncreased";
     public const string NumericDecreased = "NumericDecreased";
     public const string NumericThreshold = "NumericThreshold";
+    public const string NumericReachedMaxValue = "NumericReachedMaxValue";
     public const string HitPointsChanged = "HitPointsChanged";
     public const string HitPointsDamaged = "HitPointsDamaged";
     public const string HitPointsHealed = "HitPointsHealed";
@@ -114,6 +115,7 @@ public static class EventTriggerCatalog
         new() { Kind = EventTriggerKinds.NumericIncreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field increased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.NumericDecreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field decreased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.NumericThreshold, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field crossed a value", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true, NeedsThreshold = true, ThresholdLabel = "Numeric value" },
+        new() { Kind = EventTriggerKinds.NumericReachedMaxValue, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field reached max value", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.HitPointsChanged, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points changed", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.HitPointsDamaged, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points decreased", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.HitPointsHealed, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points increased", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true },

@@ -1,8 +1,8 @@
 @page "/automations"
 @using DiceCombats.Automations
+@using DiceCombats.Components.BlazorComponents.Automations
 @inject AutomationConfigurationService ConfigService
 @inject IDiceEventPublisher EventPublisher
-@inject DiceCombatsService CombatService
 
 <style>
     .settings-group-name {
@@ -61,287 +61,34 @@
             <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
         </div>
     </div>
-    <div>
 
-        <div style="display:flex;align-items:center;">
-            <div style="margin:15px;">
-                <h4>External apps</h4>
-            </div>
-            <div>
-                <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddExternalApp">Add external app</MudButton>
-            </div>
+    <ExternalAppsEditor ExternalApps="_config.ExternalApps" OnAdd="AddExternalApp" OnRemove="RemoveExternalApp" />
+
+    <div style="display:flex;align-items:center;">
+        <div style="margin:15px;">
+            <h4>Automations</h4>
         </div>
-        @foreach (var app in _config.ExternalApps.ToList())
-        {
-            <MudPaper Class="pa-2 my-2 automation-app-item">
-                <MudStack Row="true" Justify="Justify.SpaceBetween">
-                    <MudText Typo="Typo.h6">@app.Name</MudText>
-                    <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveExternalApp(app))">Delete</MudButton>
-                </MudStack>
-
-                <MudTextField @bind-Value="app.Name" Label="App name" />
-                <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
-                <MudSwitch @bind-Value="app.IsEnabled" Color="Color.Primary" Label="@(app.IsEnabled == true ? "Enabled" : "Disabled")" />
-            </MudPaper>
-        }
-
-        <div style="display:flex;align-items:center;">
-            <div style="margin:15px;">
-                <h4>Automations</h4>
-            </div>
-            <div>
-                <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">Add automation</MudButton>
-            </div>
-        </div>
-
-        <div style="display:flex; flex-wrap:wrap">
-            @foreach (var binding in _config.Bindings.ToList())
-            {
-                <MudExpansionPanels Class="automation-item">
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <div style="display:flex;">
-                                <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" class="mr-3"
-                                         Color="@(binding.IsEnabled == true ? Color.Primary : Color.Dark)"></MudIcon>
-                                <MudText Style="font-size: 20px; font-weight:700;">@(string.IsNullOrWhiteSpace(binding.Name) ? "Automation" : binding.Name)</MudText>
-                            </div>
-                        </TitleContent>
-                        <ChildContent>
-                            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveBinding(binding))">Delete automation</MudButton>
-
-                            <MudTextField @bind-Value="binding.Name" Label="Automation name" />
-                            <MudSwitch @bind-Value="binding.IsEnabled" Color="Color.Primary" Label="@(binding.IsEnabled == true ? "Enabled" : "Disabled")" />
-
-                            @{
-                                var trigger = EnsureTrigger(binding);
-                                var triggerEntry = GetTriggerEntry(trigger);
-                            }
-
-                            <MudPaper Class="pa-2 my-2" Style="background-color:#202020;border-radius:10px;">
-                                <MudText Typo="Typo.h6">When</MudText>
-                                <MudSelect T="string" Value="@trigger.Kind" ValueChanged="@((string value) => SetTriggerKind(binding, value))" Label="Trigger">
-                                    @foreach (var ev in EventTriggerCatalog.Entries)
-                                    {
-                                        <MudSelectItem T="string" Value="@ev.Kind">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
-                                    }
-                                </MudSelect>
-
-                                @if (triggerEntry.SupportsCreatureFilter)
-                                {
-                                    <MudSelect T="string"
-                                               MultiSelection="true"
-                                               SelectedValues="@trigger.CreatureNames"
-                                               SelectedValuesChanged="@((IEnumerable<string> values) => trigger.CreatureNames = values.ToList())"
-                                               Label="Creatures (empty = any creature)">
-                                        @foreach (var creatureName in GetCreatureNames())
-                                        {
-                                            <MudSelectItem T="string" Value="@creatureName">@creatureName</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                }
-
-                                @if (triggerEntry.NeedsField)
-                                {
-                                    <MudSelect T="string" @bind-Value="trigger.FieldTitle" Label="Custom field (empty = any matching field)">
-                                        <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-                                        @foreach (var field in GetFieldChoices(triggerEntry))
-                                        {
-                                            <MudSelectItem T="string" Value="@field.Title">@field.DisplayName</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                }
-
-                                @if (triggerEntry.NeedsOption)
-                                {
-                                    <MudSelect T="string" @bind-Value="trigger.OptionName" Label="Option (empty = any option)">
-                                        <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-                                        @foreach (var optionName in GetOptionNames(triggerEntry.FieldType, trigger.FieldTitle))
-                                        {
-                                            <MudSelectItem T="string" Value="@optionName">@optionName</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                }
-
-                                @if (triggerEntry.NeedsStat)
-                                {
-                                    <MudSelect T="string" @bind-Value="trigger.StatName" Label="Stat (empty = any stat)">
-                                        <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-                                        @foreach (var statName in GetStatNames(trigger.FieldTitle))
-                                        {
-                                            <MudSelectItem T="string" Value="@statName">@statName</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                }
-
-                                @if (triggerEntry.NeedsThreshold)
-                                {
-                                    <MudSelect T="string" @bind-Value="trigger.ThresholdOperator" Label="Comparison">
-                                        @foreach (var op in _thresholdOperators)
-                                        {
-                                            <MudSelectItem T="string" Value="@op">@op</MudSelectItem>
-                                        }
-                                    </MudSelect>
-                                    <MudNumericField T="double?" @bind-Value="trigger.ThresholdValue" Label="@triggerEntry.ThresholdLabel" />
-                                    <MudSwitch @bind-Value="trigger.TriggerOnlyOnCrossing" Color="Color.Primary" Label="Only when the value crosses this threshold" />
-                                }
-
-                                <MudText Typo="Typo.caption">@GetTriggerSummary(trigger)</MudText>
-                            </MudPaper>
-
-                            <MudText Typo="Typo.h6" Class="mt-4">Actions sequence</MudText>
-
-                            <div style="display:flex; padding:20px; overflow-x: scroll;">
-                                <div style="padding:10px; border-radius:30px; height:80px; width:120px; min-width:120px; background-color:deeppink; font-weight:700; text-align:center; font-size:12px;">
-                                    <div style="justify-content:center;">
-                                        <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Title="Event" />
-                                    </div>
-                                    <div style="justify-content:center;">
-                                        @binding.Name
-                                    </div>
-                                </div>
-                                <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
-                                    - - - - >
-                                </div>
-                                @foreach (var action in binding.Actions.ToList())
-                                {
-                                    @if (action is HttpRequestActionDefinition http)
-                                    {
-                                        <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:teal; font-weight:700; text-align:center; font-size:14px;">
-                                            <div style="justify-content:center;">
-                                                <MudIcon Icon="@Icons.Material.Filled.RocketLaunch" Title="Action" />
-                                            </div>
-                                            <div style="justify-content:center;">
-                                                @http.Name
-                                            </div>
-
-                                        </div>
-                                    }
-                                    else if (action is DelayActionDefinition delay)
-                                    {
-                                        <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:darkgoldenrod; font-weight:700; text-align:center; font-size:14px;">
-                                            <div style="justify-content:center;">
-                                                <MudIcon Icon="@Icons.Material.Filled.AccessTime" Title="Action" />
-                                            </div>
-                                            <div style="justify-content:center;">
-                                                @delay.Milliseconds
-                                            </div>
-                                        </div>
-                                    }
-                                    <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
-                                        - - - - >
-                                    </div>
-                                }
-                                <div style="padding:10px; border-radius:30px; height:80px; width:60px; min-width:60px; background-color:deeppink; font-weight:700; text-align:center; font-size:14px;">
-                                    <div style="justify-content:center;">
-                                        <MudIcon Icon="@Icons.Material.Filled.Stop" Title="End" />
-                                    </div>
-                                    <div style="justify-content:center;">
-                                        End
-                                    </div>
-                                </div>
-                            </div>
-
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Launch" OnClick="@(() => AddHttp(binding))">Add HTTP Request</MudButton>
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AccessTime" OnClick="@(() => AddDelay(binding))">Add Delay</MudButton>
-
-                            @foreach (var action in binding.Actions.ToList())
-                            {
-                                <MudPaper Class="pa-2 my-2" Style="padding:10px;background-color:#202020;border-radius:10px;">
-                                    <MudStack Row="true">
-                                        <MudButton OnClick="@(() => MoveActionUp(binding, action))">↑</MudButton>
-                                        <MudButton OnClick="@(() => MoveActionDown(binding, action))">↓</MudButton>
-                                        <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveAction(binding, action))">Delete action</MudButton>
-                                    </MudStack>
-
-                                    <MudTextField @bind-Value="action.Name" Label="Action name" />
-                                    <MudSwitch @bind-Value="action.ContinueOnFailure" Color="Color.Primary" Label="Continue on failure" />
-
-                                    @if (action is HttpRequestActionDefinition http)
-                                    {
-                                        <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="External app (optional)">
-                                            <MudSelectItem T="Guid?" Value="@((Guid?)null)">None (use absolute URL)</MudSelectItem>
-                                            @foreach (var app in _config.ExternalApps)
-                                            {
-                                                <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
-                                            }
-                                        </MudSelect>
-
-                                        <MudSelect T="string" @bind-Value="http.Method" Label="Method">
-                                            @foreach (var method in _methods)
-                                            {
-                                                <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
-                                            }
-                                        </MudSelect>
-
-                                        <MudTextField @bind-Value="http.Url" Label="@(http.ExternalAppId == null ? "Endpoint absolute URL" : "Endpoint relative path")" />
-                                        <MudTextField @bind-Value="http.BodyTemplate" Label="Body template" Lines="3" />
-                                        <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="Timeout (ms)" />
-                                        <MudTextField T="string"
-                                                      Value="@GetHeadersText(http.Headers)"
-                                                      ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
-                                                      Label="Headers (one per line: Name: value)"
-                                                      Lines="4" />
-                                    }
-                                    else if (action is DelayActionDefinition delay)
-                                    {
-                                        <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="Delay milliseconds" />
-                                    }
-                                </MudPaper>
-                            }
-                        </ChildContent>
-                    </MudExpansionPanel>
-                </MudExpansionPanels>
-            }
+        <div>
+            <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">Add automation</MudButton>
         </div>
     </div>
-</div>
 
-
-
-
-<div class="settings-group">
-    <div style="display:flex;">
-        <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Dvr" Size="@Size.Large" style="color:white;margin:10px;" />
-            <h3>Delivery logs</h3>
-        </div>
-    </div>
-    <div>
-
-        @if (EventPublisher is DiceEventDispatcher dispatcher)
+    <div style="display:flex; flex-wrap:wrap">
+        @foreach (var binding in _config.Bindings.ToList())
         {
-            @foreach (var log in dispatcher.Logs)
-            {
-                <MudPaper Class="pa-2 my-1">
-                    <b>@log.Timestamp.ToLocalTime()</b> |
-                    @log.AutomationName |
-                    @log.EventType |
-                    @(log.Success ? "Success" : "Failed") |
-                    @log.StatusCode |
-                    @log.ErrorMessage
-                </MudPaper>
-            }
+            <AutomationBindingEditor Binding="binding" ExternalApps="_config.ExternalApps" OnRemove="RemoveBinding" />
         }
     </div>
 </div>
 
-
+<DeliveryLogViewer EventPublisher="EventPublisher" />
 
 @code {
     private AutomationConfiguration _config = new();
-    private readonly Dictionary<Guid, bool> _conditionEnabled = new();
-    private readonly List<string> _operators = ["Exists", "Equals", "NotEquals", "Contains", "Below", "BelowOrEqual", "Above", "AboveOrEqual"];
-    private readonly List<string> _methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
-    private readonly List<string> _thresholdOperators = ["Below", "BelowOrEqual", "Above", "AboveOrEqual"];
 
     protected override async Task OnInitializedAsync()
     {
         _config = await ConfigService.GetConfigurationAsync();
-
-        foreach (var binding in _config.Bindings)
-        {
-            _conditionEnabled[binding.Id] = binding.Condition is not null;
-        }
     }
 
     private void AddExternalApp()
@@ -367,240 +114,16 @@
 
     private void AddBinding()
     {
-        var binding = new EventActionBinding
+        _config.Bindings.Add(new EventActionBinding
         {
             Name = "New automation",
-            EventType = DiceEventTypes.InitiativeNext,
             Trigger = new EventTriggerDefinition { Kind = EventTriggerKinds.InitiativeNext }
-        };
-
-        _config.Bindings.Add(binding);
-        _conditionEnabled[binding.Id] = false;
+        });
     }
 
     private void RemoveBinding(EventActionBinding binding)
     {
         _config.Bindings.Remove(binding);
-        _conditionEnabled.Remove(binding.Id);
-    }
-
-    private void AddHttp(EventActionBinding binding)
-    {
-        binding.Actions.Add(new HttpRequestActionDefinition
-        {
-            Name = "HTTP request",
-            Type = "HttpRequest",
-            Method = "POST",
-            Url = "https://example.local/api"
-        });
-    }
-
-    private void AddDelay(EventActionBinding binding)
-    {
-        binding.Actions.Add(new DelayActionDefinition
-        {
-            Name = "Delay",
-            Type = "Delay",
-            Milliseconds = 100
-        });
-    }
-
-    private void RemoveAction(EventActionBinding binding, ActionDefinition action)
-    {
-        binding.Actions.Remove(action);
-    }
-
-    private void MoveActionUp(EventActionBinding binding, ActionDefinition action)
-    {
-        int index = binding.Actions.IndexOf(action);
-        if (index <= 0)
-        {
-            return;
-        }
-
-        (binding.Actions[index - 1], binding.Actions[index]) = (binding.Actions[index], binding.Actions[index - 1]);
-    }
-
-    private void MoveActionDown(EventActionBinding binding, ActionDefinition action)
-    {
-        int index = binding.Actions.IndexOf(action);
-        if (index < 0 || index >= binding.Actions.Count - 1)
-        {
-            return;
-        }
-
-        (binding.Actions[index + 1], binding.Actions[index]) = (binding.Actions[index], binding.Actions[index + 1]);
-    }
-
-    private bool GetConditionEnabled(EventActionBinding binding)
-    {
-        return _conditionEnabled.GetValueOrDefault(binding.Id, binding.Condition is not null);
-    }
-
-    private void SetConditionEnabled(EventActionBinding binding, bool enabled)
-    {
-        _conditionEnabled[binding.Id] = enabled;
-
-        if (enabled)
-        {
-            binding.Condition ??= new EventCondition();
-        }
-        else
-        {
-            binding.Condition = null;
-        }
-    }
-
-    private static EventCondition EnsureCondition(EventActionBinding binding)
-    {
-        binding.Condition ??= new EventCondition();
-        return binding.Condition;
-    }
-
-    private EventTriggerDefinition EnsureTrigger(EventActionBinding binding)
-    {
-        if (binding.Trigger is null)
-        {
-            var kind = EventTriggerCatalog.Entries.FirstOrDefault(x => x.EventType == binding.EventType)?.Kind ?? EventTriggerKinds.InitiativeNext;
-            binding.Trigger = new EventTriggerDefinition { Kind = kind };
-        }
-
-        binding.EventType = GetTriggerEntry(binding.Trigger).EventType;
-        return binding.Trigger;
-    }
-
-    private static EventTriggerCatalogEntry GetTriggerEntry(EventTriggerDefinition trigger)
-    {
-        return EventTriggerCatalog.Get(trigger.Kind) ?? EventTriggerCatalog.Entries.First();
-    }
-
-    private static void SetTriggerKind(EventActionBinding binding, string kind)
-    {
-        binding.Trigger ??= new EventTriggerDefinition();
-        binding.Trigger.Kind = kind;
-        binding.Trigger.FieldTitle = string.Empty;
-        binding.Trigger.OptionName = string.Empty;
-        binding.Trigger.StatName = string.Empty;
-        binding.Trigger.ThresholdValue = null;
-        binding.EventType = EventTriggerCatalog.Get(kind)?.EventType ?? DiceEventTypes.InitiativeNext;
-    }
-
-    private IReadOnlyList<string> GetCreatureNames()
-    {
-        return CombatService.GetCreatureList()
-            .Select(x => x.Name)
-            .Concat(CombatService.GetCombatList().SelectMany(x => x.CreaturesList).Select(x => x.Name))
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(x => x)
-            .ToList();
-    }
-
-    private IReadOnlyList<CustomFieldChoice> GetFieldChoices(EventTriggerCatalogEntry triggerEntry)
-    {
-        return GetKnownCustomFields()
-            .Where(x => IsFieldChoiceCompatible(x, triggerEntry))
-            .GroupBy(x => new { x.Title, x.FieldType })
-            .Select(x => new CustomFieldChoice(x.Key.Title, x.Key.FieldType))
-            .OrderBy(x => x.Title)
-            .ThenBy(x => x.FieldType)
-            .ToList();
-    }
-
-    private static bool IsFieldChoiceCompatible(DCCreatureCustomField field, EventTriggerCatalogEntry triggerEntry)
-    {
-        if (!string.IsNullOrWhiteSpace(triggerEntry.FieldType) && !string.Equals(field.FieldType, triggerEntry.FieldType, StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        return triggerEntry.Kind != EventTriggerKinds.NumericReachedMaxValue || field is DCCreatureNumericField { ShowMaxValue: true };
-    }
-
-    private IReadOnlyList<string> GetOptionNames(string fieldType, string fieldTitle)
-    {
-        return GetKnownCustomFields()
-            .Where(x => string.IsNullOrWhiteSpace(fieldTitle) || string.Equals(x.Title, fieldTitle, StringComparison.OrdinalIgnoreCase))
-            .Where(x => string.IsNullOrWhiteSpace(fieldType) || string.Equals(x.FieldType, fieldType, StringComparison.OrdinalIgnoreCase))
-            .SelectMany(field => field switch
-            {
-                DCCreatureCheckboxField checkbox => checkbox.Labels,
-                DCCreatureConditionsField conditions => conditions.Labels,
-                _ => Enumerable.Empty<string>()
-            })
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(x => x)
-            .ToList();
-    }
-
-    private IReadOnlyList<string> GetStatNames(string fieldTitle)
-    {
-        return GetKnownCustomFields()
-            .OfType<DCCreatureStatsField>()
-            .Where(x => string.IsNullOrWhiteSpace(fieldTitle) || string.Equals(x.Title, fieldTitle, StringComparison.OrdinalIgnoreCase))
-            .SelectMany(x => x.StatsLabels)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(x => x)
-            .ToList();
-    }
-
-    private IEnumerable<DCCreatureCustomField> GetKnownCustomFields()
-    {
-        foreach (var field in CombatService.GetUserCreatureCustomFields())
-            yield return field;
-
-        foreach (var creature in CombatService.GetCreatureList())
-            foreach (var field in creature.CustomFields)
-                yield return field;
-
-        foreach (var combat in CombatService.GetCombatList())
-        {
-            foreach (var creature in combat.CreaturesList)
-                foreach (var field in creature.CustomFields)
-                    yield return field;
-
-            foreach (var creatureFields in combat.InCombatCustomFieldsInstances)
-                foreach (var instanceFields in creatureFields)
-                    foreach (var field in instanceFields)
-                        yield return field;
-        }
-    }
-
-    private static string GetTriggerSummary(EventTriggerDefinition trigger)
-    {
-        var entry = GetTriggerEntry(trigger);
-        var creatureText = trigger.CreatureNames.Count == 0 ? "any creature" : string.Join(", ", trigger.CreatureNames);
-        var fieldText = string.IsNullOrWhiteSpace(trigger.FieldTitle) ? "any matching field" : $"field '{trigger.FieldTitle}'";
-        var optionText = string.IsNullOrWhiteSpace(trigger.OptionName) ? "any option" : $"option '{trigger.OptionName}'";
-        var statText = string.IsNullOrWhiteSpace(trigger.StatName) ? "any stat" : $"stat '{trigger.StatName}'";
-
-        if (trigger.Kind == EventTriggerKinds.NumericReachedMaxValue) return $"Triggers when {fieldText} on {creatureText} becomes equal to its max value.";
-        if (entry.NeedsThreshold) return $"Triggers when {fieldText} on {creatureText} is {trigger.ThresholdOperator} {trigger.ThresholdValue}.";
-        if (entry.NeedsStat) return $"Triggers when {statText} in {fieldText} changes on {creatureText}.";
-        if (entry.NeedsOption) return $"Triggers when {optionText} in {fieldText} changes on {creatureText}.";
-        if (entry.NeedsField) return $"Triggers when {fieldText} changes on {creatureText}.";
-        if (entry.SupportsCreatureFilter) return $"Triggers for {creatureText}.";
-        return $"Triggers on: {entry.DisplayName}.";
-    }
-
-    private sealed record CustomFieldChoice(string Title, string FieldType)
-    {
-        public string DisplayName => string.IsNullOrWhiteSpace(FieldType) ? Title : $"{Title} ({FieldType})";
-    }
-
-    private static string GetHeadersText(Dictionary<string, string> headers)
-    {
-        return string.Join("\n", headers.Select(header => $"{header.Key}: {header.Value}"));
-    }
-
-    private static void SetHeadersFromText(HttpRequestActionDefinition action, string value)
-    {
-        action.Headers = value.Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Split(':', 2, StringSplitOptions.TrimEntries))
-            .Where(parts => parts.Length == 2 && !string.IsNullOrWhiteSpace(parts[0]))
-            .ToDictionary(parts => parts[0], parts => parts[1]);
     }
 
     private async Task Save()

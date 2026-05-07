@@ -61,7 +61,7 @@ public sealed class EventConditionEvaluator
 
     public bool EvaluateTrigger(EventTriggerDefinition? trigger, DiceEvent diceEvent)
     {
-        if (trigger is null) return true;
+        if (trigger is null) return false;
 
         var entry = EventTriggerCatalog.Get(trigger.Kind);
         if (entry is null) return false;
@@ -77,18 +77,16 @@ public sealed class EventConditionEvaluator
         if (!string.IsNullOrWhiteSpace(trigger.OptionName) && !TextEquals(GetDataText(diceEvent, "optionName"), trigger.OptionName)) return false;
         if (!string.IsNullOrWhiteSpace(trigger.StatName) && !TextEquals(GetDataText(diceEvent, "statName"), trigger.StatName)) return false;
 
-        return trigger.Kind switch
+        if (entry.RequiredChangeDirection is not null && !TextEquals(GetDataText(diceEvent, "changeDirection"), entry.RequiredChangeDirection)) return false;
+        if (entry.RequiredEventAction is not null && !TextEquals(GetDataText(diceEvent, "eventAction"), entry.RequiredEventAction)) return false;
+        if (entry.RequiredBoolDataKey is not null && !GetDataBool(diceEvent, entry.RequiredBoolDataKey)) return false;
+        if (entry.NeedsThreshold && !EvaluateTriggerThreshold(trigger, diceEvent, entry.ThresholdOldKey, entry.ThresholdNewKey)) return false;
+
+        return entry.SpecialMatcher switch
         {
-            EventTriggerKinds.NumericIncreased or EventTriggerKinds.HitPointsHealed or EventTriggerKinds.StatsIncreased => TextEquals(GetDataText(diceEvent, "changeDirection"), "Increased"),
-            EventTriggerKinds.NumericDecreased or EventTriggerKinds.HitPointsDamaged or EventTriggerKinds.StatsDecreased => TextEquals(GetDataText(diceEvent, "changeDirection"), "Decreased"),
-            EventTriggerKinds.CheckboxOptionChecked or EventTriggerKinds.CheckboxGridCellChecked => TextEquals(GetDataText(diceEvent, "eventAction"), "Checked"),
-            EventTriggerKinds.CheckboxOptionUnchecked or EventTriggerKinds.CheckboxGridCellUnchecked => TextEquals(GetDataText(diceEvent, "eventAction"), "Unchecked"),
-            EventTriggerKinds.ConditionAdded => TextEquals(GetDataText(diceEvent, "eventAction"), "Added"),
-            EventTriggerKinds.ConditionRemoved => TextEquals(GetDataText(diceEvent, "eventAction"), "Removed"),
-            EventTriggerKinds.NumericReachedMaxValue => EvaluateNumericReachedMaxValue(diceEvent),
-            EventTriggerKinds.NumericThreshold or EventTriggerKinds.StatsThreshold => EvaluateTriggerThreshold(trigger, diceEvent, "oldValue", "newValue"),
-            EventTriggerKinds.HitPointsThreshold => EvaluateTriggerThreshold(trigger, diceEvent, "oldPercentage", "percentage"),
-            _ => true
+            TriggerSpecialMatchers.NumericReachedMaxValue => EvaluateNumericReachedMaxValue(diceEvent),
+            null or "" => true,
+            _ => false
         };
     }
 
@@ -218,7 +216,7 @@ public sealed class DiceEventDispatcher : IDiceEventPublisher
         try
         {
             var cfg = await _configService.GetConfigurationAsync();
-            foreach (var binding in cfg.Bindings.Where(x => x.IsEnabled && GetBindingEventType(x) == diceEvent.Type))
+            foreach (var binding in cfg.Bindings.Where(x => x.IsEnabled))
             {
                 if (!_conditionEvaluator.EvaluateTrigger(binding.Trigger, diceEvent)) continue;
                 if (!_conditionEvaluator.Evaluate(binding.Condition, diceEvent)) continue;
@@ -234,16 +232,6 @@ public sealed class DiceEventDispatcher : IDiceEventPublisher
             await _configService.SaveAsync();
         }
         catch (Exception ex) { Debug.WriteLine($"Automation dispatch failed: {ex}"); }
-    }
-
-    private static string GetBindingEventType(EventActionBinding binding)
-    {
-        if (binding.Trigger is not null)
-        {
-            return EventTriggerCatalog.Get(binding.Trigger.Kind)?.EventType ?? binding.EventType;
-        }
-
-        return binding.EventType;
     }
 
     private async Task<ActionExecutionResult> ExecuteActionAsync(ActionDefinition action, DiceEvent diceEvent, AutomationConfiguration cfg)

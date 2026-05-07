@@ -1,0 +1,30 @@
+@using DiceCombats.Automations
+
+<div style="display:flex;align-items:center;">
+    <div style="margin:15px;">
+        <h4>External apps</h4>
+    </div>
+    <div>
+        <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => OnAdd.InvokeAsync())">Add external app</MudButton>
+    </div>
+</div>
+
+@foreach (var app in ExternalApps.ToList())
+{
+    <MudPaper Class="pa-2 my-2 automation-app-item">
+        <MudStack Row="true" Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.h6">@app.Name</MudText>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(app))">Delete</MudButton>
+        </MudStack>
+
+        <MudTextField @bind-Value="app.Name" Label="App name" />
+        <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
+        <MudSwitch @bind-Value="app.IsEnabled" Color="Color.Primary" Label="@(app.IsEnabled == true ? "Enabled" : "Disabled")" />
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public List<ExternalAppDefinition> ExternalApps { get; set; } = new();
+    [Parameter] public EventCallback OnAdd { get; set; }
+    [Parameter] public EventCallback<ExternalAppDefinition> OnRemove { get; set; }
+}

@@ -83,6 +83,11 @@ public static class EventTriggerKinds
     public const string UserCustomFieldRemoved = "UserCustomFieldRemoved";
 }
 
+public static class TriggerSpecialMatchers
+{
+    public const string NumericReachedMaxValue = "NumericReachedMaxValue";
+}
+
 public sealed class EventTriggerCatalogEntry
 {
     public string Kind { get; set; } = "";
@@ -96,6 +101,12 @@ public sealed class EventTriggerCatalogEntry
     public bool NeedsStat { get; set; }
     public bool NeedsThreshold { get; set; }
     public string ThresholdLabel { get; set; } = "Value";
+    public string ThresholdOldKey { get; set; } = "oldValue";
+    public string ThresholdNewKey { get; set; } = "newValue";
+    public string? RequiredChangeDirection { get; set; }
+    public string? RequiredEventAction { get; set; }
+    public string? RequiredBoolDataKey { get; set; }
+    public string? SpecialMatcher { get; set; }
 }
 
 public static class EventTriggerCatalog
@@ -112,30 +123,30 @@ public static class EventTriggerCatalog
         new() { Kind = EventTriggerKinds.TimerStopped, EventType = DiceEventTypes.TimerStopped, Category = "Combat timer", DisplayName = "Timer stopped" },
         new() { Kind = EventTriggerKinds.AnyCustomFieldChanged, EventType = DiceEventTypes.CustomFieldChanged, Category = "Custom fields", DisplayName = "Custom field changed", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.NumericChanged, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field changed", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.NumericIncreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field increased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.NumericDecreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field decreased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
+        new() { Kind = EventTriggerKinds.NumericIncreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field increased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true, RequiredChangeDirection = "Increased" },
+        new() { Kind = EventTriggerKinds.NumericDecreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field decreased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true, RequiredChangeDirection = "Decreased" },
         new() { Kind = EventTriggerKinds.NumericThreshold, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field crossed a value", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true, NeedsThreshold = true, ThresholdLabel = "Numeric value" },
-        new() { Kind = EventTriggerKinds.NumericReachedMaxValue, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field reached max value", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true}, 
+        new() { Kind = EventTriggerKinds.NumericReachedMaxValue, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field reached max value", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true, SpecialMatcher = TriggerSpecialMatchers.NumericReachedMaxValue },
         new() { Kind = EventTriggerKinds.HitPointsChanged, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points changed", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.HitPointsDamaged, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points decreased", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.HitPointsHealed, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points increased", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.HitPointsThreshold, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points crossed a percentage", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true, NeedsThreshold = true, ThresholdLabel = "Hit points (%)" },
+        new() { Kind = EventTriggerKinds.HitPointsDamaged, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points decreased", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true, RequiredChangeDirection = "Decreased" },
+        new() { Kind = EventTriggerKinds.HitPointsHealed, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points increased", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true, RequiredChangeDirection = "Increased" },
+        new() { Kind = EventTriggerKinds.HitPointsThreshold, EventType = DiceEventTypes.CustomFieldHitPointsChanged, Category = "Custom fields", DisplayName = "Hit points crossed a percentage", FieldType = "HitPoints", SupportsCreatureFilter = true, NeedsField = true, NeedsThreshold = true, ThresholdLabel = "Hit points (%)", ThresholdOldKey = "oldPercentage", ThresholdNewKey = "percentage" },
         new() { Kind = EventTriggerKinds.CheckboxOptionChanged, EventType = DiceEventTypes.CustomFieldCheckboxOptionChanged, Category = "Custom fields", DisplayName = "Checkbox option changed", FieldType = "Checkbox", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
-        new() { Kind = EventTriggerKinds.CheckboxOptionChecked, EventType = DiceEventTypes.CustomFieldCheckboxOptionChanged, Category = "Custom fields", DisplayName = "Checkbox option checked", FieldType = "Checkbox", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
-        new() { Kind = EventTriggerKinds.CheckboxOptionUnchecked, EventType = DiceEventTypes.CustomFieldCheckboxOptionChanged, Category = "Custom fields", DisplayName = "Checkbox option unchecked", FieldType = "Checkbox", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
+        new() { Kind = EventTriggerKinds.CheckboxOptionChecked, EventType = DiceEventTypes.CustomFieldCheckboxOptionChanged, Category = "Custom fields", DisplayName = "Checkbox option checked", FieldType = "Checkbox", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true, RequiredEventAction = "Checked" },
+        new() { Kind = EventTriggerKinds.CheckboxOptionUnchecked, EventType = DiceEventTypes.CustomFieldCheckboxOptionChanged, Category = "Custom fields", DisplayName = "Checkbox option unchecked", FieldType = "Checkbox", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true, RequiredEventAction = "Unchecked" },
         new() { Kind = EventTriggerKinds.CheckboxTextChanged, EventType = DiceEventTypes.CustomFieldCheckboxTextChanged, Category = "Custom fields", DisplayName = "Checkbox text changed", FieldType = "Checkbox", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
         new() { Kind = EventTriggerKinds.ConditionsOptionChanged, EventType = DiceEventTypes.CustomFieldConditionsOptionChanged, Category = "Custom fields", DisplayName = "Condition option changed", FieldType = "DnDConditions", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
-        new() { Kind = EventTriggerKinds.ConditionAdded, EventType = DiceEventTypes.CustomFieldConditionsOptionChanged, Category = "Custom fields", DisplayName = "Condition option added", FieldType = "DnDConditions", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
-        new() { Kind = EventTriggerKinds.ConditionRemoved, EventType = DiceEventTypes.CustomFieldConditionsOptionChanged, Category = "Custom fields", DisplayName = "Condition option removed", FieldType = "DnDConditions", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true },
+        new() { Kind = EventTriggerKinds.ConditionAdded, EventType = DiceEventTypes.CustomFieldConditionsOptionChanged, Category = "Custom fields", DisplayName = "Condition option added", FieldType = "DnDConditions", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true, RequiredEventAction = "Added" },
+        new() { Kind = EventTriggerKinds.ConditionRemoved, EventType = DiceEventTypes.CustomFieldConditionsOptionChanged, Category = "Custom fields", DisplayName = "Condition option removed", FieldType = "DnDConditions", SupportsCreatureFilter = true, NeedsField = true, NeedsOption = true, RequiredEventAction = "Removed" },
         new() { Kind = EventTriggerKinds.CheckboxGridCellChanged, EventType = DiceEventTypes.CustomFieldCheckboxGridCellChanged, Category = "Custom fields", DisplayName = "Checkbox grid cell changed", FieldType = "CheckboxGrid", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.CheckboxGridCellChecked, EventType = DiceEventTypes.CustomFieldCheckboxGridCellChanged, Category = "Custom fields", DisplayName = "Checkbox grid cell checked", FieldType = "CheckboxGrid", SupportsCreatureFilter = true, NeedsField = true },
-        new() { Kind = EventTriggerKinds.CheckboxGridCellUnchecked, EventType = DiceEventTypes.CustomFieldCheckboxGridCellChanged, Category = "Custom fields", DisplayName = "Checkbox grid cell unchecked", FieldType = "CheckboxGrid", SupportsCreatureFilter = true, NeedsField = true },
+        new() { Kind = EventTriggerKinds.CheckboxGridCellChecked, EventType = DiceEventTypes.CustomFieldCheckboxGridCellChanged, Category = "Custom fields", DisplayName = "Checkbox grid cell checked", FieldType = "CheckboxGrid", SupportsCreatureFilter = true, NeedsField = true, RequiredEventAction = "Checked" },
+        new() { Kind = EventTriggerKinds.CheckboxGridCellUnchecked, EventType = DiceEventTypes.CustomFieldCheckboxGridCellChanged, Category = "Custom fields", DisplayName = "Checkbox grid cell unchecked", FieldType = "CheckboxGrid", SupportsCreatureFilter = true, NeedsField = true, RequiredEventAction = "Unchecked" },
         new() { Kind = EventTriggerKinds.TextChanged, EventType = DiceEventTypes.CustomFieldTextChanged, Category = "Custom fields", DisplayName = "Text field changed", FieldType = "Text", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.TextGridCellChanged, EventType = DiceEventTypes.CustomFieldTextGridCellChanged, Category = "Custom fields", DisplayName = "Text grid cell changed", FieldType = "TextGrid", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.ColourChanged, EventType = DiceEventTypes.CustomFieldColorChanged, Category = "Custom fields", DisplayName = "Colour field changed", FieldType = "Color", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.StatsChanged, EventType = DiceEventTypes.CustomFieldStatsValueChanged, Category = "Custom fields", DisplayName = "Stat value changed", FieldType = "Stats", SupportsCreatureFilter = true, NeedsField = true, NeedsStat = true },
-        new() { Kind = EventTriggerKinds.StatsIncreased, EventType = DiceEventTypes.CustomFieldStatsValueChanged, Category = "Custom fields", DisplayName = "Stat value increased", FieldType = "Stats", SupportsCreatureFilter = true, NeedsField = true, NeedsStat = true },
-        new() { Kind = EventTriggerKinds.StatsDecreased, EventType = DiceEventTypes.CustomFieldStatsValueChanged, Category = "Custom fields", DisplayName = "Stat value decreased", FieldType = "Stats", SupportsCreatureFilter = true, NeedsField = true, NeedsStat = true },
+        new() { Kind = EventTriggerKinds.StatsIncreased, EventType = DiceEventTypes.CustomFieldStatsValueChanged, Category = "Custom fields", DisplayName = "Stat value increased", FieldType = "Stats", SupportsCreatureFilter = true, NeedsField = true, NeedsStat = true, RequiredChangeDirection = "Increased" },
+        new() { Kind = EventTriggerKinds.StatsDecreased, EventType = DiceEventTypes.CustomFieldStatsValueChanged, Category = "Custom fields", DisplayName = "Stat value decreased", FieldType = "Stats", SupportsCreatureFilter = true, NeedsField = true, NeedsStat = true, RequiredChangeDirection = "Decreased" },
         new() { Kind = EventTriggerKinds.StatsThreshold, EventType = DiceEventTypes.CustomFieldStatsValueChanged, Category = "Custom fields", DisplayName = "Stat crossed a value", FieldType = "Stats", SupportsCreatureFilter = true, NeedsField = true, NeedsStat = true, NeedsThreshold = true, ThresholdLabel = "Stat value" },
         new() { Kind = EventTriggerKinds.DetailedPopupOpened, EventType = DiceEventTypes.CustomFieldDetailedPopupOpened, Category = "Custom fields", DisplayName = "Detailed popup opened", FieldType = "DetailedPopup", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.UserCustomFieldSaved, EventType = DiceEventTypes.UserCustomFieldSaved, Category = "Custom fields", DisplayName = "User custom field saved", NeedsField = true },
@@ -176,7 +187,6 @@ public sealed class EventActionBinding
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = "";
     public bool IsEnabled { get; set; } = true;
-    public string EventType { get; set; } = "";
     public EventTriggerDefinition? Trigger { get; set; }
     public EventCondition? Condition { get; set; }
     public List<ActionDefinition> Actions { get; set; } = new();
@@ -205,6 +215,11 @@ public abstract class ActionDefinition
 
 public sealed class HttpRequestActionDefinition : ActionDefinition
 {
+    public HttpRequestActionDefinition()
+    {
+        Type = "HttpRequest";
+    }
+
     public Guid? ExternalAppId { get; set; }
     public string Method { get; set; } = "POST";
     public string Url { get; set; } = "";
@@ -215,6 +230,11 @@ public sealed class HttpRequestActionDefinition : ActionDefinition
 
 public sealed class DelayActionDefinition : ActionDefinition
 {
+    public DelayActionDefinition()
+    {
+        Type = "Delay";
+    }
+
     public int Milliseconds { get; set; } = 100;
 }
 

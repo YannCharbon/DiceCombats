@@ -53,9 +53,15 @@ else
                 Field = Field,
                 OldValue = oldValue,
                 NewValue = newValue,
-                MaxValue = Field.ShowMaxValue ? Field.MaxValue : null,
                 Action = "Changed",
-                ChangeDirection = GetChangeDirection(oldValue, newValue)
+                ChangeDirection = GetChangeDirection(oldValue, newValue),
+                Data = new Dictionary<string, object?>
+                {
+                    ["showMaxValue"] = Field.ShowMaxValue,
+                    ["maximumValue"] = Field.ShowMaxValue ? Field.MaxValue : null,
+                    ["showUnit"] = Field.ShowUnit,
+                    ["unit"] = Field.ShowUnit ? Field.Unit : null
+                }
             });
         }
 

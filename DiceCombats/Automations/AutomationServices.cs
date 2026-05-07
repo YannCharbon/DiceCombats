@@ -85,6 +85,7 @@ public sealed class EventConditionEvaluator
             EventTriggerKinds.CheckboxOptionUnchecked or EventTriggerKinds.CheckboxGridCellUnchecked => TextEquals(GetDataText(diceEvent, "eventAction"), "Unchecked"),
             EventTriggerKinds.ConditionAdded => TextEquals(GetDataText(diceEvent, "eventAction"), "Added"),
             EventTriggerKinds.ConditionRemoved => TextEquals(GetDataText(diceEvent, "eventAction"), "Removed"),
+            EventTriggerKinds.NumericReachedMaxValue => EvaluateNumericReachedMaxValue(diceEvent),
             EventTriggerKinds.NumericThreshold or EventTriggerKinds.StatsThreshold => EvaluateTriggerThreshold(trigger, diceEvent, "oldValue", "newValue"),
             EventTriggerKinds.HitPointsThreshold => EvaluateTriggerThreshold(trigger, diceEvent, "oldPercentage", "percentage"),
             _ => true
@@ -131,6 +132,32 @@ public sealed class EventConditionEvaluator
     {
         return string.Equals(left ?? string.Empty, right ?? string.Empty, StringComparison.OrdinalIgnoreCase);
     }
+
+    private static bool EvaluateNumericReachedMaxValue(DiceEvent diceEvent)
+    {
+        if (!GetDataBool(diceEvent, "showMaxValue")) return false;
+
+        var oldValue = ToDouble(diceEvent.Data.TryGetValue("oldValue", out var oldObj) ? oldObj : null);
+        var newValue = ToDouble(diceEvent.Data.TryGetValue("newValue", out var newObj) ? newObj : null);
+        var maxValue = ToDouble(diceEvent.Data.TryGetValue("maximumValue", out var maxObj) ? maxObj : null);
+        if (double.IsNaN(oldValue) || double.IsNaN(newValue) || double.IsNaN(maxValue)) return false;
+
+        return !ValuesEqual(oldValue, maxValue) && ValuesEqual(newValue, maxValue);
+    }
+
+    private static bool GetDataBool(DiceEvent diceEvent, string key)
+    {
+        if (!diceEvent.Data.TryGetValue(key, out var value)) return false;
+
+        return value switch
+        {
+            bool boolValue => boolValue,
+            string text => bool.TryParse(text, out var parsed) && parsed,
+            _ => false
+        };
+    }
+
+    private static bool ValuesEqual(double left, double right) => Math.Abs(left - right) < 0.0000001d;
 
     private static double ToDouble(object? value) => double.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : double.NaN;
 

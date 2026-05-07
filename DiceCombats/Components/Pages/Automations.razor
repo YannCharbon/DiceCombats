@@ -144,7 +144,7 @@
                                 {
                                     <MudSelect T="string" @bind-Value="trigger.FieldTitle" Label="Custom field (empty = any matching field)">
                                         <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-                                        @foreach (var field in GetFieldChoices(triggerEntry.FieldType))
+                                        @foreach (var field in GetFieldChoices(triggerEntry))
                                         {
                                             <MudSelectItem T="string" Value="@field.Title">@field.DisplayName</MudSelectItem>
                                         }
@@ -496,15 +496,25 @@
             .ToList();
     }
 
-    private IReadOnlyList<CustomFieldChoice> GetFieldChoices(string fieldType)
+    private IReadOnlyList<CustomFieldChoice> GetFieldChoices(EventTriggerCatalogEntry triggerEntry)
     {
         return GetKnownCustomFields()
-            .Where(x => string.IsNullOrWhiteSpace(fieldType) || string.Equals(x.FieldType, fieldType, StringComparison.OrdinalIgnoreCase))
+            .Where(x => IsFieldChoiceCompatible(x, triggerEntry))
             .GroupBy(x => new { x.Title, x.FieldType })
             .Select(x => new CustomFieldChoice(x.Key.Title, x.Key.FieldType))
             .OrderBy(x => x.Title)
             .ThenBy(x => x.FieldType)
             .ToList();
+    }
+
+    private static bool IsFieldChoiceCompatible(DCCreatureCustomField field, EventTriggerCatalogEntry triggerEntry)
+    {
+        if (!string.IsNullOrWhiteSpace(triggerEntry.FieldType) && !string.Equals(field.FieldType, triggerEntry.FieldType, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        return triggerEntry.Kind != EventTriggerKinds.NumericReachedMaxValue || field is DCCreatureNumericField { ShowMaxValue: true };
     }
 
     private IReadOnlyList<string> GetOptionNames(string fieldType, string fieldTitle)
@@ -566,6 +576,7 @@
         var optionText = string.IsNullOrWhiteSpace(trigger.OptionName) ? "any option" : $"option '{trigger.OptionName}'";
         var statText = string.IsNullOrWhiteSpace(trigger.StatName) ? "any stat" : $"stat '{trigger.StatName}'";
 
+        if (trigger.Kind == EventTriggerKinds.NumericReachedMaxValue) return $"Triggers when {fieldText} on {creatureText} becomes equal to its max value.";
         if (entry.NeedsThreshold) return $"Triggers when {fieldText} on {creatureText} is {trigger.ThresholdOperator} {trigger.ThresholdValue}.";
         if (entry.NeedsStat) return $"Triggers when {statText} in {fieldText} changes on {creatureText}.";
         if (entry.NeedsOption) return $"Triggers when {optionText} in {fieldText} changes on {creatureText}.";

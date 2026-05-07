@@ -53,7 +53,7 @@ else
                 Field = Field,
                 OldValue = oldValue,
                 NewValue = newValue,
-                MaxValue = Field.MaxValue,
+                MaxValue = Field.ShowMaxValue ? Field.MaxValue : null,
                 Action = "Changed",
                 ChangeDirection = GetChangeDirection(oldValue, newValue)
             });

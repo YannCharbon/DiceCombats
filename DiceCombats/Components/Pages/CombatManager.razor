@@ -451,6 +451,25 @@
         AddIfNotNull(data, "statName", info.StatName);
         AddIfNotNull(data, "textLabel", info.TextLabel);
 
+        if (info.Field is DCCreatureNumericField numericField)
+        {
+            data["showMaxValue"] = numericField.ShowMaxValue;
+            if (numericField.ShowMaxValue)
+            {
+                data["maximumValue"] = info.MaxValue ?? numericField.MaxValue;
+            }
+
+            data["showUnit"] = numericField.ShowUnit;
+            if (numericField.ShowUnit)
+            {
+                AddIfNotNull(data, "unit", numericField.Unit);
+            }
+        }
+        else
+        {
+            AddIfNotNull(data, "maximumValue", info.MaxValue);
+        }
+
         var oldNumber = ToNullableDouble(info.OldValue);
         var newNumber = ToNullableDouble(info.NewValue);
         if (oldNumber.HasValue && newNumber.HasValue)

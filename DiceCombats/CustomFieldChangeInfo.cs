@@ -5,6 +5,7 @@ public sealed class CustomFieldChangeInfo
     public DCCreatureCustomField Field { get; set; } = default!;
     public object? OldValue { get; set; }
     public object? NewValue { get; set; }
+    public object? MaxValue { get; set; }
     public string Action { get; set; } = "Changed";
     public string? ChangeDirection { get; set; }
     public int? OptionIndex { get; set; }

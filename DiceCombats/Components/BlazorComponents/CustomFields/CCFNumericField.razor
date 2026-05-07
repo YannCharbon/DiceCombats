@@ -6,11 +6,28 @@
 @if (EditionMode)
 {
     <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudCheckBox T="bool" @bind-Value="Field.ShowMaxValue" Label="Show max value"></MudCheckBox>
+    @if (Field.ShowMaxValue == true)
+    {
+        <MudNumericField T="int" @bind-value="Field.MaxValue" Label="Max value" Variant="Variant.Outlined" />
+    }
+    <MudCheckBox T="bool" @bind-Value="Field.ShowUnit" Label="Show unit"></MudCheckBox>
+    @if (Field.ShowUnit == true)
+    {
+        <MudTextField T="string" spellcheck="false" @bind-value="Field.Unit" Label="Unit" Variant="Variant.Outlined" />
+    }
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        @if (Field.ShowMaxValue)
+        {
+            <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaxValue.ToString() + (Field.ShowUnit == true ? (" " + Field.Unit) : ""))" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        }
+        else
+        {
+            <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        }
     </div>
 }
 
@@ -36,6 +53,7 @@ else
                 Field = Field,
                 OldValue = oldValue,
                 NewValue = newValue,
+                MaxValue = Field.MaxValue,
                 Action = "Changed",
                 ChangeDirection = GetChangeDirection(oldValue, newValue)
             });

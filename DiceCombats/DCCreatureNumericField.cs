@@ -12,6 +12,10 @@ namespace DiceCombats
     {
         public override string FieldType => "Numeric";
         public int Value { get; set; }
+        public int MaxValue { get; set; }
+        public bool ShowMaxValue { get; set; }
+        public string Unit {  get; set; } = string.Empty;
+        public bool ShowUnit { get; set; }
 
         public override object GetValue()
         {
@@ -25,6 +29,10 @@ namespace DiceCombats
             {
                 Title = this.Title,
                 Value = this.Value,
+                MaxValue = this.MaxValue,
+                ShowMaxValue = this.ShowMaxValue,
+                Unit = this.Unit,
+                ShowUnit = this.ShowUnit,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }

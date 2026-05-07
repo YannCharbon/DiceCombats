@@ -2,6 +2,7 @@
 @using DiceCombats.Automations
 @inject AutomationConfigurationService ConfigService
 @inject IDiceEventPublisher EventPublisher
+@inject DiceCombatsService CombatService
 
 <style>
     .settings-group-name {
@@ -38,7 +39,7 @@
     .automation-item {
         padding-top: 10px;
         padding-right: 10px;
-        min-width: 30%;
+        min-width: 40%;
         max-width: 50%;
     }
 
@@ -53,7 +54,7 @@
 <div class="settings-group">
     <div style="display:flex;align-items:center;">
         <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.AutoFixHigh" Size="@Size.Large" style="color:white;margin:10px;" />
+            <MudIcon Icon="@Icons.Material.Filled.AutoMode" Size="@Size.Large" style="color:white;margin:10px;" />
             <h3>Automations</h3>
         </div>
         <div>
@@ -111,51 +112,81 @@
                             <MudTextField @bind-Value="binding.Name" Label="Automation name" />
                             <MudSwitch @bind-Value="binding.IsEnabled" Color="Color.Primary" Label="@(binding.IsEnabled == true ? "Enabled" : "Disabled")" />
 
-                            <MudSelect T="string" @bind-Value="binding.EventType" Label="When">
-                                @foreach (var ev in DiceEventCatalog.Entries)
+                            @{
+                                var trigger = EnsureTrigger(binding);
+                                var triggerEntry = GetTriggerEntry(trigger);
+                            }
+
+                            <MudPaper Class="pa-2 my-2" Style="background-color:#202020;border-radius:10px;">
+                                <MudText Typo="Typo.h6">When</MudText>
+                                <MudSelect T="string" Value="@trigger.Kind" ValueChanged="@((string value) => SetTriggerKind(binding, value))" Label="Trigger">
+                                    @foreach (var ev in EventTriggerCatalog.Entries)
+                                    {
+                                        <MudSelectItem T="string" Value="@ev.Kind">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
+                                    }
+                                </MudSelect>
+
+                                @if (triggerEntry.SupportsCreatureFilter)
                                 {
-                                    <MudSelectItem T="string" Value="@ev.Type">@($"{ev.Category} - {ev.DisplayName}")</MudSelectItem>
+                                    <MudSelect T="string"
+                                               MultiSelection="true"
+                                               SelectedValues="@trigger.CreatureNames"
+                                               SelectedValuesChanged="@((IEnumerable<string> values) => trigger.CreatureNames = values.ToList())"
+                                               Label="Creatures (empty = any creature)">
+                                        @foreach (var creatureName in GetCreatureNames())
+                                        {
+                                            <MudSelectItem T="string" Value="@creatureName">@creatureName</MudSelectItem>
+                                        }
+                                    </MudSelect>
                                 }
-                            </MudSelect>
 
-                            <MudPaper Class="pa-2 my-2">
-                                <MudSwitch T="bool"
-                                           Value="@GetConditionEnabled(binding)"
-                                           ValueChanged="@((bool value) => SetConditionEnabled(binding, value))"
-                                           Label="Enable condition"
-                                           Color="Color.Primary" />
-
-                                @if (GetConditionEnabled(binding))
+                                @if (triggerEntry.NeedsField)
                                 {
-                                    var condition = EnsureCondition(binding);
+                                    <MudSelect T="string" @bind-Value="trigger.FieldTitle" Label="Custom field (empty = any matching field)">
+                                        <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
+                                        @foreach (var field in GetFieldChoices(triggerEntry.FieldType))
+                                        {
+                                            <MudSelectItem T="string" Value="@field.Title">@field.DisplayName</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
 
-                                    <MudTextField @bind-Value="condition.Left" Label="Left value (ex: Data.percentage)" />
+                                @if (triggerEntry.NeedsOption)
+                                {
+                                    <MudSelect T="string" @bind-Value="trigger.OptionName" Label="Option (empty = any option)">
+                                        <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
+                                        @foreach (var optionName in GetOptionNames(triggerEntry.FieldType, trigger.FieldTitle))
+                                        {
+                                            <MudSelectItem T="string" Value="@optionName">@optionName</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
 
-                                    <MudSelect T="string" @bind-Value="condition.Operator" Label="Operator">
-                                        @foreach (var op in _operators)
+                                @if (triggerEntry.NeedsStat)
+                                {
+                                    <MudSelect T="string" @bind-Value="trigger.StatName" Label="Stat (empty = any stat)">
+                                        <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
+                                        @foreach (var statName in GetStatNames(trigger.FieldTitle))
+                                        {
+                                            <MudSelectItem T="string" Value="@statName">@statName</MudSelectItem>
+                                        }
+                                    </MudSelect>
+                                }
+
+                                @if (triggerEntry.NeedsThreshold)
+                                {
+                                    <MudSelect T="string" @bind-Value="trigger.ThresholdOperator" Label="Comparison">
+                                        @foreach (var op in _thresholdOperators)
                                         {
                                             <MudSelectItem T="string" Value="@op">@op</MudSelectItem>
                                         }
                                     </MudSelect>
-
-                                    <MudTextField @bind-Value="condition.Right" Label="Right value" />
-                                    <MudSwitch @bind-Value="condition.TriggerOnlyOnCrossing" Color="Color.Primary" Label="Trigger only when crossing threshold" />
-
-                                    @if (condition.TriggerOnlyOnCrossing)
-                                    {
-                                        <MudSelect T="string" @bind-Value="condition.CrossingDirection" Label="Crossing direction">
-                                            <MudSelectItem T="string" Value="@("Below")">Below</MudSelectItem>
-                                            <MudSelectItem T="string" Value="@("Above")">Above</MudSelectItem>
-                                        </MudSelect>
-                                    }
+                                    <MudNumericField T="double?" @bind-Value="trigger.ThresholdValue" Label="@triggerEntry.ThresholdLabel" />
+                                    <MudSwitch @bind-Value="trigger.TriggerOnlyOnCrossing" Color="Color.Primary" Label="Only when the value crosses this threshold" />
                                 }
-                            </MudPaper>
 
-                            <MudText Typo="Typo.subtitle2">Template placeholders for selected event</MudText>
-                            @foreach (var ph in GetPlaceholders(binding.EventType))
-                            {
-                                <MudChip T="string" Class="ma-1">@ph</MudChip>
-                            }
+                                <MudText Typo="Typo.caption">@GetTriggerSummary(trigger)</MudText>
+                            </MudPaper>
 
                             <MudText Typo="Typo.h6" Class="mt-4">Actions sequence</MudText>
 
@@ -301,6 +332,7 @@
     private readonly Dictionary<Guid, bool> _conditionEnabled = new();
     private readonly List<string> _operators = ["Exists", "Equals", "NotEquals", "Contains", "Below", "BelowOrEqual", "Above", "AboveOrEqual"];
     private readonly List<string> _methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+    private readonly List<string> _thresholdOperators = ["Below", "BelowOrEqual", "Above", "AboveOrEqual"];
 
     protected override async Task OnInitializedAsync()
     {
@@ -338,7 +370,8 @@
         var binding = new EventActionBinding
         {
             Name = "New automation",
-            EventType = DiceEventTypes.InitiativeNext
+            EventType = DiceEventTypes.InitiativeNext,
+            Trigger = new EventTriggerDefinition { Kind = EventTriggerKinds.InitiativeNext }
         };
 
         _config.Bindings.Add(binding);
@@ -424,9 +457,126 @@
         return binding.Condition;
     }
 
-    private static IReadOnlyList<string> GetPlaceholders(string type)
+    private EventTriggerDefinition EnsureTrigger(EventActionBinding binding)
     {
-        return DiceEventCatalog.Entries.FirstOrDefault(x => x.Type == type)?.CommonPlaceholders ?? [];
+        if (binding.Trigger is null)
+        {
+            var kind = EventTriggerCatalog.Entries.FirstOrDefault(x => x.EventType == binding.EventType)?.Kind ?? EventTriggerKinds.InitiativeNext;
+            binding.Trigger = new EventTriggerDefinition { Kind = kind };
+        }
+
+        binding.EventType = GetTriggerEntry(binding.Trigger).EventType;
+        return binding.Trigger;
+    }
+
+    private static EventTriggerCatalogEntry GetTriggerEntry(EventTriggerDefinition trigger)
+    {
+        return EventTriggerCatalog.Get(trigger.Kind) ?? EventTriggerCatalog.Entries.First();
+    }
+
+    private static void SetTriggerKind(EventActionBinding binding, string kind)
+    {
+        binding.Trigger ??= new EventTriggerDefinition();
+        binding.Trigger.Kind = kind;
+        binding.Trigger.FieldTitle = string.Empty;
+        binding.Trigger.OptionName = string.Empty;
+        binding.Trigger.StatName = string.Empty;
+        binding.Trigger.ThresholdValue = null;
+        binding.EventType = EventTriggerCatalog.Get(kind)?.EventType ?? DiceEventTypes.InitiativeNext;
+    }
+
+    private IReadOnlyList<string> GetCreatureNames()
+    {
+        return CombatService.GetCreatureList()
+            .Select(x => x.Name)
+            .Concat(CombatService.GetCombatList().SelectMany(x => x.CreaturesList).Select(x => x.Name))
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x)
+            .ToList();
+    }
+
+    private IReadOnlyList<CustomFieldChoice> GetFieldChoices(string fieldType)
+    {
+        return GetKnownCustomFields()
+            .Where(x => string.IsNullOrWhiteSpace(fieldType) || string.Equals(x.FieldType, fieldType, StringComparison.OrdinalIgnoreCase))
+            .GroupBy(x => new { x.Title, x.FieldType })
+            .Select(x => new CustomFieldChoice(x.Key.Title, x.Key.FieldType))
+            .OrderBy(x => x.Title)
+            .ThenBy(x => x.FieldType)
+            .ToList();
+    }
+
+    private IReadOnlyList<string> GetOptionNames(string fieldType, string fieldTitle)
+    {
+        return GetKnownCustomFields()
+            .Where(x => string.IsNullOrWhiteSpace(fieldTitle) || string.Equals(x.Title, fieldTitle, StringComparison.OrdinalIgnoreCase))
+            .Where(x => string.IsNullOrWhiteSpace(fieldType) || string.Equals(x.FieldType, fieldType, StringComparison.OrdinalIgnoreCase))
+            .SelectMany(field => field switch
+            {
+                DCCreatureCheckboxField checkbox => checkbox.Labels,
+                DCCreatureConditionsField conditions => conditions.Labels,
+                _ => Enumerable.Empty<string>()
+            })
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x)
+            .ToList();
+    }
+
+    private IReadOnlyList<string> GetStatNames(string fieldTitle)
+    {
+        return GetKnownCustomFields()
+            .OfType<DCCreatureStatsField>()
+            .Where(x => string.IsNullOrWhiteSpace(fieldTitle) || string.Equals(x.Title, fieldTitle, StringComparison.OrdinalIgnoreCase))
+            .SelectMany(x => x.StatsLabels)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(x => x)
+            .ToList();
+    }
+
+    private IEnumerable<DCCreatureCustomField> GetKnownCustomFields()
+    {
+        foreach (var field in CombatService.GetUserCreatureCustomFields())
+            yield return field;
+
+        foreach (var creature in CombatService.GetCreatureList())
+            foreach (var field in creature.CustomFields)
+                yield return field;
+
+        foreach (var combat in CombatService.GetCombatList())
+        {
+            foreach (var creature in combat.CreaturesList)
+                foreach (var field in creature.CustomFields)
+                    yield return field;
+
+            foreach (var creatureFields in combat.InCombatCustomFieldsInstances)
+                foreach (var instanceFields in creatureFields)
+                    foreach (var field in instanceFields)
+                        yield return field;
+        }
+    }
+
+    private static string GetTriggerSummary(EventTriggerDefinition trigger)
+    {
+        var entry = GetTriggerEntry(trigger);
+        var creatureText = trigger.CreatureNames.Count == 0 ? "any creature" : string.Join(", ", trigger.CreatureNames);
+        var fieldText = string.IsNullOrWhiteSpace(trigger.FieldTitle) ? "any matching field" : $"field '{trigger.FieldTitle}'";
+        var optionText = string.IsNullOrWhiteSpace(trigger.OptionName) ? "any option" : $"option '{trigger.OptionName}'";
+        var statText = string.IsNullOrWhiteSpace(trigger.StatName) ? "any stat" : $"stat '{trigger.StatName}'";
+
+        if (entry.NeedsThreshold) return $"Triggers when {fieldText} on {creatureText} is {trigger.ThresholdOperator} {trigger.ThresholdValue}.";
+        if (entry.NeedsStat) return $"Triggers when {statText} in {fieldText} changes on {creatureText}.";
+        if (entry.NeedsOption) return $"Triggers when {optionText} in {fieldText} changes on {creatureText}.";
+        if (entry.NeedsField) return $"Triggers when {fieldText} changes on {creatureText}.";
+        if (entry.SupportsCreatureFilter) return $"Triggers for {creatureText}.";
+        return $"Triggers on: {entry.DisplayName}.";
+    }
+
+    private sealed record CustomFieldChoice(string Title, string FieldType)
+    {
+        public string DisplayName => string.IsNullOrWhiteSpace(FieldType) ? Title : $"{Title} ({FieldType})";
     }
 
     private static string GetHeadersText(Dictionary<string, string> headers)

@@ -35,9 +35,13 @@ public sealed class EventConditionEvaluator
 {
     private readonly EventTemplateRenderer _renderer;
     public EventConditionEvaluator(EventTemplateRenderer renderer) => _renderer = renderer;
+
     public bool Evaluate(EventCondition? condition, DiceEvent diceEvent)
     {
-        if (condition is null || string.IsNullOrWhiteSpace(condition.Operator)) return true;
+        if (condition is null) return true;
+        if (condition.All.Count > 0) return condition.All.All(x => Evaluate(x, diceEvent));
+        if (string.IsNullOrWhiteSpace(condition.Operator)) return true;
+
         var left = _renderer.ResolvePath(diceEvent, condition.Left);
         var result = condition.Operator switch
         {
@@ -45,6 +49,7 @@ public sealed class EventConditionEvaluator
             "Equals" => string.Equals(left?.ToString(), condition.Right, StringComparison.OrdinalIgnoreCase),
             "NotEquals" => !string.Equals(left?.ToString(), condition.Right, StringComparison.OrdinalIgnoreCase),
             "Contains" => (left?.ToString() ?? "").Contains(condition.Right, StringComparison.OrdinalIgnoreCase),
+            "OneOf" => condition.Right.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Contains(left?.ToString() ?? "", StringComparer.OrdinalIgnoreCase),
             "Below" => ToDouble(left) < ToDouble(condition.Right),
             "BelowOrEqual" => ToDouble(left) <= ToDouble(condition.Right),
             "Above" => ToDouble(left) > ToDouble(condition.Right),
@@ -53,7 +58,82 @@ public sealed class EventConditionEvaluator
         };
         return result && EvaluateCrossing(condition, diceEvent);
     }
+
+    public bool EvaluateTrigger(EventTriggerDefinition? trigger, DiceEvent diceEvent)
+    {
+        if (trigger is null) return true;
+
+        var entry = EventTriggerCatalog.Get(trigger.Kind);
+        if (entry is null) return false;
+        if (!string.Equals(diceEvent.Type, entry.EventType, StringComparison.OrdinalIgnoreCase)) return false;
+
+        if (entry.SupportsCreatureFilter && trigger.CreatureNames.Count > 0 && !trigger.CreatureNames.Contains(GetDataText(diceEvent, "creatureName"), StringComparer.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(trigger.FieldTitle) && !TextEquals(GetDataText(diceEvent, "fieldTitle"), trigger.FieldTitle)) return false;
+        if (!string.IsNullOrWhiteSpace(entry.FieldType) && !TextEquals(GetDataText(diceEvent, "fieldType"), entry.FieldType)) return false;
+        if (!string.IsNullOrWhiteSpace(trigger.OptionName) && !TextEquals(GetDataText(diceEvent, "optionName"), trigger.OptionName)) return false;
+        if (!string.IsNullOrWhiteSpace(trigger.StatName) && !TextEquals(GetDataText(diceEvent, "statName"), trigger.StatName)) return false;
+
+        return trigger.Kind switch
+        {
+            EventTriggerKinds.NumericIncreased or EventTriggerKinds.HitPointsHealed or EventTriggerKinds.StatsIncreased => TextEquals(GetDataText(diceEvent, "changeDirection"), "Increased"),
+            EventTriggerKinds.NumericDecreased or EventTriggerKinds.HitPointsDamaged or EventTriggerKinds.StatsDecreased => TextEquals(GetDataText(diceEvent, "changeDirection"), "Decreased"),
+            EventTriggerKinds.CheckboxOptionChecked or EventTriggerKinds.CheckboxGridCellChecked => TextEquals(GetDataText(diceEvent, "eventAction"), "Checked"),
+            EventTriggerKinds.CheckboxOptionUnchecked or EventTriggerKinds.CheckboxGridCellUnchecked => TextEquals(GetDataText(diceEvent, "eventAction"), "Unchecked"),
+            EventTriggerKinds.ConditionAdded => TextEquals(GetDataText(diceEvent, "eventAction"), "Added"),
+            EventTriggerKinds.ConditionRemoved => TextEquals(GetDataText(diceEvent, "eventAction"), "Removed"),
+            EventTriggerKinds.NumericThreshold or EventTriggerKinds.StatsThreshold => EvaluateTriggerThreshold(trigger, diceEvent, "oldValue", "newValue"),
+            EventTriggerKinds.HitPointsThreshold => EvaluateTriggerThreshold(trigger, diceEvent, "oldPercentage", "percentage"),
+            _ => true
+        };
+    }
+
+    private static bool EvaluateTriggerThreshold(EventTriggerDefinition trigger, DiceEvent diceEvent, string oldKey, string newKey)
+    {
+        if (trigger.ThresholdValue is null) return false;
+
+        var oldValue = ToDouble(diceEvent.Data.TryGetValue(oldKey, out var oldObj) ? oldObj : null);
+        var newValue = ToDouble(diceEvent.Data.TryGetValue(newKey, out var newObj) ? newObj : null);
+        var threshold = trigger.ThresholdValue.Value;
+        if (double.IsNaN(newValue)) return false;
+
+        var nowMatches = trigger.ThresholdOperator switch
+        {
+            "Below" => newValue < threshold,
+            "BelowOrEqual" => newValue <= threshold,
+            "Above" => newValue > threshold,
+            "AboveOrEqual" => newValue >= threshold,
+            _ => false
+        };
+
+        if (!trigger.TriggerOnlyOnCrossing) return nowMatches;
+        if (double.IsNaN(oldValue)) return false;
+
+        return trigger.ThresholdOperator switch
+        {
+            "Below" => oldValue >= threshold && newValue < threshold,
+            "BelowOrEqual" => oldValue > threshold && newValue <= threshold,
+            "Above" => oldValue <= threshold && newValue > threshold,
+            "AboveOrEqual" => oldValue < threshold && newValue >= threshold,
+            _ => false
+        };
+    }
+
+    private static string GetDataText(DiceEvent diceEvent, string key)
+    {
+        return diceEvent.Data.TryGetValue(key, out var value) ? value?.ToString() ?? string.Empty : string.Empty;
+    }
+
+    private static bool TextEquals(string? left, string? right)
+    {
+        return string.Equals(left ?? string.Empty, right ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static double ToDouble(object? value) => double.TryParse(value?.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : double.NaN;
+
     private static bool EvaluateCrossing(EventCondition condition, DiceEvent ev)
     {
         if (!condition.TriggerOnlyOnCrossing) return true;
@@ -111,8 +191,9 @@ public sealed class DiceEventDispatcher : IDiceEventPublisher
         try
         {
             var cfg = await _configService.GetConfigurationAsync();
-            foreach (var binding in cfg.Bindings.Where(x => x.IsEnabled && x.EventType == diceEvent.Type))
+            foreach (var binding in cfg.Bindings.Where(x => x.IsEnabled && GetBindingEventType(x) == diceEvent.Type))
             {
+                if (!_conditionEvaluator.EvaluateTrigger(binding.Trigger, diceEvent)) continue;
                 if (!_conditionEvaluator.Evaluate(binding.Condition, diceEvent)) continue;
                 if (binding.CooldownMs > 0 && binding.LastTriggeredAt.HasValue && (DateTimeOffset.UtcNow - binding.LastTriggeredAt.Value).TotalMilliseconds < binding.CooldownMs) continue;
                 binding.LastTriggeredAt = DateTimeOffset.UtcNow;
@@ -126,6 +207,16 @@ public sealed class DiceEventDispatcher : IDiceEventPublisher
             await _configService.SaveAsync();
         }
         catch (Exception ex) { Debug.WriteLine($"Automation dispatch failed: {ex}"); }
+    }
+
+    private static string GetBindingEventType(EventActionBinding binding)
+    {
+        if (binding.Trigger is not null)
+        {
+            return EventTriggerCatalog.Get(binding.Trigger.Kind)?.EventType ?? binding.EventType;
+        }
+
+        return binding.EventType;
     }
 
     private async Task<ActionExecutionResult> ExecuteActionAsync(ActionDefinition action, DiceEvent diceEvent, AutomationConfiguration cfg)

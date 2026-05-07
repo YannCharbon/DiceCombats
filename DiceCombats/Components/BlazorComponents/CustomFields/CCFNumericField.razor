@@ -5,12 +5,12 @@
 
 @if (EditionMode)
 {
-    <MudNumericField T="int" Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudNumericField T="int" Value="Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     </div>
 }
 
@@ -24,9 +24,31 @@ else
     {
         var oldValue = Field.Value;
         Field.Value = value;
+        await RaiseChanged(oldValue, value);
+    }
+
+    private async Task RaiseChanged(int oldValue, int newValue)
+    {
         if (OnFieldChanged.HasDelegate)
-            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo { Field = Field, OldValue = oldValue, NewValue = value });
+        {
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = "Changed",
+                ChangeDirection = GetChangeDirection(oldValue, newValue)
+            });
+        }
+
         if (OnChange.HasDelegate)
             await OnChange.InvokeAsync();
+    }
+
+    private static string GetChangeDirection(int oldValue, int newValue)
+    {
+        if (newValue > oldValue) return "Increased";
+        if (newValue < oldValue) return "Decreased";
+        return "Unchanged";
     }
 }

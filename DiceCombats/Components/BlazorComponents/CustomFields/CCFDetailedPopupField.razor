@@ -40,21 +40,32 @@ else
         <DetailedPopupFieldPopup DetailedPopupField="Field" />
     </GenericModal>
 
-    <MudButton OnClick="@(() => _modal?.ShowAsync() ?? Task.CompletedTask)" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@Field.Title</MudButton>
+    <MudButton OnClick="OpenPopup" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@Field.Title</MudButton>
 }
 
 @code {
     [Parameter] public DCCreatureDetailedPopupField Field { get; set; } = default!;
     [Parameter] public bool EditionMode { get; set; } = false;
     [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
     private GenericModal<DetailedPopupFieldPopup>? _modal;
 
-    private void NotifyParentOnChange()
+    private async Task OpenPopup()
     {
-        if (OnChange.HasDelegate)
+        if (_modal is not null)
+            await _modal.ShowAsync();
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                Action = "Opened"
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

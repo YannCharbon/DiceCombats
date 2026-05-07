@@ -36,10 +36,10 @@ else
             @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
             {
                 var index = i;
-                <MudCheckBox T="bool" Label="@Field.Labels[index]" Value="Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
+                <MudCheckBox T="bool" Label="@Field.Labels[index]" Value="@Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
                 @if (Field.ShowTextFields == true)
                 {
-                    <MudTextField T="string" AutoGrow spellcheck="false" Value="Field.TextFields[index]" ValueChanged="@((string v) => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                    <MudTextField T="string" AutoGrow spellcheck="false" Value="@Field.TextFields[index]" ValueChanged="@((string v) => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                 }
             }
         </MudStack>
@@ -56,20 +56,32 @@ else
     {
         var oldValue = Field.SelectedOptions[index];
         Field.SelectedOptions[index] = newValue;
-        await RaiseChanged(oldValue, newValue);
+        await RaiseChanged(oldValue, newValue, newValue ? "Checked" : "Unchecked", index, Field.Labels.ElementAtOrDefault(index));
     }
 
     private async Task OnTextChanged(int index, string newValue)
     {
         var oldValue = Field.TextFields[index];
         Field.TextFields[index] = newValue;
-        await RaiseChanged(oldValue, newValue);
+        await RaiseChanged(oldValue, newValue, "TextChanged", index, Field.Labels.ElementAtOrDefault(index), Field.TextFieldsLabels.ElementAtOrDefault(index));
     }
 
-    private async Task RaiseChanged(object? oldValue, object? newValue)
+    private async Task RaiseChanged(object? oldValue, object? newValue, string action, int index, string? optionName, string? textLabel = null)
     {
         if (OnFieldChanged.HasDelegate)
-            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo { Field = Field, OldValue = oldValue, NewValue = newValue });
+        {
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = action,
+                OptionIndex = index,
+                OptionName = optionName,
+                TextLabel = textLabel
+            });
+        }
+
         if (OnChange.HasDelegate)
             await OnChange.InvokeAsync();
     }

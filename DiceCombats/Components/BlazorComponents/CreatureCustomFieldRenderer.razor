@@ -7,8 +7,10 @@
 *@
 
 @using DiceCombats
+@using DiceCombats.Automations
 @using MudBlazor.Utilities
 @inject DiceCombatsService CombatService
+@inject IDiceEventPublisher EventPublisher
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 <style>
@@ -56,10 +58,10 @@
         <MudItem sm="4">
             @if (CombatService.GetUserCreatureCustomFieldByName(Field.Title) == null)
             {
-                <MudButton OnClick="@(() => CombatService.AddUserCreatureCustomField(Field))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
+                <MudButton OnClick="SaveUserCustomField" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
             } else
             {
-                <MudButton OnClick="@(() => CombatService.RemoveUserCreatureCustomFieldByName(Field.Title))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonRemove" Color="@Color.Error" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
+                <MudButton OnClick="RemoveUserCustomField" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonRemove" Color="@Color.Error" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
             }
         </MudItem>
         <MudItem sm="2">
@@ -78,11 +80,11 @@ else if (Field is DCCreatureNumericField numericField)
 }
 else if (Field is DCCreatureTextField textField)
 {
-    <CCFTextField Field="textField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFTextField Field="textField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureTextGridField textGridField)
 {
-    <CCFTextGridField Field="textGridField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFTextGridField Field="textGridField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureCheckboxField checkBoxField)
 {
@@ -90,23 +92,23 @@ else if (Field is DCCreatureCheckboxField checkBoxField)
 }
 else if (Field is DCCreatureCheckboxGridField checkboxGridField)
 {
-    <CCFCheckboxGridField Field="checkboxGridField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFCheckboxGridField Field="checkboxGridField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureColorField colorField)
 {
-    <CCFColorField Field="colorField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFColorField Field="colorField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureConditionsField dndConditionsField)
 {
-    <CCFConditionsField Field="dndConditionsField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFConditionsField Field="dndConditionsField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureStatsField statsField)
 {
-    <CCFStatsField Field="statsField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFStatsField Field="statsField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 else if (Field is DCCreatureDetailedPopupField detailedPopupField)
 {
-    <CCFDetailedPopupField Field="detailedPopupField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" />
+    <CCFDetailedPopupField Field="detailedPopupField" EditionMode="EditionMode" OnChange="NotifyParentOnChange" OnFieldChanged="NotifyParentOnFieldChanged" />
 }
 
 @code {
@@ -133,11 +135,42 @@ else if (Field is DCCreatureDetailedPopupField detailedPopupField)
         {
             await OnFieldChanged.InvokeAsync(info);
         }
+    }
 
-        if (OnChange.HasDelegate)
+    private async Task SaveUserCustomField()
+    {
+        if (CombatService.AddUserCreatureCustomField(Field))
         {
-            await OnChange.InvokeAsync();
+            await EventPublisher.PublishAsync(new DiceEvent
+            {
+                Type = DiceEventTypes.UserCustomFieldSaved,
+                Category = "Custom fields",
+                DisplayName = "User custom field saved",
+                Data = new()
+                {
+                    ["fieldTitle"] = Field.Title,
+                    ["fieldType"] = Field.FieldType,
+                    ["isUserCustomField"] = true
+                }
+            });
         }
     }
 
+    private async Task RemoveUserCustomField()
+    {
+        CombatService.RemoveUserCreatureCustomFieldByName(Field.Title);
+
+        await EventPublisher.PublishAsync(new DiceEvent
+        {
+            Type = DiceEventTypes.UserCustomFieldRemoved,
+            Category = "Custom fields",
+            DisplayName = "User custom field removed",
+            Data = new()
+            {
+                ["fieldTitle"] = Field.Title,
+                ["fieldType"] = Field.FieldType,
+                ["isUserCustomField"] = true
+            }
+        });
+    }
 }

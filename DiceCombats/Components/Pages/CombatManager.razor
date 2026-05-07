@@ -401,6 +401,31 @@
     {
         StateHasChanged();
 
+        var typedEventType = GetCustomFieldEventType(info);
+        var data = BuildCustomFieldEventData(creature, instanceIndex, info);
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
+        {
+            Type = DiceCombats.Automations.DiceEventTypes.CustomFieldChanged,
+            Category = "Custom fields",
+            DisplayName = "Custom field changed",
+            Data = new Dictionary<string, object?>(data)
+        });
+
+        if (typedEventType != DiceCombats.Automations.DiceEventTypes.CustomFieldChanged)
+        {
+            await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
+            {
+                Type = typedEventType,
+                Category = "Custom fields",
+                DisplayName = data.TryGetValue("fieldType", out var fieldType) ? $"{fieldType} field event" : "Custom field event",
+                Data = data
+            });
+        }
+    }
+
+    private Dictionary<string, object?> BuildCustomFieldEventData(DCCreature creature, int instanceIndex, CustomFieldChangeInfo info)
+    {
         var data = new Dictionary<string, object?>
         {
             ["combatId"] = _combat.Id,
@@ -410,26 +435,93 @@
             ["instanceIndex"] = instanceIndex,
             ["fieldTitle"] = info.Field.Title,
             ["fieldType"] = info.Field.FieldType,
+            ["eventAction"] = info.Action,
             ["oldValue"] = info.OldValue,
             ["newValue"] = info.NewValue
         };
 
+        AddIfNotNull(data, "changeDirection", info.ChangeDirection);
+        AddIfNotNull(data, "optionIndex", info.OptionIndex);
+        AddIfNotNull(data, "optionName", info.OptionName);
+        AddIfNotNull(data, "rowIndex", info.RowIndex);
+        AddIfNotNull(data, "rowName", info.RowName);
+        AddIfNotNull(data, "columnIndex", info.ColumnIndex);
+        AddIfNotNull(data, "columnName", info.ColumnName);
+        AddIfNotNull(data, "statIndex", info.StatIndex);
+        AddIfNotNull(data, "statName", info.StatName);
+        AddIfNotNull(data, "textLabel", info.TextLabel);
+
+        var oldNumber = ToNullableDouble(info.OldValue);
+        var newNumber = ToNullableDouble(info.NewValue);
+        if (oldNumber.HasValue && newNumber.HasValue)
+        {
+            data["oldNumericValue"] = oldNumber.Value;
+            data["numericValue"] = newNumber.Value;
+            data["delta"] = newNumber.Value - oldNumber.Value;
+            data["changeDirection"] = GetChangeDirection(oldNumber.Value, newNumber.Value);
+        }
+
         if (info.Field is DCCreatureHitPointsField hp && hp.MaximumHP > 0)
         {
-            var oldHp = Convert.ToDouble(info.OldValue ?? hp.CurrentHP);
-            var newHp = Convert.ToDouble(info.NewValue ?? hp.CurrentHP);
+            var oldHp = oldNumber ?? hp.CurrentHP;
+            var newHp = newNumber ?? hp.CurrentHP;
             data["maximumValue"] = hp.MaximumHP;
             data["oldPercentage"] = oldHp * 100d / hp.MaximumHP;
             data["percentage"] = newHp * 100d / hp.MaximumHP;
         }
 
-        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
+        return data;
+    }
+
+    private static string GetCustomFieldEventType(CustomFieldChangeInfo info)
+    {
+        return info.Field switch
         {
-            Type = DiceCombats.Automations.DiceEventTypes.CustomFieldChanged,
-            Category = "Custom fields",
-            DisplayName = "Custom field changed",
-            Data = data
-        });
+            DCCreatureNumericField => DiceCombats.Automations.DiceEventTypes.CustomFieldNumericChanged,
+            DCCreatureHitPointsField => DiceCombats.Automations.DiceEventTypes.CustomFieldHitPointsChanged,
+            DCCreatureTextField => DiceCombats.Automations.DiceEventTypes.CustomFieldTextChanged,
+            DCCreatureCheckboxField => info.Action == "TextChanged" ? DiceCombats.Automations.DiceEventTypes.CustomFieldCheckboxTextChanged : DiceCombats.Automations.DiceEventTypes.CustomFieldCheckboxOptionChanged,
+            DCCreatureCheckboxGridField => DiceCombats.Automations.DiceEventTypes.CustomFieldCheckboxGridCellChanged,
+            DCCreatureConditionsField => DiceCombats.Automations.DiceEventTypes.CustomFieldConditionsOptionChanged,
+            DCCreatureTextGridField => DiceCombats.Automations.DiceEventTypes.CustomFieldTextGridCellChanged,
+            DCCreatureColorField => DiceCombats.Automations.DiceEventTypes.CustomFieldColorChanged,
+            DCCreatureStatsField => DiceCombats.Automations.DiceEventTypes.CustomFieldStatsValueChanged,
+            DCCreatureDetailedPopupField => DiceCombats.Automations.DiceEventTypes.CustomFieldDetailedPopupOpened,
+            _ => DiceCombats.Automations.DiceEventTypes.CustomFieldChanged
+        };
+    }
+
+    private static void AddIfNotNull(Dictionary<string, object?> data, string key, object? value)
+    {
+        if (value is not null)
+        {
+            data[key] = value;
+        }
+    }
+
+    private static double? ToNullableDouble(object? value)
+    {
+        if (value is null) return null;
+        if (value is IConvertible convertible)
+        {
+            try
+            {
+                return convertible.ToDouble(System.Globalization.CultureInfo.InvariantCulture);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private static string GetChangeDirection(double oldValue, double newValue)
+    {
+        if (newValue > oldValue) return "Increased";
+        if (newValue < oldValue) return "Decreased";
+        return "Unchanged";
     }
 
     private async Task SortCreaturesInitiativeRankByRoll()
@@ -490,7 +582,18 @@
             }
         }
         await JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
-        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["previousCreatureId"] = previous.Id, ["previousCreatureName"] = previous.Name, ["currentCreatureId"] = _currentInitiativeCreature.Id, ["currentCreatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature) } });
+
+        var previousIndex = _initiativeWindowCreatureListCopy.IndexOf(previous);
+        var currentIndex = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["previousCreatureId"] = previous.Id, ["previousCreatureName"] = previous.Name, ["previousInitiativeIndex"] = previousIndex, ["currentCreatureId"] = _currentInitiativeCreature.Id, ["currentCreatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = currentIndex } });
+
+        if (previous.Id != Guid.Empty)
+        {
+            await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureLostInitiative, Category = "Creatures", DisplayName = "Creature lost initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = previous.Id, ["creatureName"] = previous.Name, ["initiativeIndex"] = previousIndex } });
+        }
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureGotInitiative, Category = "Creatures", DisplayName = "Creature got initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = _currentInitiativeCreature.Id, ["creatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = currentIndex } });
     }
 
     private void OpenCreaturesSelectorModal()

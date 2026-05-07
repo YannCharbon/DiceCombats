@@ -5,13 +5,13 @@
 
 @if (EditionMode)
 {
-    <MudNumericField T="uint" Value="Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" />
+    <MudNumericField T="uint" Value="@Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
         <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
-            <MudNumericField T="uint" Value="Field.CurrentHP" ValueChanged="OnCurrentHpChanged" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+            <MudNumericField T="uint" Value="@Field.CurrentHP" ValueChanged="OnCurrentHpChanged" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
         </MudStack>
     </div>
 }
@@ -26,21 +26,38 @@ else
     {
         var oldValue = Field.CurrentHP;
         Field.CurrentHP = value;
-        await NotifyParentOnChange(oldValue, value);
+        await NotifyParentOnChange(oldValue, value, "CurrentChanged");
     }
 
     private async Task OnMaximumHpChanged(uint value)
     {
         var oldValue = Field.MaximumHP;
         Field.MaximumHP = value;
-        await NotifyParentOnChange(oldValue, value);
+        await NotifyParentOnChange(oldValue, value, "MaximumChanged");
     }
 
-    private async Task NotifyParentOnChange(object? oldValue, object? newValue)
+    private async Task NotifyParentOnChange(uint oldValue, uint newValue, string action)
     {
         if (OnFieldChanged.HasDelegate)
-            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo { Field = Field, OldValue = oldValue, NewValue = newValue });
+        {
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = action,
+                ChangeDirection = GetChangeDirection(oldValue, newValue)
+            });
+        }
+
         if (OnChange.HasDelegate)
             await OnChange.InvokeAsync();
+    }
+
+    private static string GetChangeDirection(uint oldValue, uint newValue)
+    {
+        if (newValue > oldValue) return "Increased";
+        if (newValue < oldValue) return "Decreased";
+        return "Unchanged";
     }
 }

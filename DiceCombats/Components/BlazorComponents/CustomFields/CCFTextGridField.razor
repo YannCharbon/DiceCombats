@@ -33,7 +33,6 @@
                     @if (Field.HasRowHeaders)
                     {
                         <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="Field.RowHeaders[i]" Label="@Loc["TextGridRowName"]" Variant="Variant.Outlined" /></td>
-
                     }
                     @foreach (int j in Enumerable.Range(0, Field.Columns))
                     {
@@ -76,21 +75,23 @@ else
                         }
                         @foreach (int i in Enumerable.Range(0, Field.Rows))
                         {
+                            var rowIndex = i;
                             <tr>
                                 @if (Field.HasRowHeaders)
                                 {
-                                    <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[i]</span></td>
+                                    <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[rowIndex]</span></td>
                                 }
                                 @foreach (int j in Enumerable.Range(0, Field.Columns))
                                 {
+                                    var columnIndex = j;
                                     <td style="padding:3px;vertical-align:top;">
-                                        @if (Field.HasTextLabels[i][j] == true)
+                                        @if (Field.HasTextLabels[rowIndex][columnIndex] == true)
                                         {
-                                            <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="Field.TextValues[i][j]" Label="@Field.TextLabels[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                            <MudTextField T="string" AutoGrow Immediate="true" spellcheck="false" Value="@Field.TextValues[rowIndex][columnIndex]" ValueChanged="@((string v) => OnTextValueChanged(rowIndex, columnIndex, v))" Label="@Field.TextLabels[rowIndex][columnIndex]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                                         }
                                         else
                                         {
-                                            <MudTextField AutoGrow Immediate="true" spellcheck="false" @bind-Value="Field.TextValues[i][j]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                            <MudTextField T="string" AutoGrow Immediate="true" spellcheck="false" Value="@Field.TextValues[rowIndex][columnIndex]" ValueChanged="@((string v) => OnTextValueChanged(rowIndex, columnIndex, v))" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                                         }
                                     </td>
                                 }
@@ -104,18 +105,33 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureTextGridField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureTextGridField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnTextValueChanged(int rowIndex, int columnIndex, string value)
     {
-        if (OnChange.HasDelegate)
+        var oldValue = Field.TextValues[rowIndex][columnIndex];
+        Field.TextValues[rowIndex][columnIndex] = value;
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = value,
+                Action = "Changed",
+                RowIndex = rowIndex,
+                RowName = Field.RowHeaders.ElementAtOrDefault(rowIndex),
+                ColumnIndex = columnIndex,
+                ColumnName = Field.ColumnHeaders.ElementAtOrDefault(columnIndex),
+                TextLabel = Field.TextLabels[rowIndex].ElementAtOrDefault(columnIndex)
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

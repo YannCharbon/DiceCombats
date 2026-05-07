@@ -5,7 +5,7 @@
 
 @if (EditionMode)
 {
-    <MudColorPicker Variant="Variant.Outlined" ColorPickerView="ColorPickerView.GridCompact" Label="@Loc["ColorPickerName"]" @bind-Text="Field.Value" Style="@($"color: {Field.Value};")" Placeholder="Select Color" />
+    <MudColorPicker Variant="Variant.Outlined" ColorPickerView="ColorPickerView.GridCompact" Label="@Loc["ColorPickerName"]" Text="@Field.Value" TextChanged="OnColorChanged" Style="@($"color: {Field.Value};")" Placeholder="Select Color" />
 }
 else
 {
@@ -13,19 +13,20 @@ else
         <MudStack Row="true" Wrap="Wrap.Wrap">
             @if (_showColorPicker)
             {
-                <div @onclick="() => {_showColorPicker = false; NotifyParentOnChange();}">
+                <div @onclick="ToggleColorPicker">
                     <MudColorPicker PickerVariant="PickerVariant.Static"
                                     ColorPickerView="ColorPickerView.GridCompact"
                                     Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
-                                    @bind-Text="Field.Value"
+                                    Text="@Field.Value"
+                                    TextChanged="OnColorChanged"
                                     Style="@($"color: {Field.Value ?? ""};")" Placeholder="Select Color" />
                 </div>
-                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;Close&nbsp;</span>
+                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="ToggleColorPicker">&nbsp;Close&nbsp;</span>
             }
             else
             {
                 <span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span>
-                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="() => {_showColorPicker = !_showColorPicker; NotifyParentOnChange();}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="ToggleColorPicker">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             }
 
         </MudStack>
@@ -33,20 +34,37 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureColorField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureColorField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
     private bool _showColorPicker = false;
 
-    private void NotifyParentOnChange()
+    private async Task ToggleColorPicker()
     {
+        _showColorPicker = !_showColorPicker;
         if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
+    }
+
+    private async Task OnColorChanged(string value)
+    {
+        var oldValue = Field.Value;
+        Field.Value = value;
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = value,
+                Action = "Changed"
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

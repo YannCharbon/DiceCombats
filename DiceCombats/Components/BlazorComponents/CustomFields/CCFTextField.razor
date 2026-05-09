@@ -5,28 +5,38 @@
 
 @if (EditionMode)
 {
-    <MudTextField AutoGrow @bind-Value="Field.Text" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudTextField T="string" AutoGrow Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudTextField AutoGrow spellcheck="false" @bind-Value="Field.Text" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudTextField T="string" AutoGrow spellcheck="false" Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     </div>
 }
 
 @code {
-    [Parameter]
-    public DCCreatureTextField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureTextField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnTextChanged(string value)
     {
-        if (OnChange.HasDelegate)
+        var oldValue = Field.Text;
+        Field.Text = value;
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = value,
+                Action = "Changed"
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

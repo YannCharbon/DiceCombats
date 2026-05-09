@@ -5,28 +5,74 @@
 
 @if (EditionMode)
 {
-    <MudNumericField @bind-Value="Field.Value" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudCheckBox T="bool" @bind-Value="Field.ShowMaxValue" Label="Show max value"></MudCheckBox>
+    @if (Field.ShowMaxValue == true)
+    {
+        <MudNumericField T="int" @bind-value="Field.MaxValue" Label="Max value" Variant="Variant.Outlined" />
+    }
+    <MudCheckBox T="bool" @bind-Value="Field.ShowUnit" Label="Show unit"></MudCheckBox>
+    @if (Field.ShowUnit == true)
+    {
+        <MudTextField T="string" spellcheck="false" @bind-value="Field.Unit" Label="Unit" Variant="Variant.Outlined" />
+    }
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudNumericField @bind-Value="Field.Value" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        @if (Field.ShowMaxValue)
+        {
+            <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaxValue.ToString() + (Field.ShowUnit == true ? (" " + Field.Unit) : ""))" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        }
+        else
+        {
+            <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        }
     </div>
 }
 
 @code {
-    [Parameter]
-    public DCCreatureNumericField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureNumericField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnValueChanged(int value)
     {
-        if (OnChange.HasDelegate)
+        var oldValue = Field.Value;
+        Field.Value = value;
+        await RaiseChanged(oldValue, value);
+    }
+
+    private async Task RaiseChanged(int oldValue, int newValue)
+    {
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = "Changed",
+                ChangeDirection = GetChangeDirection(oldValue, newValue),
+                Data = new Dictionary<string, object?>
+                {
+                    ["showMaxValue"] = Field.ShowMaxValue,
+                    ["maximumValue"] = Field.ShowMaxValue ? Field.MaxValue : null,
+                    ["showUnit"] = Field.ShowUnit,
+                    ["unit"] = Field.ShowUnit ? Field.Unit : null
+                }
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
+    }
+
+    private static string GetChangeDirection(int oldValue, int newValue)
+    {
+        if (newValue > oldValue) return "Increased";
+        if (newValue < oldValue) return "Decreased";
+        return "Unchanged";
     }
 }

@@ -35,10 +35,11 @@ else
         <MudStack Row="true">
             @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
             {
-                <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                var index = i;
+                <MudCheckBox T="bool" Label="@Field.Labels[index]" Value="@Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
                 @if (Field.ShowTextFields == true)
                 {
-                    <MudTextField AutoGrow spellcheck="false" @bind-Value="Field.TextFields[i]" Label="@Field.TextFieldsLabels[i]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                    <MudTextField T="string" AutoGrow spellcheck="false" Value="@Field.TextFields[index]" ValueChanged="@((string v) => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                 }
             }
         </MudStack>
@@ -46,18 +47,42 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureCheckboxField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureCheckboxField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnOptionChanged(int index, bool newValue)
     {
-        if (OnChange.HasDelegate)
+        var oldValue = Field.SelectedOptions[index];
+        Field.SelectedOptions[index] = newValue;
+        await RaiseChanged(oldValue, newValue, newValue ? "Checked" : "Unchecked", index, Field.Labels.ElementAtOrDefault(index));
+    }
+
+    private async Task OnTextChanged(int index, string newValue)
+    {
+        var oldValue = Field.TextFields[index];
+        Field.TextFields[index] = newValue;
+        await RaiseChanged(oldValue, newValue, "TextChanged", index, Field.Labels.ElementAtOrDefault(index), Field.TextFieldsLabels.ElementAtOrDefault(index));
+    }
+
+    private async Task RaiseChanged(object? oldValue, object? newValue, string action, int index, string? optionName, string? textLabel = null)
+    {
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = action,
+                OptionIndex = index,
+                OptionName = optionName,
+                TextLabel = textLabel
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

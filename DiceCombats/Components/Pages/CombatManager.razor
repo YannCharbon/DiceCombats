@@ -13,6 +13,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<Resources.Localization.CombatManager> Loc
+@inject DiceCombats.Automations.IDiceEventPublisher EventPublisher
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
@@ -285,7 +286,7 @@
                                     {
                                         <div>
                                             <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" OnFieldChanged="@(info => OnCustomFieldChanged(creature, 0, info))" />
                                             </MudPaper>
                                         </div>
                                     }
@@ -296,17 +297,25 @@
                         @if (nonSharedFields.Count > 0)
                         {
                             @* Render non-shared fields for each creature instance *@
-                            @foreach (var instanceCustomFields in _combat.GetCreatureInstancesCustomFields(creature))
+                            var creatureInstancesCustomFields = _combat.GetCreatureInstancesCustomFields(creature);
+
+                            @for (int instanceIndex = 0; instanceIndex < creatureInstancesCustomFields.Count; instanceIndex++)
                             {
-                                <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{ instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px { instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
+                                var capturedInstanceIndex = instanceIndex;
+                                var instanceCustomFields = creatureInstancesCustomFields[instanceIndex];
+
+                                <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px {instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
                                     <div class="d-flex flex-wrap gap-2" style="align-items:center;">
                                         @foreach (DCCreatureCustomField field in instanceCustomFields)
                                         {
-                                            @if (field.SharedAcrossCreatureInstances == false)
+                                            if (field.SharedAcrossCreatureInstances == false)
                                             {
                                                 <div>
                                                     <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                        <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" />
+                                                        <CreatureCustomFieldRenderer Field="field"
+                                                                                     EditionMode="false"
+                                                                                     OnChange="OnCustomFieldChanged"
+                                                                                     OnFieldChanged="@(info => OnCustomFieldChanged(creature, capturedInstanceIndex, info))" />
                                                     </MudPaper>
                                                 </div>
                                             }
@@ -360,7 +369,7 @@
 
         _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
 
-        SortCreaturesInitiativeRankByRoll();
+        _ = SortCreaturesInitiativeRankByRoll();
 
         base.OnInitialized();
     }
@@ -381,12 +390,24 @@
         }
     }
 
-    private void OnCustomFieldChanged()
+    private Task OnCustomFieldChanged()
     {
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
-    private void SortCreaturesInitiativeRankByRoll()
+
+    private async Task OnCustomFieldChanged(DCCreature creature, int instanceIndex, CustomFieldChangeInfo info)
+    {
+        StateHasChanged();
+
+        foreach (var diceEvent in DiceCombats.Automations.CustomFieldEventFactory.CreateCustomFieldEvents(_combat, creature, instanceIndex, info))
+        {
+            await EventPublisher.PublishAsync(diceEvent);
+        }
+    }
+
+    private async Task SortCreaturesInitiativeRankByRoll()
     {
         _initiativeWindowCreatureListCopy = _initiativeWindowCreatureListCopy.OrderByDescending(x => x.InitiativeRoll).ToList();
 
@@ -409,19 +430,28 @@
         }
 
         _currentInitiativeCreature = _initiativeWindowCreatureListCopy.First();
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
+        {
+            Type = DiceCombats.Automations.DiceEventTypes.InitiativeSorted,
+            Category = "Initiative",
+            DisplayName = "Initiative sorted",
+            Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name }
+        });
     }
 
-    private void CreaturesInitiativeReset()
+    private async Task CreaturesInitiativeReset()
     {
         foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
         {
             creature.InitiativeRoll = 0;
             creature.InitiativeRank = 0;
         }
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeReset, Category = "Initiative", DisplayName = "Initiative reset", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name } });
     }
 
-    private void MoveToNextCreatureInInitiative()
+    private async Task MoveToNextCreatureInInitiative()
     {
+        var previous = _currentInitiativeCreature;
         int idx = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
         if (idx >= 0)
         {
@@ -434,7 +464,19 @@
                 _currentInitiativeCreature = _initiativeWindowCreatureListCopy[0];
             }
         }
-        JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
+        await JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
+
+        var previousIndex = _initiativeWindowCreatureListCopy.IndexOf(previous);
+        var currentIndex = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["previousCreatureId"] = previous.Id, ["previousCreatureName"] = previous.Name, ["previousInitiativeIndex"] = previousIndex, ["currentCreatureId"] = _currentInitiativeCreature.Id, ["currentCreatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = currentIndex } });
+
+        if (previous.Id != Guid.Empty)
+        {
+            await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureLostInitiative, Category = "Creatures", DisplayName = "Creature lost initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = previous.Id, ["creatureName"] = previous.Name, ["initiativeIndex"] = previousIndex } });
+        }
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureGotInitiative, Category = "Creatures", DisplayName = "Creature got initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = _currentInitiativeCreature.Id, ["creatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = currentIndex } });
     }
 
     private void OpenCreaturesSelectorModal()
@@ -474,24 +516,28 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void StartTimer()
+    private async Task StartTimer()
     {
+        _timer.Elapsed -= TimerElapsed;
         _timer.Elapsed += TimerElapsed;
         _timer.Start();
         _timer.Enabled = true;
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerStarted, Category = "Timer", DisplayName = "Timer started", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 
-    private void PauseTimer()
+    private async Task PauseTimer()
     {
         _timer.Enabled = false;
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerPaused, Category = "Timer", DisplayName = "Timer paused", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 
-    private void StopTimer()
+    private async Task StopTimer()
     {
         _timer.Stop();
         _timer.Enabled = false;
         _timer.Elapsed -= TimerElapsed;
         _combat.DurationCount = 0;
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerStopped, Category = "Timer", DisplayName = "Timer stopped", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 
     private string GetDurationAsString()

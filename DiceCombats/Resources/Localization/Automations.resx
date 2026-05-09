@@ -1,0 +1,546 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ActionName" xml:space="preserve">
+    <value>Action name</value>
+  </data>
+  <data name="ActionTitle" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="ActionsSequence" xml:space="preserve">
+    <value>Actions sequence</value>
+  </data>
+  <data name="AddAutomation" xml:space="preserve">
+    <value>Add automation</value>
+  </data>
+  <data name="AddDelay" xml:space="preserve">
+    <value>Add Delay</value>
+  </data>
+  <data name="AddExternalApp" xml:space="preserve">
+    <value>Add external app</value>
+  </data>
+  <data name="AddHttpRequest" xml:space="preserve">
+    <value>Add HTTP Request</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>App name</value>
+  </data>
+  <data name="Assistance" xml:space="preserve">
+    <value>Assistance</value>
+  </data>
+  <data name="AssistanceActionsText1" xml:space="preserve">
+    <value>Actions run from left to right. Use HTTP requests to call another app and delays to pause between requests. If</value>
+  </data>
+  <data name="AssistanceActionsText2" xml:space="preserve">
+    <value>is disabled, the remaining actions are skipped after a failed action.</value>
+  </data>
+  <data name="AssistanceActionsTitle" xml:space="preserve">
+    <value>3. Actions</value>
+  </data>
+  <data name="AssistanceAutomationsText" xml:space="preserve">
+    <value>Add one automation for each independent rule. Give it a clear name, keep it enabled, then choose when it should run. Some triggers can be restricted to specific creatures, custom fields, options, stats, or numeric thresholds. Empty filters mean “any”.</value>
+  </data>
+  <data name="AssistanceAutomationsTitle" xml:space="preserve">
+    <value>2. Automations</value>
+  </data>
+  <data name="AssistanceExternalAppsText1" xml:space="preserve">
+    <value>Add an external app when several HTTP actions target the same server. Set its base URL, for example</value>
+  </data>
+  <data name="AssistanceExternalAppsText2" xml:space="preserve">
+    <value>HTTP actions can then use short relative paths such as</value>
+  </data>
+  <data name="AssistanceExternalAppsText3" xml:space="preserve">
+    <value>You can also skip external apps and enter an absolute URL directly in an HTTP action.</value>
+  </data>
+  <data name="AssistanceExternalAppsTitle" xml:space="preserve">
+    <value>1. External apps</value>
+  </data>
+  <data name="AssistanceSaveLogsText1" xml:space="preserve">
+    <value>Press</value>
+  </data>
+  <data name="AssistanceSaveLogsText2" xml:space="preserve">
+    <value>after editing. Delivery logs at the bottom of this page show which automation ran, whether it succeeded, the HTTP status code, and possible error messages.</value>
+  </data>
+  <data name="AssistanceSaveLogsTitle" xml:space="preserve">
+    <value>4. Save and check logs</value>
+  </data>
+  <data name="AssistanceWhatAutomationsDoText" xml:space="preserve">
+    <value>Automations let DiceCombats react to combat events. An automation watches for one trigger, then runs one or more actions in order. Typical uses are starting or stopping an external timer, notifying another tool, or sending the current creature information to a local companion app.</value>
+  </data>
+  <data name="AssistanceWhatAutomationsDoTitle" xml:space="preserve">
+    <value>What automations do</value>
+  </data>
+  <data name="AutomationFallback" xml:space="preserve">
+    <value>Automation</value>
+  </data>
+  <data name="AutomationName" xml:space="preserve">
+    <value>Automation name</value>
+  </data>
+  <data name="AutomationsSectionTitle" xml:space="preserve">
+    <value>Automations</value>
+  </data>
+  <data name="BaseUrl" xml:space="preserve">
+    <value>Base URL</value>
+  </data>
+  <data name="BodyTemplate" xml:space="preserve">
+    <value>Body template</value>
+  </data>
+  <data name="Comparison" xml:space="preserve">
+    <value>Comparison</value>
+  </data>
+  <data name="ContinueOnFailure" xml:space="preserve">
+    <value>Continue on failure</value>
+  </data>
+  <data name="CreaturesEmptyAnyCreature" xml:space="preserve">
+    <value>Creatures (empty = any creature)</value>
+  </data>
+  <data name="CustomFieldEmptyAnyMatchingField" xml:space="preserve">
+    <value>Custom field (empty = any matching field)</value>
+  </data>
+  <data name="DefaultDelayName" xml:space="preserve">
+    <value>Delay</value>
+  </data>
+  <data name="DefaultHttpRequestName" xml:space="preserve">
+    <value>HTTP request</value>
+  </data>
+  <data name="DelayMilliseconds" xml:space="preserve">
+    <value>Delay milliseconds</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteAction" xml:space="preserve">
+    <value>Delete action</value>
+  </data>
+  <data name="DeleteAutomation" xml:space="preserve">
+    <value>Delete automation</value>
+  </data>
+  <data name="DeliveryLogs" xml:space="preserve">
+    <value>Delivery logs</value>
+  </data>
+  <data name="Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="EndTitle" xml:space="preserve">
+    <value>End</value>
+  </data>
+  <data name="EndpointAbsoluteUrl" xml:space="preserve">
+    <value>Endpoint absolute URL</value>
+  </data>
+  <data name="EndpointRelativePath" xml:space="preserve">
+    <value>Endpoint relative path</value>
+  </data>
+  <data name="EventDataPlaceholdersTitle" xml:space="preserve">
+    <value>Event data placeholders</value>
+  </data>
+  <data name="EventTitle" xml:space="preserve">
+    <value>Event</value>
+  </data>
+  <data name="ExampleNumericMaxText1" xml:space="preserve">
+    <value>On the creature custom field, enable the numeric maximum value display first. Then create an automation with trigger</value>
+  </data>
+  <data name="ExampleNumericMaxText2" xml:space="preserve">
+    <value>Select the relevant creature and field, or leave them empty to react to any matching field.</value>
+  </data>
+  <data name="ExampleNumericMaxTitle" xml:space="preserve">
+    <value>Example: react when a numeric field reaches its maximum</value>
+  </data>
+  <data name="ExampleTimerText1" xml:space="preserve">
+    <value>Create an external app named</value>
+  </data>
+  <data name="ExampleTimerText2" xml:space="preserve">
+    <value>with base URL</value>
+  </data>
+  <data name="ExampleTimerText3" xml:space="preserve">
+    <value>Then create an automation with trigger</value>
+  </data>
+  <data name="ExampleTimerText4" xml:space="preserve">
+    <value>and add an HTTP POST action to</value>
+  </data>
+  <data name="ExampleTimerTitle" xml:space="preserve">
+    <value>Example: send the active creature to an external timer</value>
+  </data>
+  <data name="ExternalAppNoneAbsolute" xml:space="preserve">
+    <value>None (use absolute URL)</value>
+  </data>
+  <data name="ExternalAppOptional" xml:space="preserve">
+    <value>External app (optional)</value>
+  </data>
+  <data name="ExternalApps" xml:space="preserve">
+    <value>External apps</value>
+  </data>
+  <data name="FieldType_Checkbox" xml:space="preserve">
+    <value>Checkbox</value>
+  </data>
+  <data name="FieldType_CheckboxGrid" xml:space="preserve">
+    <value>Checkbox grid</value>
+  </data>
+  <data name="FieldType_Color" xml:space="preserve">
+    <value>Colour</value>
+  </data>
+  <data name="FieldType_DetailedPopup" xml:space="preserve">
+    <value>Detailed popup</value>
+  </data>
+  <data name="FieldType_DnDConditions" xml:space="preserve">
+    <value>D&amp;D conditions</value>
+  </data>
+  <data name="FieldType_HitPoints" xml:space="preserve">
+    <value>Hit points</value>
+  </data>
+  <data name="FieldType_Numeric" xml:space="preserve">
+    <value>Numeric</value>
+  </data>
+  <data name="FieldType_Stats" xml:space="preserve">
+    <value>Stats</value>
+  </data>
+  <data name="FieldType_Text" xml:space="preserve">
+    <value>Text</value>
+  </data>
+  <data name="FieldType_TextGrid" xml:space="preserve">
+    <value>Text grid</value>
+  </data>
+  <data name="HeadersOnePerLine" xml:space="preserve">
+    <value>Headers (one per line: Name: value)</value>
+  </data>
+  <data name="LogFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="LogSuccess" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="MeaningColumn" xml:space="preserve">
+    <value>Meaning</value>
+  </data>
+  <data name="Method" xml:space="preserve">
+    <value>Method</value>
+  </data>
+  <data name="NewAppName" xml:space="preserve">
+    <value>New app</value>
+  </data>
+  <data name="NewAutomationName" xml:space="preserve">
+    <value>New automation</value>
+  </data>
+  <data name="OnlyWhenValueCrossesThreshold" xml:space="preserve">
+    <value>Only when the value crosses this threshold</value>
+  </data>
+  <data name="OptionEmptyAnyOption" xml:space="preserve">
+    <value>Option (empty = any option)</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="PlaceholderCatalogueIntro1" xml:space="preserve">
+    <value>In HTTP URL, body, and header values, use</value>
+  </data>
+  <data name="PlaceholderCatalogueIntro2" xml:space="preserve">
+    <value>placeholders to insert event data. Unknown or unavailable placeholders are replaced by an empty value. The available</value>
+  </data>
+  <data name="PlaceholderCatalogueIntro3" xml:space="preserve">
+    <value>values depend on the selected trigger.</value>
+  </data>
+  <data name="PlaceholderCatalogueTitle" xml:space="preserve">
+    <value>Placeholder catalogue for HTTP templates</value>
+  </data>
+  <data name="PlaceholderColumn" xml:space="preserve">
+    <value>Placeholder</value>
+  </data>
+  <data name="PlaceholderMeaningCategory" xml:space="preserve">
+    <value>Event family, for example</value>
+  </data>
+  <data name="PlaceholderMeaningDisplayName" xml:space="preserve">
+    <value>Readable event name shown by DiceCombats.</value>
+  </data>
+  <data name="PlaceholderMeaningId" xml:space="preserve">
+    <value>Unique event id.</value>
+  </data>
+  <data name="PlaceholderMeaningOccurredAt" xml:space="preserve">
+    <value>UTC timestamp in ISO-8601 format.</value>
+  </data>
+  <data name="PlaceholderMeaningType" xml:space="preserve">
+    <value>Technical event type, for example</value>
+  </data>
+  <data name="PlaceholderMetadataTitle" xml:space="preserve">
+    <value>Event metadata, available for every trigger</value>
+  </data>
+  <data name="PlaceholderWhenAllCreatureCustomFieldEvents" xml:space="preserve">
+    <value>All creature custom-field events</value>
+  </data>
+  <data name="PlaceholderWhenCheckboxConditionOptions" xml:space="preserve">
+    <value>Checkbox and condition options</value>
+  </data>
+  <data name="PlaceholderWhenCombatTimer" xml:space="preserve">
+    <value>Combat timer started/paused/stopped</value>
+  </data>
+  <data name="PlaceholderWhenCreatureGotLostInitiative" xml:space="preserve">
+    <value>Creature got/lost initiative</value>
+  </data>
+  <data name="PlaceholderWhenGridCells" xml:space="preserve">
+    <value>Checkbox-grid and text-grid cells</value>
+  </data>
+  <data name="PlaceholderWhenHitPointsField" xml:space="preserve">
+    <value>Hit-points field</value>
+  </data>
+  <data name="PlaceholderWhenMostCombatEvents" xml:space="preserve">
+    <value>Most combat events</value>
+  </data>
+  <data name="PlaceholderWhenNextCreature" xml:space="preserve">
+    <value>Next creature in initiative</value>
+  </data>
+  <data name="PlaceholderWhenNumericHpStatsValueChanges" xml:space="preserve">
+    <value>Numeric, hit-points, and stats value changes</value>
+  </data>
+  <data name="PlaceholderWhenNumericMaximumUnit" xml:space="preserve">
+    <value>Numeric field with maximum/unit enabled</value>
+  </data>
+  <data name="PlaceholderWhenStatsField" xml:space="preserve">
+    <value>Stats field</value>
+  </data>
+  <data name="PlaceholderWhenUserCustomFieldSavedRemoved" xml:space="preserve">
+    <value>User custom field saved/removed</value>
+  </data>
+  <data name="PlaceholdersColumn" xml:space="preserve">
+    <value>Placeholders</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SaveSuccessMessage" xml:space="preserve">
+    <value>Successfully saved automations, triggers and external apps</value>
+  </data>
+  <data name="SaveSuccessTitle" xml:space="preserve">
+    <value>Automations saved</value>
+  </data>
+  <data name="StatEmptyAnyStat" xml:space="preserve">
+    <value>Stat (empty = any stat)</value>
+  </data>
+  <data name="ThresholdLabel_HitPointsThreshold" xml:space="preserve">
+    <value>Hit points (%)</value>
+  </data>
+  <data name="ThresholdLabel_NumericThreshold" xml:space="preserve">
+    <value>Numeric value</value>
+  </data>
+  <data name="ThresholdLabel_StatsThreshold" xml:space="preserve">
+    <value>Stat value</value>
+  </data>
+  <data name="ThresholdLabel_Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="ThresholdOperator_Above" xml:space="preserve">
+    <value>above</value>
+  </data>
+  <data name="ThresholdOperator_AboveOrEqual" xml:space="preserve">
+    <value>above or equal to</value>
+  </data>
+  <data name="ThresholdOperator_Below" xml:space="preserve">
+    <value>below</value>
+  </data>
+  <data name="ThresholdOperator_BelowOrEqual" xml:space="preserve">
+    <value>below or equal to</value>
+  </data>
+  <data name="TimeoutMs" xml:space="preserve">
+    <value>Timeout (ms)</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Automations</value>
+  </data>
+  <data name="Trigger" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="TriggerCategory_Combattimer" xml:space="preserve">
+    <value>Combat timer</value>
+  </data>
+  <data name="TriggerCategory_Creatures" xml:space="preserve">
+    <value>Creatures</value>
+  </data>
+  <data name="TriggerCategory_Customfields" xml:space="preserve">
+    <value>Custom fields</value>
+  </data>
+  <data name="TriggerCategory_Initiative" xml:space="preserve">
+    <value>Initiative</value>
+  </data>
+  <data name="TriggerDisplay_AnyCustomFieldChanged" xml:space="preserve">
+    <value>Custom field changed</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxGridCellChanged" xml:space="preserve">
+    <value>Checkbox grid cell changed</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxGridCellChecked" xml:space="preserve">
+    <value>Checkbox grid cell checked</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxGridCellUnchecked" xml:space="preserve">
+    <value>Checkbox grid cell unchecked</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxOptionChanged" xml:space="preserve">
+    <value>Checkbox option changed</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxOptionChecked" xml:space="preserve">
+    <value>Checkbox option checked</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxOptionUnchecked" xml:space="preserve">
+    <value>Checkbox option unchecked</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxTextChanged" xml:space="preserve">
+    <value>Checkbox text changed</value>
+  </data>
+  <data name="TriggerDisplay_ColourChanged" xml:space="preserve">
+    <value>Colour field changed</value>
+  </data>
+  <data name="TriggerDisplay_ConditionAdded" xml:space="preserve">
+    <value>Condition option added</value>
+  </data>
+  <data name="TriggerDisplay_ConditionRemoved" xml:space="preserve">
+    <value>Condition option removed</value>
+  </data>
+  <data name="TriggerDisplay_ConditionsOptionChanged" xml:space="preserve">
+    <value>Condition option changed</value>
+  </data>
+  <data name="TriggerDisplay_CreatureGotInitiative" xml:space="preserve">
+    <value>Creature got initiative</value>
+  </data>
+  <data name="TriggerDisplay_CreatureLostInitiative" xml:space="preserve">
+    <value>Creature lost initiative</value>
+  </data>
+  <data name="TriggerDisplay_DetailedPopupOpened" xml:space="preserve">
+    <value>Detailed popup opened</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsChanged" xml:space="preserve">
+    <value>Hit points changed</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsDamaged" xml:space="preserve">
+    <value>Hit points decreased</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsHealed" xml:space="preserve">
+    <value>Hit points increased</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsThreshold" xml:space="preserve">
+    <value>Hit points crossed a percentage</value>
+  </data>
+  <data name="TriggerDisplay_InitiativeNext" xml:space="preserve">
+    <value>Next creature in initiative</value>
+  </data>
+  <data name="TriggerDisplay_InitiativeReset" xml:space="preserve">
+    <value>Initiative reset</value>
+  </data>
+  <data name="TriggerDisplay_InitiativeSorted" xml:space="preserve">
+    <value>Initiative sorted</value>
+  </data>
+  <data name="TriggerDisplay_NumericChanged" xml:space="preserve">
+    <value>Numeric field changed</value>
+  </data>
+  <data name="TriggerDisplay_NumericDecreased" xml:space="preserve">
+    <value>Numeric field decreased</value>
+  </data>
+  <data name="TriggerDisplay_NumericIncreased" xml:space="preserve">
+    <value>Numeric field increased</value>
+  </data>
+  <data name="TriggerDisplay_NumericReachedMaxValue" xml:space="preserve">
+    <value>Numeric field reached max value</value>
+  </data>
+  <data name="TriggerDisplay_NumericThreshold" xml:space="preserve">
+    <value>Numeric field crossed a value</value>
+  </data>
+  <data name="TriggerDisplay_StatsChanged" xml:space="preserve">
+    <value>Stat value changed</value>
+  </data>
+  <data name="TriggerDisplay_StatsDecreased" xml:space="preserve">
+    <value>Stat value decreased</value>
+  </data>
+  <data name="TriggerDisplay_StatsIncreased" xml:space="preserve">
+    <value>Stat value increased</value>
+  </data>
+  <data name="TriggerDisplay_StatsThreshold" xml:space="preserve">
+    <value>Stat crossed a value</value>
+  </data>
+  <data name="TriggerDisplay_TextChanged" xml:space="preserve">
+    <value>Text field changed</value>
+  </data>
+  <data name="TriggerDisplay_TextGridCellChanged" xml:space="preserve">
+    <value>Text grid cell changed</value>
+  </data>
+  <data name="TriggerDisplay_TimerPaused" xml:space="preserve">
+    <value>Timer paused</value>
+  </data>
+  <data name="TriggerDisplay_TimerStarted" xml:space="preserve">
+    <value>Timer started</value>
+  </data>
+  <data name="TriggerDisplay_TimerStopped" xml:space="preserve">
+    <value>Timer stopped</value>
+  </data>
+  <data name="TriggerDisplay_UserCustomFieldRemoved" xml:space="preserve">
+    <value>User custom field removed</value>
+  </data>
+  <data name="TriggerDisplay_UserCustomFieldSaved" xml:space="preserve">
+    <value>User custom field saved</value>
+  </data>
+  <data name="TriggerSummaryAnyCreature" xml:space="preserve">
+    <value>any creature</value>
+  </data>
+  <data name="TriggerSummaryAnyMatchingField" xml:space="preserve">
+    <value>any matching field</value>
+  </data>
+  <data name="TriggerSummaryAnyOption" xml:space="preserve">
+    <value>any option</value>
+  </data>
+  <data name="TriggerSummaryAnyStat" xml:space="preserve">
+    <value>any stat</value>
+  </data>
+  <data name="TriggerSummaryCreatureFilter" xml:space="preserve">
+    <value>Triggers for {0}.</value>
+  </data>
+  <data name="TriggerSummaryDefault" xml:space="preserve">
+    <value>Triggers on: {0}.</value>
+  </data>
+  <data name="TriggerSummaryField" xml:space="preserve">
+    <value>field “{0}”</value>
+  </data>
+  <data name="TriggerSummaryFieldChanged" xml:space="preserve">
+    <value>Triggers when {0} changes on {1}.</value>
+  </data>
+  <data name="TriggerSummaryNumericReachedMaxValue" xml:space="preserve">
+    <value>Triggers when {0} on {1} becomes equal to its max value.</value>
+  </data>
+  <data name="TriggerSummaryOption" xml:space="preserve">
+    <value>option “{0}”</value>
+  </data>
+  <data name="TriggerSummaryOptionChanged" xml:space="preserve">
+    <value>Triggers when {0} in {1} changes on {2}.</value>
+  </data>
+  <data name="TriggerSummaryStat" xml:space="preserve">
+    <value>stat “{0}”</value>
+  </data>
+  <data name="TriggerSummaryStatChanged" xml:space="preserve">
+    <value>Triggers when {0} in {1} changes on {2}.</value>
+  </data>
+  <data name="TriggerSummaryThreshold" xml:space="preserve">
+    <value>Triggers when {0} on {1} is {2} {3}.</value>
+  </data>
+  <data name="TroubleshootingText" xml:space="preserve">
+    <value>If nothing happens, check that the automation and the external app are enabled, press Save, then perform the action in Combat Manager again. If a log entry appears with a failure, verify the URL, HTTP method, timeout, and that the external application is running and reachable.</value>
+  </data>
+  <data name="TroubleshootingTitle" xml:space="preserve">
+    <value>Troubleshooting</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>When</value>
+  </data>
+  <data name="WhenAvailableColumn" xml:space="preserve">
+    <value>When available</value>
+  </data>
+</root>

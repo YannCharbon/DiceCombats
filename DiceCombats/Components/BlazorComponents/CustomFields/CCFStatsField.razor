@@ -23,16 +23,17 @@ else
         <MudStack Row="true">
             @foreach (int i in Enumerable.Range(0, Field.Count))
             {
+                var index = i;
                 <MudStack Row="false" Style="border-radius:5px;border-width:thin;background-color:darkcyan;">
                     @if (Field.ValuesAreEditable)
                     {
-                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[i]</MudItem>
-                        <MudNumericField @bind-Value="Field.StatsValues[i]" style="max-width:90px;" Variant="Variant.Outlined" />
+                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[index]</MudItem>
+                        <MudNumericField T="int" Value="@Field.StatsValues[index]" ValueChanged="@((int v) => OnStatValueChanged(index, v))" style="max-width:90px;" Variant="Variant.Outlined" />
                     }
                     else
                     {
-                        <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@Field.StatsValues[i]</MudItem>
-                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[i]</MudItem>
+                        <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@Field.StatsValues[index]</MudItem>
+                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[index]</MudItem>
                     }
                 </MudStack>
             }
@@ -41,18 +42,38 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureStatsField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureStatsField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnStatValueChanged(int index, int value)
     {
-        if (OnChange.HasDelegate)
+        var oldValue = Field.StatsValues[index];
+        Field.StatsValues[index] = value;
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = value,
+                Action = "Changed",
+                ChangeDirection = GetChangeDirection(oldValue, value),
+                StatIndex = index,
+                StatName = Field.StatsLabels.ElementAtOrDefault(index)
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
+    }
+
+    private static string GetChangeDirection(int oldValue, int newValue)
+    {
+        if (newValue > oldValue) return "Increased";
+        if (newValue < oldValue) return "Decreased";
+        return "Unchanged";
     }
 }

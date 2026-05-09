@@ -1,0 +1,168 @@
+@using DiceCombats.Automations
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
+
+<MudText Typo="Typo.h6" Class="mt-4">@Loc["ActionsSequence"]</MudText>
+
+<div style="display:flex; padding:20px; overflow-x: scroll;">
+    <div style="padding:10px; border-radius:30px; height:80px; width:120px; min-width:120px; background-color:deeppink; font-weight:700; text-align:center; font-size:12px;">
+        <div style="justify-content:center;">
+            <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Title="@Loc["EventTitle"]" />
+        </div>
+        <div style="justify-content:center;">
+            @Binding.Name
+        </div>
+    </div>
+    <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
+        - - - - &gt;
+    </div>
+    @foreach (var action in Binding.Actions.ToList())
+    {
+        @if (action is HttpRequestActionDefinition http)
+        {
+            <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:teal; font-weight:700; text-align:center; font-size:14px;">
+                <div style="justify-content:center;">
+                    <MudIcon Icon="@Icons.Material.Filled.RocketLaunch" Title="@Loc["ActionTitle"]" />
+                </div>
+                <div style="justify-content:center;">
+                    @http.Name
+                </div>
+            </div>
+        }
+        else if (action is DelayActionDefinition delay)
+        {
+            <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:darkgoldenrod; font-weight:700; text-align:center; font-size:14px;">
+                <div style="justify-content:center;">
+                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Title="@Loc["ActionTitle"]" />
+                </div>
+                <div style="justify-content:center;">
+                    @delay.Milliseconds
+                </div>
+            </div>
+        }
+        <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
+            - - - - &gt;
+        </div>
+    }
+    <div style="padding:10px; border-radius:30px; height:80px; width:60px; min-width:60px; background-color:deeppink; font-weight:700; text-align:center; font-size:14px;">
+        <div style="justify-content:center;">
+            <MudIcon Icon="@Icons.Material.Filled.Stop" Title="@Loc["EndTitle"]" />
+        </div>
+        <div style="justify-content:center;">
+            @Loc["End"]
+        </div>
+    </div>
+</div>
+
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Launch" OnClick="AddHttp">@Loc["AddHttpRequest"]</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AccessTime" OnClick="AddDelay">@Loc["AddDelay"]</MudButton>
+
+@foreach (var action in Binding.Actions.ToList())
+{
+    <MudPaper Class="pa-2 my-2" Style="padding:10px;background-color:#202020;border-radius:10px;">
+        <MudStack Row="true">
+            <MudButton OnClick="@(() => MoveActionUp(action))">↑</MudButton>
+            <MudButton OnClick="@(() => MoveActionDown(action))">↓</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveAction(action))">@Loc["DeleteAction"]</MudButton>
+        </MudStack>
+
+        <MudTextField @bind-Value="action.Name" Label="@Loc["ActionName"]" />
+        <MudSwitch @bind-Value="action.ContinueOnFailure" Color="Color.Primary" Label="@Loc["ContinueOnFailure"]" />
+
+        @if (action is HttpRequestActionDefinition http)
+        {
+            <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="@Loc["ExternalAppOptional"]">
+                <MudSelectItem T="Guid?" Value="@((Guid?)null)">@Loc["ExternalAppNoneAbsolute"]</MudSelectItem>
+                @foreach (var app in ExternalApps)
+                {
+                    <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect T="string" @bind-Value="http.Method" Label="@Loc["Method"]">
+                @foreach (var method in _methods)
+                {
+                    <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudTextField @bind-Value="http.Url" Label="@(http.ExternalAppId == null ? Loc["EndpointAbsoluteUrl"].Value : Loc["EndpointRelativePath"].Value)" />
+            <MudTextField @bind-Value="http.BodyTemplate" Label="@Loc["BodyTemplate"]" Lines="3" />
+            <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="@Loc["TimeoutMs"]" />
+            <MudTextField T="string"
+                          Value="@GetHeadersText(http.Headers)"
+                          ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
+                          Label="@Loc["HeadersOnePerLine"]"
+                          Lines="4" />
+        }
+        else if (action is DelayActionDefinition delay)
+        {
+            <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="@Loc["DelayMilliseconds"]" />
+        }
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public EventActionBinding Binding { get; set; } = new();
+    [Parameter] public List<ExternalAppDefinition> ExternalApps { get; set; } = new();
+
+    private readonly List<string> _methods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+
+    private void AddHttp()
+    {
+        Binding.Actions.Add(new HttpRequestActionDefinition
+        {
+            Name = Loc["DefaultHttpRequestName"].Value,
+            Method = "POST",
+            Url = "https://example.local/api"
+        });
+    }
+
+    private void AddDelay()
+    {
+        Binding.Actions.Add(new DelayActionDefinition
+        {
+            Name = Loc["DefaultDelayName"].Value,
+            Milliseconds = 100
+        });
+    }
+
+    private void RemoveAction(ActionDefinition action)
+    {
+        Binding.Actions.Remove(action);
+    }
+
+    private void MoveActionUp(ActionDefinition action)
+    {
+        int index = Binding.Actions.IndexOf(action);
+        if (index <= 0)
+        {
+            return;
+        }
+
+        (Binding.Actions[index - 1], Binding.Actions[index]) = (Binding.Actions[index], Binding.Actions[index - 1]);
+    }
+
+    private void MoveActionDown(ActionDefinition action)
+    {
+        int index = Binding.Actions.IndexOf(action);
+        if (index < 0 || index >= Binding.Actions.Count - 1)
+        {
+            return;
+        }
+
+        (Binding.Actions[index + 1], Binding.Actions[index]) = (Binding.Actions[index], Binding.Actions[index + 1]);
+    }
+
+    private static string GetHeadersText(Dictionary<string, string> headers)
+    {
+        return string.Join("\n", headers.Select(header => $"{header.Key}: {header.Value}"));
+    }
+
+    private static void SetHeadersFromText(HttpRequestActionDefinition action, string value)
+    {
+        action.Headers = value.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Split(':', 2, StringSplitOptions.TrimEntries))
+            .Where(parts => parts.Length == 2 && !string.IsNullOrWhiteSpace(parts[0]))
+            .ToDictionary(parts => parts[0], parts => parts[1]);
+    }
+}

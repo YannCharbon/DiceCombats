@@ -33,7 +33,6 @@
                     @if (Field.HasRowHeaders)
                     {
                         <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="Field.RowHeaders[i]" Label="@Loc["CBGridRowName"]" Variant="Variant.Outlined" /></td>
-
                     }
                     @foreach (int j in Enumerable.Range(0, Field.Columns))
                     {
@@ -67,15 +66,17 @@ else
                 }
                 @foreach (int i in Enumerable.Range(0, Field.Rows))
                 {
+                    var rowIndex = i;
                     <tr>
                         @if (Field.HasRowHeaders)
                         {
-                            <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[i]</span></td>
+                            <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[rowIndex]</span></td>
                         }
                         @foreach (int j in Enumerable.Range(0, Field.Columns))
                         {
+                            var columnIndex = j;
                             <td style="padding:3px;">
-                                <input type="checkbox" @bind="Field.GridState[i][j]" />
+                                <input type="checkbox" checked="@Field.GridState[rowIndex][columnIndex]" @onchange="@(e => OnCellChanged(rowIndex, columnIndex, e.Value is bool value && value))" />
                             </td>
                         }
                     </tr>
@@ -86,18 +87,32 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureCheckboxGridField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureCheckboxGridField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private void NotifyParentOnChange()
+    private async Task OnCellChanged(int rowIndex, int columnIndex, bool newValue)
     {
-        if (OnChange.HasDelegate)
+        var oldValue = Field.GridState[rowIndex][columnIndex];
+        Field.GridState[rowIndex][columnIndex] = newValue;
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = newValue ? "Checked" : "Unchecked",
+                RowIndex = rowIndex,
+                RowName = Field.RowHeaders.ElementAtOrDefault(rowIndex),
+                ColumnIndex = columnIndex,
+                ColumnName = Field.ColumnHeaders.ElementAtOrDefault(columnIndex)
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

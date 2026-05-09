@@ -1,0 +1,31 @@
+@using DiceCombats.Automations
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
+
+<div class="settings-group">
+    <div style="display:flex;">
+        <div class="settings-group-name">
+            <MudIcon Icon="@Icons.Material.Filled.Dvr" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>@Loc["DeliveryLogs"]</h3>
+        </div>
+    </div>
+    <div>
+        @if (EventPublisher is DiceEventDispatcher dispatcher)
+        {
+            @foreach (var log in dispatcher.Logs)
+            {
+                <MudPaper Class="pa-2 my-1">
+                    <b>@log.Timestamp.ToLocalTime()</b> |
+                    @log.AutomationName |
+                    @log.EventType |
+                    @(log.Success ? Loc["LogSuccess"].Value : Loc["LogFailed"].Value) |
+                    @log.StatusCode |
+                    @log.ErrorMessage
+                </MudPaper>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public IDiceEventPublisher? EventPublisher { get; set; }
+}

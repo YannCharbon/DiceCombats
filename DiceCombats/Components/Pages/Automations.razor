@@ -1,0 +1,365 @@
+@page "/automations"
+@using DiceCombats.Automations
+@using DiceCombats.Components.BlazorComponents.Automations
+@inject AutomationConfigurationService ConfigService
+@inject IDiceEventPublisher EventPublisher
+@inject PopupNotificationService PopupNotificationService
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
+
+<style>
+    .settings-group-name {
+    border-radius: 60px;
+    padding: 0px 20px 0px 0px;
+    margin:10px;
+    background-color: darkcyan;
+    display: flex;
+    align-items: center;
+    }
+
+    .settings-group {
+    margin:10px;
+    padding:10px;
+    border-radius:10px;
+    background-color:#505050;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+    }
+
+    .automation-app-item {
+        padding-top: 10px;
+        padding-right: 10px;
+        min-width: 30%;
+        max-width: 30%;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .automation-app-item {
+            min-width: 100%; /* Adjust for smaller screens */
+            max-width: 100%;
+        }
+    }
+
+    .automation-item {
+        padding-top: 10px;
+        padding-right: 10px;
+        min-width: 40%;
+        max-width: 50%;
+    }
+
+    .assist-box {
+        background: #3d3d46;
+        border: 1px solid #5f5f6d;
+        border-radius: 10px;
+        padding: 14px;
+        margin: 10px 0;
+    }
+
+    .assist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+    }
+
+    .assist-example {
+        background: #2d2d34;
+        border-radius: 8px;
+        padding: 10px;
+        font-family: monospace;
+        font-size: 90%;
+        white-space: pre-wrap;
+    }
+
+    .kbd {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #2d2d34;
+        border: 1px solid #666;
+        font-family: monospace;
+        font-size: 90%;
+    }
+
+    .placeholder-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+    }
+
+    .placeholder-table th,
+    .placeholder-table td {
+        border-top: 1px solid #5f5f6d;
+        padding: 7px;
+        vertical-align: top;
+    }
+
+    .placeholder-table th {
+        text-align: left;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .automation-item {
+            min-width: 100%; /* Adjust for smaller screens */
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="settings-group">
+    <div style="display:flex;align-items:center;">
+        <div class="settings-group-name">
+            <MudIcon Icon="@Icons.Material.Filled.AutoMode" Size="@Size.Large" style="color:white;margin:10px;" />
+            <h3>@Loc["Title"]</h3>
+        </div>
+        <div>
+            <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">@Loc["Save"]</MudButton>
+        </div>
+    </div>
+
+
+    <MudExpansionPanel Expanded="@_assistanceExpanded" Elevation="1" ExpandedChanged="() => _assistanceExpanded = !_assistanceExpanded">
+        <TitleContent>
+            <div class="d-flex">
+                <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
+                <MudText class="mr-3">@Loc["Assistance"]</MudText>
+            </div>
+        </TitleContent>
+        <ChildContent>
+            <div class="assist-box">
+                <MudText Typo="Typo.h6">@Loc["AssistanceWhatAutomationsDoTitle"]</MudText>
+                <p>@Loc["AssistanceWhatAutomationsDoText"]</p>
+            </div>
+
+            <div class="assist-grid">
+                <div class="assist-box">
+                    <MudText Typo="Typo.h6">@Loc["AssistanceExternalAppsTitle"]</MudText>
+                    <p>
+                        @Loc["AssistanceExternalAppsText1"]
+                        <span class="kbd">http://localhost:5000</span>.
+                        @Loc["AssistanceExternalAppsText2"]
+                        <span class="kbd">/api/timer/start</span>.
+                    </p>
+                    <p>@Loc["AssistanceExternalAppsText3"]</p>
+                </div>
+
+                <div class="assist-box">
+                    <MudText Typo="Typo.h6">@Loc["AssistanceAutomationsTitle"]</MudText>
+                    <p>@Loc["AssistanceAutomationsText"]</p>
+                </div>
+
+                <div class="assist-box">
+                    <MudText Typo="Typo.h6">@Loc["AssistanceActionsTitle"]</MudText>
+                    <p>
+                        @Loc["AssistanceActionsText1"]
+                        <span class="kbd">@Loc["ContinueOnFailure"]</span>
+                        @Loc["AssistanceActionsText2"]
+                    </p>
+                </div>
+
+                <div class="assist-box">
+                    <MudText Typo="Typo.h6">@Loc["AssistanceSaveLogsTitle"]</MudText>
+                    <p>
+                        @Loc["AssistanceSaveLogsText1"]
+                        <span class="kbd">@Loc["Save"]</span>
+                        @Loc["AssistanceSaveLogsText2"]
+                    </p>
+                </div>
+            </div>
+
+            <MudExpansionPanels MultiExpansion="true" Dense="true" Elevation="0" Class="mt-2">
+                <MudExpansionPanel Text="@Loc["PlaceholderCatalogueTitle"]">
+                    <div class="assist-box">
+                        <p>
+                            @Loc["PlaceholderCatalogueIntro1"]
+                            <span class="kbd">{{Name}}</span>
+                            @Loc["PlaceholderCatalogueIntro2"]
+                            <span class="kbd">Data.*</span>
+                            @Loc["PlaceholderCatalogueIntro3"]
+                        </p>
+
+                        <MudText Typo="Typo.subtitle2">@Loc["PlaceholderMetadataTitle"]</MudText>
+                        <table class="placeholder-table">
+                            <tr>
+                                <th>@Loc["PlaceholderColumn"]</th>
+                                <th>@Loc["MeaningColumn"]</th>
+                            </tr>
+                            <tr><td><span class="kbd">{{Id}}</span></td><td>@Loc["PlaceholderMeaningId"]</td></tr>
+                            <tr><td><span class="kbd">{{Type}}</span></td><td>@Loc["PlaceholderMeaningType"] <span class="kbd">combat.initiative.next</span>.</td></tr>
+                            <tr><td><span class="kbd">{{Category}}</span></td><td>@Loc["PlaceholderMeaningCategory"] <span class="kbd">Initiative</span>, <span class="kbd">Creatures</span>, <span class="kbd">Timer</span>, @Loc["Or"] <span class="kbd">Custom fields</span>.</td></tr>
+                            <tr><td><span class="kbd">{{DisplayName}}</span></td><td>@Loc["PlaceholderMeaningDisplayName"]</td></tr>
+                            <tr><td><span class="kbd">{{OccurredAt}}</span></td><td>@Loc["PlaceholderMeaningOccurredAt"]</td></tr>
+                        </table>
+                    </div>
+
+                    <div class="assist-box">
+                        <MudText Typo="Typo.subtitle2">@Loc["EventDataPlaceholdersTitle"]</MudText>
+                        <table class="placeholder-table">
+                            <tr>
+                                <th>@Loc["WhenAvailableColumn"]</th>
+                                <th>@Loc["PlaceholdersColumn"]</th>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenMostCombatEvents"]</td>
+                                <td><span class="kbd">{{Data.combatId}}</span>, <span class="kbd">{{Data.combatName}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenNextCreature"]</td>
+                                <td><span class="kbd">{{Data.previousCreatureId}}</span>, <span class="kbd">{{Data.previousCreatureName}}</span>, <span class="kbd">{{Data.previousInitiativeIndex}}</span>, <span class="kbd">{{Data.currentCreatureId}}</span>, <span class="kbd">{{Data.currentCreatureName}}</span>, <span class="kbd">{{Data.initiativeIndex}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenCreatureGotLostInitiative"]</td>
+                                <td><span class="kbd">{{Data.creatureId}}</span>, <span class="kbd">{{Data.creatureName}}</span>, <span class="kbd">{{Data.initiativeIndex}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenCombatTimer"]</td>
+                                <td><span class="kbd">{{Data.durationSeconds}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenAllCreatureCustomFieldEvents"]</td>
+                                <td><span class="kbd">{{Data.creatureId}}</span>, <span class="kbd">{{Data.creatureName}}</span>, <span class="kbd">{{Data.instanceIndex}}</span>, <span class="kbd">{{Data.fieldTitle}}</span>, <span class="kbd">{{Data.fieldType}}</span>, <span class="kbd">{{Data.eventAction}}</span>, <span class="kbd">{{Data.oldValue}}</span>, <span class="kbd">{{Data.newValue}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenNumericHpStatsValueChanges"]</td>
+                                <td><span class="kbd">{{Data.oldNumericValue}}</span>, <span class="kbd">{{Data.numericValue}}</span>, <span class="kbd">{{Data.delta}}</span>, <span class="kbd">{{Data.changeDirection}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenNumericMaximumUnit"]</td>
+                                <td><span class="kbd">{{Data.showMaxValue}}</span>, <span class="kbd">{{Data.maximumValue}}</span>, <span class="kbd">{{Data.showUnit}}</span>, <span class="kbd">{{Data.unit}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenHitPointsField"]</td>
+                                <td><span class="kbd">{{Data.maximumValue}}</span>, <span class="kbd">{{Data.oldPercentage}}</span>, <span class="kbd">{{Data.percentage}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenCheckboxConditionOptions"]</td>
+                                <td><span class="kbd">{{Data.optionIndex}}</span>, <span class="kbd">{{Data.optionName}}</span>, <span class="kbd">{{Data.textLabel}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenGridCells"]</td>
+                                <td><span class="kbd">{{Data.rowIndex}}</span>, <span class="kbd">{{Data.rowName}}</span>, <span class="kbd">{{Data.columnIndex}}</span>, <span class="kbd">{{Data.columnName}}</span>, <span class="kbd">{{Data.textLabel}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenStatsField"]</td>
+                                <td><span class="kbd">{{Data.statIndex}}</span>, <span class="kbd">{{Data.statName}}</span></td>
+                            </tr>
+                            <tr>
+                                <td>@Loc["PlaceholderWhenUserCustomFieldSavedRemoved"]</td>
+                                <td><span class="kbd">{{Data.fieldTitle}}</span>, <span class="kbd">{{Data.fieldType}}</span>, <span class="kbd">{{Data.isUserCustomField}}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="@Loc["ExampleTimerTitle"]">
+                    <div class="assist-box">
+                        <p>
+                            @Loc["ExampleTimerText1"]
+                            <span class="kbd">DiceTimer</span>
+                            @Loc["ExampleTimerText2"]
+                            <span class="kbd">http://localhost:5000</span>.
+                            @Loc["ExampleTimerText3"]
+                            <span class="kbd">@Loc["TriggerCategory_Initiative"] - @Loc["TriggerDisplay_InitiativeNext"]</span>
+                            @Loc["ExampleTimerText4"]
+                            <span class="kbd">/api/timer/start</span>.
+                        </p>
+                        <div class="assist-example">{
+  "creature": "{{Data.currentCreatureName}}",
+  "combat": "{{Data.combatName}}"
+}</div>
+                    </div>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="@Loc["ExampleNumericMaxTitle"]">
+                    <div class="assist-box">
+                        <p>
+                            @Loc["ExampleNumericMaxText1"]
+                            <span class="kbd">@Loc["TriggerCategory_Customfields"] - @Loc["TriggerDisplay_NumericReachedMaxValue"]</span>.
+                            @Loc["ExampleNumericMaxText2"]
+                        </p>
+                    </div>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="@Loc["TroubleshootingTitle"]">
+                    <div class="assist-box">
+                        <p>@Loc["TroubleshootingText"]</p>
+                    </div>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        </ChildContent>
+    </MudExpansionPanel>
+
+
+    <ExternalAppsEditor ExternalApps="_config.ExternalApps" OnAdd="AddExternalApp" OnRemove="RemoveExternalApp" />
+
+    <div style="display:flex;align-items:center;">
+        <div style="margin:15px;">
+            <h4>@Loc["AutomationsSectionTitle"]</h4>
+        </div>
+        <div>
+            <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">@Loc["AddAutomation"]</MudButton>
+        </div>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap">
+        @foreach (var binding in _config.Bindings.ToList())
+        {
+            <AutomationBindingEditor Binding="binding" ExternalApps="_config.ExternalApps" OnRemove="RemoveBinding" />
+        }
+    </div>
+</div>
+
+<DeliveryLogViewer EventPublisher="EventPublisher" />
+
+@code {
+    private AutomationConfiguration _config = new();
+
+    private bool _assistanceExpanded
+    {
+        get => Preferences.Get("AssistanceAutomations", false);
+        set => Preferences.Set("AssistanceAutomations", value);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _config = await ConfigService.GetConfigurationAsync();
+    }
+
+    private void AddExternalApp()
+    {
+        _config.ExternalApps.Add(new ExternalAppDefinition { Name = Loc["NewAppName"].Value });
+    }
+
+    private void RemoveExternalApp(ExternalAppDefinition app)
+    {
+        _config.ExternalApps.Remove(app);
+
+        foreach (var binding in _config.Bindings)
+        {
+            foreach (var action in binding.Actions.OfType<HttpRequestActionDefinition>())
+            {
+                if (action.ExternalAppId == app.Id)
+                {
+                    action.ExternalAppId = null;
+                }
+            }
+        }
+    }
+
+    private void AddBinding()
+    {
+        _config.Bindings.Add(new EventActionBinding
+        {
+            Name = Loc["NewAutomationName"].Value,
+            Trigger = new EventTriggerDefinition { Kind = EventTriggerKinds.InitiativeNext }
+        });
+    }
+
+    private void RemoveBinding(EventActionBinding binding)
+    {
+        _config.Bindings.Remove(binding);
+    }
+
+    private async Task Save()
+    {
+        await ConfigService.SaveAsync();
+        PopupNotificationService.Show(Loc["SaveSuccessTitle"].Value, Loc["SaveSuccessMessage"].Value, PopupNotificationService.Type.SUCCESS, 2000);
+    }
+}

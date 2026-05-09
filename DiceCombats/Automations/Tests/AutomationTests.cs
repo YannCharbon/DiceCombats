@@ -1,0 +1,18 @@
+using System.Text.Json;
+using DiceCombats.Automations;
+
+public class AutomationTests
+{
+    [Fact] public void Template_Replaces_Data() { var r = new EventTemplateRenderer(); var e = new DiceEvent(); e.Data["combatName"] = "Boss"; Assert.Equal("Boss", r.Render("{{Data.combatName}}", e)); }
+    [Fact] public void Template_Unknown_Empty() { var r = new EventTemplateRenderer(); Assert.Equal("", r.Render("{{Data.unknown}}", new DiceEvent())); }
+    [Fact] public void Template_Replaces_Event_Metadata() { var r = new EventTemplateRenderer(); var e = new DiceEvent { Type = DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature" }; Assert.Equal("combat.initiative.next|Initiative|Next creature", r.Render("{{Type}}|{{Category}}|{{DisplayName}}", e)); }
+    [Fact] public void Condition_Equals() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Equals", Right = "abc" }, new DiceEvent { Data = new() { ["x"] = "abc" } }));
+    [Fact] public void Condition_Contains() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Contains", Right = "bc" }, new DiceEvent { Data = new() { ["x"] = "abcd" } }));
+    [Fact] public void Condition_Below() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Below", Right = "10" }, new DiceEvent { Data = new() { ["x"] = 5 } }));
+    [Fact] public void Condition_Above() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Above", Right = "10" }, new DiceEvent { Data = new() { ["x"] = 15 } }));
+    [Fact] public void Crossing_Below_Triggers() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.percentage", Operator = "Below", Right = "25", TriggerOnlyOnCrossing = true, CrossingDirection = "Below" }, new DiceEvent { Data = new() { ["oldPercentage"] = 30, ["percentage"] = 20 } }));
+    [Fact] public void Crossing_Below_NoTrigger_WhenAlreadyBelow() => Assert.False(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.percentage", Operator = "Below", Right = "25", TriggerOnlyOnCrossing = true, CrossingDirection = "Below" }, new DiceEvent { Data = new() { ["oldPercentage"] = 20, ["percentage"] = 15 } }));
+    [Fact] public void ActionJson_Http() { ActionDefinition a = new HttpRequestActionDefinition { Type = "HttpRequest", Url = "http://x" }; var s = JsonSerializer.Serialize(a); var d = JsonSerializer.Deserialize<ActionDefinition>(s); Assert.IsType<HttpRequestActionDefinition>(d); }
+    [Fact] public void ActionJson_Delay() { ActionDefinition a = new DelayActionDefinition { Type = "Delay", Milliseconds = 123 }; var s = JsonSerializer.Serialize(a); var d = JsonSerializer.Deserialize<ActionDefinition>(s); Assert.IsType<DelayActionDefinition>(d); }
+    [Fact] public void AutomationConfiguration_Serializes() { var cfg = new AutomationConfiguration { ExternalApps = [new ExternalAppDefinition { Name = "Example App", BaseUrl = "http://localhost:1234" }], Bindings = [new EventActionBinding { Trigger = new EventTriggerDefinition { Kind = EventTriggerKinds.InitiativeNext }, Actions = [new HttpRequestActionDefinition { Url = "/api/example" }, new DelayActionDefinition { Milliseconds = 100 }] }] }; var s = JsonSerializer.Serialize(cfg); var d = JsonSerializer.Deserialize<AutomationConfiguration>(s); Assert.NotNull(d); Assert.NotEmpty(d!.Bindings); }
+}

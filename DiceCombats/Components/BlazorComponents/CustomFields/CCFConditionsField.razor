@@ -22,7 +22,7 @@
 else
 {
     <div style="zoom: 0.85;">
-        <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="() => {_dndConditionsFieldMaximized = !_dndConditionsFieldMaximized; NotifyParentOnChange();}">
+        <MudStack Row="true" Wrap="Wrap.Wrap" Style="cursor:pointer;" @onclick="ToggleMaximized">
             @if (_dndConditionsFieldMaximized == false)
             {
                 @if (Field.SelectedOptions.Count(x => x == true) == 0) {
@@ -38,14 +38,15 @@ else
                 <MudItem style="padding:5px;border-radius:5px;border-color:grey;border-width:thin;"><h5>@Loc["DnDConditionMinimize"]&nbsp;<MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowLeft" Color="Color.Success"></MudIcon></h5></MudItem>
                 @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
                 {
+                    var index = i;
                     @if (Field.SelectedOptions[i] == true)
                     {
                         <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
-                            <MudCheckBox style="color:#BAAA00;" Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                            <MudCheckBox T="bool" style="color:#BAAA00;" Label="@Field.Labels[index]" Value="@Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
                         </MudItem>
                     } else {
                         <MudItem Style="margin:-10px;padding:-5px;transform: scale(0.9);">
-                            <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
+                            <MudCheckBox T="bool" Label="@Field.Labels[index]" Value="@Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
                         </MudItem>
                     }
                 }
@@ -55,20 +56,39 @@ else
 }
 
 @code {
-    [Parameter]
-    public DCCreatureConditionsField Field { get; set; } = default!;
-    [Parameter]
-    public bool EditionMode { get; set; } = false;
-    [Parameter]
-    public EventCallback OnChange { get; set; }
+    [Parameter] public DCCreatureConditionsField Field { get; set; } = default!;
+    [Parameter] public bool EditionMode { get; set; } = false;
+    [Parameter] public EventCallback OnChange { get; set; }
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
     private bool _dndConditionsFieldMaximized = false;
 
-    private void NotifyParentOnChange()
+    private async Task ToggleMaximized()
     {
+        _dndConditionsFieldMaximized = !_dndConditionsFieldMaximized;
         if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
+    }
+
+    private async Task OnOptionChanged(int index, bool newValue)
+    {
+        var oldValue = Field.SelectedOptions[index];
+        Field.SelectedOptions[index] = newValue;
+
+        if (OnFieldChanged.HasDelegate)
         {
-            OnChange.InvokeAsync();
+            await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
+            {
+                Field = Field,
+                OldValue = oldValue,
+                NewValue = newValue,
+                Action = newValue ? "Added" : "Removed",
+                OptionIndex = index,
+                OptionName = Field.Labels.ElementAtOrDefault(index)
+            });
         }
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

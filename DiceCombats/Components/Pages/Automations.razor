@@ -3,6 +3,7 @@
 @using DiceCombats.Components.BlazorComponents.Automations
 @inject AutomationConfigurationService ConfigService
 @inject IDiceEventPublisher EventPublisher
+@inject PopupNotificationService PopupNotificationService
 
 <style>
     .settings-group-name {
@@ -358,5 +359,6 @@
     private async Task Save()
     {
         await ConfigService.SaveAsync();
+        PopupNotificationService.Show("Automations saved", "Successfully saved automations, triggers and external apps", PopupNotificationService.Type.SUCCESS, 2000);
     }
 }

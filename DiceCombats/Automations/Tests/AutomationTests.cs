@@ -5,6 +5,7 @@ public class AutomationTests
 {
     [Fact] public void Template_Replaces_Data() { var r = new EventTemplateRenderer(); var e = new DiceEvent(); e.Data["combatName"] = "Boss"; Assert.Equal("Boss", r.Render("{{Data.combatName}}", e)); }
     [Fact] public void Template_Unknown_Empty() { var r = new EventTemplateRenderer(); Assert.Equal("", r.Render("{{Data.unknown}}", new DiceEvent())); }
+    [Fact] public void Template_Replaces_Event_Metadata() { var r = new EventTemplateRenderer(); var e = new DiceEvent { Type = DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature" }; Assert.Equal("combat.initiative.next|Initiative|Next creature", r.Render("{{Type}}|{{Category}}|{{DisplayName}}", e)); }
     [Fact] public void Condition_Equals() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Equals", Right = "abc" }, new DiceEvent { Data = new() { ["x"] = "abc" } }));
     [Fact] public void Condition_Contains() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Contains", Right = "bc" }, new DiceEvent { Data = new() { ["x"] = "abcd" } }));
     [Fact] public void Condition_Below() => Assert.True(new EventConditionEvaluator(new EventTemplateRenderer()).Evaluate(new EventCondition { Left = "Data.x", Operator = "Below", Right = "10" }, new DiceEvent { Data = new() { ["x"] = 5 } }));

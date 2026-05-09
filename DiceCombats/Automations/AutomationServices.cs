@@ -24,6 +24,8 @@ public sealed class EventTemplateRenderer
     {
         if (path == nameof(DiceEvent.Id)) return diceEvent.Id;
         if (path == nameof(DiceEvent.Type)) return diceEvent.Type;
+        if (path == nameof(DiceEvent.Category)) return diceEvent.Category;
+        if (path == nameof(DiceEvent.DisplayName)) return diceEvent.DisplayName;
         if (path == nameof(DiceEvent.OccurredAt)) return diceEvent.OccurredAt.ToString("O", CultureInfo.InvariantCulture);
         if (!path.StartsWith("Data.", StringComparison.OrdinalIgnoreCase)) return null;
         var key = path[5..];

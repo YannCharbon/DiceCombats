@@ -1,11 +1,12 @@
 @using DiceCombats.Automations
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
 
 <div style="display:flex;align-items:center;">
     <div style="margin:15px;">
-        <h4>External apps</h4>
+        <h4>@Loc["ExternalApps"]</h4>
     </div>
     <div>
-        <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => OnAdd.InvokeAsync())">Add external app</MudButton>
+        <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => OnAdd.InvokeAsync())">@Loc["AddExternalApp"]</MudButton>
     </div>
 </div>
 
@@ -14,12 +15,12 @@
     <MudPaper Class="pa-2 my-2 automation-app-item">
         <MudStack Row="true" Justify="Justify.SpaceBetween">
             <MudText Typo="Typo.h6">@app.Name</MudText>
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(app))">Delete</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(app))">@Loc["Delete"]</MudButton>
         </MudStack>
 
-        <MudTextField @bind-Value="app.Name" Label="App name" />
-        <MudTextField @bind-Value="app.BaseUrl" Label="Base URL" />
-        <MudSwitch @bind-Value="app.IsEnabled" Color="Color.Primary" Label="@(app.IsEnabled == true ? "Enabled" : "Disabled")" />
+        <MudTextField @bind-Value="app.Name" Label="@Loc["AppName"]" />
+        <MudTextField @bind-Value="app.BaseUrl" Label="@Loc["BaseUrl"]" />
+        <MudSwitch @bind-Value="app.IsEnabled" Color="Color.Primary" Label="@(app.IsEnabled == true ? Loc["Enabled"].Value : Loc["Disabled"].Value)" />
     </MudPaper>
 }
 

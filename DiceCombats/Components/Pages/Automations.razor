@@ -4,6 +4,7 @@
 @inject AutomationConfigurationService ConfigService
 @inject IDiceEventPublisher EventPublisher
 @inject PopupNotificationService PopupNotificationService
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
 
 <style>
     .settings-group-name {
@@ -106,10 +107,10 @@
     <div style="display:flex;align-items:center;">
         <div class="settings-group-name">
             <MudIcon Icon="@Icons.Material.Filled.AutoMode" Size="@Size.Large" style="color:white;margin:10px;" />
-            <h3>Automations</h3>
+            <h3>@Loc["Title"]</h3>
         </div>
         <div>
-            <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">Save</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">@Loc["Save"]</MudButton>
         </div>
     </div>
 
@@ -118,143 +119,145 @@
         <TitleContent>
             <div class="d-flex">
                 <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
-                <MudText class="mr-3">Assistance</MudText>
+                <MudText class="mr-3">@Loc["Assistance"]</MudText>
             </div>
         </TitleContent>
         <ChildContent>
             <div class="assist-box">
-                <MudText Typo="Typo.h6">What automations do</MudText>
-                <p>
-                    Automations let DiceCombats react to combat events. An automation watches for one trigger, then runs one or more actions in order.
-                    Typical uses are starting or stopping an external timer, notifying another tool, or sending the current creature information to a local companion app.
-                </p>
+                <MudText Typo="Typo.h6">@Loc["AssistanceWhatAutomationsDoTitle"]</MudText>
+                <p>@Loc["AssistanceWhatAutomationsDoText"]</p>
             </div>
 
             <div class="assist-grid">
                 <div class="assist-box">
-                    <MudText Typo="Typo.h6">1. External apps</MudText>
+                    <MudText Typo="Typo.h6">@Loc["AssistanceExternalAppsTitle"]</MudText>
                     <p>
-                        Add an external app when several HTTP actions target the same server. Set its base URL, for example
-                        <span class="kbd">http://localhost:5000</span>. HTTP actions can then use short relative paths such as
+                        @Loc["AssistanceExternalAppsText1"]
+                        <span class="kbd">http://localhost:5000</span>.
+                        @Loc["AssistanceExternalAppsText2"]
                         <span class="kbd">/api/timer/start</span>.
                     </p>
+                    <p>@Loc["AssistanceExternalAppsText3"]</p>
+                </div>
+
+                <div class="assist-box">
+                    <MudText Typo="Typo.h6">@Loc["AssistanceAutomationsTitle"]</MudText>
+                    <p>@Loc["AssistanceAutomationsText"]</p>
+                </div>
+
+                <div class="assist-box">
+                    <MudText Typo="Typo.h6">@Loc["AssistanceActionsTitle"]</MudText>
                     <p>
-                        You can also skip external apps and enter an absolute URL directly in an HTTP action.
+                        @Loc["AssistanceActionsText1"]
+                        <span class="kbd">@Loc["ContinueOnFailure"]</span>
+                        @Loc["AssistanceActionsText2"]
                     </p>
                 </div>
 
                 <div class="assist-box">
-                    <MudText Typo="Typo.h6">2. Automations</MudText>
+                    <MudText Typo="Typo.h6">@Loc["AssistanceSaveLogsTitle"]</MudText>
                     <p>
-                        Add one automation for each independent rule. Give it a clear name, keep it enabled, then choose when it should run.
-                        Some triggers can be restricted to specific creatures, custom fields, options, stats, or numeric thresholds. Empty filters mean “any”.
-                    </p>
-                </div>
-
-                <div class="assist-box">
-                    <MudText Typo="Typo.h6">3. Actions</MudText>
-                    <p>
-                        Actions run from left to right. Use HTTP requests to call another app and delays to pause between requests.
-                        If <span class="kbd">Continue on failure</span> is disabled, the remaining actions are skipped after a failed action.
-                    </p>
-                </div>
-
-                <div class="assist-box">
-                    <MudText Typo="Typo.h6">4. Save and check logs</MudText>
-                    <p>
-                        Press <span class="kbd">Save</span> after editing. Delivery logs at the bottom of this page show which automation ran, whether it succeeded,
-                        the HTTP status code, and possible error messages.
+                        @Loc["AssistanceSaveLogsText1"]
+                        <span class="kbd">@Loc["Save"]</span>
+                        @Loc["AssistanceSaveLogsText2"]
                     </p>
                 </div>
             </div>
 
             <MudExpansionPanels MultiExpansion="true" Dense="true" Elevation="0" Class="mt-2">
-                <MudExpansionPanel Text="Placeholder catalogue for HTTP templates">
+                <MudExpansionPanel Text="@Loc["PlaceholderCatalogueTitle"]">
                     <div class="assist-box">
                         <p>
-                            In HTTP URL, body, and header values, use <span class="kbd">{{Name}}</span> placeholders to insert event data.
-                            Unknown or unavailable placeholders are replaced by an empty value. The available <span class="kbd">Data.*</span> values depend on the selected trigger.
+                            @Loc["PlaceholderCatalogueIntro1"]
+                            <span class="kbd">{{Name}}</span>
+                            @Loc["PlaceholderCatalogueIntro2"]
+                            <span class="kbd">Data.*</span>
+                            @Loc["PlaceholderCatalogueIntro3"]
                         </p>
 
-                        <MudText Typo="Typo.subtitle2">Event metadata, available for every trigger</MudText>
+                        <MudText Typo="Typo.subtitle2">@Loc["PlaceholderMetadataTitle"]</MudText>
                         <table class="placeholder-table">
                             <tr>
-                                <th>Placeholder</th>
-                                <th>Meaning</th>
+                                <th>@Loc["PlaceholderColumn"]</th>
+                                <th>@Loc["MeaningColumn"]</th>
                             </tr>
-                            <tr><td><span class="kbd">{{Id}}</span></td><td>Unique event id.</td></tr>
-                            <tr><td><span class="kbd">{{Type}}</span></td><td>Technical event type, for example <span class="kbd">combat.initiative.next</span>.</td></tr>
-                            <tr><td><span class="kbd">{{Category}}</span></td><td>Event family, for example <span class="kbd">Initiative</span>, <span class="kbd">Creatures</span>, <span class="kbd">Timer</span>, or <span class="kbd">Custom fields</span>.</td></tr>
-                            <tr><td><span class="kbd">{{DisplayName}}</span></td><td>Readable event name shown by DiceCombats.</td></tr>
-                            <tr><td><span class="kbd">{{OccurredAt}}</span></td><td>UTC timestamp in ISO-8601 format.</td></tr>
+                            <tr><td><span class="kbd">{{Id}}</span></td><td>@Loc["PlaceholderMeaningId"]</td></tr>
+                            <tr><td><span class="kbd">{{Type}}</span></td><td>@Loc["PlaceholderMeaningType"] <span class="kbd">combat.initiative.next</span>.</td></tr>
+                            <tr><td><span class="kbd">{{Category}}</span></td><td>@Loc["PlaceholderMeaningCategory"] <span class="kbd">Initiative</span>, <span class="kbd">Creatures</span>, <span class="kbd">Timer</span>, @Loc["Or"] <span class="kbd">Custom fields</span>.</td></tr>
+                            <tr><td><span class="kbd">{{DisplayName}}</span></td><td>@Loc["PlaceholderMeaningDisplayName"]</td></tr>
+                            <tr><td><span class="kbd">{{OccurredAt}}</span></td><td>@Loc["PlaceholderMeaningOccurredAt"]</td></tr>
                         </table>
                     </div>
 
                     <div class="assist-box">
-                        <MudText Typo="Typo.subtitle2">Event data placeholders</MudText>
+                        <MudText Typo="Typo.subtitle2">@Loc["EventDataPlaceholdersTitle"]</MudText>
                         <table class="placeholder-table">
                             <tr>
-                                <th>When available</th>
-                                <th>Placeholders</th>
+                                <th>@Loc["WhenAvailableColumn"]</th>
+                                <th>@Loc["PlaceholdersColumn"]</th>
                             </tr>
                             <tr>
-                                <td>Most combat events</td>
+                                <td>@Loc["PlaceholderWhenMostCombatEvents"]</td>
                                 <td><span class="kbd">{{Data.combatId}}</span>, <span class="kbd">{{Data.combatName}}</span></td>
                             </tr>
                             <tr>
-                                <td>Next creature in initiative</td>
+                                <td>@Loc["PlaceholderWhenNextCreature"]</td>
                                 <td><span class="kbd">{{Data.previousCreatureId}}</span>, <span class="kbd">{{Data.previousCreatureName}}</span>, <span class="kbd">{{Data.previousInitiativeIndex}}</span>, <span class="kbd">{{Data.currentCreatureId}}</span>, <span class="kbd">{{Data.currentCreatureName}}</span>, <span class="kbd">{{Data.initiativeIndex}}</span></td>
                             </tr>
                             <tr>
-                                <td>Creature got/lost initiative</td>
+                                <td>@Loc["PlaceholderWhenCreatureGotLostInitiative"]</td>
                                 <td><span class="kbd">{{Data.creatureId}}</span>, <span class="kbd">{{Data.creatureName}}</span>, <span class="kbd">{{Data.initiativeIndex}}</span></td>
                             </tr>
                             <tr>
-                                <td>Combat timer started/paused/stopped</td>
+                                <td>@Loc["PlaceholderWhenCombatTimer"]</td>
                                 <td><span class="kbd">{{Data.durationSeconds}}</span></td>
                             </tr>
                             <tr>
-                                <td>All creature custom-field events</td>
+                                <td>@Loc["PlaceholderWhenAllCreatureCustomFieldEvents"]</td>
                                 <td><span class="kbd">{{Data.creatureId}}</span>, <span class="kbd">{{Data.creatureName}}</span>, <span class="kbd">{{Data.instanceIndex}}</span>, <span class="kbd">{{Data.fieldTitle}}</span>, <span class="kbd">{{Data.fieldType}}</span>, <span class="kbd">{{Data.eventAction}}</span>, <span class="kbd">{{Data.oldValue}}</span>, <span class="kbd">{{Data.newValue}}</span></td>
                             </tr>
                             <tr>
-                                <td>Numeric, hit-points, and stats value changes</td>
+                                <td>@Loc["PlaceholderWhenNumericHpStatsValueChanges"]</td>
                                 <td><span class="kbd">{{Data.oldNumericValue}}</span>, <span class="kbd">{{Data.numericValue}}</span>, <span class="kbd">{{Data.delta}}</span>, <span class="kbd">{{Data.changeDirection}}</span></td>
                             </tr>
                             <tr>
-                                <td>Numeric field with maximum/unit enabled</td>
+                                <td>@Loc["PlaceholderWhenNumericMaximumUnit"]</td>
                                 <td><span class="kbd">{{Data.showMaxValue}}</span>, <span class="kbd">{{Data.maximumValue}}</span>, <span class="kbd">{{Data.showUnit}}</span>, <span class="kbd">{{Data.unit}}</span></td>
                             </tr>
                             <tr>
-                                <td>Hit-points field</td>
+                                <td>@Loc["PlaceholderWhenHitPointsField"]</td>
                                 <td><span class="kbd">{{Data.maximumValue}}</span>, <span class="kbd">{{Data.oldPercentage}}</span>, <span class="kbd">{{Data.percentage}}</span></td>
                             </tr>
                             <tr>
-                                <td>Checkbox and condition options</td>
+                                <td>@Loc["PlaceholderWhenCheckboxConditionOptions"]</td>
                                 <td><span class="kbd">{{Data.optionIndex}}</span>, <span class="kbd">{{Data.optionName}}</span>, <span class="kbd">{{Data.textLabel}}</span></td>
                             </tr>
                             <tr>
-                                <td>Checkbox-grid and text-grid cells</td>
+                                <td>@Loc["PlaceholderWhenGridCells"]</td>
                                 <td><span class="kbd">{{Data.rowIndex}}</span>, <span class="kbd">{{Data.rowName}}</span>, <span class="kbd">{{Data.columnIndex}}</span>, <span class="kbd">{{Data.columnName}}</span>, <span class="kbd">{{Data.textLabel}}</span></td>
                             </tr>
                             <tr>
-                                <td>Stats field</td>
+                                <td>@Loc["PlaceholderWhenStatsField"]</td>
                                 <td><span class="kbd">{{Data.statIndex}}</span>, <span class="kbd">{{Data.statName}}</span></td>
                             </tr>
                             <tr>
-                                <td>User custom field saved/removed</td>
+                                <td>@Loc["PlaceholderWhenUserCustomFieldSavedRemoved"]</td>
                                 <td><span class="kbd">{{Data.fieldTitle}}</span>, <span class="kbd">{{Data.fieldType}}</span>, <span class="kbd">{{Data.isUserCustomField}}</span></td>
                             </tr>
                         </table>
                     </div>
                 </MudExpansionPanel>
 
-                <MudExpansionPanel Text="Example: send the active creature to an external timer">
+                <MudExpansionPanel Text="@Loc["ExampleTimerTitle"]">
                     <div class="assist-box">
                         <p>
-                            Create an external app named <span class="kbd">DiceTimer</span> with base URL
-                            <span class="kbd">http://localhost:5000</span>. Then create an automation with trigger
-                            <span class="kbd">Initiative - Next creature</span> and add an HTTP POST action to
+                            @Loc["ExampleTimerText1"]
+                            <span class="kbd">DiceTimer</span>
+                            @Loc["ExampleTimerText2"]
+                            <span class="kbd">http://localhost:5000</span>.
+                            @Loc["ExampleTimerText3"]
+                            <span class="kbd">@Loc["TriggerCategory_Initiative"] - @Loc["TriggerDisplay_InitiativeNext"]</span>
+                            @Loc["ExampleTimerText4"]
                             <span class="kbd">/api/timer/start</span>.
                         </p>
                         <div class="assist-example">{
@@ -264,21 +267,19 @@
                     </div>
                 </MudExpansionPanel>
 
-                <MudExpansionPanel Text="Example: react when a numeric field reaches its maximum">
+                <MudExpansionPanel Text="@Loc["ExampleNumericMaxTitle"]">
                     <div class="assist-box">
                         <p>
-                            On the creature custom field, enable the numeric maximum value display first. Then create an automation with trigger
-                            <span class="kbd">Custom fields - Numeric field reached max value</span>. Select the relevant creature and field, or leave them empty to react to any matching field.
+                            @Loc["ExampleNumericMaxText1"]
+                            <span class="kbd">@Loc["TriggerCategory_Customfields"] - @Loc["TriggerDisplay_NumericReachedMaxValue"]</span>.
+                            @Loc["ExampleNumericMaxText2"]
                         </p>
                     </div>
                 </MudExpansionPanel>
 
-                <MudExpansionPanel Text="Troubleshooting">
+                <MudExpansionPanel Text="@Loc["TroubleshootingTitle"]">
                     <div class="assist-box">
-                        <p>
-                            If nothing happens, check that the automation and the external app are enabled, press Save, then perform the action in Combat Manager again.
-                            If a log entry appears with a failure, verify the URL, HTTP method, timeout, and that the external application is running and reachable.
-                        </p>
+                        <p>@Loc["TroubleshootingText"]</p>
                     </div>
                 </MudExpansionPanel>
             </MudExpansionPanels>
@@ -290,10 +291,10 @@
 
     <div style="display:flex;align-items:center;">
         <div style="margin:15px;">
-            <h4>Automations</h4>
+            <h4>@Loc["AutomationsSectionTitle"]</h4>
         </div>
         <div>
-            <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">Add automation</MudButton>
+            <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">@Loc["AddAutomation"]</MudButton>
         </div>
     </div>
 
@@ -323,7 +324,7 @@
 
     private void AddExternalApp()
     {
-        _config.ExternalApps.Add(new ExternalAppDefinition { Name = "New app" });
+        _config.ExternalApps.Add(new ExternalAppDefinition { Name = Loc["NewAppName"].Value });
     }
 
     private void RemoveExternalApp(ExternalAppDefinition app)
@@ -346,7 +347,7 @@
     {
         _config.Bindings.Add(new EventActionBinding
         {
-            Name = "New automation",
+            Name = Loc["NewAutomationName"].Value,
             Trigger = new EventTriggerDefinition { Kind = EventTriggerKinds.InitiativeNext }
         });
     }
@@ -359,6 +360,6 @@
     private async Task Save()
     {
         await ConfigService.SaveAsync();
-        PopupNotificationService.Show("Automations saved", "Successfully saved automations, triggers and external apps", PopupNotificationService.Type.SUCCESS, 2000);
+        PopupNotificationService.Show(Loc["SaveSuccessTitle"].Value, Loc["SaveSuccessMessage"].Value, PopupNotificationService.Type.SUCCESS, 2000);
     }
 }

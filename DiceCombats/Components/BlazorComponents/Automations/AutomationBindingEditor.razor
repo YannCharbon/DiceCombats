@@ -1,4 +1,5 @@
 @using DiceCombats.Automations
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
 
 @{
     var trigger = EnsureTrigger();
@@ -10,14 +11,14 @@
             <div style="display:flex;">
                 <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" class="mr-3"
                          Color="@(Binding.IsEnabled == true ? Color.Primary : Color.Dark)"></MudIcon>
-                <MudText Style="font-size: 20px; font-weight:700;">@(string.IsNullOrWhiteSpace(Binding.Name) ? "Automation" : Binding.Name)</MudText>
+                <MudText Style="font-size: 20px; font-weight:700;">@(string.IsNullOrWhiteSpace(Binding.Name) ? Loc["AutomationFallback"].Value : Binding.Name)</MudText>
             </div>
         </TitleContent>
         <ChildContent>
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(Binding))">Delete automation</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(Binding))">@Loc["DeleteAutomation"]</MudButton>
 
-            <MudTextField @bind-Value="Binding.Name" Label="Automation name" />
-            <MudSwitch @bind-Value="Binding.IsEnabled" Color="Color.Primary" Label="@(Binding.IsEnabled == true ? "Enabled" : "Disabled")" />
+            <MudTextField @bind-Value="Binding.Name" Label="@Loc["AutomationName"]" />
+            <MudSwitch @bind-Value="Binding.IsEnabled" Color="Color.Primary" Label="@(Binding.IsEnabled == true ? Loc["Enabled"].Value : Loc["Disabled"].Value)" />
 
             <TriggerEditor Trigger="trigger" />
             <ActionSequenceEditor Binding="Binding" ExternalApps="ExternalApps" />

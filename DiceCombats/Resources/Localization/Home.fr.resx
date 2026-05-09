@@ -147,4 +147,7 @@
   <data name="SettingsTitle" xml:space="preserve">
     <value>Paramètres</value>
   </data>
+  <data name="AutomationTitle" xml:space="preserve">
+    <value>Automatisations</value>
+  </data>
 </root>

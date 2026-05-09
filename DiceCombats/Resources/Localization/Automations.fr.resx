@@ -1,0 +1,546 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ActionName" xml:space="preserve">
+    <value>Nom de l’action</value>
+  </data>
+  <data name="ActionTitle" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="ActionsSequence" xml:space="preserve">
+    <value>Séquence d’actions</value>
+  </data>
+  <data name="AddAutomation" xml:space="preserve">
+    <value>Ajouter une automatisation</value>
+  </data>
+  <data name="AddDelay" xml:space="preserve">
+    <value>Ajouter un délai</value>
+  </data>
+  <data name="AddExternalApp" xml:space="preserve">
+    <value>Ajouter une application externe</value>
+  </data>
+  <data name="AddHttpRequest" xml:space="preserve">
+    <value>Ajouter une requête HTTP</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>Nom de l’application</value>
+  </data>
+  <data name="Assistance" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+  <data name="AssistanceActionsText1" xml:space="preserve">
+    <value>Les actions s’exécutent de gauche à droite. Utilisez des requêtes HTTP pour appeler une autre application et des délais pour faire une pause entre deux requêtes. Si</value>
+  </data>
+  <data name="AssistanceActionsText2" xml:space="preserve">
+    <value>est désactivé, les actions restantes sont ignorées après l’échec d’une action.</value>
+  </data>
+  <data name="AssistanceActionsTitle" xml:space="preserve">
+    <value>3. Actions</value>
+  </data>
+  <data name="AssistanceAutomationsText" xml:space="preserve">
+    <value>Ajoutez une automatisation pour chaque règle indépendante. Donnez-lui un nom clair, gardez-la activée, puis choisissez quand elle doit s’exécuter. Certains déclencheurs peuvent être limités à des créatures, champs personnalisés, options, caractéristiques ou seuils numériques précis. Les filtres vides signifient « n’importe lequel ».</value>
+  </data>
+  <data name="AssistanceAutomationsTitle" xml:space="preserve">
+    <value>2. Automatisations</value>
+  </data>
+  <data name="AssistanceExternalAppsText1" xml:space="preserve">
+    <value>Ajoutez une application externe lorsque plusieurs actions HTTP visent le même serveur. Définissez son URL de base, par exemple</value>
+  </data>
+  <data name="AssistanceExternalAppsText2" xml:space="preserve">
+    <value>Les actions HTTP peuvent ensuite utiliser des chemins relatifs courts, comme</value>
+  </data>
+  <data name="AssistanceExternalAppsText3" xml:space="preserve">
+    <value>Vous pouvez aussi ignorer les applications externes et saisir directement une URL absolue dans une action HTTP.</value>
+  </data>
+  <data name="AssistanceExternalAppsTitle" xml:space="preserve">
+    <value>1. Applications externes</value>
+  </data>
+  <data name="AssistanceSaveLogsText1" xml:space="preserve">
+    <value>Appuyez sur</value>
+  </data>
+  <data name="AssistanceSaveLogsText2" xml:space="preserve">
+    <value>après modification. Les journaux d’envoi en bas de cette page indiquent quelle automatisation s’est exécutée, si elle a réussi, le code de statut HTTP et les éventuels messages d’erreur.</value>
+  </data>
+  <data name="AssistanceSaveLogsTitle" xml:space="preserve">
+    <value>4. Enregistrer et vérifier les journaux</value>
+  </data>
+  <data name="AssistanceWhatAutomationsDoText" xml:space="preserve">
+    <value>Les automatisations permettent à DiceCombats de réagir aux évènements de combat. Une automatisation surveille un déclencheur, puis exécute une ou plusieurs actions dans l’ordre. Les usages typiques sont le démarrage ou l’arrêt d’un minuteur externe, la notification d’un autre outil, ou l’envoi des informations de la créature active à une application compagnon locale.</value>
+  </data>
+  <data name="AssistanceWhatAutomationsDoTitle" xml:space="preserve">
+    <value>À quoi servent les automatisations</value>
+  </data>
+  <data name="AutomationFallback" xml:space="preserve">
+    <value>Automatisation</value>
+  </data>
+  <data name="AutomationName" xml:space="preserve">
+    <value>Nom de l’automatisation</value>
+  </data>
+  <data name="AutomationsSectionTitle" xml:space="preserve">
+    <value>Automatisations</value>
+  </data>
+  <data name="BaseUrl" xml:space="preserve">
+    <value>URL de base</value>
+  </data>
+  <data name="BodyTemplate" xml:space="preserve">
+    <value>Modèle de corps</value>
+  </data>
+  <data name="Comparison" xml:space="preserve">
+    <value>Comparaison</value>
+  </data>
+  <data name="ContinueOnFailure" xml:space="preserve">
+    <value>Continuer en cas d’échec</value>
+  </data>
+  <data name="CreaturesEmptyAnyCreature" xml:space="preserve">
+    <value>Créatures (vide = n’importe quelle créature)</value>
+  </data>
+  <data name="CustomFieldEmptyAnyMatchingField" xml:space="preserve">
+    <value>Champ personnalisé (vide = tout champ compatible)</value>
+  </data>
+  <data name="DefaultDelayName" xml:space="preserve">
+    <value>Délai</value>
+  </data>
+  <data name="DefaultHttpRequestName" xml:space="preserve">
+    <value>Requête HTTP</value>
+  </data>
+  <data name="DelayMilliseconds" xml:space="preserve">
+    <value>Délai en millisecondes</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="DeleteAction" xml:space="preserve">
+    <value>Supprimer l’action</value>
+  </data>
+  <data name="DeleteAutomation" xml:space="preserve">
+    <value>Supprimer l’automatisation</value>
+  </data>
+  <data name="DeliveryLogs" xml:space="preserve">
+    <value>Journaux d’envoi</value>
+  </data>
+  <data name="Disabled" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="EndTitle" xml:space="preserve">
+    <value>Fin</value>
+  </data>
+  <data name="EndpointAbsoluteUrl" xml:space="preserve">
+    <value>URL absolue du point d’accès</value>
+  </data>
+  <data name="EndpointRelativePath" xml:space="preserve">
+    <value>Chemin relatif du point d’accès</value>
+  </data>
+  <data name="EventDataPlaceholdersTitle" xml:space="preserve">
+    <value>Placeholders de données d’évènement</value>
+  </data>
+  <data name="EventTitle" xml:space="preserve">
+    <value>Évènement</value>
+  </data>
+  <data name="ExampleNumericMaxText1" xml:space="preserve">
+    <value>Sur le champ personnalisé de la créature, activez d’abord l’affichage de la valeur maximale. Créez ensuite une automatisation avec le déclencheur</value>
+  </data>
+  <data name="ExampleNumericMaxText2" xml:space="preserve">
+    <value>Sélectionnez la créature et le champ concernés, ou laissez-les vides pour réagir à tout champ compatible.</value>
+  </data>
+  <data name="ExampleNumericMaxTitle" xml:space="preserve">
+    <value>Exemple : réagir quand un champ numérique atteint son maximum</value>
+  </data>
+  <data name="ExampleTimerText1" xml:space="preserve">
+    <value>Créez une application externe nommée</value>
+  </data>
+  <data name="ExampleTimerText2" xml:space="preserve">
+    <value>avec l’URL de base</value>
+  </data>
+  <data name="ExampleTimerText3" xml:space="preserve">
+    <value>Créez ensuite une automatisation avec le déclencheur</value>
+  </data>
+  <data name="ExampleTimerText4" xml:space="preserve">
+    <value>et ajoutez une action HTTP POST vers</value>
+  </data>
+  <data name="ExampleTimerTitle" xml:space="preserve">
+    <value>Exemple : envoyer la créature active à un minuteur externe</value>
+  </data>
+  <data name="ExternalAppNoneAbsolute" xml:space="preserve">
+    <value>Aucune (utiliser une URL absolue)</value>
+  </data>
+  <data name="ExternalAppOptional" xml:space="preserve">
+    <value>Application externe (facultatif)</value>
+  </data>
+  <data name="ExternalApps" xml:space="preserve">
+    <value>Applications externes</value>
+  </data>
+  <data name="FieldType_Checkbox" xml:space="preserve">
+    <value>Case à cocher</value>
+  </data>
+  <data name="FieldType_CheckboxGrid" xml:space="preserve">
+    <value>Grille de cases à cocher</value>
+  </data>
+  <data name="FieldType_Color" xml:space="preserve">
+    <value>Couleur</value>
+  </data>
+  <data name="FieldType_DetailedPopup" xml:space="preserve">
+    <value>Popup détaillée</value>
+  </data>
+  <data name="FieldType_DnDConditions" xml:space="preserve">
+    <value>Conditions D&amp;D</value>
+  </data>
+  <data name="FieldType_HitPoints" xml:space="preserve">
+    <value>Points de vie</value>
+  </data>
+  <data name="FieldType_Numeric" xml:space="preserve">
+    <value>Numérique</value>
+  </data>
+  <data name="FieldType_Stats" xml:space="preserve">
+    <value>Caractéristiques</value>
+  </data>
+  <data name="FieldType_Text" xml:space="preserve">
+    <value>Texte</value>
+  </data>
+  <data name="FieldType_TextGrid" xml:space="preserve">
+    <value>Grille de texte</value>
+  </data>
+  <data name="HeadersOnePerLine" xml:space="preserve">
+    <value>En-têtes (un par ligne : Nom: valeur)</value>
+  </data>
+  <data name="LogFailed" xml:space="preserve">
+    <value>Échec</value>
+  </data>
+  <data name="LogSuccess" xml:space="preserve">
+    <value>Succès</value>
+  </data>
+  <data name="MeaningColumn" xml:space="preserve">
+    <value>Signification</value>
+  </data>
+  <data name="Method" xml:space="preserve">
+    <value>Méthode</value>
+  </data>
+  <data name="NewAppName" xml:space="preserve">
+    <value>Nouvelle application</value>
+  </data>
+  <data name="NewAutomationName" xml:space="preserve">
+    <value>Nouvelle automatisation</value>
+  </data>
+  <data name="OnlyWhenValueCrossesThreshold" xml:space="preserve">
+    <value>Uniquement quand la valeur franchit ce seuil</value>
+  </data>
+  <data name="OptionEmptyAnyOption" xml:space="preserve">
+    <value>Option (vide = toute option)</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>ou</value>
+  </data>
+  <data name="PlaceholderCatalogueIntro1" xml:space="preserve">
+    <value>Dans les URL, corps et en-têtes HTTP, utilisez des placeholders</value>
+  </data>
+  <data name="PlaceholderCatalogueIntro2" xml:space="preserve">
+    <value>pour insérer les données de l’évènement. Les placeholders inconnus ou indisponibles sont remplacés par une valeur vide. Les valeurs</value>
+  </data>
+  <data name="PlaceholderCatalogueIntro3" xml:space="preserve">
+    <value>disponibles dépendent du déclencheur sélectionné.</value>
+  </data>
+  <data name="PlaceholderCatalogueTitle" xml:space="preserve">
+    <value>Catalogue des placeholders pour les modèles HTTP</value>
+  </data>
+  <data name="PlaceholderColumn" xml:space="preserve">
+    <value>Placeholder</value>
+  </data>
+  <data name="PlaceholderMeaningCategory" xml:space="preserve">
+    <value>Famille de l’évènement, par exemple</value>
+  </data>
+  <data name="PlaceholderMeaningDisplayName" xml:space="preserve">
+    <value>Nom lisible de l’évènement affiché par DiceCombats.</value>
+  </data>
+  <data name="PlaceholderMeaningId" xml:space="preserve">
+    <value>Identifiant unique de l’évènement.</value>
+  </data>
+  <data name="PlaceholderMeaningOccurredAt" xml:space="preserve">
+    <value>Horodatage UTC au format ISO-8601.</value>
+  </data>
+  <data name="PlaceholderMeaningType" xml:space="preserve">
+    <value>Type technique de l’évènement, par exemple</value>
+  </data>
+  <data name="PlaceholderMetadataTitle" xml:space="preserve">
+    <value>Métadonnées de l’évènement, disponibles pour tous les déclencheurs</value>
+  </data>
+  <data name="PlaceholderWhenAllCreatureCustomFieldEvents" xml:space="preserve">
+    <value>Tous les évènements de champ personnalisé de créature</value>
+  </data>
+  <data name="PlaceholderWhenCheckboxConditionOptions" xml:space="preserve">
+    <value>Options de case à cocher et de condition</value>
+  </data>
+  <data name="PlaceholderWhenCombatTimer" xml:space="preserve">
+    <value>Minuteur de combat démarré/en pause/arrêté</value>
+  </data>
+  <data name="PlaceholderWhenCreatureGotLostInitiative" xml:space="preserve">
+    <value>Créature qui gagne/perd l’initiative</value>
+  </data>
+  <data name="PlaceholderWhenGridCells" xml:space="preserve">
+    <value>Cellules de grille de cases à cocher et de grille de texte</value>
+  </data>
+  <data name="PlaceholderWhenHitPointsField" xml:space="preserve">
+    <value>Champ de points de vie</value>
+  </data>
+  <data name="PlaceholderWhenMostCombatEvents" xml:space="preserve">
+    <value>La plupart des évènements de combat</value>
+  </data>
+  <data name="PlaceholderWhenNextCreature" xml:space="preserve">
+    <value>Créature suivante dans l’initiative</value>
+  </data>
+  <data name="PlaceholderWhenNumericHpStatsValueChanges" xml:space="preserve">
+    <value>Changements de valeur numérique, points de vie et caractéristiques</value>
+  </data>
+  <data name="PlaceholderWhenNumericMaximumUnit" xml:space="preserve">
+    <value>Champ numérique avec maximum/unité activés</value>
+  </data>
+  <data name="PlaceholderWhenStatsField" xml:space="preserve">
+    <value>Champ de caractéristiques</value>
+  </data>
+  <data name="PlaceholderWhenUserCustomFieldSavedRemoved" xml:space="preserve">
+    <value>Champ personnalisé utilisateur enregistré/supprimé</value>
+  </data>
+  <data name="PlaceholdersColumn" xml:space="preserve">
+    <value>Placeholders</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Enregistrer</value>
+  </data>
+  <data name="SaveSuccessMessage" xml:space="preserve">
+    <value>Automatisations, déclencheurs et applications externes enregistrés avec succès</value>
+  </data>
+  <data name="SaveSuccessTitle" xml:space="preserve">
+    <value>Automatisations enregistrées</value>
+  </data>
+  <data name="StatEmptyAnyStat" xml:space="preserve">
+    <value>Caractéristique (vide = toute caractéristique)</value>
+  </data>
+  <data name="ThresholdLabel_HitPointsThreshold" xml:space="preserve">
+    <value>Points de vie (%)</value>
+  </data>
+  <data name="ThresholdLabel_NumericThreshold" xml:space="preserve">
+    <value>Valeur numérique</value>
+  </data>
+  <data name="ThresholdLabel_StatsThreshold" xml:space="preserve">
+    <value>Valeur de caractéristique</value>
+  </data>
+  <data name="ThresholdLabel_Value" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="ThresholdOperator_Above" xml:space="preserve">
+    <value>supérieur à</value>
+  </data>
+  <data name="ThresholdOperator_AboveOrEqual" xml:space="preserve">
+    <value>supérieur ou égal à</value>
+  </data>
+  <data name="ThresholdOperator_Below" xml:space="preserve">
+    <value>inférieur à</value>
+  </data>
+  <data name="ThresholdOperator_BelowOrEqual" xml:space="preserve">
+    <value>inférieur ou égal à</value>
+  </data>
+  <data name="TimeoutMs" xml:space="preserve">
+    <value>Délai d’attente (ms)</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Automatisations</value>
+  </data>
+  <data name="Trigger" xml:space="preserve">
+    <value>Déclencheur</value>
+  </data>
+  <data name="TriggerCategory_Combattimer" xml:space="preserve">
+    <value>Minuteur de combat</value>
+  </data>
+  <data name="TriggerCategory_Creatures" xml:space="preserve">
+    <value>Créatures</value>
+  </data>
+  <data name="TriggerCategory_Customfields" xml:space="preserve">
+    <value>Champs personnalisés</value>
+  </data>
+  <data name="TriggerCategory_Initiative" xml:space="preserve">
+    <value>Initiative</value>
+  </data>
+  <data name="TriggerDisplay_AnyCustomFieldChanged" xml:space="preserve">
+    <value>Champ personnalisé modifié</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxGridCellChanged" xml:space="preserve">
+    <value>Cellule de grille de cases à cocher modifiée</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxGridCellChecked" xml:space="preserve">
+    <value>Cellule de grille de cases à cocher cochée</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxGridCellUnchecked" xml:space="preserve">
+    <value>Cellule de grille de cases à cocher décochée</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxOptionChanged" xml:space="preserve">
+    <value>Option de case à cocher modifiée</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxOptionChecked" xml:space="preserve">
+    <value>Option de case à cocher cochée</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxOptionUnchecked" xml:space="preserve">
+    <value>Option de case à cocher décochée</value>
+  </data>
+  <data name="TriggerDisplay_CheckboxTextChanged" xml:space="preserve">
+    <value>Texte de case à cocher modifié</value>
+  </data>
+  <data name="TriggerDisplay_ColourChanged" xml:space="preserve">
+    <value>Champ de couleur modifié</value>
+  </data>
+  <data name="TriggerDisplay_ConditionAdded" xml:space="preserve">
+    <value>Option de condition ajoutée</value>
+  </data>
+  <data name="TriggerDisplay_ConditionRemoved" xml:space="preserve">
+    <value>Option de condition retirée</value>
+  </data>
+  <data name="TriggerDisplay_ConditionsOptionChanged" xml:space="preserve">
+    <value>Option de condition modifiée</value>
+  </data>
+  <data name="TriggerDisplay_CreatureGotInitiative" xml:space="preserve">
+    <value>Créature qui gagne l’initiative</value>
+  </data>
+  <data name="TriggerDisplay_CreatureLostInitiative" xml:space="preserve">
+    <value>Créature qui perd l’initiative</value>
+  </data>
+  <data name="TriggerDisplay_DetailedPopupOpened" xml:space="preserve">
+    <value>Popup détaillée ouverte</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsChanged" xml:space="preserve">
+    <value>Points de vie modifiés</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsDamaged" xml:space="preserve">
+    <value>Points de vie diminués</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsHealed" xml:space="preserve">
+    <value>Points de vie augmentés</value>
+  </data>
+  <data name="TriggerDisplay_HitPointsThreshold" xml:space="preserve">
+    <value>Points de vie ayant franchi un pourcentage</value>
+  </data>
+  <data name="TriggerDisplay_InitiativeNext" xml:space="preserve">
+    <value>Créature suivante dans l’initiative</value>
+  </data>
+  <data name="TriggerDisplay_InitiativeReset" xml:space="preserve">
+    <value>Initiative réinitialisée</value>
+  </data>
+  <data name="TriggerDisplay_InitiativeSorted" xml:space="preserve">
+    <value>Initiative triée</value>
+  </data>
+  <data name="TriggerDisplay_NumericChanged" xml:space="preserve">
+    <value>Champ numérique modifié</value>
+  </data>
+  <data name="TriggerDisplay_NumericDecreased" xml:space="preserve">
+    <value>Champ numérique diminué</value>
+  </data>
+  <data name="TriggerDisplay_NumericIncreased" xml:space="preserve">
+    <value>Champ numérique augmenté</value>
+  </data>
+  <data name="TriggerDisplay_NumericReachedMaxValue" xml:space="preserve">
+    <value>Champ numérique ayant atteint sa valeur maximale</value>
+  </data>
+  <data name="TriggerDisplay_NumericThreshold" xml:space="preserve">
+    <value>Champ numérique ayant franchi une valeur</value>
+  </data>
+  <data name="TriggerDisplay_StatsChanged" xml:space="preserve">
+    <value>Valeur de caractéristique modifiée</value>
+  </data>
+  <data name="TriggerDisplay_StatsDecreased" xml:space="preserve">
+    <value>Valeur de caractéristique diminuée</value>
+  </data>
+  <data name="TriggerDisplay_StatsIncreased" xml:space="preserve">
+    <value>Valeur de caractéristique augmentée</value>
+  </data>
+  <data name="TriggerDisplay_StatsThreshold" xml:space="preserve">
+    <value>Caractéristique ayant franchi une valeur</value>
+  </data>
+  <data name="TriggerDisplay_TextChanged" xml:space="preserve">
+    <value>Champ de texte modifié</value>
+  </data>
+  <data name="TriggerDisplay_TextGridCellChanged" xml:space="preserve">
+    <value>Cellule de grille de texte modifiée</value>
+  </data>
+  <data name="TriggerDisplay_TimerPaused" xml:space="preserve">
+    <value>Minuteur mis en pause</value>
+  </data>
+  <data name="TriggerDisplay_TimerStarted" xml:space="preserve">
+    <value>Minuteur démarré</value>
+  </data>
+  <data name="TriggerDisplay_TimerStopped" xml:space="preserve">
+    <value>Minuteur arrêté</value>
+  </data>
+  <data name="TriggerDisplay_UserCustomFieldRemoved" xml:space="preserve">
+    <value>Champ personnalisé utilisateur supprimé</value>
+  </data>
+  <data name="TriggerDisplay_UserCustomFieldSaved" xml:space="preserve">
+    <value>Champ personnalisé utilisateur enregistré</value>
+  </data>
+  <data name="TriggerSummaryAnyCreature" xml:space="preserve">
+    <value>n’importe quelle créature</value>
+  </data>
+  <data name="TriggerSummaryAnyMatchingField" xml:space="preserve">
+    <value>tout champ compatible</value>
+  </data>
+  <data name="TriggerSummaryAnyOption" xml:space="preserve">
+    <value>toute option</value>
+  </data>
+  <data name="TriggerSummaryAnyStat" xml:space="preserve">
+    <value>toute caractéristique</value>
+  </data>
+  <data name="TriggerSummaryCreatureFilter" xml:space="preserve">
+    <value>Se déclenche pour {0}.</value>
+  </data>
+  <data name="TriggerSummaryDefault" xml:space="preserve">
+    <value>Se déclenche sur : {0}.</value>
+  </data>
+  <data name="TriggerSummaryField" xml:space="preserve">
+    <value>le champ « {0} »</value>
+  </data>
+  <data name="TriggerSummaryFieldChanged" xml:space="preserve">
+    <value>Se déclenche lorsque {0} change sur {1}.</value>
+  </data>
+  <data name="TriggerSummaryNumericReachedMaxValue" xml:space="preserve">
+    <value>Se déclenche lorsque {0} sur {1} devient égal à sa valeur maximale.</value>
+  </data>
+  <data name="TriggerSummaryOption" xml:space="preserve">
+    <value>l’option « {0} »</value>
+  </data>
+  <data name="TriggerSummaryOptionChanged" xml:space="preserve">
+    <value>Se déclenche lorsque {0} dans {1} change sur {2}.</value>
+  </data>
+  <data name="TriggerSummaryStat" xml:space="preserve">
+    <value>la caractéristique « {0} »</value>
+  </data>
+  <data name="TriggerSummaryStatChanged" xml:space="preserve">
+    <value>Se déclenche lorsque {0} dans {1} change sur {2}.</value>
+  </data>
+  <data name="TriggerSummaryThreshold" xml:space="preserve">
+    <value>Se déclenche lorsque {0} sur {1} est {2} {3}.</value>
+  </data>
+  <data name="TroubleshootingText" xml:space="preserve">
+    <value>Si rien ne se passe, vérifiez que l’automatisation et l’application externe sont activées, enregistrez, puis refaites l’action dans le gestionnaire de combat. Si une entrée de journal indique un échec, vérifiez l’URL, la méthode HTTP, le délai d’attente, et que l’application externe est lancée et accessible.</value>
+  </data>
+  <data name="TroubleshootingTitle" xml:space="preserve">
+    <value>Dépannage</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>Quand</value>
+  </data>
+  <data name="WhenAvailableColumn" xml:space="preserve">
+    <value>Disponibilité</value>
+  </data>
+</root>

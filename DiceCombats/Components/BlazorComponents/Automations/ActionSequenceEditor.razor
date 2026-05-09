@@ -1,11 +1,12 @@
 @using DiceCombats.Automations
+@inject IStringLocalizer<Resources.Localization.Automations> Loc
 
-<MudText Typo="Typo.h6" Class="mt-4">Actions sequence</MudText>
+<MudText Typo="Typo.h6" Class="mt-4">@Loc["ActionsSequence"]</MudText>
 
 <div style="display:flex; padding:20px; overflow-x: scroll;">
     <div style="padding:10px; border-radius:30px; height:80px; width:120px; min-width:120px; background-color:deeppink; font-weight:700; text-align:center; font-size:12px;">
         <div style="justify-content:center;">
-            <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Title="Event" />
+            <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Title="@Loc["EventTitle"]" />
         </div>
         <div style="justify-content:center;">
             @Binding.Name
@@ -20,7 +21,7 @@
         {
             <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:teal; font-weight:700; text-align:center; font-size:14px;">
                 <div style="justify-content:center;">
-                    <MudIcon Icon="@Icons.Material.Filled.RocketLaunch" Title="Action" />
+                    <MudIcon Icon="@Icons.Material.Filled.RocketLaunch" Title="@Loc["ActionTitle"]" />
                 </div>
                 <div style="justify-content:center;">
                     @http.Name
@@ -31,7 +32,7 @@
         {
             <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:darkgoldenrod; font-weight:700; text-align:center; font-size:14px;">
                 <div style="justify-content:center;">
-                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Title="Action" />
+                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Title="@Loc["ActionTitle"]" />
                 </div>
                 <div style="justify-content:center;">
                     @delay.Milliseconds
@@ -44,16 +45,16 @@
     }
     <div style="padding:10px; border-radius:30px; height:80px; width:60px; min-width:60px; background-color:deeppink; font-weight:700; text-align:center; font-size:14px;">
         <div style="justify-content:center;">
-            <MudIcon Icon="@Icons.Material.Filled.Stop" Title="End" />
+            <MudIcon Icon="@Icons.Material.Filled.Stop" Title="@Loc["EndTitle"]" />
         </div>
         <div style="justify-content:center;">
-            End
+            @Loc["End"]
         </div>
     </div>
 </div>
 
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Launch" OnClick="AddHttp">Add HTTP Request</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AccessTime" OnClick="AddDelay">Add Delay</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Launch" OnClick="AddHttp">@Loc["AddHttpRequest"]</MudButton>
+<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AccessTime" OnClick="AddDelay">@Loc["AddDelay"]</MudButton>
 
 @foreach (var action in Binding.Actions.ToList())
 {
@@ -61,41 +62,41 @@
         <MudStack Row="true">
             <MudButton OnClick="@(() => MoveActionUp(action))">↑</MudButton>
             <MudButton OnClick="@(() => MoveActionDown(action))">↓</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveAction(action))">Delete action</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveAction(action))">@Loc["DeleteAction"]</MudButton>
         </MudStack>
 
-        <MudTextField @bind-Value="action.Name" Label="Action name" />
-        <MudSwitch @bind-Value="action.ContinueOnFailure" Color="Color.Primary" Label="Continue on failure" />
+        <MudTextField @bind-Value="action.Name" Label="@Loc["ActionName"]" />
+        <MudSwitch @bind-Value="action.ContinueOnFailure" Color="Color.Primary" Label="@Loc["ContinueOnFailure"]" />
 
         @if (action is HttpRequestActionDefinition http)
         {
-            <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="External app (optional)">
-                <MudSelectItem T="Guid?" Value="@((Guid?)null)">None (use absolute URL)</MudSelectItem>
+            <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="@Loc["ExternalAppOptional"]">
+                <MudSelectItem T="Guid?" Value="@((Guid?)null)">@Loc["ExternalAppNoneAbsolute"]</MudSelectItem>
                 @foreach (var app in ExternalApps)
                 {
                     <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
                 }
             </MudSelect>
 
-            <MudSelect T="string" @bind-Value="http.Method" Label="Method">
+            <MudSelect T="string" @bind-Value="http.Method" Label="@Loc["Method"]">
                 @foreach (var method in _methods)
                 {
                     <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
                 }
             </MudSelect>
 
-            <MudTextField @bind-Value="http.Url" Label="@(http.ExternalAppId == null ? "Endpoint absolute URL" : "Endpoint relative path")" />
-            <MudTextField @bind-Value="http.BodyTemplate" Label="Body template" Lines="3" />
-            <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="Timeout (ms)" />
+            <MudTextField @bind-Value="http.Url" Label="@(http.ExternalAppId == null ? Loc["EndpointAbsoluteUrl"].Value : Loc["EndpointRelativePath"].Value)" />
+            <MudTextField @bind-Value="http.BodyTemplate" Label="@Loc["BodyTemplate"]" Lines="3" />
+            <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="@Loc["TimeoutMs"]" />
             <MudTextField T="string"
                           Value="@GetHeadersText(http.Headers)"
                           ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
-                          Label="Headers (one per line: Name: value)"
+                          Label="@Loc["HeadersOnePerLine"]"
                           Lines="4" />
         }
         else if (action is DelayActionDefinition delay)
         {
-            <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="Delay milliseconds" />
+            <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="@Loc["DelayMilliseconds"]" />
         }
     </MudPaper>
 }
@@ -110,7 +111,7 @@
     {
         Binding.Actions.Add(new HttpRequestActionDefinition
         {
-            Name = "HTTP request",
+            Name = Loc["DefaultHttpRequestName"].Value,
             Method = "POST",
             Url = "https://example.local/api"
         });
@@ -120,7 +121,7 @@
     {
         Binding.Actions.Add(new DelayActionDefinition
         {
-            Name = "Delay",
+            Name = Loc["DefaultDelayName"].Value,
             Milliseconds = 100
         });
     }

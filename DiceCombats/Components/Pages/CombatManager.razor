@@ -145,14 +145,22 @@
 <script>
     window.initializeMasonry = (selector) => {
     const grid = document.querySelector(selector);
-    if (grid) {
-    new Masonry(grid, {
+    if (!grid) {
+    return;
+    }
+    // Called after every render: relayout the instance the element already has
+    // instead of stacking a new one (and another resize listener) on top of it.
+    if (grid.dcMasonry) {
+    grid.dcMasonry.reloadItems();
+    grid.dcMasonry.layout();
+    return;
+    }
+    grid.dcMasonry = new Masonry(grid, {
     itemSelector: '.masonry-item',
     columnWidth: '.masonry-item',
     percentPosition: true,
     gutter: 10
     });
-    }
     };
 </script>
 

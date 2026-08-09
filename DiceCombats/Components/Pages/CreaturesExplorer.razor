@@ -13,10 +13,11 @@
 @inject NavigationManager Navigation
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
+@inject IDialogService DialogService
 @inject IStringLocalizer<Resources.Localization.CreaturesExplorer> Loc
 
 <style>
-    /* Card list — same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
+    /* Card list with the same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
     .dc-card {
         border-radius: 12px;
         background: #12201d;
@@ -97,23 +98,45 @@
     <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary">@Loc["NewCreatureBtn"]</MudButton>
     <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary">@Loc["ExportCreaturesBtn"]</MudButton>
     <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary">@Loc["ImportCreaturesBtn"]</MudButton>
+    <MudButton OnClick="@(() => PlayerGroupsModalRef?.Show())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Groups2" Color="@Color.Primary">@Loc["PlayerGroupsBtn"]</MudButton>
 </MudStack>
+
+<div style="max-width:420px; margin-bottom:6px;">
+    <MudTextField T="string" Immediate="true" Value="@_search" ValueChanged="@((string v) => _search = v)"
+                  Label="@Loc["SearchCreature"]" Variant="Variant.Outlined" Clearable="true"
+                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+</div>
 
 @RenderCreatureSection(false, Loc["CreaturesTitle"], Loc["NoCreatures"], Icons.Material.Filled.Pets)
 @RenderCreatureSection(true, Loc["PlayersTitle"], Loc["NoPlayers"], Icons.Material.Filled.Person)
 
+<GenericModal TContent="PlayerGroupsEditor" @ref="PlayerGroupsModalRef" OnClose="OnPlayerGroupsModalClose">
+    <PlayerGroupsEditor />
+</GenericModal>
+
 @code {
+    private GenericModal<PlayerGroupsEditor>? PlayerGroupsModalRef;
+
+    private string _search = string.Empty;
+
+    /// Case-insensitive substring match on the name, like the selector's search.
+    private bool Matches(DCCreature creature) =>
+        string.IsNullOrWhiteSpace(_search) ||
+        creature.Name.Contains(_search.Trim(), StringComparison.CurrentCultureIgnoreCase);
+
+    private void OnPlayerGroupsModalClose(bool result) => StateHasChanged();
+
     /// Both sections (monsters/NPCs and player characters) share the exact same
     /// card anatomy; only the filter, heading and icon differ.
     private RenderFragment RenderCreatureSection(bool isPlayer, string title, string emptyText, string icon) => __builder =>
     {
-        var creatures = CombatService.GetCreatureList().Where(x => x.IsPlayer == isPlayer).ToList();
+        var creatures = CombatService.GetCreatureList().Where(x => x.IsPlayer == isPlayer && Matches(x)).ToList();
 
         <div class="dc-cat-header" style="font-size:28px;">@title</div>
 
         if (creatures.Count == 0)
         {
-            <p class="dc-empty">@emptyText</p>
+            <p class="dc-empty">@(string.IsNullOrWhiteSpace(_search) ? emptyText : Loc["NoSearchResult"])</p>
         }
 
         foreach (var group in creatures
@@ -136,7 +159,7 @@
                         <div @onclick:stopPropagation="true">
                             <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["EditCreatureBtn"]" />
                             <MudIconButton OnClick="() => ExportCreature(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["ExportCreatureBtn"]" />
-                            <MudIconButton OnClick="() => CombatService.DeleteCreature(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["DeleteCreatureBtn"]" />
+                            <MudIconButton OnClick="() => DeleteCreature(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["DeleteCreatureBtn"]" />
                         </div>
                     </div>
                 }
@@ -160,22 +183,25 @@
             $"{creature.CustomFields.Count} {Loc["FieldsMeta"]}"
         };
 
-        if (creature.InCombatInstanceCount > 1)
-        {
-            parts.Add($"×{creature.InCombatInstanceCount}");
-        }
-
-        if (!string.IsNullOrEmpty(creature.MarkdownSheet) || !string.IsNullOrEmpty(creature.HtmlSheet) || !string.IsNullOrEmpty(creature.ImageSheetBas64))
-        {
-            parts.Add(Loc["SheetMeta"]);
-        }
-
         return string.Join(" · ", parts);
     }
 
     private void Edit(DCCreature creature)
     {
         Navigation.NavigateTo($"/creaturemanager/{creature.Id.ToString()}");
+    }
+
+    private async Task DeleteCreature(DCCreature creature)
+    {
+        bool? confirm = await DialogService.ShowMessageBox(
+            Loc["DeleteCreatureTitle"],
+            string.Format(Loc["DeleteCreatureQuestion"], creature.Name),
+            yesText: Loc["DeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);
+        if (confirm != true) return;
+
+        CombatService.DeleteCreature(creature);
+        CombatService.SaveCreatures();
+        StateHasChanged();
     }
 
     private async Task ExportCreature(DCCreature creature)

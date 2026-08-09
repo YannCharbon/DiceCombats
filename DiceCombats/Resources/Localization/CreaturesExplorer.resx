@@ -145,7 +145,7 @@
     <value>Creatures</value>
   </data>
   <data name="ExplorerSubtitle" xml:space="preserve">
-    <value>Your bestiary and player characters — reusable stat blocks you drop into combats.</value>
+    <value>Your bestiary and player characters: reusable stat blocks you drop into combats.</value>
   </data>
   <data name="NoCreatures" xml:space="preserve">
     <value>No creatures yet. Create one to get started.</value>
@@ -158,5 +158,53 @@
   </data>
   <data name="SheetMeta" xml:space="preserve">
     <value>sheet</value>
+  </data>
+  <data name="SearchCreature" xml:space="preserve">
+    <value>Search a creature or a player</value>
+  </data>
+  <data name="NoSearchResult" xml:space="preserve">
+    <value>No match for this search.</value>
+  </data>
+  <data name="DeleteCreatureTitle" xml:space="preserve">
+    <value>Delete creature</value>
+  </data>
+  <data name="DeleteCreatureQuestion" xml:space="preserve">
+    <value>Delete &quot;{0}&quot;? This cannot be undone.</value>
+  </data>
+  <data name="DeleteConfirmBtn" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="PlayerGroupsBtn" xml:space="preserve">
+    <value>Player groups</value>
+  </data>
+  <data name="PlayerGroupsTitle" xml:space="preserve">
+    <value>Player groups</value>
+  </data>
+  <data name="PlayerGroupsSubtitle" xml:space="preserve">
+    <value>Group the players of a table together, then drop the whole party into a combat in one click.</value>
+  </data>
+  <data name="NewPlayerGroupBtn" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="NewPlayerGroupName" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="NoPlayerGroups" xml:space="preserve">
+    <value>No group yet. Create one to get started.</value>
+  </data>
+  <data name="PlayerGroupName" xml:space="preserve">
+    <value>Group name</value>
+  </data>
+  <data name="DeletePlayerGroupBtn" xml:space="preserve">
+    <value>Delete group</value>
+  </data>
+  <data name="UnnamedPlayerGroup" xml:space="preserve">
+    <value>(unnamed group)</value>
+  </data>
+  <data name="PlayersMeta" xml:space="preserve">
+    <value>player(s)</value>
   </data>
 </root>

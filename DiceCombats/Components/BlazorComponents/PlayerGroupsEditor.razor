@@ -1,0 +1,122 @@
+@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@* Only ever shown from the creatures explorer, so it shares that page's
+   resources instead of carrying a resx of its own. *@
+@inject DiceCombatsService CombatService
+@inject IStringLocalizer<Resources.Localization.CreaturesExplorer> Loc
+
+<style>
+    .pg-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+
+    .pg-players {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 0 12px;
+    }
+
+    .pg-hint {
+        color: grey;
+        font-size: 13px;
+    }
+</style>
+
+<h3>@Loc["PlayerGroupsTitle"]</h3>
+<MudText Typo="Typo.body2" Style="color:grey; margin-bottom:14px;">@Loc["PlayerGroupsSubtitle"]</MudText>
+
+<MudButton OnClick="AddGroup" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary">
+    @Loc["NewPlayerGroupBtn"]
+</MudButton>
+
+@if (Players.Count == 0)
+{
+    <p class="pg-hint" style="padding:20px 0;">@Loc["NoPlayers"]</p>
+}
+else if (CombatService.GetPlayerGroups().Count == 0)
+{
+    <p class="pg-hint" style="padding:20px 0;">@Loc["NoPlayerGroups"]</p>
+}
+
+<MudExpansionPanels MultiExpansion="true" Style="margin-top:14px;">
+    @foreach (DCPlayerGroup group in CombatService.GetPlayerGroups())
+    {
+        var g = group;
+        <MudExpansionPanel Expanded="false" Elevation="1">
+            <TitleContent>
+                <div class="d-flex">
+                    <MudIcon Icon="@Icons.Material.Filled.Groups2" Color="@Color.Primary" class="mr-3"></MudIcon>
+                    <MudText class="mr-3">@(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name)</MudText>
+                    <MudText class="mr-3" Style="color:grey;">@CombatService.GetPlayerGroupMembers(g).Count @Loc["PlayersMeta"]</MudText>
+                </div>
+            </TitleContent>
+            <ChildContent>
+                <div class="pg-row">
+                    <MudTextField T="string" Label="@Loc["PlayerGroupName"]" Variant="Variant.Outlined"
+                                  Value="@g.Name" ValueChanged="@((string v) => Rename(g, v))" Immediate="true" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error"
+                                   OnClick="() => DeleteGroup(g)" title="@Loc["DeletePlayerGroupBtn"]" />
+                </div>
+                <div class="pg-players">
+                    @foreach (DCCreature player in Players)
+                    {
+                        var p = player;
+                        <MudCheckBox T="bool" Label="@p.Name" Color="@Color.Primary"
+                                     Value="@g.PlayerIds.Contains(p.Id)"
+                                     ValueChanged="@((bool v) => ToggleMember(g, p, v))" />
+                    }
+                </div>
+            </ChildContent>
+        </MudExpansionPanel>
+    }
+</MudExpansionPanels>
+
+@code {
+    private List<DCCreature> Players =>
+        CombatService.GetCreatureList()
+            .Where(x => x.IsPlayer)
+            .OrderBy(x => x.Name, StringComparer.CurrentCulture)
+            .ToList();
+
+    private void AddGroup()
+    {
+        CombatService.AddPlayerGroup(new DCPlayerGroup(Loc["NewPlayerGroupName"]));
+    }
+
+    private void DeleteGroup(DCPlayerGroup group)
+    {
+        CombatService.DeletePlayerGroup(group);
+    }
+
+    private void Rename(DCPlayerGroup group, string name)
+    {
+        group.Name = name;
+        CombatService.SavePlayerGroups();
+    }
+
+    private void ToggleMember(DCPlayerGroup group, DCCreature player, bool selected)
+    {
+        if (selected)
+        {
+            if (!group.PlayerIds.Contains(player.Id))
+            {
+                group.PlayerIds.Add(player.Id);
+            }
+        }
+        else
+        {
+            group.PlayerIds.Remove(player.Id);
+        }
+
+        CombatService.SavePlayerGroups();
+    }
+}

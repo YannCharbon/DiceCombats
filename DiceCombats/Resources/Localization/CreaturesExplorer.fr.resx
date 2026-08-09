@@ -145,7 +145,7 @@
     <value>Créatures</value>
   </data>
   <data name="ExplorerSubtitle" xml:space="preserve">
-    <value>Votre bestiaire et vos personnages joueurs — des fiches réutilisables à placer dans vos combats.</value>
+    <value>Votre bestiaire et vos personnages joueurs : des fiches réutilisables à placer dans vos combats.</value>
   </data>
   <data name="NoCreatures" xml:space="preserve">
     <value>Aucune créature pour l'instant. Créez-en une pour commencer.</value>
@@ -158,5 +158,53 @@
   </data>
   <data name="SheetMeta" xml:space="preserve">
     <value>fiche</value>
+  </data>
+  <data name="SearchCreature" xml:space="preserve">
+    <value>Rechercher une créature ou un joueur</value>
+  </data>
+  <data name="NoSearchResult" xml:space="preserve">
+    <value>Aucun résultat pour cette recherche.</value>
+  </data>
+  <data name="DeleteCreatureTitle" xml:space="preserve">
+    <value>Supprimer la créature</value>
+  </data>
+  <data name="DeleteCreatureQuestion" xml:space="preserve">
+    <value>Supprimer &quot;{0}&quot; ? Cette action est irréversible.</value>
+  </data>
+  <data name="DeleteConfirmBtn" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="PlayerGroupsBtn" xml:space="preserve">
+    <value>Groupes de joueurs</value>
+  </data>
+  <data name="PlayerGroupsTitle" xml:space="preserve">
+    <value>Groupes de joueurs</value>
+  </data>
+  <data name="PlayerGroupsSubtitle" xml:space="preserve">
+    <value>Regroupez les joueurs d'une table, puis ajoutez tout le groupe à un combat en un clic.</value>
+  </data>
+  <data name="NewPlayerGroupBtn" xml:space="preserve">
+    <value>Nouveau groupe</value>
+  </data>
+  <data name="NewPlayerGroupName" xml:space="preserve">
+    <value>Nouveau groupe</value>
+  </data>
+  <data name="NoPlayerGroups" xml:space="preserve">
+    <value>Aucun groupe pour l'instant. Créez-en un pour commencer.</value>
+  </data>
+  <data name="PlayerGroupName" xml:space="preserve">
+    <value>Nom du groupe</value>
+  </data>
+  <data name="DeletePlayerGroupBtn" xml:space="preserve">
+    <value>Supprimer le groupe</value>
+  </data>
+  <data name="UnnamedPlayerGroup" xml:space="preserve">
+    <value>(groupe sans nom)</value>
+  </data>
+  <data name="PlayersMeta" xml:space="preserve">
+    <value>joueur(s)</value>
   </data>
 </root>

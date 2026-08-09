@@ -40,6 +40,8 @@ namespace DiceCombats
         {
             var creatureClone = (DCCreature)creature.Clone();
             CreaturesList.Add(creatureClone);
+            ResetHitPointsForCombat(creatureClone.CustomFields);
+
             List<List<DCCreatureCustomField>> tmp = new List<List<DCCreatureCustomField>>();
             for (int i = 0; i < creatureClone.InCombatInstanceCount; i++)
             {
@@ -48,9 +50,25 @@ namespace DiceCombats
                 {
                     fields.Add(field.Clone());
                 }
+                ResetHitPointsForCombat(fields);
                 tmp.Add(fields);
             }
             InCombatCustomFieldsInstances.Add(tmp);
+        }
+
+        /// <summary>
+        /// A creature joins a fight at full health, whatever the sheet it was
+        /// copied from happened to be left at.
+        /// </summary>
+        private static void ResetHitPointsForCombat(List<DCCreatureCustomField> fields)
+        {
+            foreach (var field in fields)
+            {
+                if (field is DCCreatureHitPointsField hitPoints)
+                {
+                    hitPoints.ResetForCombat();
+                }
+            }
         }
 
         public void RemoveCreature(DCCreature creature)

@@ -248,7 +248,7 @@ else
     private async Task OnMaximumHpChanged(uint value)
     {
         var oldValue = Field.MaximumHP;
-        Field.MaximumHP = value;
+        Field.SetMaximumHP(value);
 
         if (OnFieldChanged.HasDelegate)
         {

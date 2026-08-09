@@ -364,6 +364,33 @@ namespace DiceCombats
             MitigationRules.Add(new DCHitPointsMitigationRule { Name = "Vulnerable", Factor = 2.0 });
         }
 
+        /// <summary>
+        /// Sets the maximum and lets the current value follow it when the creature
+        /// was at full, or had no value yet. A field taken from a user template
+        /// starts with both at zero, so without this it would stay at zero.
+        /// </summary>
+        public void SetMaximumHP(uint value)
+        {
+            bool wasFull = CurrentHP == UnsetHP || CurrentHP == (int)MaximumHP;
+            MaximumHP = value;
+            if (wasFull)
+            {
+                CurrentHP = (int)value;
+            }
+        }
+
+        /// <summary>
+        /// Full health, with the temporary pool and the maximum reduction cleared:
+        /// both are effects of a past fight and do not carry into a new one.
+        /// </summary>
+        public void ResetForCombat()
+        {
+            TemporaryHP = 0;
+            MaximumHPReduction = 0;
+            CurrentHP = (int)MaximumHP;
+            UndoCurrentHP = null;
+        }
+
         public void SaveUndo()
         {
             UndoCurrentHP = CurrentHP;

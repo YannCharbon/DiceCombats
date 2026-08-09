@@ -186,8 +186,10 @@
             color: #fff;
         }
 
-    /* ── Narrow windows / phones: labels collapse to icons ── */
-    @@media (max-width: 700px) {
+    /* ── Narrow windows / phones: labels collapse to icons ──
+       Breakpoint is where the two capsules + logo + side padding stop fitting;
+       below it the right capsule would otherwise slide under the utilities. */
+    @@media (max-width: 1000px) {
         .dc-bar {
             gap: 10px;
             padding-left: 46px; /* stays symmetric, so the gem keeps the centre */

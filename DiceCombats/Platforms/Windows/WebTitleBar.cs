@@ -20,8 +20,8 @@ using Control = Microsoft.UI.Xaml.Controls.Control;
 namespace DiceCombats
 {
     /// <summary>
-    /// Windows-only. Makes the BlazorWebView occupy the full window height —
-    /// including the strip MAUI normally reserves for the native title bar —
+    /// Windows-only. Makes the BlazorWebView occupy the full window height,
+    /// including the strip MAUI normally reserves for the native title bar,
     /// so the web app bar (and its gem) IS the title bar, the way Teams and
     /// the new Outlook do it. Window dragging comes from WebView2 non-client
     /// region support: page elements with CSS `app-region: drag` hit-test as
@@ -56,7 +56,7 @@ namespace DiceCombats
                 Enforce(root, webView);
 
                 // MAUI re-applies the native strip (visibility AND the 32px
-                // content margin) whenever the window state changes — e.g.
+                // content margin) whenever the window state changes, e.g.
                 // maximized -> windowed via the caption button or by dragging
                 // the strip. Re-enforce immediately on those events, with a
                 // slow periodic backstop for anything that slips through.
@@ -82,7 +82,7 @@ namespace DiceCombats
         /// <summary>
         /// Keeps the web content at the window's top edge: collapses MAUI's
         /// native title-bar strip and zeroes the content offset MAUI parks on
-        /// the NavigationView's ContentGrid. Idempotent — safe (and cheap) to
+        /// the NavigationView's ContentGrid. Idempotent, so it is safe (and cheap) to
         /// run after every window/layout event, because MAUI re-applies both
         /// on state changes (e.g. maximized -> windowed).
         /// </summary>
@@ -113,7 +113,7 @@ namespace DiceCombats
                 });
 
                 // MAUI re-applies a 32px top margin on the NavigationView's
-                // 'ContentGrid' on EVERY layout pass — zeroing it just loses a
+                // 'ContentGrid' on EVERY layout pass, and zeroing it just loses a
                 // war (visible as rapid oscillation during drag-resize).
                 // Instead, compensate: a negative top margin of the same size
                 // on the child element along the webview's chain. Both values

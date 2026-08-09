@@ -1,4 +1,4 @@
-@page "/automations"
+﻿@page "/automations"
 @using DiceCombats.Automations
 @using DiceCombats.Components.BlazorComponents.Automations
 @inject AutomationConfigurationService ConfigService
@@ -115,7 +115,7 @@
     </div>
 
 
-    <MudExpansionPanel Expanded="@_assistanceExpanded" Elevation="1" ExpandedChanged="() => _assistanceExpanded = !_assistanceExpanded">
+    <MudExpansionPanel Expanded="@_assistanceExpanded" ExpandedChanged="() => _assistanceExpanded = !_assistanceExpanded">
         <TitleContent>
             <div class="d-flex">
                 <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * DiceCombats - Copyright (C) 2025 Yann Charbon
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -17,26 +17,48 @@ using View = Android.Views.View;
 
 namespace DiceCombats.Platform.Android;
 
-[SupportedOSPlatform("Android")]
+// Version pinned to the project's own android minimum so the immersive flags,
+// which need API 21, are not reported as unsupported.
+[SupportedOSPlatform("Android24.0")]
 public static class WebViewSoftInputPatch
 {
     static Activity Activity => Microsoft.Maui.ApplicationModel.Platform.CurrentActivity ?? throw new InvalidOperationException("Android Activity can't be null.");
-    static View MChildOfContent;
-    static FrameLayout.LayoutParams FrameLayoutParams;
+    // Both stay null until Initialize has found the content view, so every use
+    // below has to cope with the patch never having been wired up.
+    static View? MChildOfContent;
+    static FrameLayout.LayoutParams? FrameLayoutParams;
     static int UsableHeightPrevious = 0;
 
     public static void Initialize()
     {
-        FrameLayout content = (FrameLayout)Activity.FindViewById(Id.Content);
+        if (Activity.FindViewById(Id.Content) is not FrameLayout content)
+        {
+            return;
+        }
+
         MChildOfContent = content.GetChildAt(0);
-        MChildOfContent.ViewTreeObserver.GlobalLayout += (s, o) => PossiblyResizeChildOfContent();
-        FrameLayoutParams = (FrameLayout.LayoutParams)MChildOfContent?.LayoutParameters;
+        if (MChildOfContent == null)
+        {
+            return;
+        }
+
+        if (MChildOfContent.ViewTreeObserver != null)
+        {
+            MChildOfContent.ViewTreeObserver.GlobalLayout += (s, o) => PossiblyResizeChildOfContent();
+        }
+
+        FrameLayoutParams = MChildOfContent.LayoutParameters as FrameLayout.LayoutParams;
     }
 
     static void PossiblyResizeChildOfContent()
     {
+        if (MChildOfContent?.RootView == null)
+        {
+            return;
+        }
+
         int usableHeightNow = ComputeUsableHeight();
-        if (usableHeightNow != UsableHeightPrevious)
+        if (usableHeightNow != UsableHeightPrevious && FrameLayoutParams != null)
         {
             int usableHeightSansKeyboard = MChildOfContent.RootView.Height;
             int heightDifference = usableHeightSansKeyboard - usableHeightNow;
@@ -63,7 +85,7 @@ public static class WebViewSoftInputPatch
     static int ComputeUsableHeight()
     {
         Rect rect = new Rect();
-        MChildOfContent.GetWindowVisibleDisplayFrame(rect);
+        MChildOfContent?.GetWindowVisibleDisplayFrame(rect);
         if (IsImmersiveMode())
         {
             return rect.Bottom;
@@ -77,7 +99,14 @@ public static class WebViewSoftInputPatch
     static int GetStatusBarHeight()
     {
         int result = 0;
+        // var, not the type name: 'Resources' would bind to the project's own
+        // DiceCombats.Resources namespace here.
         var resources = Activity.Resources;
+        if (resources == null)
+        {
+            return result;
+        }
+
         int resourceId = resources.GetIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0)
         {
@@ -88,10 +117,17 @@ public static class WebViewSoftInputPatch
 
     static bool IsImmersiveMode()
     {
-        View decorView = Activity.Window.DecorView;
-        int uiOptions = (int)decorView.SystemUiVisibility;
-        return (uiOptions & (int)SystemUiFlags.Immersive) == (int)SystemUiFlags.Immersive;
+        View? decorView = Activity.Window?.DecorView;
+        if (decorView == null)
+        {
+            return false;
+        }
+
+        // Deprecated from API 30 in favour of WindowInsetsController, but kept on
+        // purpose: the flags still read back correctly, and this only decides
+        // whether the status bar height counts towards the usable height.
+#pragma warning disable CA1422
+        return (decorView.SystemUiFlags & SystemUiFlags.Immersive) == SystemUiFlags.Immersive;
+#pragma warning restore CA1422
     }
 }
-
-

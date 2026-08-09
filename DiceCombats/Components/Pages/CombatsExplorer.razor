@@ -335,7 +335,7 @@ else
 
     private async Task DeleteCombat(DCCombat combat)
     {
-        bool? confirm = await DialogService.ShowMessageBox(
+        bool? confirm = await DialogService.ShowMessageBoxAsync(
             Loc["DeleteCombatTitle"],
             string.Format(Loc["DeleteCombatQuestion"], combat.Name),
             yesText: Loc["DeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);

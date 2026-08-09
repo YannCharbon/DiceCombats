@@ -1,4 +1,4 @@
-@*
+﻿@*
  * DiceCombats - Copyright (C) 2025 Yann Charbon
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
@@ -51,7 +51,7 @@ else if (CombatService.GetPlayerGroups().Count == 0)
     @foreach (DCPlayerGroup group in CombatService.GetPlayerGroups())
     {
         var g = group;
-        <MudExpansionPanel Expanded="false" Elevation="1">
+        <MudExpansionPanel Expanded="false">
             <TitleContent>
                 <div class="d-flex">
                     <MudIcon Icon="@Icons.Material.Filled.Groups2" Color="@Color.Primary" class="mr-3"></MudIcon>

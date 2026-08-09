@@ -193,7 +193,7 @@
 
     private async Task DeleteCreature(DCCreature creature)
     {
-        bool? confirm = await DialogService.ShowMessageBox(
+        bool? confirm = await DialogService.ShowMessageBoxAsync(
             Loc["DeleteCreatureTitle"],
             string.Format(Loc["DeleteCreatureQuestion"], creature.Name),
             yesText: Loc["DeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);

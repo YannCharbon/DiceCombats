@@ -5,12 +5,12 @@
 
 @if (EditionMode)
 {
-    <MudTextField T="string" AutoGrow Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" />
+    <MudTextField T="string" Sizing="InputSizing.Auto" Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" />
 }
 else
 {
     <div style="zoom: 0.85;">
-        <MudTextField T="string" AutoGrow spellcheck="false" Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudTextField T="string" Sizing="InputSizing.Auto" spellcheck="false" Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
     </div>
 }
 

@@ -118,12 +118,15 @@
     @if (_layoutMode == "Local image")
     {
         <div>
+            @* ActivatorContent is gone; CustomContent hands us the upload instance
+               so the button can open the picker itself. *@
             <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" MaximumFileCount="1">
-                <ActivatorContent>
+                <CustomContent Context="upload">
                     <MudFab Color="Color.Secondary"
                     StartIcon="@Icons.Material.Filled.Image"
-                    Label="@Loc["LoadPictureBtnLabel"]" />
-                </ActivatorContent>
+                    Label="@Loc["LoadPictureBtnLabel"]"
+                    OnClick="@(() => upload.OpenFilePickerAsync())" />
+                </CustomContent>
             </MudFileUpload>
         </div>
         @if (!string.IsNullOrEmpty(_localImageBase64))
@@ -133,7 +136,7 @@
             </div>
             <div class="row">
                 <div class="col col-md-4">
-                    <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                    <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
                 </div>
                 @if (_creatureName != "N/A" && _creatureName != "")
                 {
@@ -150,7 +153,7 @@
     {
         <div>
             <div>
-                <MudTextField DebounceInterval="500" Label="@Loc["AideddURLtfLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
+                <MudTextField DebounceInterval="500" Label="@Loc["AideddURLtfLabel"]" Variant="Variant.Outlined" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
                 @if (CombatService.IsCurrentCulture("fr"))
                 {
                     <MudLink Href="https://www.aidedd.org/">Se rendre sur aidedd.org</MudLink>
@@ -180,7 +183,7 @@
         </div>
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["OptionalCreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["OptionalCreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
@@ -196,7 +199,7 @@
     {
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
@@ -207,7 +210,7 @@
         </div>
         <div style="display:flex;flex-wrap:wrap;">
             <div class="one-column-item" style="padding-right:10px;">
-                <MudTextField DebounceInterval="500" AutoGrow MaxLines="20" Label="@Loc["MarkdownLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" Value="@_markdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
+                <MudTextField DebounceInterval="500" Sizing="InputSizing.Auto" MaxLines="20" Label="@Loc["MarkdownLabel"]" Variant="Variant.Outlined" T="string" Value="@_markdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
             </div>
             <div class="markdown-html-preview one-column-item" style="padding-left:10px;">
                 <div class="markdown-content">
@@ -221,7 +224,7 @@
     {
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
@@ -236,7 +239,7 @@
     {
         <div class="row">
             <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["PlayerNameEditLabel"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" T="string" @bind-Value="_creatureName"></MudTextField>
+                <MudTextField Immediate="true" Label="@Loc["PlayerNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {

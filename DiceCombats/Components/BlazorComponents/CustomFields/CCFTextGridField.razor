@@ -42,7 +42,7 @@
                             {
                                 <MudTextField style="min-width:100px;" Immediate="true" @bind-Value="Field.TextLabels[i][j]" Label="Label" Variant="Variant.Outlined" />
                             }
-                            <MudTextField style="min-width:100px;" AutoGrow Immediate="true" @bind-Value="Field.TextValues[i][j]" Label="@Field.TextLabels[i][j]" Variant="Variant.Outlined" />
+                            <MudTextField style="min-width:100px;" Sizing="InputSizing.Auto" Immediate="true" @bind-Value="Field.TextValues[i][j]" Label="@Field.TextLabels[i][j]" Variant="Variant.Outlined" />
                         </td>
                     }
                 </tr>
@@ -87,11 +87,11 @@ else
                                     <td style="padding:3px;vertical-align:top;">
                                         @if (Field.HasTextLabels[rowIndex][columnIndex] == true)
                                         {
-                                            <MudTextField T="string" AutoGrow Immediate="true" spellcheck="false" Value="@Field.TextValues[rowIndex][columnIndex]" ValueChanged="@((string v) => OnTextValueChanged(rowIndex, columnIndex, v))" Label="@Field.TextLabels[rowIndex][columnIndex]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                            <MudTextField T="string" Sizing="InputSizing.Auto" Immediate="true" spellcheck="false" Value="@Field.TextValues[rowIndex][columnIndex]" ValueChanged="@((string v) => OnTextValueChanged(rowIndex, columnIndex, v))" Label="@Field.TextLabels[rowIndex][columnIndex]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                                         }
                                         else
                                         {
-                                            <MudTextField T="string" AutoGrow Immediate="true" spellcheck="false" Value="@Field.TextValues[rowIndex][columnIndex]" ValueChanged="@((string v) => OnTextValueChanged(rowIndex, columnIndex, v))" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                                            <MudTextField T="string" Sizing="InputSizing.Auto" Immediate="true" spellcheck="false" Value="@Field.TextValues[rowIndex][columnIndex]" ValueChanged="@((string v) => OnTextValueChanged(rowIndex, columnIndex, v))" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
                                         }
                                     </td>
                                 }

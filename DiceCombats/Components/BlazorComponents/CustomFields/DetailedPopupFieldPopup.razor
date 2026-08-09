@@ -223,7 +223,7 @@
                 <MudTextField @bind-Value="entry.Inline"
                               Label="@Loc["DetailedPopupTextContentLabel"]"
                               Variant="Variant.Outlined"
-                              AutoGrow MaxLines="20" />
+                              Sizing="InputSizing.Auto" MaxLines="20" />
             }
             @* === MARKDOWN === *@
             else if (entry.Kind == "markdown")
@@ -231,7 +231,7 @@
                 <MudTextField @bind-Value="entry.Inline"
                               Label="@Loc["DetailedPopupMarkdownContentLabel"]"
                               Variant="Variant.Outlined"
-                              AutoGrow MaxLines="20" />
+                              Sizing="InputSizing.Auto" MaxLines="20" />
             }
             @* === HTML (templated) === *@
             else if (entry.Kind == "html")
@@ -256,30 +256,32 @@
                         <MudTextField Value="@(GetMeta(entry, "template"))"
                                       ValueChanged="@( (string? v) => SetMeta(entry, "template", v) )"
                                       Label="@Loc["DetailedPopupTemplateLabel"]"
-                                      Variant="Variant.Outlined" AutoGrow MaxLines="20" />
+                                      Variant="Variant.Outlined" Sizing="InputSizing.Auto" MaxLines="20" />
                     </MudItem>
 
                     <MudItem xs="12">
                         <MudTextField Value="@(GetMeta(entry, "css"))"
                                       ValueChanged="@( (string? v) => SetMeta(entry, "css", v) )"
                                       Label="@Loc["DetailedPopupCssLabel"]"
-                                      Variant="Variant.Outlined" AutoGrow MaxLines="16" />
+                                      Variant="Variant.Outlined" Sizing="InputSizing.Auto" MaxLines="16" />
                     </MudItem>
 
                     <MudItem xs="12">
                         <MudTextField Value="@(GetMeta(entry, "map.json"))"
                                       ValueChanged="@( (string? v) => SetMeta(entry, "map.json", v) )"
                                       Label="@Loc["DetailedPopupMapJsonLabel"]"
-                                      Variant="Variant.Outlined" AutoGrow MaxLines="16" />
+                                      Variant="Variant.Outlined" Sizing="InputSizing.Auto" MaxLines="16" />
                     </MudItem>
 
                     <MudItem xs="12" md="6">
+                        @* MudRadioGroup lost its Row parameter, the row layout comes from the stack now. *@
                         <MudRadioGroup T="string"
                                        Value="@GetHtmlSource(entry)"
-                                       ValueChanged="@( (string v) => OnHtmlSourceChanged(entry, v) )"
-                                       Row="true">
-                            <MudRadio T="string" Value="@("inline")">@Loc["DetailedPopupHtmlSourceInlineLabel"]</MudRadio>
-                            <MudRadio T="string" Value="@("file")">@Loc["DetailedPopupHtmlSourceFileLabel"]</MudRadio>
+                                       ValueChanged="@( (string v) => OnHtmlSourceChanged(entry, v) )">
+                            <MudStack Row="true">
+                                <MudRadio T="string" Value="@("inline")">@Loc["DetailedPopupHtmlSourceInlineLabel"]</MudRadio>
+                                <MudRadio T="string" Value="@("file")">@Loc["DetailedPopupHtmlSourceFileLabel"]</MudRadio>
+                            </MudStack>
                         </MudRadioGroup>
                     </MudItem>
 
@@ -289,7 +291,7 @@
                             <MudTextField @bind-Value="entry.Inline"
                                           Label="@Loc["DetailedPopupHtmlContentLabel"]"
                                           Variant="Variant.Outlined"
-                                          AutoGrow MaxLines="25" />
+                                          Sizing="InputSizing.Auto" MaxLines="25" />
                         </MudItem>
                     }
                     else
@@ -658,7 +660,7 @@ else
                 FullWidth = true,
             };
 
-        var confirm = await DialogService.ShowMessageBox(
+        var confirm = await DialogService.ShowMessageBoxAsync(
             title: Loc["DetailedPopupDeleteDialogTitle"],
             markupMessage: (MarkupString)Loc["DetailedPopupDeleteDialogMessage"].Value,
             yesText: Loc["DetailedPopupDeleteDialogYes"],

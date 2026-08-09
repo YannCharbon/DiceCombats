@@ -1,4 +1,4 @@
-@using DiceCombats.Automations
+﻿@using DiceCombats.Automations
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
 
@@ -20,7 +20,7 @@
         <MudSelect T="string"
                    MultiSelection="true"
                    SelectedValues="@Trigger.CreatureNames"
-                   SelectedValuesChanged="@((IEnumerable<string> values) => Trigger.CreatureNames = values.ToList())"
+                   SelectedValuesChanged="@((IReadOnlyCollection<string> values) => Trigger.CreatureNames = values.ToList())"
                    Label="@Loc["CreaturesEmptyAnyCreature"]">
             @foreach (var creatureName in GetCreatureNames())
             {
@@ -188,7 +188,7 @@
         var statText = string.IsNullOrWhiteSpace(trigger.StatName) ? Loc["TriggerSummaryAnyStat"].Value : Loc["TriggerSummaryStat", trigger.StatName].Value;
 
         if (trigger.Kind == EventTriggerKinds.NumericReachedMaxValue) return Loc["TriggerSummaryNumericReachedMaxValue", fieldText, creatureText].Value;
-        if (entry.NeedsThreshold) return Loc["TriggerSummaryThreshold", fieldText, creatureText, GetThresholdOperatorDisplay(trigger.ThresholdOperator), trigger.ThresholdValue].Value;
+        if (entry.NeedsThreshold) return Loc["TriggerSummaryThreshold", fieldText, creatureText, GetThresholdOperatorDisplay(trigger.ThresholdOperator), trigger.ThresholdValue?.ToString() ?? string.Empty].Value;
         if (entry.NeedsStat) return Loc["TriggerSummaryStatChanged", statText, fieldText, creatureText].Value;
         if (entry.NeedsOption) return Loc["TriggerSummaryOptionChanged", optionText, fieldText, creatureText].Value;
         if (entry.NeedsField) return Loc["TriggerSummaryFieldChanged", fieldText, creatureText].Value;

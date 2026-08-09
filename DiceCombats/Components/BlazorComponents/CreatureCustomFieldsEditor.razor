@@ -66,7 +66,7 @@
     {
         <h3>@Loc["AddAdditionalFieldsTitle"]</h3>
 
-        <MudExpansionPanel Expanded="false" Elevation="1">
+        <MudExpansionPanel Expanded="false">
             <TitleContent>
                 <div class="d-flex">
                     <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
@@ -78,7 +78,7 @@
                     @Loc["AssitanceGeneral1"]
                 </p>
                 <h4>@Loc["AssistanceGeneralSharedFieldsTitle"]</h4>
-                <MudCheckBox T="bool" Label="@Loc["SharedField"]" Variant="Variant.Outlined" />
+                <MudCheckBox T="bool" Label="@Loc["SharedField"]" />
                 <p>
                     @((MarkupString)Loc["AssistanceGeneralSharedFieldsDesc"].Value)
                 </p>
@@ -151,7 +151,7 @@
                 </div>
 
                 <div style="flex:1 1 500px;">
-                    <MudExpansionPanel Expanded="@_fieldHelpExpanded" Elevation="1" ExpandedChanged="() => _fieldHelpExpanded = !_fieldHelpExpanded">
+                    <MudExpansionPanel Expanded="@_fieldHelpExpanded" ExpandedChanged="() => _fieldHelpExpanded = !_fieldHelpExpanded">
                         <TitleContent>
                             <div class="d-flex">
                                 <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>

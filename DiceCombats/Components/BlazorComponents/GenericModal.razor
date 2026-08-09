@@ -14,6 +14,7 @@
         inset: 0; /* shorthand for top/right/bottom/left: 0 */
         width: 100vw;
         height: 100vh;
+        height: 100dvh; /* Android: 100vh also spans behind the system bars */
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 2000;
         transition: opacity 1.0s ease;
@@ -42,6 +43,7 @@
         margin: 7% auto;
         max-width: 90%;
         max-height: 86vh; /* use viewport height for consistent sizing */
+        max-height: 86dvh;
         overflow: hidden; /* clip overflowing content */
     }
 
@@ -58,8 +60,11 @@
         display: flex;
         justify-content: flex-end;
         padding: 12px 20px;
+        /* Keep the OK button above the Android navigation bar. */
+        padding-bottom: calc(12px + var(--dc-safe-area-bottom));
         background: #2D2D2D;
         border-top: 1px solid #444;
+        flex: 0 0 auto; /* never squeezed out by a tall body */
     }
 
     /* close button (top-right corner) */
@@ -90,14 +95,16 @@
             margin: 0;
             width: 100%;
             height: 100vh; /* full screen modal on mobile */
+            height: 100dvh;
             max-width: 100%;
             max-height: 100vh;
+            max-height: 100dvh;
             overflow: hidden;
             border-radius: 0; /* edge-to-edge look on small screens */
         }
 
         .generic-modal-content {
-            padding-top: 50px; /* smaller top padding */
+            padding-top: calc(50px + var(--dc-safe-area-top)); /* smaller top padding */
             padding-left: 12px;
             padding-right: 12px;
         }
@@ -106,8 +113,13 @@
             padding-bottom: 10px;
         }
 
+        .generic-modal-close {
+            top: calc(10px + var(--dc-safe-area-top)); /* clear of the status bar */
+        }
+
         .generic-modal-footer {
             padding: 10px 16px;
+            padding-bottom: calc(10px + var(--dc-safe-area-bottom));
         }
     }
 </style>

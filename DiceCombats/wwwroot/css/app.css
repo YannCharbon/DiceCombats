@@ -1,5 +1,8 @@
 :root {
     --dc-safe-area-top: env(safe-area-inset-top, 0px);
+    /* viewport-fit=cover lets the page run under the Android navigation bar,
+       so anything anchored to the bottom has to keep this much clear. */
+    --dc-safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 html, body {

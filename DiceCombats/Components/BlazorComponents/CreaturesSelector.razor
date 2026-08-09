@@ -39,6 +39,17 @@
         overflow-y: auto;
         overflow-x: hidden;
     }
+
+    /* Phones: the two panels stack, so cap them against the viewport instead of
+       a fixed 500px, and drop the min width that overflows a narrow screen. */
+    @@media screen and (max-width: 768px) {
+        .CombatEditorCreatureBox {
+            height: 60vh;
+            height: 60dvh;
+            min-width: 0;
+            margin: 5px;
+        }
+    }
 </style>
 
 @* AlignItems.Center: without it the row stretches the buttons to the height of

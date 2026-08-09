@@ -1,0 +1,317 @@
+﻿@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@using DiceCombats
+@using MudBlazor.Utilities
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+<style>
+    /* Two columns as soon as there is room, so the configuration fits a screen. */
+    .hp-config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+        gap: 10px;
+        align-items: start;
+    }
+
+    .hp-config-section {
+        background-color: #2A2A2A;
+        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        border: 1px solid #808080;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .hp-config-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+
+    .hp-config-title {
+        padding: 4px 12px;
+        background-color: darkcyan;
+        border-radius: 10px;
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .hp-config-help {
+        color: grey;
+        font-size: 13px;
+        margin: 0 0 8px 0;
+    }
+
+    .hp-config-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+        padding: 6px;
+        border-radius: 5px;
+        background-color: #404040;
+    }
+
+    .hp-scroll {
+        max-height: 260px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .hp-kind-preview {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+</style>
+
+<h4 style="text-align:center;margin-bottom:10px;">@Field.Title</h4>
+
+<div class="hp-config-section">
+    <div class="hp-config-head">
+        <span class="hp-config-title">@Loc["HPGeneralTitle"]</span>
+        @* Temporary hit points and the maximum reduction are effects applied
+           during play, so they live in the damage popup, not here. *@
+        <div style="width:130px;">
+            <MudNumericField T="uint" Value="@Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        </div>
+        <MudCheckBox T="bool" @bind-Value="Field.AllowNegative" Label="@Loc["HPAllowNegative"]" Color="@Color.Primary" Dense="true" />
+    </div>
+</div>
+
+
+<div class="hp-config-grid">
+    <div class="hp-config-section">
+        <div class="hp-config-head">
+            <span class="hp-config-title">@Loc["HPKindsTitle"]</span>
+            <MudButton OnClick="@(() => Field.AddDamageKind())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddKind"]</MudButton>
+        </div>
+        <p class="hp-config-help">@Loc["HPKindsHelp"]</p>
+
+        @* Bounded height for long lists. Dragging uses the handle so the text
+           fields stay usable. *@
+        <div class="hp-scroll">
+            <SortableList Id="hpKindsSortable" Items="Field.DamageKinds" OnUpdate="@SortKinds" Handle=".hp-drag" Context="kind">
+                <SortableItemTemplate>
+                    <div class="hp-config-row">
+                        <MudIcon Icon="@Icons.Material.Filled.DragIndicator" Class="hp-drag" Style="cursor:move;color:grey;" title="@Loc["HPReorderKind"]" />
+                        <div style="width:150px;">
+                            <MudTextField Immediate="true" T="string" Value="@kind.Name" ValueChanged="@((string v) => RenameKind(kind, v))" Label="@Loc["HPKind"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                        </div>
+                        <div style="width:130px;">
+                            <MudColorPicker Variant="Variant.Outlined" Margin="Margin.Dense" ColorPickerView="ColorPickerView.GridCompact"
+                                            Palette="@_palette" Label="@Loc["HPKindColor"]"
+                                            Text="@kind.Color" TextChanged="@((string v) => kind.Color = v)" Style="@($"color:{kind.Color};")" />
+                        </div>
+                        <div style="width:100px;">
+                            <MudSelect T="string" @bind-Value="kind.Icon" Label="@Loc["HPKindIcon"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                                @foreach (string icon in DCHitPointsIcons.Names)
+                                {
+                                    <MudSelectItem T="string" Value="@icon">
+                                        <MudIcon Icon="@DCHitPointsIcons.Resolve(icon)" />
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </div>
+                        <span class="hp-kind-preview" style="@($"background-color:{kind.Color};color:{kind.TextColor};")">
+                            <MudIcon Icon="@DCHitPointsIcons.Resolve(kind.Icon)" Style="font-size:18px;" />
+                            @kind.Name
+                        </span>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveDamageKind(kind))" title="@Loc["HPRemoveKind"]" />
+                    </div>
+                </SortableItemTemplate>
+            </SortableList>
+        </div>
+    </div>
+
+    <div class="hp-config-section">
+        <div class="hp-config-head">
+            <span class="hp-config-title">@Loc["HPTagsTitle"]</span>
+            <MudButton OnClick="@(() => Field.AddTag())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddTag"]</MudButton>
+        </div>
+        <p class="hp-config-help">@Loc["HPTagsHelp"]</p>
+
+        @foreach (int i in Enumerable.Range(0, Field.Tags.Count))
+        {
+            var index = i;
+            <div class="hp-config-row">
+                <div style="width:200px;">
+                    <MudTextField Immediate="true" T="string" Value="@Field.Tags[index]" ValueChanged="@((string v) => RenameTag(index, v))" Label="@Loc["HPTag"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </div>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveTag(Field.Tags[index]))" title="@Loc["HPRemoveTag"]" />
+            </div>
+        }
+    </div>
+
+    <div class="hp-config-section">
+        <div class="hp-config-head">
+            <span class="hp-config-title">@Loc["HPRulesTitle"]</span>
+            <MudButton OnClick="@(() => Field.AddMitigationRule())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddRule"]</MudButton>
+            @if (Field.MitigationRules.Count == 0)
+            {
+                <MudButton OnClick="@(() => Field.AddDefaultMitigationRules())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.AutoMode" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddDefaultRules"]</MudButton>
+            }
+        </div>
+        <p class="hp-config-help">@Loc["HPRulesHelp"]</p>
+
+        @foreach (var rule in Field.MitigationRules)
+        {
+            var r = rule;
+            <div class="hp-config-row">
+                <div style="width:130px;">
+                    <MudTextField Immediate="true" T="string" Value="@r.Name" ValueChanged="@((string v) => RenameRule(r, v))" Label="@Loc["HPRuleName"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </div>
+                <div style="width:100px;">
+                    <MudNumericField T="double" @bind-Value="r.Factor" Label="@Loc["HPRuleFactor"]" Variant="Variant.Outlined" Margin="Margin.Dense" Step="0.1" />
+                </div>
+                <div style="width:100px;">
+                    <MudNumericField T="int" @bind-Value="r.FlatReduction" Label="@Loc["HPRuleFlat"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                </div>
+                <div style="width:120px;">
+                    <MudSelect T="string" @bind-Value="r.Rounding" Label="@Loc["HPRuleRounding"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        <MudSelectItem T="string" Value="@("Down")">@Loc["HPRoundDown"]</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Up")">@Loc["HPRoundUp"]</MudSelectItem>
+                        <MudSelectItem T="string" Value="@("Nearest")">@Loc["HPRoundNearest"]</MudSelectItem>
+                    </MudSelect>
+                </div>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveMitigationRule(r))" title="@Loc["HPRemoveRule"]" />
+            </div>
+        }
+    </div>
+
+    <div class="hp-config-section">
+        <div class="hp-config-head">
+            <span class="hp-config-title">@Loc["HPMitigationsTitle"]</span>
+            <MudButton OnClick="@(() => Field.AddMitigation())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small"
+                       Disabled="@(Field.DamageKinds.Count == 0 || Field.MitigationRules.Count == 0)">
+                @Loc["HPAddMitigation"]
+            </MudButton>
+        </div>
+        <p class="hp-config-help">@Loc["HPMitigationsHelp"]</p>
+
+        @foreach (var mitigation in Field.Mitigations)
+        {
+            var m = mitigation;
+            <div class="hp-config-row">
+                <div style="width:130px;">
+                    <MudSelect T="string" @bind-Value="m.Kind" Label="@Loc["HPKind"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        @foreach (var kind in Field.DamageKinds)
+                        {
+                            <MudSelectItem T="string" Value="@kind.Name">@kind.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+                <div style="width:130px;">
+                    <MudSelect T="string" @bind-Value="m.RuleName" Label="@Loc["HPRuleName"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        @foreach (var rule in Field.MitigationRules)
+                        {
+                            <MudSelectItem T="string" Value="@rule.Name">@rule.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+
+                @if (Field.Tags.Count > 0)
+                {
+                    <div style="width:130px;">
+                        <MudSelect T="string" @bind-Value="m.RequiredTag" Label="@Loc["HPRequiredTag"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem T="string" Value="@("")">@Loc["HPAnyAttack"]</MudSelectItem>
+                            @foreach (string tag in Field.Tags)
+                            {
+                                <MudSelectItem T="string" Value="@tag">@tag</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(m.RequiredTag))
+                    {
+                        <div style="width:130px;">
+                            <MudSelect T="bool" @bind-Value="m.TagMustBePresent" Label="@Loc["HPTagCondition"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                                <MudSelectItem T="bool" Value="@true">@Loc["HPTagPresent"]</MudSelectItem>
+                                <MudSelectItem T="bool" Value="@false">@Loc["HPTagAbsent"]</MudSelectItem>
+                            </MudSelect>
+                        </div>
+                    }
+                }
+
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveMitigation(m))" title="@Loc["HPRemoveMitigation"]" />
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public DCCreatureHitPointsField Field { get; set; } = default!;
+
+    /// Palette spanning the whole colour wheel, greens included.
+    private readonly IEnumerable<MudColor> _palette = new MudColor[]
+    {
+        new MudColor("#e53935"), new MudColor("#f4511e"), new MudColor("#fb8c00"), new MudColor("#ffb300"),
+        new MudColor("#fdd835"), new MudColor("#c0ca33"), new MudColor("#7cb342"), new MudColor("#43a047"),
+        new MudColor("#00897b"), new MudColor("#00acc1"), new MudColor("#039be5"), new MudColor("#1e88e5"),
+        new MudColor("#3949ab"), new MudColor("#5e35b1"), new MudColor("#8e24aa"), new MudColor("#d81b60"),
+        new MudColor("#6d4c41"), new MudColor("#546e7a"), new MudColor("#757575"), new MudColor("#212121"),
+        new MudColor("#9ccc65"), new MudColor("#26a69a"), new MudColor("#ef9a9a"), new MudColor("#ffffff")
+    };
+
+    private void OnMaximumHpChanged(uint value)
+    {
+        Field.MaximumHP = value;
+    }
+
+    private void SortKinds((int oldIndex, int newIndex) indices)
+    {
+        var (oldIndex, newIndex) = indices;
+        var kind = Field.DamageKinds[oldIndex];
+        Field.DamageKinds.RemoveAt(oldIndex);
+        Field.DamageKinds.Insert(newIndex, kind);
+        StateHasChanged();
+    }
+
+    /// Renaming has to follow through to whatever already points at the old name,
+    /// otherwise the mitigations silently stop matching.
+    private void RenameKind(DCHitPointsDamageKind kind, string newName)
+    {
+        string oldName = kind.Name;
+        kind.Name = newName;
+
+        foreach (var mitigation in Field.Mitigations.FindAll(x => x.Kind == oldName))
+        {
+            mitigation.Kind = newName;
+        }
+    }
+
+    private void RenameTag(int index, string newName)
+    {
+        string oldName = Field.Tags[index];
+        Field.Tags[index] = newName;
+
+        foreach (var mitigation in Field.Mitigations.FindAll(x => x.RequiredTag == oldName))
+        {
+            mitigation.RequiredTag = newName;
+        }
+    }
+
+    private void RenameRule(DCHitPointsMitigationRule rule, string newName)
+    {
+        string oldName = rule.Name;
+        rule.Name = newName;
+
+        foreach (var mitigation in Field.Mitigations.FindAll(x => x.RuleName == oldName))
+        {
+            mitigation.RuleName = newName;
+        }
+    }
+}

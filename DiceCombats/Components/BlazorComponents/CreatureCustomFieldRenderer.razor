@@ -139,7 +139,7 @@ else if (Field is DCCreatureDetailedPopupField detailedPopupField)
 
     private async Task SaveUserCustomField()
     {
-        if (CombatService.AddUserCreatureCustomField(Field))
+        if (CombatService.AddUserCreatureCustomField(Field.CloneAsTemplate()))
         {
             await EventPublisher.PublishAsync(new DiceEvent
             {

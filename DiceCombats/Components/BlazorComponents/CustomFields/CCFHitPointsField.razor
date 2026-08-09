@@ -3,15 +3,167 @@
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
+<style>
+    .hp-bar {
+        position: relative;
+        height: 22px;
+        border-radius: 5px;
+        background-color: #202020;
+        border: 1px solid #505050;
+        overflow: hidden;
+        min-width: 110px;
+        flex: 1;
+    }
+
+    .hp-bar-fill {
+        height: 100%;
+        background-color: #1E867F;
+        transition: width 0.2s;
+    }
+
+    .hp-bar-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 13px;
+        color: white;
+    }
+
+    .hp-temporary {
+        color: #23aba0;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .hp-quick-off {
+        opacity: 0.45;
+    }
+
+    .hp-quick-kind {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        color: white;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+</style>
+
 @if (EditionMode)
 {
-    <MudNumericField T="uint" Value="@Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" />
+    <GenericModal TContent="HitPointsConfigPopup" OnClose="() => {}" @ref="_configModal">
+        <HitPointsConfigPopup Field="Field" />
+    </GenericModal>
+
+    <MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Style="gap:10px;">
+        <MudNumericField T="uint" Value="@Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" Style="width:150px;" />
+        <MudButton OnClick="@(() => _configModal?.ShowAsync() ?? Task.CompletedTask)" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">
+            @Loc["HPConfigureButton"]
+        </MudButton>
+    </MudStack>
+
+    @* One chip per rule of this creature, so a kind carrying both a general and
+       a tag restricted rule shows both. *@
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+        @foreach (var mitigation in ResistedMitigations)
+        {
+            var m = mitigation;
+            var kind = Field.GetKind(m.Kind);
+            <span class="hp-quick-kind" style="@($"background-color:{kind!.Color};color:{kind.TextColor};")">
+                <MudIcon Icon="@DCHitPointsIcons.Resolve(kind.Icon)" Style="font-size:18px;" />
+                @kind.Name
+                <span style="opacity:0.75;font-weight:normal;">@m.RuleName</span>
+                @if (!string.IsNullOrEmpty(m.RequiredTag))
+                {
+                    <span style="opacity:0.75;font-weight:normal;font-style:italic;">
+                        @(m.TagMustBePresent ? Loc["HPTagWhen"] : Loc["HPTagUnless"]) @m.RequiredTag
+                    </span>
+                }
+            </span>
+        }
+    </div>
 }
 else
 {
+    <GenericModal TContent="HitPointsApplyPopup" OnClose="OnApplyModalClose" @ref="_applyModal">
+        <HitPointsApplyPopup Field="Field" OnApplied="OnApplied" @ref="_applyPopup" />
+    </GenericModal>
+
     <div style="zoom: 0.85;">
-        <MudStack Row="true" Style="display: flex;justify-content: center;align-items: center;">
-            <MudNumericField T="uint" Value="@Field.CurrentHP" ValueChanged="OnCurrentHpChanged" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaximumHP.ToString() + " " + Loc["HP"])" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+        <MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Style="gap:6px;">
+            <div class="hp-bar">
+                <div class="hp-bar-fill" style="width:@(FillPercentage)%;"></div>
+                <div class="hp-bar-text">@Field.CurrentHP / @Field.EffectiveMaximumHP @Loc["HP"]</div>
+            </div>
+
+            @if (Field.TemporaryHP > 0)
+            {
+                <span class="hp-temporary">+@Field.TemporaryHP</span>
+            }
+
+            <MudNumericField T="int" @bind-Value="_quickAmount" Variant="Variant.Outlined" Min="0" Style="width:80px;" Class="CreatureCustomFieldRendererFieldBackground" />
+
+            @if (Field.Mitigations.Count == 0)
+            {
+                @* Nothing could change the amount, so do not ask. *@
+                <MudIconButton Icon="@Icons.Material.Filled.Remove" Color="@Color.Error" OnClick="() => QuickDamage(string.Empty)" title="@Loc["HPDamage"]" />
+            }
+            else
+            {
+                @* The menu draws its own activator: an icon button inside
+                   ActivatorContent would swallow the click. *@
+                <MudMenu Icon="@Icons.Material.Filled.Remove" Color="@Color.Error" title="@Loc["HPDamage"]">
+                    @* Plain divs, not menu items: clicking a menu item closes the
+                       menu, and a tag has to stay togglable before picking a kind. *@
+                    @if (Field.Tags.Count > 0)
+                    {
+                        <div style="padding:8px 12px;color:grey;">@Loc["HPTagsTitle"]</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 8px 12px;">
+                            @foreach (string tag in Field.Tags)
+                            {
+                                var t = tag;
+                                <span class="hp-quick-kind @(_quickTags.Contains(t) ? "" : "hp-quick-off")"
+                                      style="background-color:#4A5A7A;color:#FFFFFF;cursor:pointer;"
+                                      @onclick="() => ToggleQuickTag(t)">
+                                    @t
+                                </span>
+                            }
+                        </div>
+                    }
+                    <div style="padding:8px 12px;color:grey;">@Loc["HPPickKind"]</div>
+                    @foreach (var kind in Field.DamageKinds)
+                    {
+                        var k = kind;
+                        <MudMenuItem OnClick="() => QuickDamage(k.Name)">
+                            <span class="hp-quick-kind" style="@($"background-color:{k.Color};color:{k.TextColor};")">
+                                <MudIcon Icon="@DCHitPointsIcons.Resolve(k.Icon)" Style="font-size:18px;" />
+                                @k.Name
+                            </span>
+                        </MudMenuItem>
+                    }
+                    <MudMenuItem OnClick="() => QuickDamage(string.Empty)">
+                        <span class="hp-quick-kind" style="background-color:#555555;">@Loc["HPNoKind"]</span>
+                    </MudMenuItem>
+                    <MudMenuItem>
+                        <span style="color:grey;">@Loc["CancelBtn"]</span>
+                    </MudMenuItem>
+                </MudMenu>
+            }
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="@Color.Success" OnClick="QuickHeal" title="@Loc["HPHeal"]" />
+            <MudButton Variant="Variant.Filled" Color="@Color.Primary" Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.Calculate"
+                       OnClick="@(() => _applyModal?.ShowAsync() ?? Task.CompletedTask)" title="@Loc["HPApplyButton"]">
+                @Loc["HPApplyShort"]
+            </MudButton>
+            @if (Field.CanUndo)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Restore" Color="@Color.Warning" OnClick="UndoLast" title="@Loc["HPUndo"]" />
+            }
         </MudStack>
     </div>
 }
@@ -22,31 +174,91 @@ else
     [Parameter] public EventCallback OnChange { get; set; }
     [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
 
-    private async Task OnCurrentHpChanged(uint value)
+    private GenericModal<HitPointsConfigPopup>? _configModal;
+    private GenericModal<HitPointsApplyPopup>? _applyModal;
+    private HitPointsApplyPopup? _applyPopup;
+
+    private int _quickAmount = 0;
+    private List<string> _quickTags = new List<string>();
+
+    private void ToggleQuickTag(string tag)
     {
-        var oldValue = Field.CurrentHP;
-        Field.CurrentHP = value;
-        await NotifyParentOnChange(oldValue, value, "CurrentChanged");
+        if (!_quickTags.Remove(tag)) _quickTags.Add(tag);
+    }
+
+    /// The rules this creature has, ordered like the system list of kinds.
+    private List<DCHitPointsMitigation> ResistedMitigations =>
+        Field.Mitigations
+            .FindAll(m => Field.GetKind(m.Kind) != null)
+            .OrderBy(m => Field.DamageKinds.FindIndex(k => k.Name == m.Kind))
+            .ToList();
+
+    private int FillPercentage
+    {
+        get
+        {
+            if (Field.EffectiveMaximumHP <= 0) return 0;
+            int percentage = Field.CurrentHP * 100 / Field.EffectiveMaximumHP;
+            return Math.Clamp(percentage, 0, 100);
+        }
+    }
+
+    /// The quick box covers the common single hit. The kind comes from the small
+    /// menu when the creature has rules, and is empty otherwise.
+    private async Task QuickDamage(string kind)
+    {
+        if (_quickAmount <= 0) return;
+
+        int oldValue = Field.CurrentHP;
+        Field.SaveUndo();
+
+        int raw = _quickAmount;
+        int amount = raw;
+        var rule = string.IsNullOrEmpty(kind) ? null : Field.ResolveRule(kind, _quickTags);
+        if (rule != null) amount = rule.Apply(amount);
+
+        uint absorbed = Field.ApplyDamage(amount);
+        _quickAmount = 0;
+        _quickTags.Clear();
+
+        await NotifyChanged(oldValue, "CurrentChanged", kind, raw, amount, 0, (int)absorbed);
+    }
+
+    private async Task QuickHeal()
+    {
+        if (_quickAmount <= 0) return;
+
+        int oldValue = Field.CurrentHP;
+        Field.SaveUndo();
+
+        int amount = _quickAmount;
+        Field.ApplyHeal(amount);
+        _quickAmount = 0;
+
+        await NotifyChanged(oldValue, "CurrentChanged", null, 0, 0, amount, 0);
+    }
+
+    private async Task UndoLast()
+    {
+        int oldValue = Field.CurrentHP;
+        Field.Undo();
+        await NotifyChanged(oldValue, "Undone", null, 0, 0, 0, 0);
     }
 
     private async Task OnMaximumHpChanged(uint value)
     {
         var oldValue = Field.MaximumHP;
         Field.MaximumHP = value;
-        await NotifyParentOnChange(oldValue, value, "MaximumChanged");
-    }
 
-    private async Task NotifyParentOnChange(uint oldValue, uint newValue, string action)
-    {
         if (OnFieldChanged.HasDelegate)
         {
             await OnFieldChanged.InvokeAsync(new CustomFieldChangeInfo
             {
                 Field = Field,
                 OldValue = oldValue,
-                NewValue = newValue,
-                Action = action,
-                ChangeDirection = GetChangeDirection(oldValue, newValue)
+                NewValue = value,
+                Action = "MaximumChanged",
+                ChangeDirection = value > oldValue ? "Increased" : (value < oldValue ? "Decreased" : "Unchanged")
             });
         }
 
@@ -54,10 +266,44 @@ else
             await OnChange.InvokeAsync();
     }
 
-    private static string GetChangeDirection(uint oldValue, uint newValue)
+    /// The modal's OK button is what commits the staged lines.
+    private async Task OnApplyModalClose(bool result)
     {
-        if (newValue > oldValue) return "Increased";
-        if (newValue < oldValue) return "Decreased";
-        return "Unchanged";
+        if (result && _applyPopup != null)
+        {
+            await _applyPopup.ApplyAsync();
+        }
+    }
+
+    private async Task OnApplied(CustomFieldChangeInfo info)
+    {
+        if (OnFieldChanged.HasDelegate)
+            await OnFieldChanged.InvokeAsync(info);
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
+    }
+
+    private async Task NotifyChanged(int oldValue, string action, string? kind, int rawDamage, int appliedDamage, int appliedHeal, int temporaryAbsorbed)
+    {
+        var info = new CustomFieldChangeInfo
+        {
+            Field = Field,
+            OldValue = oldValue,
+            NewValue = Field.CurrentHP,
+            Action = action,
+            ChangeDirection = Field.CurrentHP > oldValue ? "Increased" : (Field.CurrentHP < oldValue ? "Decreased" : "Unchanged")
+        };
+        info.Data["damageKinds"] = string.IsNullOrEmpty(kind) ? null : kind;
+        info.Data["rawDamage"] = rawDamage;
+        info.Data["appliedDamage"] = appliedDamage;
+        info.Data["appliedHeal"] = appliedHeal;
+        info.Data["temporaryAbsorbed"] = temporaryAbsorbed;
+
+        if (OnFieldChanged.HasDelegate)
+            await OnFieldChanged.InvokeAsync(info);
+
+        if (OnChange.HasDelegate)
+            await OnChange.InvokeAsync();
     }
 }

@@ -1,0 +1,530 @@
+﻿@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@using DiceCombats
+@inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
+
+<style>
+    .hp-section {
+        background-color: #2A2A2A;
+        border: 1px solid #505050;
+        border-radius: 10px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .hp-section-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    /* Heal, temporary hit points and the maximum reduction are one number each,
+       so they sit side by side instead of stacking three near empty rows. */
+    .hp-small-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 10px;
+        align-items: start;
+    }
+
+    .hp-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Sized to keep a system of a dozen kinds within two rows of one line. */
+    .hp-kind-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        max-height: 76px;
+        overflow-y: auto;
+        padding: 2px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .hp-kind-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        opacity: 0.45;
+        border: 2px solid transparent;
+        transition: opacity .15s, border-color .15s;
+        white-space: nowrap;
+    }
+
+        .hp-kind-btn:hover {
+            opacity: 0.8;
+        }
+
+        .hp-kind-btn.selected {
+            opacity: 1;
+            border-color: white;
+        }
+
+    .hp-damage-line {
+        padding: 8px;
+        border-radius: 8px;
+        background-color: #333333;
+        margin-bottom: 8px;
+    }
+
+    /* The whole calculation, kept at the top so it is the first thing read. */
+    .hp-total {
+        border-radius: 10px;
+        background-color: #12201d;
+        border: 1px solid #24463f;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    /* One line, read left to right: current, every applied term, result. */
+    .hp-calc {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 14px;
+    }
+
+    .hp-term {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 190px;
+    }
+
+    .hp-term-main {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 30px;
+        font-weight: bold;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .hp-term-sub {
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 300;
+        color: grey;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .hp-term-max {
+        color: grey;
+        font-size: 15px;
+        font-weight: normal;
+    }
+
+    .hp-max-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #24463f;
+        color: #b39ddb;
+        font-size: 13px;
+    }
+
+    .hp-op {
+        font-size: 26px;
+        color: grey;
+        line-height: 1;
+        padding-top: 4px;
+    }
+
+    .hp-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        white-space: nowrap;
+    }
+</style>
+
+<h4 style="text-align:center;margin-bottom:10px;">@Field.Title</h4>
+
+@* ---------------- The calculation, first ---------------- *@
+<div class="hp-total">
+    <div class="hp-calc">
+        <div class="hp-term">
+            <span class="hp-term-main">@Field.CurrentHP<span class="hp-term-max">/ @Field.EffectiveMaximumHP</span></span>
+        </div>
+
+        @foreach (var line in _damageLines.Where(x => x.Amount > 0))
+        {
+            var l = line;
+            var kind = Field.GetKind(l.Kind);
+            var rule = string.IsNullOrEmpty(l.Kind) ? null : Field.ResolveRule(l.Kind, l.Tags);
+            <span class="hp-op">−</span>
+            <div class="hp-term">
+                <span class="hp-term-main" style="@($"color:{(kind == null ? "#e57373" : kind.Color)};")">
+                    @if (kind != null)
+                    {
+                        <MudIcon Icon="@DCHitPointsIcons.Resolve(kind.Icon)" Style="font-size:24px;" />
+                    }
+                    @MitigatedAmount(l)
+                </span>
+                @if (rule != null && MitigatedAmount(l) != l.Amount)
+                {
+                    <span class="hp-term-sub">@rule.Name<br />@FormulaFor(l)</span>
+                }
+            </div>
+        }
+
+        @if (TemporaryAbsorbed > 0)
+        {
+            <span class="hp-op">+</span>
+            <div class="hp-term">
+                <span class="hp-term-main" style="color:#23aba0;">
+                    <MudIcon Icon="@Icons.Material.Filled.Shield" Style="font-size:24px;" />@TemporaryAbsorbed
+                </span>
+                <span class="hp-term-sub">@Loc["HPCalcAbsorbed"]</span>
+            </div>
+        }
+
+        @if (_heal > 0)
+        {
+            <span class="hp-op">+</span>
+            <div class="hp-term">
+                <span class="hp-term-main" style="color:#66bb6a;">
+                    <MudIcon Icon="@Icons.Material.Filled.Add" Style="font-size:24px;" />@_heal
+                </span>
+                <span class="hp-term-sub">@Loc["HPHeal"]</span>
+            </div>
+        }
+
+        <span class="hp-op">=</span>
+        <div class="hp-term">
+            <span class="hp-term-main" style="@($"color:{ResultColor};")">@PreviewCurrentHP<span class="hp-term-max">/ @PreviewMaximum</span></span>
+            @if (PreviewTemporaryHP > 0)
+            {
+                <span class="hp-term-sub" style="color:#23aba0;">+@PreviewTemporaryHP @Loc["HPTemporaryShort"]</span>
+            }
+        </div>
+
+    </div>
+
+    @* Outside the equation: this moves the ceiling, the denominator above, not
+       the current hit points. *@
+    @if (_maximumReduction > 0)
+    {
+        <div class="hp-max-note">
+            <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:16px;" />
+            @Loc["HPMaxReductionLabel"] : @Field.MaximumHP − @_maximumReduction = @PreviewMaximum
+        </div>
+    }
+</div>
+
+@* ---------------- Damage ---------------- *@
+<div class="hp-section">
+    <div class="hp-row" style="margin-bottom:8px;">
+        <span class="hp-section-title" style="background-color:#8B2C3B;">
+            <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:18px;" />@Loc["HPDamage"]
+        </span>
+        <MudButton OnClick="AddLine" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">
+            @Loc["HPAddLine"]
+        </MudButton>
+    </div>
+
+    @foreach (var line in _damageLines)
+    {
+        var l = line;
+        <div class="hp-damage-line">
+            <div class="hp-row">
+                <div style="width:100px;">
+                    <MudNumericField T="int" @bind-Value="l.Amount" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                </div>
+
+                @if (Field.DamageKinds.Count > 0)
+                {
+                    @* Once a kind is picked the rest fold away; clicking the
+                       picked one again brings them back. *@
+                    <div class="hp-kind-strip">
+                        @foreach (var kind in Field.DamageKinds)
+                        {
+                            var k = kind;
+                            @if (l.KindsExpanded || l.Kind == k.Name)
+                            {
+                                <div class="hp-kind-btn @(l.Kind == k.Name ? "selected" : "")"
+                                     style="@($"background-color:{k.Color};color:{k.TextColor};")"
+                                     @onclick="() => SelectKind(l, k.Name)">
+                                    <MudIcon Icon="@DCHitPointsIcons.Resolve(k.Icon)" Style="font-size:15px;" />
+                                    @k.Name
+                                </div>
+                            }
+                        }
+                        @if (l.KindsExpanded)
+                        {
+                            <div class="hp-kind-btn @(string.IsNullOrEmpty(l.Kind) ? "selected" : "")"
+                                 style="background-color:#555555;color:#FFFFFF;"
+                                 @onclick="() => SelectKind(l, string.Empty)">
+                                @Loc["HPNoKind"]
+                            </div>
+                        }
+                        else
+                        {
+                            <span style="color:grey;font-size:12px;align-self:center;">@Loc["HPChangeKind"]</span>
+                        }
+                    </div>
+                }
+
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="() => RemoveLine(l)" title="@Loc["HPRemoveLine"]" />
+            </div>
+
+            @* Shown whenever the system has tags, kind selected or not. *@
+            @if (Field.Tags.Count > 0)
+            {
+                <div class="hp-row" style="margin-top:6px;gap:5px;">
+                    <span style="color:grey;font-size:12px;">@Loc["HPTagsTitle"]</span>
+                    @foreach (string tag in Field.Tags)
+                    {
+                        var t = tag;
+                        <div class="hp-kind-btn @(l.Tags.Contains(t) ? "selected" : "")"
+                             style="background-color:#4A5A7A;color:#FFFFFF;"
+                             @onclick="() => ToggleTag(l, t, !l.Tags.Contains(t))">
+                            @t
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@* ------- Heal, temporary hit points, maximum reduction, side by side ------- *@
+<div class="hp-small-grid">
+    <div class="hp-section">
+        <div class="hp-row">
+            <span class="hp-section-title" style="background-color:#1E867F;">
+                <MudIcon Icon="@Icons.Material.Filled.Add" Style="font-size:18px;" />@Loc["HPHeal"]
+            </span>
+            <div style="width:100px;">
+                <MudNumericField T="int" @bind-Value="_heal" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+            </div>
+        </div>
+        <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPHealHint"]</div>
+    </div>
+
+    <div class="hp-section">
+        <div class="hp-row">
+            <span class="hp-section-title" style="background-color:#23aba0;">
+                <MudIcon Icon="@Icons.Material.Filled.Shield" Style="font-size:18px;" />@Loc["HPTemporary"]
+            </span>
+            <div style="width:100px;">
+                <MudNumericField T="int" @bind-Value="_temporary" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+            </div>
+        </div>
+        <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPTemporaryHint"]</div>
+    </div>
+
+    <div class="hp-section">
+        <div class="hp-row">
+            <span class="hp-section-title" style="background-color:#6A4C93;">
+                <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:18px;" />@Loc["HPMaxReductionLabel"]
+            </span>
+            <div style="width:100px;">
+                <MudNumericField T="int" @bind-Value="_maximumReduction" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+            </div>
+        </div>
+        <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPMaxReductionHint"]</div>
+    </div>
+</div>
+
+<MudText Typo="Typo.caption" Style="color:grey;display:block;text-align:center;margin-top:8px;">@Loc["HPApplyHint"]</MudText>
+
+@code {
+    [Parameter] public DCCreatureHitPointsField Field { get; set; } = default!;
+    [Parameter] public EventCallback<CustomFieldChangeInfo> OnApplied { get; set; }
+
+    private class DamageLine
+    {
+        public int Amount { get; set; } = 0;
+        public string Kind { get; set; } = string.Empty;
+        public List<string> Tags { get; set; } = new List<string>();
+        // Whether the kinds other than the picked one are on screen.
+        public bool KindsExpanded { get; set; } = true;
+    }
+
+    private List<DamageLine> _damageLines = new List<DamageLine>();
+    private int _heal = 0;
+    private int _temporary = 0;
+    private int _maximumReduction = 0;
+
+    protected override void OnInitialized()
+    {
+        _temporary = (int)Field.TemporaryHP;
+        _maximumReduction = (int)Field.MaximumHPReduction;
+        AddLine();
+        base.OnInitialized();
+    }
+
+    private void AddLine()
+    {
+        // A new line keeps the previous kind, so entering several hits of the
+        // same kind does not mean picking it again every time.
+        var previous = _damageLines.LastOrDefault();
+        _damageLines.Add(new DamageLine { Kind = previous?.Kind ?? string.Empty });
+    }
+
+    private void RemoveLine(DamageLine line)
+    {
+        _damageLines.Remove(line);
+        if (_damageLines.Count == 0) AddLine();
+    }
+
+    private void SelectKind(DamageLine line, string kind)
+    {
+        // Clicking the kind already picked reopens the list rather than
+        // reselecting the same thing.
+        if (line.Kind == kind && !string.IsNullOrEmpty(kind))
+        {
+            line.KindsExpanded = !line.KindsExpanded;
+            return;
+        }
+
+        line.Kind = kind;
+        if (string.IsNullOrEmpty(kind))
+        {
+            line.Tags.Clear();
+            line.KindsExpanded = true;
+        }
+        else
+        {
+            line.KindsExpanded = false;
+        }
+    }
+
+    private void ToggleTag(DamageLine line, string tag, bool selected)
+    {
+        if (selected)
+        {
+            if (!line.Tags.Contains(tag)) line.Tags.Add(tag);
+        }
+        else
+        {
+            line.Tags.Remove(tag);
+        }
+    }
+
+    private int MitigatedAmount(DamageLine line)
+    {
+        if (string.IsNullOrEmpty(line.Kind)) return line.Amount;
+        var rule = Field.ResolveRule(line.Kind, line.Tags);
+        return rule == null ? line.Amount : rule.Apply(line.Amount);
+    }
+
+    /// Spells out the arithmetic of one line, e.g. "38 × 0.5 − 2 = 17".
+    private string FormulaFor(DamageLine line)
+    {
+        var rule = string.IsNullOrEmpty(line.Kind) ? null : Field.ResolveRule(line.Kind, line.Tags);
+        if (rule == null) return line.Amount.ToString();
+
+        string formula = line.Amount.ToString();
+        if (rule.Factor != 1.0) formula += $" × {rule.Factor}";
+        if (rule.FlatReduction != 0) formula += $" − {rule.FlatReduction}";
+        return $"{formula} = {rule.Apply(line.Amount)}";
+    }
+
+    private int TotalDamage => _damageLines.Sum(x => MitigatedAmount(x));
+
+    private uint StagedTemporary => (uint)Math.Max(0, _temporary);
+
+    private int TemporaryAbsorbed => (int)Math.Min(StagedTemporary, (uint)Math.Max(0, TotalDamage));
+
+    private uint PreviewTemporaryHP => StagedTemporary - (uint)TemporaryAbsorbed;
+
+    private int PreviewMaximum => Math.Max(0, (int)Field.MaximumHP - Math.Max(0, _maximumReduction));
+
+    private int PreviewCurrentHP
+    {
+        get
+        {
+            int result = Field.CurrentHP - (TotalDamage - TemporaryAbsorbed);
+            if (!Field.AllowNegative) result = Math.Max(0, result);
+            return Math.Min(PreviewMaximum, result + Math.Max(0, _heal));
+        }
+    }
+
+    private string ResultColor
+    {
+        get
+        {
+            if (PreviewCurrentHP < Field.CurrentHP) return "#e57373";
+            if (PreviewCurrentHP > Field.CurrentHP) return "#66bb6a";
+            return "white";
+        }
+    }
+
+    /// <summary>
+    /// Commits everything staged as a single change, so one undo takes the whole
+    /// attack back.
+    /// </summary>
+    public async Task ApplyAsync()
+    {
+        bool changed = TotalDamage > 0 || _heal > 0
+            || StagedTemporary != Field.TemporaryHP
+            || Math.Max(0, _maximumReduction) != (int)Field.MaximumHPReduction;
+        if (!changed) return;
+
+        int oldValue = Field.CurrentHP;
+        Field.SaveUndo();
+
+        Field.TemporaryHP = StagedTemporary;
+        Field.MaximumHPReduction = (uint)Math.Max(0, _maximumReduction);
+
+        uint absorbed = Field.ApplyDamage(TotalDamage);
+        Field.ApplyHeal(Math.Max(0, _heal));
+
+        var kinds = _damageLines.Where(x => x.Amount > 0 && !string.IsNullOrEmpty(x.Kind)).Select(x => x.Kind).Distinct().ToList();
+
+        var info = new CustomFieldChangeInfo
+        {
+            Field = Field,
+            OldValue = oldValue,
+            NewValue = Field.CurrentHP,
+            Action = "CurrentChanged",
+            ChangeDirection = Field.CurrentHP > oldValue ? "Increased" : (Field.CurrentHP < oldValue ? "Decreased" : "Unchanged")
+        };
+        info.Data["damageKinds"] = kinds.Count > 0 ? string.Join(", ", kinds) : null;
+        info.Data["rawDamage"] = _damageLines.Sum(x => x.Amount);
+        info.Data["appliedDamage"] = TotalDamage;
+        info.Data["appliedHeal"] = Math.Max(0, _heal);
+        info.Data["temporaryAbsorbed"] = (int)absorbed;
+
+        _damageLines.Clear();
+        AddLine();
+        _heal = 0;
+        _temporary = (int)Field.TemporaryHP;
+
+        if (OnApplied.HasDelegate)
+            await OnApplied.InvokeAsync(info);
+    }
+}

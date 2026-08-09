@@ -148,7 +148,7 @@
     <value>Combats</value>
   </data>
   <data name="CombatsSubtitle" xml:space="preserve">
-    <value>Vos rencontres préparées — alignez les créatures, lancez l'initiative et menez le combat en direct.</value>
+    <value>Vos rencontres préparées : alignez les créatures, lancez l'initiative et menez le combat en direct.</value>
   </data>
   <data name="NoCombats" xml:space="preserve">
     <value>Aucun combat pour l'instant. Créez-en un pour commencer.</value>
@@ -161,5 +161,50 @@
   </data>
   <data name="FavoriteBtn" xml:space="preserve">
     <value>Favori</value>
+  </data>
+  <data name="SearchCombat" xml:space="preserve">
+    <value>Rechercher un combat</value>
+  </data>
+  <data name="NoSearchResult" xml:space="preserve">
+    <value>Aucun résultat pour cette recherche.</value>
+  </data>
+  <data name="DeleteCombatTitle" xml:space="preserve">
+    <value>Supprimer le combat</value>
+  </data>
+  <data name="DeleteCombatQuestion" xml:space="preserve">
+    <value>Supprimer &quot;{0}&quot; ? Cette action est irréversible.</value>
+  </data>
+  <data name="DeleteConfirmBtn" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="CampaignsTitle" xml:space="preserve">
+    <value>Campagnes</value>
+  </data>
+  <data name="LooseCombatsTitle" xml:space="preserve">
+    <value>Combats</value>
+  </data>
+  <data name="CombatsMeta" xml:space="preserve">
+    <value>combat(s)</value>
+  </data>
+  <data name="BackBtn" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="NoCombatsInCampaign" xml:space="preserve">
+    <value>Cette campagne ne contient plus aucun combat.</value>
+  </data>
+  <data name="RenameCampaignBtn" xml:space="preserve">
+    <value>Renommer la campagne</value>
+  </data>
+  <data name="CampaignName" xml:space="preserve">
+    <value>Nom de la campagne</value>
+  </data>
+  <data name="SearchResultsTitle" xml:space="preserve">
+    <value>Résultats de la recherche</value>
+  </data>
+  <data name="NoCampaignTitle" xml:space="preserve">
+    <value>Sans campagne</value>
   </data>
 </root>

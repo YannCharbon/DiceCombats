@@ -151,7 +151,7 @@
     <value>Combats</value>
   </data>
   <data name="CombatsSubtitle" xml:space="preserve">
-    <value>Prepared encounters — line up creatures, roll initiative and run the fight live.</value>
+    <value>Prepared encounters: line up creatures, roll initiative and run the fight live.</value>
   </data>
   <data name="NoCombats" xml:space="preserve">
     <value>No combats yet. Create one to get started.</value>
@@ -164,5 +164,50 @@
   </data>
   <data name="FavoriteBtn" xml:space="preserve">
     <value>Favorite</value>
+  </data>
+  <data name="SearchCombat" xml:space="preserve">
+    <value>Search a combat</value>
+  </data>
+  <data name="NoSearchResult" xml:space="preserve">
+    <value>No match for this search.</value>
+  </data>
+  <data name="DeleteCombatTitle" xml:space="preserve">
+    <value>Delete combat</value>
+  </data>
+  <data name="DeleteCombatQuestion" xml:space="preserve">
+    <value>Delete &quot;{0}&quot;? This cannot be undone.</value>
+  </data>
+  <data name="DeleteConfirmBtn" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CampaignsTitle" xml:space="preserve">
+    <value>Campaigns</value>
+  </data>
+  <data name="LooseCombatsTitle" xml:space="preserve">
+    <value>Combats</value>
+  </data>
+  <data name="CombatsMeta" xml:space="preserve">
+    <value>combat(s)</value>
+  </data>
+  <data name="BackBtn" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="NoCombatsInCampaign" xml:space="preserve">
+    <value>This campaign has no combat left.</value>
+  </data>
+  <data name="RenameCampaignBtn" xml:space="preserve">
+    <value>Rename the campaign</value>
+  </data>
+  <data name="CampaignName" xml:space="preserve">
+    <value>Campaign name</value>
+  </data>
+  <data name="SearchResultsTitle" xml:space="preserve">
+    <value>Search results</value>
+  </data>
+  <data name="NoCampaignTitle" xml:space="preserve">
+    <value>No campaign</value>
   </data>
 </root>

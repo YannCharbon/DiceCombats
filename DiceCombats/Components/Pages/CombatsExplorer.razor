@@ -12,10 +12,11 @@
 @inject DiceCombatsService CombatService
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
+@inject IDialogService DialogService
 @inject IStringLocalizer<Resources.Localization.CombatsExplorer> Loc
 
 <style>
-    /* Card list — same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
+    /* Card list with the same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
     .dc-card {
         border-radius: 12px;
         background: #12201d;
@@ -113,48 +114,244 @@
     <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
 </MudStack>
 
-@if (CombatService.GetCombatList().Count == 0)
-{
-    <p class="dc-empty">@Loc["NoCombats"]</p>
-}
+<div style="max-width:420px; margin-bottom:6px;">
+    <MudTextField T="string" Immediate="true" Value="@_search" ValueChanged="@((string v) => _search = v)"
+                  Label="@Loc["SearchCombat"]" Variant="Variant.Outlined" Clearable="true"
+                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+</div>
 
-@foreach (var group in CombatService.GetCombatList()
-    .GroupBy(c => InitialOf(c.Name))
-    .OrderBy(g => g.Key, StringComparer.CurrentCulture))
+@if (_openCampaign == null && !string.IsNullOrWhiteSpace(_search))
 {
-    <div class="dc-cat-header">@group.Key</div>
-    <div class="dc-grid">
-        @foreach (DCCombat combat in group.OrderBy(c => c.Name, StringComparer.CurrentCulture))
+    @* Searching from the root reaches into the campaigns: the matching combats
+       are listed themselves, grouped under the campaign they belong to. *@
+    var results = SearchResults();
+
+    <div class="dc-cat-header" style="font-size:28px;">@Loc["SearchResultsTitle"]</div>
+
+    if (results.Count == 0)
+    {
+        <p class="dc-empty">@Loc["NoSearchResult"]</p>
+    }
+
+    foreach (var group in results
+        .GroupBy(c => string.IsNullOrWhiteSpace(c.Campaign) ? string.Empty : c.Campaign)
+        .OrderBy(g => g.Key, StringComparer.CurrentCulture))
+    {
+        var campaign = group.Key;
+        <div class="dc-cat-header">
+            @if (campaign.Length == 0)
+            {
+                @Loc["NoCampaignTitle"]
+            }
+            else
+            {
+                <span style="cursor:pointer;" @onclick="() => OpenCampaign(campaign)">
+                    <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Style="font-size:16px; vertical-align:text-bottom;" />
+                    @campaign
+                </span>
+            }
+        </div>
+        @RenderCombatGrid(group.OrderBy(c => c.Name, StringComparer.CurrentCulture).ToList())
+    }
+}
+else if (_openCampaign == null)
+{
+    @* Root view: the campaign folders first, then the combats that belong to none. *@
+    var campaigns = CombatService.GetCampaigns();
+    if (campaigns.Count > 0)
+    {
+        <div class="dc-cat-header" style="font-size:28px;">@Loc["CampaignsTitle"]</div>
+        <div class="dc-grid">
+            @foreach (string campaign in campaigns)
+            {
+                var name = campaign;
+                var count = CombatService.GetCombatsOfCampaign(name).Count;
+                <div class="dc-card" @onclick="() => OpenCampaign(name)">
+                    <div class="dc-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.FolderOpen" />
+                    </div>
+                    <div class="dc-body">
+                        <div class="dc-name">@name</div>
+                        <div class="dc-meta">@count @Loc["CombatsMeta"]</div>
+                    </div>
+                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Style="color:grey;" />
+                </div>
+            }
+        </div>
+    }
+
+    <div class="dc-cat-header" style="font-size:28px;">@Loc["LooseCombatsTitle"]</div>
+    @RenderCombats(CombatService.GetCombatList().FindAll(x => string.IsNullOrWhiteSpace(x.Campaign)), Loc["NoCombats"])
+}
+else
+{
+    @* Inside a campaign: only its combats, plus the way out and a rename. *@
+    <MudStack Row="true" AlignItems="AlignItems.Center" Style="gap:10px; margin:10px 0 0 0;">
+        <MudButton OnClick="CloseCampaign" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack" Color="@Color.Primary">
+            @Loc["BackBtn"]
+        </MudButton>
+        <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Color="@Color.Primary" />
+        @if (_renamingCampaign)
         {
-            var c = combat;
-            var isFavorite = CombatService.IsCombatFavorite(c.Id.ToString());
-            <div class="dc-card" @onclick="@(() => Navigation.NavigateTo($"/combatmanager/{c.Id}"))">
-                <div class="dc-icon">
-                    <MudIcon Icon="@Icons.Material.Filled.Shield" />
-                </div>
-                <div class="dc-body">
-                    <div class="dc-name">@c.Name</div>
-                    <div class="dc-meta">@MetaOf(c)</div>
-                </div>
-                <div @onclick:stopPropagation="true">
-                    <MudIconButton OnClick="() => ToggleFavorite(c)"
-                                   Icon="@(isFavorite ? Icons.Material.Filled.Star : Icons.Material.Filled.StarBorder)"
-                                   Color="@(isFavorite ? Color.Warning : Color.Default)"
-                                   title="@Loc["FavoriteBtn"]" />
-                    @if (_showEditionButtons)
-                    {
-                        <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["CombatEditBtn"]" />
-                        <MudIconButton OnClick="() => ExportCombat(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["CombatExportBtn"]" />
-                        <MudIconButton OnClick="() => CombatService.DeleteCombat(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["CombatDeleteBtn"]" />
-                    }
-                </div>
+            @* Sized wrapper: the MudTextField root is width:100%, so as a bare flex
+               item it would eat the row and shove the confirm/cancel to the far right. *@
+            <div style="width:320px;">
+                <MudTextField T="string" @bind-Value="_campaignRename" Label="@Loc["CampaignName"]"
+                              Variant="Variant.Outlined" Immediate="true" />
             </div>
+            <MudIconButton Icon="@Icons.Material.Filled.Check" Color="@Color.Success"
+                           OnClick="ConfirmRenameCampaign" title="@Loc["RenameCampaignBtn"]" />
+            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                           OnClick="@(() => _renamingCampaign = false)" title="@Loc["CancelBtn"]" />
         }
-    </div>
+        else
+        {
+            <MudText Typo="Typo.h6">@_openCampaign</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="StartRenameCampaign" title="@Loc["RenameCampaignBtn"]" />
+        }
+    </MudStack>
+
+    @RenderCombats(VisibleCombats(_openCampaign), Loc["NoCombatsInCampaign"])
 }
 
 @code {
     private bool _showEditionButtons;
+
+    private string _search = string.Empty;
+
+    /// Null = root view (campaign folders + combats with no campaign); otherwise
+    /// the campaign whose "folder" the user has entered.
+    private string? _openCampaign;
+
+    private bool _renamingCampaign;
+    private string _campaignRename = string.Empty;
+
+    private bool MatchesSearch(string text) =>
+        string.IsNullOrWhiteSpace(_search) ||
+        text.Contains(_search.Trim(), StringComparison.CurrentCultureIgnoreCase);
+
+    /// Every combat matching the search, campaigns included. A combat also
+    /// matches through its campaign name, so searching a campaign lists all
+    /// the combats it holds.
+    private List<DCCombat> SearchResults()
+    {
+        return CombatService.GetCombatList()
+            .FindAll(x => MatchesSearch(x.Name) ||
+                          (!string.IsNullOrWhiteSpace(x.Campaign) && MatchesSearch(x.Campaign)));
+    }
+
+    /// Combats of the open campaign, narrowed by the search unless the campaign
+    /// name itself is what matched.
+    private List<DCCombat> VisibleCombats(string campaign)
+    {
+        var combats = CombatService.GetCombatsOfCampaign(campaign);
+        return MatchesSearch(campaign) ? combats : combats.FindAll(x => MatchesSearch(x.Name));
+    }
+
+    private void OpenCampaign(string campaign)
+    {
+        _openCampaign = campaign;
+        _search = string.Empty;
+        _renamingCampaign = false;
+    }
+
+    private void CloseCampaign()
+    {
+        _openCampaign = null;
+        _search = string.Empty;
+        _renamingCampaign = false;
+    }
+
+    private void StartRenameCampaign()
+    {
+        _campaignRename = _openCampaign ?? string.Empty;
+        _renamingCampaign = true;
+    }
+
+    private void ConfirmRenameCampaign()
+    {
+        if (_openCampaign == null) return;
+
+        string newName = _campaignRename.Trim();
+        if (newName.Length > 0 && newName != _openCampaign)
+        {
+            CombatService.RenameCampaign(_openCampaign, newName);
+            // Stay in the same folder under its new name.
+            _openCampaign = newName;
+        }
+
+        _renamingCampaign = false;
+    }
+
+    /// One letter-grouped card list, used by the root view and inside a campaign.
+    private RenderFragment RenderCombats(List<DCCombat> combats, string emptyText) => __builder =>
+    {
+        if (combats.Count == 0)
+        {
+            <p class="dc-empty">@(string.IsNullOrWhiteSpace(_search) ? emptyText : Loc["NoSearchResult"])</p>
+        }
+
+        foreach (var group in combats
+            .GroupBy(c => InitialOf(c.Name))
+            .OrderBy(g => g.Key, StringComparer.CurrentCulture))
+        {
+            <div class="dc-cat-header">@group.Key</div>
+            @RenderCombatGrid(group.OrderBy(c => c.Name, StringComparer.CurrentCulture).ToList())
+        }
+    };
+
+    /// The cards themselves, without any grouping of their own.
+    private RenderFragment RenderCombatGrid(List<DCCombat> combats) => __builder =>
+    {
+        <div class="dc-grid">
+            @foreach (DCCombat combat in combats)
+            {
+                var c = combat;
+                var isFavorite = CombatService.IsCombatFavorite(c.Id.ToString());
+                <div class="dc-card" @onclick="@(() => Navigation.NavigateTo($"/combatmanager/{c.Id}"))">
+                    <div class="dc-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.Shield" />
+                    </div>
+                    <div class="dc-body">
+                        <div class="dc-name">@c.Name</div>
+                        <div class="dc-meta">@MetaOf(c)</div>
+                    </div>
+                    <div @onclick:stopPropagation="true">
+                        <MudIconButton OnClick="() => ToggleFavorite(c)"
+                                       Icon="@(isFavorite ? Icons.Material.Filled.Star : Icons.Material.Filled.StarBorder)"
+                                       Color="@(isFavorite ? Color.Warning : Color.Default)"
+                                       title="@Loc["FavoriteBtn"]" />
+                        @if (_showEditionButtons)
+                        {
+                            <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["CombatEditBtn"]" />
+                            <MudIconButton OnClick="() => ExportCombat(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["CombatExportBtn"]" />
+                            <MudIconButton OnClick="() => DeleteCombat(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["CombatDeleteBtn"]" />
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    };
+
+    private async Task DeleteCombat(DCCombat combat)
+    {
+        bool? confirm = await DialogService.ShowMessageBox(
+            Loc["DeleteCombatTitle"],
+            string.Format(Loc["DeleteCombatQuestion"], combat.Name),
+            yesText: Loc["DeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);
+        if (confirm != true) return;
+
+        CombatService.DeleteCombat(combat);
+        CombatService.SaveCombats();
+
+        // The campaign may have just lost its last combat, so its folder is gone.
+        if (_openCampaign != null && CombatService.GetCombatsOfCampaign(_openCampaign).Count == 0)
+        {
+            CloseCampaign();
+        }
+
+        StateHasChanged();
+    }
 
     /// Grouping key: the first letter, or "#" for names starting with anything else
     /// (digits, punctuation). The old 'a'..'z' loop silently hid those entries.

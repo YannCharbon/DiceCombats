@@ -123,4 +123,10 @@
   <data name="CreaturesBtn" xml:space="preserve">
     <value>Creatures</value>
   </data>
+  <data name="AutomationsBtn" xml:space="preserve">
+    <value>Automations</value>
+  </data>
+  <data name="SettingsBtn" xml:space="preserve">
+    <value>Settings</value>
+  </data>
 </root>

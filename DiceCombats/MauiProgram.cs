@@ -47,18 +47,42 @@ namespace DiceCombats
                     {
                         w.OnWindowCreated(window =>
                         {
-                            // Extend the title bar
-                            window.ExtendsContentIntoTitleBar = true;
+                            // Extend content into the title bar at the AppWindow
+                            // (OS) level, NOT via the XAML Window property: the
+                            // XAML property activates MAUI's own title-bar strip
+                            // machinery, which re-inserts a native strip above
+                            // the WebView2 on every interactive state change
+                            // (restore, drag-resize) and fights any suppression.
+                            // AppWindow-level extension bypasses MAUI entirely:
+                            // the webview owns the full client area, the system
+                            // draws the caption buttons above it and provides
+                            // the default drag region across the top strip.
+                            window.ExtendsContentIntoTitleBar = false;
                             IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
                             WindowId myWndId = Win32Interop.GetWindowIdFromWindow(hWnd);
                             var _appWindow = AppWindow.GetFromWindowId(myWndId);
                             _appWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
+
+                            var titleBar = _appWindow.TitleBar;
+                            titleBar.ExtendsContentIntoTitleBar = true;
+                            titleBar.ButtonBackgroundColor = Microsoft.UI.Colors.Transparent;
+                            titleBar.ButtonInactiveBackgroundColor = Microsoft.UI.Colors.Transparent;
+                            titleBar.ButtonForegroundColor = Microsoft.UI.Colors.White;
+                            titleBar.ButtonInactiveForegroundColor = Windows.UI.Color.FromArgb(160, 255, 255, 255);
+                            titleBar.ButtonHoverBackgroundColor = Windows.UI.Color.FromArgb(32, 255, 255, 255);
+                            titleBar.ButtonHoverForegroundColor = Microsoft.UI.Colors.White;
 
                             // Maximize the window on creation
                             if (_appWindow.Presenter is OverlappedPresenter p)
                             {
                                 p.Maximize();
                             }
+
+                            // The web page IS the title bar (Teams/Outlook style):
+                            // the WebView2 extends to the window top, the web app
+                            // bar carries the gem, and CSS app-region regions
+                            // provide dragging.
+                            WebTitleBar.Attach(window);
 
                             // Attach to the Closing event and use the service provider
                             _appWindow.Closing += (s, e) =>

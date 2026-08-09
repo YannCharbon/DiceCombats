@@ -16,85 +16,163 @@
 @inject IStringLocalizer<Resources.Localization.CreaturesExplorer> Loc
 
 <style>
-    .CreatureViewerCreature {
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
-    background-color: #303030;
+    /* Card list — same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
+    .dc-card {
+        border-radius: 12px;
+        background: #12201d;
+        border: 1px solid #24463f;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+        .dc-card:hover {
+            box-shadow: 0 4px 16px rgba(255,255,255,0.08);
+            border-color: #3c7a6c;
+        }
+
+    .dc-card-clickable {
+        cursor: pointer;
+    }
+
+    .dc-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(-45deg, rgba(85,197,109,0.35), rgba(50,200,126,0.45), rgba(0,170,170,0.55), rgba(35,170,128,0.65));
+    }
+
+    .dc-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .dc-name {
+        font-weight: bold;
+        font-size: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dc-meta {
+        font-size: 12px;
+        color: grey;
+    }
+
+    .dc-cat-header {
+        font-size: 15px;
+        font-weight: bold;
+        color: #33bbb0;
+        border-bottom: 1px solid #24463f;
+        padding: 14px 4px 4px 4px;
+        margin: 4px 2px;
+    }
+
+    .dc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 10px;
+        margin: 10px 2px 6px 2px;
+    }
+
+    .dc-empty {
+        color: grey;
+        padding: 20px;
     }
 </style>
 
-<div style="padding-top:10px; padding-bottom:20px; display: flex; justify-content: flex-end; align-items: center;">
-    <MudStack Row="true" Wrap="Wrap.Wrap">
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["NewCreatureBtn"]</MudButton>
-        <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large">@Loc["ExportCreaturesBtn"]</MudButton>
-        <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Large">@Loc["ImportCreaturesBtn"]</MudButton>
-    </MudStack>
-</div>
+<h3>@Loc["ExplorerTitle"]</h3>
+<MudText Typo="Typo.body2" Style="color:grey; margin-bottom:14px;">
+    @Loc["ExplorerSubtitle"]
+</MudText>
 
-<div style="margin-bottom:20px;">
-    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">@Loc["CreaturesTitle"]</span></h3>
-</div>
-<div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
-    @for (char chr = 'a'; chr <= 'z'; chr++)
-    {
-        @if (CombatService.GetCreatureList().Find(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == false) != null)
-        {
-            <div style="border-bottom:solid; border-bottom-width:1px; border-bottom-color:grey;">
-                <h4>@chr.ToString().ToUpper()</h4>
-            </div>
-            <div class="row">
-                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == false))
-                {
-                    <div class="col col-md-3 CreatureViewerCreature">
-                        <MudStack Row="true">
-                            <h4>@creature.Name</h4>
-                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["EditCreatureBtn"]"></MudIconButton>
-                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["ExportCreatureBtn"]"></MudIconButton>
-                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["DeleteCreatureBtn"]"></MudIconButton>
-                            </MudButtonGroup>
-                        </MudStack>
-                    </div>
-                }
-            </div>
-        }
-    }
+<MudStack Row="true" Wrap="Wrap.Wrap" Style="gap:10px; margin-bottom:10px;">
+    <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary">@Loc["NewCreatureBtn"]</MudButton>
+    <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary">@Loc["ExportCreaturesBtn"]</MudButton>
+    <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary">@Loc["ImportCreaturesBtn"]</MudButton>
+</MudStack>
 
-</div>
-
-<div style="margin-top:20px;margin-bottom:20px;">
-    <h3><span style="padding:5px;border-radius:10px;background-color:darkcyan">@Loc["PlayersTitle"]</span></h3>
-</div>
-<div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
-    @for (char chr = 'a'; chr <= 'z'; chr++)
-    {
-        @if (CombatService.GetCreatureList().Find(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == true) != null)
-        {
-            <div style="border-bottom:solid; border-bottom-width:1px; border-bottom-color:grey;">
-                <h4>@chr.ToString().ToUpper()</h4>
-            </div>
-            <div class="row">
-                @foreach (DCCreature creature in CombatService.GetCreatureList().FindAll(x => x.Name.ToLower().StartsWith(chr) && x.IsPlayer == true))
-                {
-                    <div class="col col-md-3 CreatureViewerCreature">
-                        <MudStack Row="true">
-                            <h4>@creature.Name</h4>
-                            <MudButtonGroup Color="Color.Primary" Variant="Variant.Filled">
-                                <MudIconButton OnClick="() => Edit(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["EditCreatureBtn"]"></MudIconButton>
-                                <MudIconButton OnClick="() => ExportCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["ExportCreatureBtn"]"></MudIconButton>
-                                <MudIconButton OnClick="() => CombatService.DeleteCreature(creature)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["DeleteCreatureBtn"]"></MudIconButton>
-                            </MudButtonGroup>
-                        </MudStack>
-                    </div>
-                }
-            </div>
-        }
-    }
-
-</div>
+@RenderCreatureSection(false, Loc["CreaturesTitle"], Loc["NoCreatures"], Icons.Material.Filled.Pets)
+@RenderCreatureSection(true, Loc["PlayersTitle"], Loc["NoPlayers"], Icons.Material.Filled.Person)
 
 @code {
+    /// Both sections (monsters/NPCs and player characters) share the exact same
+    /// card anatomy; only the filter, heading and icon differ.
+    private RenderFragment RenderCreatureSection(bool isPlayer, string title, string emptyText, string icon) => __builder =>
+    {
+        var creatures = CombatService.GetCreatureList().Where(x => x.IsPlayer == isPlayer).ToList();
+
+        <div class="dc-cat-header" style="font-size:28px;">@title</div>
+
+        if (creatures.Count == 0)
+        {
+            <p class="dc-empty">@emptyText</p>
+        }
+
+        foreach (var group in creatures
+            .GroupBy(c => InitialOf(c.Name))
+            .OrderBy(g => g.Key, StringComparer.CurrentCulture))
+        {
+            <div class="dc-cat-header">@group.Key</div>
+            <div class="dc-grid">
+                @foreach (var creature in group.OrderBy(c => c.Name, StringComparer.CurrentCulture))
+                {
+                    var c = creature;
+                    <div class="dc-card dc-card-clickable" @onclick="() => Edit(c)">
+                        <div class="dc-icon">
+                            <MudIcon Icon="@icon" />
+                        </div>
+                        <div class="dc-body">
+                            <div class="dc-name">@c.Name</div>
+                            <div class="dc-meta">@MetaOf(c)</div>
+                        </div>
+                        <div @onclick:stopPropagation="true">
+                            <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["EditCreatureBtn"]" />
+                            <MudIconButton OnClick="() => ExportCreature(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["ExportCreatureBtn"]" />
+                            <MudIconButton OnClick="() => CombatService.DeleteCreature(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["DeleteCreatureBtn"]" />
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    };
+
+    /// Grouping key: the first letter, or "#" for names starting with anything else
+    /// (digits, punctuation). The old 'a'..'z' loop silently hid those entries.
+    private static string InitialOf(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "#";
+        var first = char.ToUpperInvariant(name.TrimStart()[0]);
+        return char.IsLetter(first) ? first.ToString() : "#";
+    }
+
+    private string MetaOf(DCCreature creature)
+    {
+        var parts = new List<string>
+        {
+            $"{creature.CustomFields.Count} {Loc["FieldsMeta"]}"
+        };
+
+        if (creature.InCombatInstanceCount > 1)
+        {
+            parts.Add($"×{creature.InCombatInstanceCount}");
+        }
+
+        if (!string.IsNullOrEmpty(creature.MarkdownSheet) || !string.IsNullOrEmpty(creature.HtmlSheet) || !string.IsNullOrEmpty(creature.ImageSheetBas64))
+        {
+            parts.Add(Loc["SheetMeta"]);
+        }
+
+        return string.Join(" · ", parts);
+    }
+
     private void Edit(DCCreature creature)
     {
         Navigation.NavigateTo($"/creaturemanager/{creature.Id.ToString()}");

@@ -147,4 +147,22 @@
   <data name="ShowEditonBtnsToggle" xml:space="preserve">
     <value>Show edition buttons</value>
   </data>
+  <data name="CombatsTitle" xml:space="preserve">
+    <value>Combats</value>
+  </data>
+  <data name="CombatsSubtitle" xml:space="preserve">
+    <value>Prepared encounters — line up creatures, roll initiative and run the fight live.</value>
+  </data>
+  <data name="NoCombats" xml:space="preserve">
+    <value>No combats yet. Create one to get started.</value>
+  </data>
+  <data name="CreaturesMeta" xml:space="preserve">
+    <value>creature(s)</value>
+  </data>
+  <data name="RoundsMeta" xml:space="preserve">
+    <value>round(s)</value>
+  </data>
+  <data name="FavoriteBtn" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
 </root>

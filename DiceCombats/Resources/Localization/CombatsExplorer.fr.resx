@@ -144,4 +144,22 @@
   <data name="ShowEditonBtnsToggle" xml:space="preserve">
     <value>Afficher les boutons d'édition</value>
   </data>
+  <data name="CombatsTitle" xml:space="preserve">
+    <value>Combats</value>
+  </data>
+  <data name="CombatsSubtitle" xml:space="preserve">
+    <value>Vos rencontres préparées — alignez les créatures, lancez l'initiative et menez le combat en direct.</value>
+  </data>
+  <data name="NoCombats" xml:space="preserve">
+    <value>Aucun combat pour l'instant. Créez-en un pour commencer.</value>
+  </data>
+  <data name="CreaturesMeta" xml:space="preserve">
+    <value>créature(s)</value>
+  </data>
+  <data name="RoundsMeta" xml:space="preserve">
+    <value>tour(s)</value>
+  </data>
+  <data name="FavoriteBtn" xml:space="preserve">
+    <value>Favori</value>
+  </data>
 </root>

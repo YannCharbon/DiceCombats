@@ -15,88 +15,184 @@
 @inject IStringLocalizer<Resources.Localization.CombatsExplorer> Loc
 
 <style>
-    .CombatsCombatLink {
-    color:white;
-    background-color: #004547;
-    border-radius:30px;
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-    padding:10px;
-    margin:5px;
+    /* Card list — same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
+    .dc-card {
+        border-radius: 12px;
+        background: #12201d;
+        border: 1px solid #24463f;
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+        .dc-card:hover {
+            box-shadow: 0 4px 16px rgba(255,255,255,0.08);
+            border-color: #3c7a6c;
+        }
+
+    .dc-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(-45deg, rgba(85,197,109,0.35), rgba(50,200,126,0.45), rgba(0,170,170,0.55), rgba(35,170,128,0.65));
+    }
+
+    .dc-body {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .dc-name {
+        font-weight: bold;
+        font-size: 15px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dc-meta {
+        font-size: 12px;
+        color: grey;
+    }
+
+    .dc-cat-header {
+        font-size: 15px;
+        font-weight: bold;
+        color: #23aba0;
+        border-bottom: 1px solid #24463f;
+        padding: 14px 4px 4px 4px;
+        margin: 4px 2px;
+    }
+
+    .dc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 10px;
+        margin: 10px 2px 6px 2px;
+    }
+
+    .dc-empty {
+        color: grey;
+        padding: 20px;
     }
 </style>
 
-<div style="padding-top:10px; padding-bottom:20px; display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center;">
-    <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
+<h3>@Loc["CombatsTitle"]</h3>
+<MudText Typo="Typo.body2" Style="color:grey; margin-bottom:14px;">
+    @Loc["CombatsSubtitle"]
+</MudText>
+
+<MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Style="gap:10px; margin-bottom:10px;">
     <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
-    Variant="Variant.Filled"
-    StartIcon="@Icons.Material.Filled.Add"
-    Color="@Color.Primary"
-    Size="Size.Large"
-    Style="margin:2px;">
+               Variant="Variant.Filled"
+               StartIcon="@Icons.Material.Filled.Add"
+               Color="@Color.Primary">
         @Loc["NewCombatBtn"]
     </MudButton>
     <MudButton OnClick="@(() => ExportAllCombats())"
-    Variant="Variant.Filled"
-    StartIcon="@Icons.Material.Filled.Upload"
-    Color="@Color.Primary"
-    Size="Size.Large"
-    Style="margin:2px;"
-    title="@Loc["ExportAllCombatsBtnTitle"]">
+               Variant="Variant.Outlined"
+               StartIcon="@Icons.Material.Filled.Upload"
+               Color="@Color.Primary"
+               title="@Loc["ExportAllCombatsBtnTitle"]">
         @Loc["ExportAllCombatsBtn"]
     </MudButton>
     <MudButton OnClick="@(() => ImportCombats())"
-    Variant="Variant.Filled"
-    StartIcon="@Icons.Material.Filled.Download"
-    Color="@Color.Primary"
-    Size="Size.Large"
-    Style="margin:2px;"
-    title="@Loc["ImportCombatsBtnTitle"]">
+               Variant="Variant.Outlined"
+               StartIcon="@Icons.Material.Filled.Download"
+               Color="@Color.Primary"
+               title="@Loc["ImportCombatsBtnTitle"]">
         @Loc["ImportCombatsBtn"]
     </MudButton>
-</div>
+    <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
+</MudStack>
 
-<div style="background-color:#0F0F0F;padding:20px;border-radius:10px;">
-    @for (char chr = 'a'; chr <= 'z'; chr++)
-    {
-        @if (CombatService.GetCombatList().Find(x => x.Name.ToLower().StartsWith(chr)) != null)
+@if (CombatService.GetCombatList().Count == 0)
+{
+    <p class="dc-empty">@Loc["NoCombats"]</p>
+}
+
+@foreach (var group in CombatService.GetCombatList()
+    .GroupBy(c => InitialOf(c.Name))
+    .OrderBy(g => g.Key, StringComparer.CurrentCulture))
+{
+    <div class="dc-cat-header">@group.Key</div>
+    <div class="dc-grid">
+        @foreach (DCCombat combat in group.OrderBy(c => c.Name, StringComparer.CurrentCulture))
         {
-            <div style="border-bottom:solid; border-bottom-width:1px; border-bottom-color:grey;">
-                <h4>@chr.ToString().ToUpper()</h4>
-            </div>
-            <div style="display:flex; flex-wrap:wrap;">
-                @foreach (DCCombat combat in CombatService.GetCombatList().FindAll(x => x.Name.ToLower().StartsWith(chr)))
-                {
-                    <div style="display:flex; flex-wrap:nowrap; align-items:start; margin:5px; border-radius:5px; background-color:#303030;">
-                        <div style="margin:5px; max-width:350px;">
-                            <h4><a href="/combatmanager/@combat.Id.ToString()">@combat.Name</a></h4>
-                        </div>
-                        <div style="margin:5px;">
-                            @if (CombatService.IsCombatFavorite(combat.Id.ToString()))
-                            {
-                                <MudIconButton OnClick="() => {CombatService.RemoveCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Warning" Size="Size.Large"></MudIconButton>
-                            } else
-                            {
-                                <MudIconButton OnClick="() => {CombatService.AddCombatToFavoriteByGUID(combat.Id.ToString()); StateHasChanged();}" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Star" Color="@Color.Secondary" Size="Size.Large"></MudIconButton>
-                            }
-                        </div>
-                        <div style="margin:5px;">
-                            @if (_showEditionButtons)
-                            {
-                                <MudIconButton OnClick="() => Edit(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Edit" Color="@Color.Primary" Size="Size.Large" title="@Loc["CombatEditBtn"]"></MudIconButton>
-                                <MudIconButton OnClick="() => ExportCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Upload" Color="@Color.Primary" Size="Size.Large" title="@Loc["CombatExportBtn"]"></MudIconButton>
-                                <MudIconButton OnClick="() => CombatService.DeleteCombat(combat)" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Large" title="@Loc["CombatDeleteBtn"]"></MudIconButton>
-                            }
-                        </div>
-                    </div>
-                }
+            var c = combat;
+            var isFavorite = CombatService.IsCombatFavorite(c.Id.ToString());
+            <div class="dc-card" @onclick="@(() => Navigation.NavigateTo($"/combatmanager/{c.Id}"))">
+                <div class="dc-icon">
+                    <MudIcon Icon="@Icons.Material.Filled.Shield" />
+                </div>
+                <div class="dc-body">
+                    <div class="dc-name">@c.Name</div>
+                    <div class="dc-meta">@MetaOf(c)</div>
+                </div>
+                <div @onclick:stopPropagation="true">
+                    <MudIconButton OnClick="() => ToggleFavorite(c)"
+                                   Icon="@(isFavorite ? Icons.Material.Filled.Star : Icons.Material.Filled.StarBorder)"
+                                   Color="@(isFavorite ? Color.Warning : Color.Default)"
+                                   title="@Loc["FavoriteBtn"]" />
+                    @if (_showEditionButtons)
+                    {
+                        <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["CombatEditBtn"]" />
+                        <MudIconButton OnClick="() => ExportCombat(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["CombatExportBtn"]" />
+                        <MudIconButton OnClick="() => CombatService.DeleteCombat(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["CombatDeleteBtn"]" />
+                    }
+                </div>
             </div>
         }
-    }
-
-</div>
+    </div>
+}
 
 @code {
     private bool _showEditionButtons;
+
+    /// Grouping key: the first letter, or "#" for names starting with anything else
+    /// (digits, punctuation). The old 'a'..'z' loop silently hid those entries.
+    private static string InitialOf(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "#";
+        var first = char.ToUpperInvariant(name.TrimStart()[0]);
+        return char.IsLetter(first) ? first.ToString() : "#";
+    }
+
+    private string MetaOf(DCCombat combat)
+    {
+        var parts = new List<string>
+        {
+            $"{combat.CreaturesList.Count} {Loc["CreaturesMeta"]}"
+        };
+
+        if (combat.DurationCount > 0)
+        {
+            parts.Add($"{combat.DurationCount} {Loc["RoundsMeta"]}");
+        }
+
+        return string.Join(" · ", parts);
+    }
+
+    private void ToggleFavorite(DCCombat combat)
+    {
+        var guid = combat.Id.ToString();
+        if (CombatService.IsCombatFavorite(guid))
+        {
+            CombatService.RemoveCombatToFavoriteByGUID(guid);
+        }
+        else
+        {
+            CombatService.AddCombatToFavoriteByGUID(guid);
+        }
+        StateHasChanged();
+    }
 
     private void Edit(DCCombat combat)
     {

@@ -141,4 +141,22 @@
   <data name="PlayersTitle" xml:space="preserve">
     <value>Players</value>
   </data>
+  <data name="ExplorerTitle" xml:space="preserve">
+    <value>Creatures</value>
+  </data>
+  <data name="ExplorerSubtitle" xml:space="preserve">
+    <value>Your bestiary and player characters — reusable stat blocks you drop into combats.</value>
+  </data>
+  <data name="NoCreatures" xml:space="preserve">
+    <value>No creatures yet. Create one to get started.</value>
+  </data>
+  <data name="NoPlayers" xml:space="preserve">
+    <value>No player characters yet.</value>
+  </data>
+  <data name="FieldsMeta" xml:space="preserve">
+    <value>field(s)</value>
+  </data>
+  <data name="SheetMeta" xml:space="preserve">
+    <value>sheet</value>
+  </data>
 </root>

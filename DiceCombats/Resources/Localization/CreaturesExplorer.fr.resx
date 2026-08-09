@@ -141,4 +141,22 @@
   <data name="PlayersTitle" xml:space="preserve">
     <value>Personnages joueurs</value>
   </data>
+  <data name="ExplorerTitle" xml:space="preserve">
+    <value>Créatures</value>
+  </data>
+  <data name="ExplorerSubtitle" xml:space="preserve">
+    <value>Votre bestiaire et vos personnages joueurs — des fiches réutilisables à placer dans vos combats.</value>
+  </data>
+  <data name="NoCreatures" xml:space="preserve">
+    <value>Aucune créature pour l'instant. Créez-en une pour commencer.</value>
+  </data>
+  <data name="NoPlayers" xml:space="preserve">
+    <value>Aucun personnage joueur pour l'instant.</value>
+  </data>
+  <data name="FieldsMeta" xml:space="preserve">
+    <value>champ(s)</value>
+  </data>
+  <data name="SheetMeta" xml:space="preserve">
+    <value>fiche</value>
+  </data>
 </root>

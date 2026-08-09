@@ -26,26 +26,30 @@
         margin: 10px;
     }
 
-    .masonry-layout {
+    /* Own class names on purpose: this popup is rendered inside a creature card
+       of the combat manager's own masonry grid, and Masonry collects items from
+       the whole subtree of its container. Sharing '.masonry-item' made the outer
+       grid adopt these items and reserve empty rows for them. */
+    .dpf-masonry-layout {
         display: flex;
         flex-wrap: wrap;
         gap: 1rem;
     }
 
-    .masonry-item {
+    .dpf-masonry-item {
         display: block;
         width: calc(50% - 1rem);
         margin-bottom: 1rem;
     }
 
     @@media screen and (max-width: 768px) {
-        .masonry-item {
+        .dpf-masonry-item {
             width: calc(100% - 1rem);
         }
     }
 
     @@media screen and (max-width: 480px) {
-        .masonry-item {
+        .dpf-masonry-item {
             width: 100%;
         }
     }
@@ -89,16 +93,27 @@
 </style>
 
 <script>
-    window.initializeMasonry = (selector) => {
-        const grid = document.querySelector(selector);
-        if (grid) {
-            new Masonry(grid, {
-                itemSelector: '.masonry-item',
-                columnWidth: '.masonry-item',
+    // Kept separate from the combat manager's initializeMasonry: both scripts are
+    // global, so a shared name meant whichever component rendered last defined it.
+    // Takes the popup's own root element: one popup exists per creature card, so
+    // looking grids up by id picked the wrong one (and only ever the first).
+    window.initializeDetailedPopupMasonry = (root) => {
+        if (!root) {
+            return;
+        }
+        root.querySelectorAll('.dpf-masonry-layout').forEach(grid => {
+            if (grid.dcMasonry) {
+                grid.dcMasonry.reloadItems();
+                grid.dcMasonry.layout();
+                return;
+            }
+            grid.dcMasonry = new Masonry(grid, {
+                itemSelector: '.dpf-masonry-item',
+                columnWidth: '.dpf-masonry-item',
                 percentPosition: true,
                 gutter: 10
             });
-        }
+        });
     };
 </script>
 
@@ -357,15 +372,18 @@ else
                       DebounceInterval="1000" />
     </div>
 
+    @* Wrapper so the initializer can reach this popup's grids without ids: there
+       is one html/pdf grid per group, and one popup per creature card. *@
+    <div @ref="_gridsRoot">
     @if (DetailedPopupField.RenderModeGridEnabled)
     {
         @foreach (var g in _visibleGroups.Where(g => g.Kind == "html" || g.Kind == "pdf"))
         {
             <div style="margin:10px;"><span class="chip">@g.Title</span></div>
-            <div id="masonry-layout-detailed-popup-1" class="masonry-layout" data-kind="@g.Kind">
+            <div class="dpf-masonry-layout" data-kind="@g.Kind">
                 @foreach (var p in g.Pieces)
                 {
-                    <div class="masonry-item">
+                    <div class="dpf-masonry-item">
                         <div class="DetailedPopupSubFieldBox">
                             @if (!string.IsNullOrWhiteSpace(p.ParentName))
                             {
@@ -382,11 +400,11 @@ else
 
         @if (tmGroups.Count > 0)
         {
-            <div id="masonry-layout-detailed-popup-2" class="masonry-layout" data-kind="text-markdown">
+            <div class="dpf-masonry-layout" data-kind="text-markdown">
 
                 @foreach (var g in tmGroups)
                 {
-                    <div class="masonry-item">
+                    <div class="dpf-masonry-item">
                         <div style="margin:10px;"><span class="chip">@g.Title</span></div>
 
                         @foreach (var p in g.Pieces)
@@ -417,11 +435,14 @@ else
             }
         }
     }
+    </div>
 }
 
 @code {
     [Parameter] public DCCreatureDetailedPopupField DetailedPopupField { get; set; } = default!;
     [Parameter] public bool EditionMode { get; set; } = false;
+
+    private ElementReference _gridsRoot;
 
     private record PieceVM(string? ParentName, string Kind, RenderFragment UI, IIndexedText Index, string? Key);
     private record GroupVM(string Title, string Kind, List<PieceVM> Pieces);
@@ -449,8 +470,10 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup-1");
-        await JSRuntime.InvokeVoidAsync("initializeMasonry", "#masonry-layout-detailed-popup-2");
+        // The wrapper only exists outside edition mode.
+        if (EditionMode) return;
+
+        await JSRuntime.InvokeVoidAsync("initializeDetailedPopupMasonry", _gridsRoot);
     }
 
     protected override void OnParametersSet()

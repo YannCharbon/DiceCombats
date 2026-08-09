@@ -20,6 +20,10 @@ namespace DiceCombats
         public DCJsonMitigatorId JsonMitigatorId { get; set; } = DCJsonMitigatorId.COMBAT;
         public Guid Id { get; set; } = Guid.Empty;
         public string Name { get; set; } = string.Empty;
+        // Empty means the combat sits outside any campaign, listed on its own in
+        // the explorer. Campaigns are plain names, not entities: a campaign
+        // exists exactly as long as at least one combat carries its name.
+        public string Campaign { get; set; } = string.Empty;
         public string Notes {  get; set; } = string.Empty;
         public int DurationCount { get; set; } = 0;
         public List<DCCreature> CreaturesList { get; set; } = new List<DCCreature>();

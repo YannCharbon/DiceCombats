@@ -26,6 +26,7 @@ namespace DiceCombats
         private List<DCCombat> _CombatsList = new List<DCCombat>();
         private List<string> _favoriteCombats = new List<string>();
         private List<DCCreatureCustomField> _userCreatureCustomFields = new List<DCCreatureCustomField>();
+        private List<DCPlayerGroup> _playerGroups = new List<DCPlayerGroup>();
 
         public DiceCombatsService()
         {
@@ -33,6 +34,7 @@ namespace DiceCombats
             _ = LoadCombatsListAsync();
             _ = LoadFavoriteCombatsListAsync();
             _ = LoadUserCreatureCustomFieldsListAsync();
+            _ = LoadPlayerGroupsListAsync();
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -163,6 +165,44 @@ namespace DiceCombats
             }
         }
 
+        // Campaigns are derived from the combats themselves, so there is no separate
+        // list to keep in sync, so renaming/emptying one can never leave a ghost.
+
+        public List<string> GetCampaigns()
+        {
+            return _CombatsList
+                .Where(x => !string.IsNullOrWhiteSpace(x.Campaign))
+                .Select(x => x.Campaign)
+                .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                .OrderBy(x => x, StringComparer.CurrentCulture)
+                .ToList();
+        }
+
+        public List<DCCombat> GetCombatsOfCampaign(string campaign)
+        {
+            return _CombatsList.FindAll(x => string.Equals(x.Campaign, campaign, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        public void SetCombatCampaign(DCCombat combat, string campaign)
+        {
+            combat.Campaign = (campaign ?? string.Empty).Trim();
+            SaveCombats();
+        }
+
+        /// <summary>
+        /// Renames a campaign by moving every combat that carries the old name.
+        /// An empty new name simply takes those combats out of any campaign.
+        /// </summary>
+        public void RenameCampaign(string oldName, string newName)
+        {
+            string trimmed = (newName ?? string.Empty).Trim();
+            foreach (DCCombat combat in GetCombatsOfCampaign(oldName))
+            {
+                combat.Campaign = trimmed;
+            }
+            SaveCombats();
+        }
+
         public void AddCombatToFavoriteByGUID(string guid)
         {
             if (_favoriteCombats.Contains(guid) == false)
@@ -287,6 +327,72 @@ namespace DiceCombats
                 if (temp != null)
                 {
                     _userCreatureCustomFields = temp;
+                }
+            }
+        }
+
+        // Player groups
+
+        public List<DCPlayerGroup> GetPlayerGroups() { return _playerGroups; }
+
+        public void AddPlayerGroup(DCPlayerGroup group)
+        {
+            _playerGroups.Add(group);
+            _ = SavePlayerGroupsListAsync();
+        }
+
+        public void DeletePlayerGroup(DCPlayerGroup group)
+        {
+            _playerGroups.Remove(group);
+            _ = SavePlayerGroupsListAsync();
+        }
+
+        public void SavePlayerGroups()
+        {
+            _ = SavePlayerGroupsListAsync();
+        }
+
+        /// <summary>
+        /// Resolves a group to the creatures that still exist, in the group's own
+        /// order. Members deleted from the bestiary meanwhile are simply skipped.
+        /// </summary>
+        public List<DCCreature> GetPlayerGroupMembers(DCPlayerGroup group)
+        {
+            return group.PlayerIds
+                .Select(id => _CreatureList.Find(x => x.Id == id))
+                .Where(x => x != null)
+                .Select(x => x!)
+                .ToList();
+        }
+
+        private static string playerGroupsFilePath = Path.Combine(FileSystem.AppDataDirectory, "playerGroups.json");
+
+        public async Task SavePlayerGroupsListAsync()
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+            string json = JsonSerializer.Serialize(_playerGroups, options);
+            await File.WriteAllTextAsync(playerGroupsFilePath, json);
+            Debug.WriteLine($"Write file to {playerGroupsFilePath}");
+        }
+
+        public async Task LoadPlayerGroupsListAsync()
+        {
+            if (File.Exists(playerGroupsFilePath))
+            {
+                Debug.WriteLine($"File {playerGroupsFilePath} exists");
+                string json = await File.ReadAllTextAsync(playerGroupsFilePath);
+                var options = new JsonSerializerOptions
+                {
+                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+                };
+                var temp = JsonSerializer.Deserialize<List<DCPlayerGroup>>(json, options);
+                if (temp != null)
+                {
+                    _playerGroups = temp;
                 }
             }
         }

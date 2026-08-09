@@ -153,4 +153,16 @@
   <data name="UpdateCreaturesBtnTitle" xml:space="preserve">
     <value>Synchronize creatures with newest fields</value>
   </data>
+  <data name="Campaign" xml:space="preserve">
+    <value>Campaign</value>
+  </data>
+  <data name="CampaignHelper" xml:space="preserve">
+    <value>Pick one or type a new name</value>
+  </data>
+  <data name="QuickAddGroupBtn" xml:space="preserve">
+    <value>Add a player group</value>
+  </data>
+  <data name="UnnamedPlayerGroup" xml:space="preserve">
+    <value>(unnamed group)</value>
+  </data>
 </root>

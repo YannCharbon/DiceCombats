@@ -18,19 +18,40 @@
         box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
         border: 1px solid #505050;
         border-radius: 10px;
-        display: inline-block;
+        /* Column flex so the creature list below the search/quick-add controls
+           takes exactly the leftover height instead of a hardcoded one, which
+           overflowed the box as soon as a control was added above it. */
+        display: flex;
+        flex-direction: column;
         vertical-align: top;
         white-space: normal;
         padding: 10px;
         margin: 10px;
         width: 100%;
         height: 500px;
-        min-width:350px;
+        min-width: 350px;
+        box-sizing: border-box;
+    }
+
+    .CombatEditorCreatureList {
+        flex: 1 1 auto;
+        min-height: 0; /* required for the child to scroll instead of growing */
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 </style>
 
-<MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
+@* AlignItems.Center: without it the row stretches the buttons to the height of
+   the tallest field, which made them look bulky next to the campaign picker. *@
+<MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center">
     <MudTextField Label="Combat name" Variant="Variant.Outlined" T="string" @bind-Value="Combat.Name"></MudTextField>
+    @* Free text: picking an existing campaign or typing a brand new one both
+       just set the combat's Campaign, and clearing it takes the combat back out. *@
+    <MudAutocomplete T="string" Label="@Loc["Campaign"]" Variant="Variant.Outlined"
+                     Value="@Combat.Campaign" ValueChanged="@((string v) => SetCampaign(v))"
+                     SearchFunc="@SearchCampaigns" CoerceValue="true" Clearable="true"
+                     Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.FolderOpen"
+                     Placeholder="@Loc["CampaignHelper"]" />
     <MudButton OnClick="SyncCreatures" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" Title="@Loc["UpdateCreaturesBtnTitle"]" Size="Size.Large">@Loc["UpdateCreatureBtn"]</MudButton>
     <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">@Loc["DeleteCombatBtn"]</MudButton>
 </MudStack>
@@ -42,7 +63,24 @@
             <div style="padding-bottom:10px;">
                 <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="@Loc["SearchCreature"]" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
             </div>
-            <div style="height:370px;overflow-y:scroll;overflow-x:hidden;">
+            @* Quick add: drop a whole party in at once instead of ticking players one by one. *@
+            @if (CombatService.GetPlayerGroups().Count > 0)
+            {
+                <div style="padding-bottom:10px;">
+                    <MudMenu Label="@Loc["QuickAddGroupBtn"]" Variant="Variant.Filled" Color="@Color.Primary"
+                             StartIcon="@Icons.Material.Filled.GroupAdd" Dense="true">
+                        @foreach (DCPlayerGroup group in CombatService.GetPlayerGroups())
+                        {
+                            var g = group;
+                            var members = CombatService.GetPlayerGroupMembers(g);
+                            <MudMenuItem OnClick="() => AddPlayerGroup(g)">
+                                @(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name) (@members.Count)
+                            </MudMenuItem>
+                        }
+                    </MudMenu>
+                </div>
+            }
+            <div class="CombatEditorCreatureList">
                 @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.Name))
                 {
                     @if (creature.IsPlayer)
@@ -166,9 +204,35 @@
         Navigation.NavigateTo("/combatsexplorer");
     }
 
+    private void SetCampaign(string campaign)
+    {
+        // Saved with the rest of the combat when the selector modal closes.
+        Combat.Campaign = (campaign ?? string.Empty).Trim();
+    }
+
+    private Task<IEnumerable<string>> SearchCampaigns(string value, CancellationToken token)
+    {
+        var campaigns = CombatService.GetCampaigns();
+        if (!string.IsNullOrWhiteSpace(value))
+        {
+            campaigns = campaigns.FindAll(x => x.Contains(value, StringComparison.CurrentCultureIgnoreCase));
+        }
+        return Task.FromResult<IEnumerable<string>>(campaigns);
+    }
+
+    private void AddPlayerGroup(DCPlayerGroup group)
+    {
+        foreach (DCCreature player in CombatService.GetPlayerGroupMembers(group))
+        {
+            AddCreature(player);
+        }
+    }
+
     private void AddCreature(DCCreature creature)
     {
-        if (!Combat.CreaturesList.Contains(creature))
+        // Matched by name like the rest of the selector: the combat holds clones,
+        // so a reference check would let the same creature in twice.
+        if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
         {
             Combat.AddCreature((DCCreature)creature.Clone());
         }

@@ -27,6 +27,7 @@ namespace DiceCombats
         private List<string> _favoriteCombats = new List<string>();
         private List<DCCreatureCustomField> _userCreatureCustomFields = new List<DCCreatureCustomField>();
         private List<DCPlayerGroup> _playerGroups = new List<DCPlayerGroup>();
+        private List<DCCombatLogSession> _combatLogs = new List<DCCombatLogSession>();
 
         public DiceCombatsService()
         {
@@ -35,6 +36,7 @@ namespace DiceCombats
             _ = LoadFavoriteCombatsListAsync();
             _ = LoadUserCreatureCustomFieldsListAsync();
             _ = LoadPlayerGroupsListAsync();
+            _ = LoadCombatLogsListAsync();
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -119,6 +121,7 @@ namespace DiceCombats
         public void DeleteCombat(DCCombat combat)
         {
             _CombatsList.Remove(combat);
+            DeleteCombatLogSessions(combat.Id);
         }
 
         public void SaveCombats()
@@ -327,6 +330,86 @@ namespace DiceCombats
                 if (temp != null)
                 {
                     _userCreatureCustomFields = temp;
+                }
+            }
+        }
+
+        // Combat logs
+        //
+        // Kept in their own file rather than on the combat: a combat is exported
+        // and imported as a whole, and play history has no business travelling
+        // with it. Sessions are trimmed so the file cannot grow without bound.
+
+        private const int MaxLogSessionsPerCombat = 10;
+
+        public List<DCCombatLogSession> GetCombatLogSessions(System.Guid combatId)
+        {
+            return _combatLogs
+                .FindAll(x => x.CombatId == combatId)
+                .OrderByDescending(x => x.StartedAt)
+                .ToList();
+        }
+
+        public void AddCombatLogSession(DCCombatLogSession session)
+        {
+            _combatLogs.Add(session);
+
+            var forCombat = _combatLogs.FindAll(x => x.CombatId == session.CombatId).OrderByDescending(x => x.StartedAt).ToList();
+            foreach (var old in forCombat.Skip(MaxLogSessionsPerCombat))
+            {
+                _combatLogs.Remove(old);
+            }
+
+            SaveCombatLogs();
+        }
+
+        public void DeleteCombatLogSession(DCCombatLogSession session)
+        {
+            _combatLogs.Remove(session);
+            SaveCombatLogs();
+        }
+
+        public void DeleteCombatLogSessions(System.Guid combatId)
+        {
+            if (_combatLogs.RemoveAll(x => x.CombatId == combatId) > 0)
+            {
+                SaveCombatLogs();
+            }
+        }
+
+        private static string combatLogsFilePath = Path.Combine(FileSystem.AppDataDirectory, "combatLogs.json");
+
+        /// <summary>
+        /// Written synchronously: a session is stored when the fight ends, which
+        /// is often the moment the app is closing, and a background write would
+        /// not get the chance to finish.
+        /// </summary>
+        public void SaveCombatLogs()
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+            };
+            string json = JsonSerializer.Serialize(_combatLogs, options);
+            File.WriteAllText(combatLogsFilePath, json);
+            Debug.WriteLine($"Write file to {combatLogsFilePath}");
+        }
+
+        public async Task LoadCombatLogsListAsync()
+        {
+            if (File.Exists(combatLogsFilePath))
+            {
+                Debug.WriteLine($"File {combatLogsFilePath} exists");
+                string json = await File.ReadAllTextAsync(combatLogsFilePath);
+                var options = new JsonSerializerOptions
+                {
+                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+                };
+                var temp = JsonSerializer.Deserialize<List<DCCombatLogSession>>(json, options);
+                if (temp != null)
+                {
+                    _combatLogs = temp;
                 }
             }
         }

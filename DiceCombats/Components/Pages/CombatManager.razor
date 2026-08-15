@@ -14,6 +14,8 @@
 @inject IJSRuntime JSRuntime
 @inject IStringLocalizer<Resources.Localization.CombatManager> Loc
 @inject DiceCombats.Automations.IDiceEventPublisher EventPublisher
+@inject DiceCombats.Automations.CombatLogService CombatLog
+@inject IDialogService DialogService
 
 <style>
     .CombatEditorFloatingInitiativeWindow {
@@ -140,6 +142,32 @@
         color: #00B0B0;
     }
 
+    .combat-recording {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #4E1414;
+        border: 1px solid #A03030;
+        border-radius: 30px;
+        padding: 2px 10px;
+        font-size: 0.85rem;
+        color: #FFB0B0;
+    }
+
+    .combat-recording-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background-color: #E04545;
+        animation: combat-recording-blink 1.6s ease-in-out infinite;
+    }
+
+    @@keyframes combat-recording-blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.25; }
+        100% { opacity: 1; }
+    }
+
 </style>
 
 <script>
@@ -227,14 +255,29 @@
         }
         <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StopTimer" Icon="@Icons.Material.Filled.Stop" Title="@Loc["StopBtn"]" />
         <MudItem Style="font-size: large;">@GetDurationAsString()</MudItem>
+        @if (CombatLog.IsRecording)
+        {
+            <MudItem>
+                <span class="combat-recording">
+                    <span class="combat-recording-dot"></span>
+                    @Loc["LogRecording"] @string.Format(Loc["LogRound"], CombatLog.CurrentRound)
+                </span>
+            </MudItem>
+        }
+        <MudButton OnClick="OpenCombatLogModal" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Dvr" Color="@Color.Primary">@Loc["LogBtn"]</MudButton>
     </MudStack>
 </div>
+
+<GenericModal TContent="CombatLogPopup" @ref="CombatLogModalRef">
+    <CombatLogPopup Combat="_combat" />
+</GenericModal>
 
 
 <div style="margin-top:5px;margin-bottom:10px;">
     <MudTextField Sizing="InputSizing.Auto" spellcheck="false" @bind-Value="_combat.Notes" Label="@Loc["NotesTb"]" Class="NotesLabel" Variant="Variant.Outlined"></MudTextField>
 </div>
 
+<CascadingValue Value="@BuildDamageSourceContext()" IsFixed="false">
 <div id="masonry-layout" class="masonry-layout">
     @foreach (DCCreature creature in _combat.CreaturesList)
     {
@@ -338,6 +381,7 @@
         </div>
     }
 </div>
+</CascadingValue>
 <div style="height:450px">
     <!--Some margin-->
 </div>
@@ -352,6 +396,7 @@
     private List<DCCreature> _initiativeWindowCreatureListCopy = new List<DCCreature>();
 
     private GenericModal<CreaturesSelector>? CreaturesSelectorModalRef;
+    private GenericModal<CombatLogPopup>? CombatLogModalRef;
 
     private bool _initiativeWindowsMaximized = true;
 
@@ -438,6 +483,7 @@
         }
 
         _currentInitiativeCreature = _initiativeWindowCreatureListCopy.First();
+        await AskToStartCombat();
         await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent
         {
             Type = DiceCombats.Automations.DiceEventTypes.InitiativeSorted,
@@ -492,6 +538,11 @@
         CreaturesSelectorModalRef?.Show();
     }
 
+    private void OpenCombatLogModal()
+    {
+        CombatLogModalRef?.Show();
+    }
+
     private void HandleCreaturesSelectorModalClose(bool result)
     {
         _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
@@ -524,8 +575,46 @@
         InvokeAsync(StateHasChanged);
     }
 
+    /// Everyone in the fight can be credited for damage, and the creature
+    /// holding the initiative is the suggestion.
+    private DCDamageSourceContext BuildDamageSourceContext()
+    {
+        // Before the initiative has been sorted there is no current creature, so
+        // the top of the list stands in for it.
+        string suggested = _combat.CreaturesList.Exists(x => x.Name == _currentInitiativeCreature.Name)
+            ? _currentInitiativeCreature.Name
+            : _initiativeWindowCreatureListCopy.FirstOrDefault()?.Name ?? string.Empty;
+
+        return new DCDamageSourceContext
+        {
+            Candidates = _combat.CreaturesList
+                .GroupBy(x => x.Name)
+                .Select(x => new DCDamageSourceCandidate { Name = x.Key, IsPlayer = x.Any(c => c.IsPlayer) })
+                .OrderByDescending(x => x.IsPlayer)
+                .ThenBy(x => x.Name, StringComparer.CurrentCulture)
+                .ToList(),
+            SuggestedSource = suggested
+        };
+    }
+
+    /// Sorting the initiative is the last thing done before the fight really
+    /// begins, so it is the natural place to offer starting the recording.
+    private async Task AskToStartCombat()
+    {
+        if (CombatLog.IsRecording) return;
+
+        bool? confirm = await DialogService.ShowMessageBoxAsync(
+            Loc["StartCombatTitle"],
+            Loc["StartCombatQuestion"],
+            yesText: Loc["StartCombatConfirmBtn"], cancelText: Loc["CancelBtn"]);
+        if (confirm != true) return;
+
+        await StartTimer();
+    }
+
     private async Task StartTimer()
     {
+        CombatLog.StartSession(_combat);
         _timer.Elapsed -= TimerElapsed;
         _timer.Elapsed += TimerElapsed;
         _timer.Start();
@@ -545,6 +634,7 @@
         _timer.Enabled = false;
         _timer.Elapsed -= TimerElapsed;
         _combat.DurationCount = 0;
+        CombatLog.EndSession();
         await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.TimerStopped, Category = "Timer", DisplayName = "Timer stopped", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["durationSeconds"] = _combat.DurationCount } });
     }
 

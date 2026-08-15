@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
   <data name="EditBtn" xml:space="preserve">
     <value>Edit</value>
   </data>
@@ -153,6 +156,108 @@
   <data name="InitiativeTitle" xml:space="preserve">
     <value>Initiative</value>
   </data>
+  <data name="LogAverageHit" xml:space="preserve">
+    <value>Average</value>
+  </data>
+  <data name="LogBestHit" xml:space="preserve">
+    <value>Best hit</value>
+  </data>
+  <data name="LogBtn" xml:space="preserve">
+    <value>Combat log</value>
+  </data>
+  <data name="LogByKind" xml:space="preserve">
+    <value>By kind</value>
+  </data>
+  <data name="LogDamage" xml:space="preserve">
+    <value>Damage</value>
+  </data>
+  <data name="LogDamageDealt" xml:space="preserve">
+    <value>Damage dealt</value>
+  </data>
+  <data name="LogDamageTaken" xml:space="preserve">
+    <value>Damage taken</value>
+  </data>
+  <data name="LogDamaged" xml:space="preserve">
+    <value>hit {0} for {1}</value>
+  </data>
+  <data name="LogDeleteBtn" xml:space="preserve">
+    <value>Delete session</value>
+  </data>
+  <data name="LogDeleteConfirmBtn" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="LogDeleteQuestion" xml:space="preserve">
+    <value>This recorded session will be lost.</value>
+  </data>
+  <data name="LogDeleteTitle" xml:space="preserve">
+    <value>Delete the session</value>
+  </data>
+  <data name="LogEmpty" xml:space="preserve">
+    <value>No session recorded for this combat yet.</value>
+  </data>
+  <data name="LogEntriesCount" xml:space="preserve">
+    <value>{0} events</value>
+  </data>
+  <data name="LogExportAllBtn" xml:space="preserve">
+    <value>Export all sessions</value>
+  </data>
+  <data name="LogExportBtn" xml:space="preserve">
+    <value>Export this session</value>
+  </data>
+  <data name="LogExportDone" xml:space="preserve">
+    <value>Combat log exported successfully</value>
+  </data>
+  <data name="LogExportTitle" xml:space="preserve">
+    <value>Combat log export</value>
+  </data>
+  <data name="LogHealed" xml:space="preserve">
+    <value>healed {0} for {1}</value>
+  </data>
+  <data name="LogHealing" xml:space="preserve">
+    <value>Healing</value>
+  </data>
+  <data name="LogHits" xml:space="preserve">
+    <value>Hits</value>
+  </data>
+  <data name="LogInferredHits" xml:space="preserve">
+    <value>{0} attributed automatically</value>
+  </data>
+  <data name="LogNoData" xml:space="preserve">
+    <value>Nothing recorded</value>
+  </data>
+  <data name="LogRecording" xml:space="preserve">
+    <value>Recording</value>
+  </data>
+  <data name="LogRound" xml:space="preserve">
+    <value>Round {0}</value>
+  </data>
+  <data name="LogRoundsCount" xml:space="preserve">
+    <value>{0} rounds</value>
+  </data>
+  <data name="LogSession" xml:space="preserve">
+    <value>Session</value>
+  </data>
+  <data name="LogSource" xml:space="preserve">
+    <value>Creature</value>
+  </data>
+  <data name="LogTarget" xml:space="preserve">
+    <value>Creature</value>
+  </data>
+  <data name="LogTimeline" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="LogTitle" xml:space="preserve">
+    <value>Combat log</value>
+  </data>
+  <data name="LogTotalDamage" xml:space="preserve">
+    <value>{0} damage</value>
+  </data>
+  <data name="LogTotalHealing" xml:space="preserve">
+    <value>{0} healing</value>
+  </data>
+  <data name="LogTurnOf" xml:space="preserve">
+    <value>Turn of {0}</value>
+  </data>
   <data name="NotesTb" xml:space="preserve">
     <value>General notes</value>
   </data>
@@ -161,6 +266,15 @@
   </data>
   <data name="PlayBtn" xml:space="preserve">
     <value>Start combat timer</value>
+  </data>
+  <data name="StartCombatConfirmBtn" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="StartCombatQuestion" xml:space="preserve">
+    <value>Initiative is sorted. Start the combat now and record the log?</value>
+  </data>
+  <data name="StartCombatTitle" xml:space="preserve">
+    <value>Start the combat</value>
   </data>
   <data name="StopBtn" xml:space="preserve">
     <value>Stop combat timer</value>

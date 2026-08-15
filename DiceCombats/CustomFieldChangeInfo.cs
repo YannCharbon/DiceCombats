@@ -16,5 +16,12 @@ public sealed class CustomFieldChangeInfo
     public int? StatIndex { get; set; }
     public string? StatName { get; set; }
     public string? TextLabel { get; set; }
+
+    // Hit points only: the lines of the applied attack and who to credit.
+    public List<DCDamageLineInfo> DamageLines { get; set; } = new();
+    public string? SourceName { get; set; }
+    public bool SourceInferred { get; set; }
+    public bool SourceIsPlayer { get; set; }
+
     public Dictionary<string, object?> Data { get; set; } = new();
 }

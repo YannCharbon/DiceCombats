@@ -90,6 +90,12 @@
   <data name="AutomationsSectionTitle" xml:space="preserve">
     <value>Automatisations</value>
   </data>
+  <data name="AvailableVariables" xml:space="preserve">
+    <value>Variables disponibles pour ce déclencheur ({0})</value>
+  </data>
+  <data name="AvailableVariablesHint" xml:space="preserve">
+    <value>Cliquer sur une variable pour la copier, puis la coller dans un corps de requête, une URL, un entête ou une condition.</value>
+  </data>
   <data name="BaseUrl" xml:space="preserve">
     <value>URL de base</value>
   </data>
@@ -107,6 +113,9 @@
   </data>
   <data name="CustomFieldEmptyAnyMatchingField" xml:space="preserve">
     <value>Champ personnalisé (vide = tout champ compatible)</value>
+  </data>
+  <data name="DamageKindEmptyAnyKind" xml:space="preserve">
+    <value>Type de dégâts (vide = tous les types)</value>
   </data>
   <data name="DefaultDelayName" xml:space="preserve">
     <value>Délai</value>
@@ -282,14 +291,23 @@
   <data name="PlaceholderWhenAllCreatureCustomFieldEvents" xml:space="preserve">
     <value>Tous les évènements de champ personnalisé de créature</value>
   </data>
+  <data name="PlaceholderWhenAttackApplied" xml:space="preserve">
+    <value>Attaque appliquée (le coup entier)</value>
+  </data>
   <data name="PlaceholderWhenCheckboxConditionOptions" xml:space="preserve">
     <value>Options de case à cocher et de condition</value>
+  </data>
+  <data name="PlaceholderWhenCombatSession" xml:space="preserve">
+    <value>Combat démarré ou terminé</value>
   </data>
   <data name="PlaceholderWhenCombatTimer" xml:space="preserve">
     <value>Minuteur de combat démarré/en pause/arrêté</value>
   </data>
   <data name="PlaceholderWhenCreatureGotLostInitiative" xml:space="preserve">
     <value>Créature qui gagne/perd l’initiative</value>
+  </data>
+  <data name="PlaceholderWhenDamageHealApplied" xml:space="preserve">
+    <value>Dégâts ou soins appliqués</value>
   </data>
   <data name="PlaceholderWhenGridCells" xml:space="preserve">
     <value>Cellules de grille de cases à cocher et de grille de texte</value>
@@ -327,6 +345,9 @@
   <data name="SaveSuccessTitle" xml:space="preserve">
     <value>Automatisations enregistrées</value>
   </data>
+  <data name="SourcesEmptyAnySource" xml:space="preserve">
+    <value>Attaquants (vide = n’importe qui)</value>
+  </data>
   <data name="StatEmptyAnyStat" xml:space="preserve">
     <value>Caractéristique (vide = toute caractéristique)</value>
   </data>
@@ -363,6 +384,9 @@
   <data name="Trigger" xml:space="preserve">
     <value>Déclencheur</value>
   </data>
+  <data name="TriggerCategory_Combatlog" xml:space="preserve">
+    <value>Journal de combat</value>
+  </data>
   <data name="TriggerCategory_Combattimer" xml:space="preserve">
     <value>Minuteur de combat</value>
   </data>
@@ -377,6 +401,9 @@
   </data>
   <data name="TriggerDisplay_AnyCustomFieldChanged" xml:space="preserve">
     <value>Champ personnalisé modifié</value>
+  </data>
+  <data name="TriggerDisplay_AttackApplied" xml:space="preserve">
+    <value>Attaque appliquée</value>
   </data>
   <data name="TriggerDisplay_CheckboxGridCellChanged" xml:space="preserve">
     <value>Cellule de grille de cases à cocher modifiée</value>
@@ -417,8 +444,14 @@
   <data name="TriggerDisplay_CreatureLostInitiative" xml:space="preserve">
     <value>Créature qui perd l’initiative</value>
   </data>
+  <data name="TriggerDisplay_DamageApplied" xml:space="preserve">
+    <value>Dégâts appliqués</value>
+  </data>
   <data name="TriggerDisplay_DetailedPopupOpened" xml:space="preserve">
     <value>Popup détaillée ouverte</value>
+  </data>
+  <data name="TriggerDisplay_HealApplied" xml:space="preserve">
+    <value>Soins appliqués</value>
   </data>
   <data name="TriggerDisplay_HitPointsChanged" xml:space="preserve">
     <value>Points de vie modifiés</value>
@@ -456,6 +489,12 @@
   <data name="TriggerDisplay_NumericThreshold" xml:space="preserve">
     <value>Champ numérique ayant franchi une valeur</value>
   </data>
+  <data name="TriggerDisplay_SessionEnded" xml:space="preserve">
+    <value>Combat terminé</value>
+  </data>
+  <data name="TriggerDisplay_SessionStarted" xml:space="preserve">
+    <value>Combat démarré</value>
+  </data>
   <data name="TriggerDisplay_StatsChanged" xml:space="preserve">
     <value>Valeur de caractéristique modifiée</value>
   </data>
@@ -492,17 +531,26 @@
   <data name="TriggerSummaryAnyCreature" xml:space="preserve">
     <value>n’importe quelle créature</value>
   </data>
+  <data name="TriggerSummaryAnyDamageKind" xml:space="preserve">
+    <value>n’importe quel type de dégâts</value>
+  </data>
   <data name="TriggerSummaryAnyMatchingField" xml:space="preserve">
     <value>tout champ compatible</value>
   </data>
   <data name="TriggerSummaryAnyOption" xml:space="preserve">
     <value>toute option</value>
   </data>
+  <data name="TriggerSummaryAnySource" xml:space="preserve">
+    <value>n’importe qui</value>
+  </data>
   <data name="TriggerSummaryAnyStat" xml:space="preserve">
     <value>toute caractéristique</value>
   </data>
   <data name="TriggerSummaryCreatureFilter" xml:space="preserve">
     <value>Se déclenche pour {0}.</value>
+  </data>
+  <data name="TriggerSummaryDamage" xml:space="preserve">
+    <value>Se déclenche quand {0} inflige {1} à {2}.</value>
   </data>
   <data name="TriggerSummaryDefault" xml:space="preserve">
     <value>Se déclenche sur : {0}.</value>
@@ -521,6 +569,9 @@
   </data>
   <data name="TriggerSummaryOptionChanged" xml:space="preserve">
     <value>Se déclenche lorsque {0} dans {1} change sur {2}.</value>
+  </data>
+  <data name="TriggerSummarySource" xml:space="preserve">
+    <value>Se déclenche quand {0} affecte {1}.</value>
   </data>
   <data name="TriggerSummaryStat" xml:space="preserve">
     <value>la caractéristique « {0} »</value>

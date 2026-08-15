@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
@@ -18,7 +18,22 @@ public sealed class EventTemplateRenderer
 {
     private static readonly Regex PlaceholderRegex = new("{{\\s*(.*?)\\s*}}", RegexOptions.Compiled);
     public string Render(string? template, DiceEvent diceEvent)
-        => string.IsNullOrEmpty(template) ? string.Empty : PlaceholderRegex.Replace(template, m => ResolvePath(diceEvent, m.Groups[1].Value)?.ToString() ?? string.Empty);
+        => string.IsNullOrEmpty(template) ? string.Empty : PlaceholderRegex.Replace(template, m => FormatValue(ResolvePath(diceEvent, m.Groups[1].Value)));
+
+    /// <summary>
+    /// Rendered for a machine, not for the screen: a decimal keeps its dot and a
+    /// boolean is written the way JSON expects it, whatever the app language is.
+    /// </summary>
+    private static string FormatValue(object? value)
+    {
+        return value switch
+        {
+            null => string.Empty,
+            bool flag => flag ? "true" : "false",
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? string.Empty
+        };
+    }
 
     public object? ResolvePath(DiceEvent diceEvent, string path)
     {
@@ -74,6 +89,13 @@ public sealed class EventConditionEvaluator
             return false;
         }
 
+        if (entry.SupportsSourceFilter && trigger.SourceNames.Count > 0 && !trigger.SourceNames.Contains(GetDataText(diceEvent, "sourceName"), StringComparer.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        if (entry.SupportsDamageKindFilter && !string.IsNullOrWhiteSpace(trigger.DamageKind) && !HasDamageKind(diceEvent, trigger.DamageKind)) return false;
+
         if (!string.IsNullOrWhiteSpace(trigger.FieldTitle) && !TextEquals(GetDataText(diceEvent, "fieldTitle"), trigger.FieldTitle)) return false;
         if (!string.IsNullOrWhiteSpace(entry.FieldType) && !TextEquals(GetDataText(diceEvent, "fieldType"), entry.FieldType)) return false;
         if (!string.IsNullOrWhiteSpace(trigger.OptionName) && !TextEquals(GetDataText(diceEvent, "optionName"), trigger.OptionName)) return false;
@@ -90,6 +112,19 @@ public sealed class EventConditionEvaluator
             null or "" => true,
             _ => false
         };
+    }
+
+    /// <summary>
+    /// A single damage line carries one kind, a whole attack carries the list of
+    /// the kinds it was made of, and the filter has to match either.
+    /// </summary>
+    private static bool HasDamageKind(DiceEvent diceEvent, string damageKind)
+    {
+        if (TextEquals(GetDataText(diceEvent, "damageKind"), damageKind)) return true;
+
+        return GetDataText(diceEvent, "damageKinds")
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Contains(damageKind, StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool EvaluateTriggerThreshold(EventTriggerDefinition trigger, DiceEvent diceEvent, string oldKey, string newKey)
@@ -207,8 +242,24 @@ public sealed class DiceEventDispatcher : IDiceEventPublisher
     public DiceEventDispatcher(AutomationConfigurationService configService, EventConditionEvaluator conditionEvaluator, EventTemplateRenderer renderer)
     { _configService = configService; _conditionEvaluator = conditionEvaluator; _renderer = renderer; }
 
+    /// <summary>
+    /// Raised for every published event, before the automations are matched.
+    /// The single funnel anything interested in the whole event stream, such as
+    /// the combat log, can subscribe to without touching the call sites.
+    /// </summary>
+    public event Action<DiceEvent>? EventPublished;
+
     public Task PublishAsync(DiceEvent diceEvent, CancellationToken cancellationToken = default)
     {
+        try
+        {
+            EventPublished?.Invoke(diceEvent);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Event observer failed: {ex.Message}");
+        }
+
         _ = Task.Run(() => DispatchInternalAsync(diceEvent), CancellationToken.None);
         return Task.CompletedTask;
     }

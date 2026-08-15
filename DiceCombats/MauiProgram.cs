@@ -87,6 +87,8 @@ namespace DiceCombats
                             // Attach to the Closing event and use the service provider
                             _appWindow.Closing += (s, e) =>
                             {
+                                ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
+
                                 var diceService = ServiceProvider.GetRequiredService<DiceCombatsService>();
                                 if (diceService != null)
                                 {
@@ -105,6 +107,8 @@ namespace DiceCombats
                     {
                         android.OnPause(activity =>
                         {
+                            ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
+
                             // Use the root service provider
                             var diceService = ServiceProvider.GetRequiredService<DiceCombatsService>();
                             if (diceService != null)
@@ -133,7 +137,11 @@ namespace DiceCombats
             builder.Services.AddSingleton<AutomationConfigurationService>();
             builder.Services.AddSingleton<EventTemplateRenderer>();
             builder.Services.AddSingleton<EventConditionEvaluator>();
-            builder.Services.AddSingleton<IDiceEventPublisher, DiceEventDispatcher>();
+            // The dispatcher is resolved by its own type as well, so the combat
+            // log can subscribe to the same instance the publisher writes to.
+            builder.Services.AddSingleton<DiceEventDispatcher>();
+            builder.Services.AddSingleton<IDiceEventPublisher>(sp => sp.GetRequiredService<DiceEventDispatcher>());
+            builder.Services.AddSingleton<CombatLogService>();
 
 #if ANDROID
             builder.Services.AddSingleton<IFileHandler, FileHandler>();
@@ -161,6 +169,12 @@ namespace DiceCombats
 
             var app = builder.Build();
             ServiceProvider = app.Services; // Assign the root service provider
+
+            // Resolved right away: it subscribes to the event stream in its
+            // constructor, and a lazily created one would miss everything until
+            // something else happened to ask for it.
+            app.Services.GetRequiredService<CombatLogService>();
+
             return app;
         }
     }

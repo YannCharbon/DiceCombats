@@ -90,6 +90,12 @@
   <data name="AutomationsSectionTitle" xml:space="preserve">
     <value>Automations</value>
   </data>
+  <data name="AvailableVariables" xml:space="preserve">
+    <value>Variables available for this trigger ({0})</value>
+  </data>
+  <data name="AvailableVariablesHint" xml:space="preserve">
+    <value>Click a variable to copy it, then paste it in a body, a URL, a header or a condition.</value>
+  </data>
   <data name="BaseUrl" xml:space="preserve">
     <value>Base URL</value>
   </data>
@@ -107,6 +113,9 @@
   </data>
   <data name="CustomFieldEmptyAnyMatchingField" xml:space="preserve">
     <value>Custom field (empty = any matching field)</value>
+  </data>
+  <data name="DamageKindEmptyAnyKind" xml:space="preserve">
+    <value>Damage kind (empty = any kind)</value>
   </data>
   <data name="DefaultDelayName" xml:space="preserve">
     <value>Delay</value>
@@ -282,14 +291,23 @@
   <data name="PlaceholderWhenAllCreatureCustomFieldEvents" xml:space="preserve">
     <value>All creature custom-field events</value>
   </data>
+  <data name="PlaceholderWhenAttackApplied" xml:space="preserve">
+    <value>Attack applied (the whole hit)</value>
+  </data>
   <data name="PlaceholderWhenCheckboxConditionOptions" xml:space="preserve">
     <value>Checkbox and condition options</value>
+  </data>
+  <data name="PlaceholderWhenCombatSession" xml:space="preserve">
+    <value>Combat started or ended</value>
   </data>
   <data name="PlaceholderWhenCombatTimer" xml:space="preserve">
     <value>Combat timer started/paused/stopped</value>
   </data>
   <data name="PlaceholderWhenCreatureGotLostInitiative" xml:space="preserve">
     <value>Creature got/lost initiative</value>
+  </data>
+  <data name="PlaceholderWhenDamageHealApplied" xml:space="preserve">
+    <value>Damage or healing applied</value>
   </data>
   <data name="PlaceholderWhenGridCells" xml:space="preserve">
     <value>Checkbox-grid and text-grid cells</value>
@@ -327,6 +345,9 @@
   <data name="SaveSuccessTitle" xml:space="preserve">
     <value>Automations saved</value>
   </data>
+  <data name="SourcesEmptyAnySource" xml:space="preserve">
+    <value>Attackers (empty = anyone)</value>
+  </data>
   <data name="StatEmptyAnyStat" xml:space="preserve">
     <value>Stat (empty = any stat)</value>
   </data>
@@ -363,6 +384,9 @@
   <data name="Trigger" xml:space="preserve">
     <value>Trigger</value>
   </data>
+  <data name="TriggerCategory_Combatlog" xml:space="preserve">
+    <value>Combat log</value>
+  </data>
   <data name="TriggerCategory_Combattimer" xml:space="preserve">
     <value>Combat timer</value>
   </data>
@@ -377,6 +401,9 @@
   </data>
   <data name="TriggerDisplay_AnyCustomFieldChanged" xml:space="preserve">
     <value>Custom field changed</value>
+  </data>
+  <data name="TriggerDisplay_AttackApplied" xml:space="preserve">
+    <value>Attack applied</value>
   </data>
   <data name="TriggerDisplay_CheckboxGridCellChanged" xml:space="preserve">
     <value>Checkbox grid cell changed</value>
@@ -417,8 +444,14 @@
   <data name="TriggerDisplay_CreatureLostInitiative" xml:space="preserve">
     <value>Creature lost initiative</value>
   </data>
+  <data name="TriggerDisplay_DamageApplied" xml:space="preserve">
+    <value>Damage applied</value>
+  </data>
   <data name="TriggerDisplay_DetailedPopupOpened" xml:space="preserve">
     <value>Detailed popup opened</value>
+  </data>
+  <data name="TriggerDisplay_HealApplied" xml:space="preserve">
+    <value>Healing applied</value>
   </data>
   <data name="TriggerDisplay_HitPointsChanged" xml:space="preserve">
     <value>Hit points changed</value>
@@ -456,6 +489,12 @@
   <data name="TriggerDisplay_NumericThreshold" xml:space="preserve">
     <value>Numeric field crossed a value</value>
   </data>
+  <data name="TriggerDisplay_SessionEnded" xml:space="preserve">
+    <value>Combat ended</value>
+  </data>
+  <data name="TriggerDisplay_SessionStarted" xml:space="preserve">
+    <value>Combat started</value>
+  </data>
   <data name="TriggerDisplay_StatsChanged" xml:space="preserve">
     <value>Stat value changed</value>
   </data>
@@ -492,17 +531,26 @@
   <data name="TriggerSummaryAnyCreature" xml:space="preserve">
     <value>any creature</value>
   </data>
+  <data name="TriggerSummaryAnyDamageKind" xml:space="preserve">
+    <value>any damage kind</value>
+  </data>
   <data name="TriggerSummaryAnyMatchingField" xml:space="preserve">
     <value>any matching field</value>
   </data>
   <data name="TriggerSummaryAnyOption" xml:space="preserve">
     <value>any option</value>
   </data>
+  <data name="TriggerSummaryAnySource" xml:space="preserve">
+    <value>anyone</value>
+  </data>
   <data name="TriggerSummaryAnyStat" xml:space="preserve">
     <value>any stat</value>
   </data>
   <data name="TriggerSummaryCreatureFilter" xml:space="preserve">
     <value>Triggers for {0}.</value>
+  </data>
+  <data name="TriggerSummaryDamage" xml:space="preserve">
+    <value>Triggers when {0} deals {1} to {2}.</value>
   </data>
   <data name="TriggerSummaryDefault" xml:space="preserve">
     <value>Triggers on: {0}.</value>
@@ -521,6 +569,9 @@
   </data>
   <data name="TriggerSummaryOptionChanged" xml:space="preserve">
     <value>Triggers when {0} in {1} changes on {2}.</value>
+  </data>
+  <data name="TriggerSummarySource" xml:space="preserve">
+    <value>Triggers when {0} affects {1}.</value>
   </data>
   <data name="TriggerSummaryStat" xml:space="preserve">
     <value>stat “{0}”</value>

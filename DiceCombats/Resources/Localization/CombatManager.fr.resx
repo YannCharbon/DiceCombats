@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
   <data name="EditBtn" xml:space="preserve">
     <value>Éditer</value>
   </data>
@@ -153,6 +156,108 @@
   <data name="InitiativeTitle" xml:space="preserve">
     <value>Initiative</value>
   </data>
+  <data name="LogAverageHit" xml:space="preserve">
+    <value>Moyenne</value>
+  </data>
+  <data name="LogBestHit" xml:space="preserve">
+    <value>Meilleur coup</value>
+  </data>
+  <data name="LogBtn" xml:space="preserve">
+    <value>Journal de combat</value>
+  </data>
+  <data name="LogByKind" xml:space="preserve">
+    <value>Par type</value>
+  </data>
+  <data name="LogDamage" xml:space="preserve">
+    <value>Dégâts</value>
+  </data>
+  <data name="LogDamageDealt" xml:space="preserve">
+    <value>Dégâts infligés</value>
+  </data>
+  <data name="LogDamageTaken" xml:space="preserve">
+    <value>Dégâts subis</value>
+  </data>
+  <data name="LogDamaged" xml:space="preserve">
+    <value>touche {0} pour {1}</value>
+  </data>
+  <data name="LogDeleteBtn" xml:space="preserve">
+    <value>Supprimer la session</value>
+  </data>
+  <data name="LogDeleteConfirmBtn" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="LogDeleteQuestion" xml:space="preserve">
+    <value>Cette session enregistrée sera perdue.</value>
+  </data>
+  <data name="LogDeleteTitle" xml:space="preserve">
+    <value>Supprimer la session</value>
+  </data>
+  <data name="LogEmpty" xml:space="preserve">
+    <value>Aucune session enregistrée pour ce combat.</value>
+  </data>
+  <data name="LogEntriesCount" xml:space="preserve">
+    <value>{0} évènements</value>
+  </data>
+  <data name="LogExportAllBtn" xml:space="preserve">
+    <value>Exporter toutes les sessions</value>
+  </data>
+  <data name="LogExportBtn" xml:space="preserve">
+    <value>Exporter cette session</value>
+  </data>
+  <data name="LogExportDone" xml:space="preserve">
+    <value>Journal de combat exporté avec succès</value>
+  </data>
+  <data name="LogExportTitle" xml:space="preserve">
+    <value>Exportation du journal</value>
+  </data>
+  <data name="LogHealed" xml:space="preserve">
+    <value>soigne {0} de {1}</value>
+  </data>
+  <data name="LogHealing" xml:space="preserve">
+    <value>Soins</value>
+  </data>
+  <data name="LogHits" xml:space="preserve">
+    <value>Coups</value>
+  </data>
+  <data name="LogInferredHits" xml:space="preserve">
+    <value>{0} attribués automatiquement</value>
+  </data>
+  <data name="LogNoData" xml:space="preserve">
+    <value>Rien d'enregistré</value>
+  </data>
+  <data name="LogRecording" xml:space="preserve">
+    <value>Enregistrement</value>
+  </data>
+  <data name="LogRound" xml:space="preserve">
+    <value>Tour {0}</value>
+  </data>
+  <data name="LogRoundsCount" xml:space="preserve">
+    <value>{0} tours</value>
+  </data>
+  <data name="LogSession" xml:space="preserve">
+    <value>Session</value>
+  </data>
+  <data name="LogSource" xml:space="preserve">
+    <value>Créature</value>
+  </data>
+  <data name="LogTarget" xml:space="preserve">
+    <value>Créature</value>
+  </data>
+  <data name="LogTimeline" xml:space="preserve">
+    <value>Déroulement</value>
+  </data>
+  <data name="LogTitle" xml:space="preserve">
+    <value>Journal de combat</value>
+  </data>
+  <data name="LogTotalDamage" xml:space="preserve">
+    <value>{0} dégâts</value>
+  </data>
+  <data name="LogTotalHealing" xml:space="preserve">
+    <value>{0} soins</value>
+  </data>
+  <data name="LogTurnOf" xml:space="preserve">
+    <value>Tour de {0}</value>
+  </data>
   <data name="NotesTb" xml:space="preserve">
     <value>Notes générales</value>
   </data>
@@ -161,6 +266,15 @@
   </data>
   <data name="PlayBtn" xml:space="preserve">
     <value>Démarrer le chronomètre du combat</value>
+  </data>
+  <data name="StartCombatConfirmBtn" xml:space="preserve">
+    <value>Démarrer</value>
+  </data>
+  <data name="StartCombatQuestion" xml:space="preserve">
+    <value>L'initiative est triée. Démarrer le combat maintenant et enregistrer le journal ?</value>
+  </data>
+  <data name="StartCombatTitle" xml:space="preserve">
+    <value>Démarrer le combat</value>
   </data>
   <data name="StopBtn" xml:space="preserve">
     <value>Arrêterle chronomètre du combat</value>

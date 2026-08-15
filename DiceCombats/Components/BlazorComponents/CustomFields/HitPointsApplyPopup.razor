@@ -254,13 +254,42 @@
         </MudButton>
     </div>
 
+    @* Who gets credited. Defaults to whoever holds the initiative, which is
+       right most of the time and leaves the common case at zero clicks. *@
+    @if (SourceContext != null && SourceContext.Candidates.Count > 0)
+    {
+        <div class="hp-row" style="margin-bottom:8px;">
+            <span style="color:grey;font-size:12px;">@Loc["HPSource"]</span>
+            <div class="hp-kind-strip">
+                @foreach (var candidate in SourceContext.Candidates)
+                {
+                    var c = candidate;
+                    <div class="hp-kind-btn @(_sourceName == c.Name ? "selected" : "")"
+                         style="background-color:@(c.IsPlayer ? "#00695C" : "#4A4A4A");color:#FFFFFF;"
+                         @onclick="() => _sourceName = c.Name">
+                        @if (c.IsPlayer)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Person" Style="font-size:15px;" />
+                        }
+                        @c.Name
+                    </div>
+                }
+                <div class="hp-kind-btn @(string.IsNullOrEmpty(_sourceName) ? "selected" : "")"
+                     style="background-color:#555555;color:#FFFFFF;"
+                     @onclick="() => _sourceName = string.Empty">
+                    @Loc["HPNoSource"]
+                </div>
+            </div>
+        </div>
+    }
+
     @foreach (var line in _damageLines)
     {
         var l = line;
         <div class="hp-damage-line">
             <div class="hp-row">
                 <div style="width:100px;">
-                    <MudNumericField T="int" @bind-Value="l.Amount" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                    <MudNumericField T="int" @bind-Value="l.Amount" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
                 </div>
 
                 @if (Field.DamageKinds.Count > 0)
@@ -327,7 +356,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Add" Style="font-size:18px;" />@Loc["HPHeal"]
             </span>
             <div style="width:100px;">
-                <MudNumericField T="int" @bind-Value="_heal" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                <MudNumericField T="int" @bind-Value="_heal" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
             </div>
         </div>
         <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPHealHint"]</div>
@@ -339,7 +368,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Shield" Style="font-size:18px;" />@Loc["HPTemporary"]
             </span>
             <div style="width:100px;">
-                <MudNumericField T="int" @bind-Value="_temporary" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                <MudNumericField T="int" @bind-Value="_temporary" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
             </div>
         </div>
         <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPTemporaryHint"]</div>
@@ -351,7 +380,7 @@
                 <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:18px;" />@Loc["HPMaxReductionLabel"]
             </span>
             <div style="width:100px;">
-                <MudNumericField T="int" @bind-Value="_maximumReduction" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" />
+                <MudNumericField T="int" @bind-Value="_maximumReduction" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
             </div>
         </div>
         <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPMaxReductionHint"]</div>
@@ -363,6 +392,10 @@
 @code {
     [Parameter] public DCCreatureHitPointsField Field { get; set; } = default!;
     [Parameter] public EventCallback<CustomFieldChangeInfo> OnApplied { get; set; }
+    [CascadingParameter] public DCDamageSourceContext? SourceContext { get; set; }
+
+    private string _sourceName = string.Empty;
+    private string _lastSuggestedSource = string.Empty;
 
     private class DamageLine
     {
@@ -380,10 +413,38 @@
 
     protected override void OnInitialized()
     {
+        Reset();
+        base.OnInitialized();
+    }
+
+    /// <summary>
+    /// Brings the staging area back to what the field currently holds. Called
+    /// when the popup opens and once an attack has been applied, so a reopened
+    /// popup never shows the lines of the previous one.
+    /// </summary>
+    public void Reset()
+    {
+        _damageLines.Clear();
+        AddLine();
+        _heal = 0;
         _temporary = (int)Field.TemporaryHP;
         _maximumReduction = (int)Field.MaximumHPReduction;
-        AddLine();
-        base.OnInitialized();
+        _lastSuggestedSource = SourceContext?.SuggestedSource ?? string.Empty;
+        _sourceName = _lastSuggestedSource;
+    }
+
+    /// The source follows the initiative as it moves. A pick made by hand is kept
+    /// as long as the initiative stays on the same creature.
+    protected override void OnParametersSet()
+    {
+        string suggested = SourceContext?.SuggestedSource ?? string.Empty;
+        if (suggested != _lastSuggestedSource)
+        {
+            _lastSuggestedSource = suggested;
+            _sourceName = suggested;
+        }
+
+        base.OnParametersSet();
     }
 
     private void AddLine()
@@ -492,7 +553,11 @@
         bool changed = TotalDamage > 0 || _heal > 0
             || StagedTemporary != Field.TemporaryHP
             || Math.Max(0, _maximumReduction) != (int)Field.MaximumHPReduction;
-        if (!changed) return;
+        if (!changed)
+        {
+            Reset();
+            return;
+        }
 
         int oldValue = Field.CurrentHP;
         Field.SaveUndo();
@@ -511,7 +576,22 @@
             OldValue = oldValue,
             NewValue = Field.CurrentHP,
             Action = "CurrentChanged",
-            ChangeDirection = Field.CurrentHP > oldValue ? "Increased" : (Field.CurrentHP < oldValue ? "Decreased" : "Unchanged")
+            ChangeDirection = Field.CurrentHP > oldValue ? "Increased" : (Field.CurrentHP < oldValue ? "Decreased" : "Unchanged"),
+            SourceName = _sourceName,
+            // Picked here, so the statistics can tell it apart from a guess.
+            SourceInferred = false,
+            SourceIsPlayer = SourceContext?.IsPlayer(_sourceName) ?? false,
+            DamageLines = _damageLines
+                .Where(x => x.Amount > 0)
+                .Select(x => new DCDamageLineInfo
+                {
+                    Kind = x.Kind,
+                    RuleName = Field.ResolveRule(x.Kind, x.Tags)?.Name ?? string.Empty,
+                    RawAmount = x.Amount,
+                    AppliedAmount = MitigatedAmount(x),
+                    Tags = new List<string>(x.Tags)
+                })
+                .ToList()
         };
         info.Data["damageKinds"] = kinds.Count > 0 ? string.Join(", ", kinds) : null;
         info.Data["rawDamage"] = _damageLines.Sum(x => x.Amount);
@@ -519,10 +599,7 @@
         info.Data["appliedHeal"] = Math.Max(0, _heal);
         info.Data["temporaryAbsorbed"] = (int)absorbed;
 
-        _damageLines.Clear();
-        AddLine();
-        _heal = 0;
-        _temporary = (int)Field.TemporaryHP;
+        Reset();
 
         if (OnApplied.HasDelegate)
             await OnApplied.InvokeAsync(info);

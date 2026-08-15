@@ -90,6 +90,9 @@
   <data name="CBGridVertical" xml:space="preserve">
     <value>Vertical</value>
   </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
   <data name="ColorPickerName" xml:space="preserve">
     <value>Sélecteur de couleurs</value>
   </data>
@@ -105,6 +108,9 @@
   <data name="CustomFieldBtn" xml:space="preserve">
     <value>Champ personnalisé</value>
   </data>
+  <data name="DetailedPopupEditButton" xml:space="preserve">
+    <value>Éditer le contenu</value>
+  </data>
   <data name="DnDConditionAddCondition" xml:space="preserve">
     <value>Ajouter un état</value>
   </data>
@@ -116,6 +122,186 @@
   </data>
   <data name="HP" xml:space="preserve">
     <value>PV</value>
+  </data>
+  <data name="HPAddDefaultRules" xml:space="preserve">
+    <value>Ajouter les règles usuelles</value>
+  </data>
+  <data name="HPAddKind" xml:space="preserve">
+    <value>Ajouter un type</value>
+  </data>
+  <data name="HPAddLine" xml:space="preserve">
+    <value>Ajouter une ligne de dégâts</value>
+  </data>
+  <data name="HPAddMitigation" xml:space="preserve">
+    <value>Ajouter une règle pour un type</value>
+  </data>
+  <data name="HPAddRule" xml:space="preserve">
+    <value>Ajouter une règle</value>
+  </data>
+  <data name="HPAddTag" xml:space="preserve">
+    <value>Ajouter un attribut</value>
+  </data>
+  <data name="HPAllowNegative" xml:space="preserve">
+    <value>Autoriser les PV négatifs</value>
+  </data>
+  <data name="HPAmount" xml:space="preserve">
+    <value>Valeur</value>
+  </data>
+  <data name="HPAnyAttack" xml:space="preserve">
+    <value>Toute attaque</value>
+  </data>
+  <data name="HPApplyButton" xml:space="preserve">
+    <value>Infliger des dégâts ou soigner</value>
+  </data>
+  <data name="HPApplyHint" xml:space="preserve">
+    <value>Appuyez sur OK pour appliquer toutes les lignes en une fois.</value>
+  </data>
+  <data name="HPApplyShort" xml:space="preserve">
+    <value>Appliquer</value>
+  </data>
+  <data name="HPCalcAbsorbed" xml:space="preserve">
+    <value>absorbés par les PV temporaires</value>
+  </data>
+  <data name="HPChangeKind" xml:space="preserve">
+    <value>cliquez sur le type pour le changer</value>
+  </data>
+  <data name="HPConfigureButton" xml:space="preserve">
+    <value>Configurer</value>
+  </data>
+  <data name="HPDamage" xml:space="preserve">
+    <value>Dégâts</value>
+  </data>
+  <data name="HPGeneralTitle" xml:space="preserve">
+    <value>Général</value>
+  </data>
+  <data name="HPHeal" xml:space="preserve">
+    <value>Soin</value>
+  </data>
+  <data name="HPHealHint" xml:space="preserve">
+    <value>Le soin ignore les types de dégâts.</value>
+  </data>
+  <data name="HPKind" xml:space="preserve">
+    <value>Type de dégâts</value>
+  </data>
+  <data name="HPKindColor" xml:space="preserve">
+    <value>Couleur</value>
+  </data>
+  <data name="HPKindIcon" xml:space="preserve">
+    <value>Icône</value>
+  </data>
+  <data name="HPKindsHelp" xml:space="preserve">
+    <value>Les types de dégâts de votre système de jeu. Listez-les une fois ici, puis indiquez plus bas ceux auxquels cette créature résiste.</value>
+  </data>
+  <data name="HPKindsTitle" xml:space="preserve">
+    <value>Types de dégâts</value>
+  </data>
+  <data name="HPMaxReductionHint" xml:space="preserve">
+    <value>Abaisse le plafond que le soin peut atteindre.</value>
+  </data>
+  <data name="HPMaxReductionLabel" xml:space="preserve">
+    <value>Réduction des PV maximum</value>
+  </data>
+  <data name="HPMitigationsHelp" xml:space="preserve">
+    <value>Applique une règle à un type de dégâts. Une ligne restreinte à un attribut l'emporte sur une ligne sans restriction.</value>
+  </data>
+  <data name="HPMitigationsTitle" xml:space="preserve">
+    <value>Règles par type de dégâts</value>
+  </data>
+  <data name="HPNoKind" xml:space="preserve">
+    <value>(aucun type)</value>
+  </data>
+  <data name="HPNoSource" xml:space="preserve">
+    <value>Personne en particulier</value>
+  </data>
+  <data name="HPPickKind" xml:space="preserve">
+    <value>Type de dégâts</value>
+  </data>
+  <data name="HPRemoveKind" xml:space="preserve">
+    <value>Supprimer ce type</value>
+  </data>
+  <data name="HPRemoveLine" xml:space="preserve">
+    <value>Supprimer cette ligne</value>
+  </data>
+  <data name="HPRemoveMitigation" xml:space="preserve">
+    <value>Supprimer cette ligne</value>
+  </data>
+  <data name="HPRemoveRule" xml:space="preserve">
+    <value>Supprimer cette règle</value>
+  </data>
+  <data name="HPRemoveTag" xml:space="preserve">
+    <value>Supprimer cet attribut</value>
+  </data>
+  <data name="HPReorderKind" xml:space="preserve">
+    <value>Glisser pour réordonner</value>
+  </data>
+  <data name="HPRequiredTag" xml:space="preserve">
+    <value>Seulement si</value>
+  </data>
+  <data name="HPRoundDown" xml:space="preserve">
+    <value>Inférieur</value>
+  </data>
+  <data name="HPRoundNearest" xml:space="preserve">
+    <value>Au plus proche</value>
+  </data>
+  <data name="HPRoundUp" xml:space="preserve">
+    <value>Supérieur</value>
+  </data>
+  <data name="HPRuleFactor" xml:space="preserve">
+    <value>Facteur</value>
+  </data>
+  <data name="HPRuleFlat" xml:space="preserve">
+    <value>Réduction fixe</value>
+  </data>
+  <data name="HPRuleName" xml:space="preserve">
+    <value>Règle</value>
+  </data>
+  <data name="HPRuleRounding" xml:space="preserve">
+    <value>Arrondi</value>
+  </data>
+  <data name="HPRulesHelp" xml:space="preserve">
+    <value>La part des dégâts qui passe. La valeur est multipliée par le facteur, arrondie, puis la réduction fixe est soustraite.</value>
+  </data>
+  <data name="HPRulesTitle" xml:space="preserve">
+    <value>Règles de réduction</value>
+  </data>
+  <data name="HPSource" xml:space="preserve">
+    <value>Attaque de</value>
+  </data>
+  <data name="HPTag" xml:space="preserve">
+    <value>Attribut</value>
+  </data>
+  <data name="HPTagAbsent" xml:space="preserve">
+    <value>Attribut absent</value>
+  </data>
+  <data name="HPTagCondition" xml:space="preserve">
+    <value>Condition</value>
+  </data>
+  <data name="HPTagPresent" xml:space="preserve">
+    <value>Attribut présent</value>
+  </data>
+  <data name="HPTagUnless" xml:space="preserve">
+    <value>sauf</value>
+  </data>
+  <data name="HPTagWhen" xml:space="preserve">
+    <value>si</value>
+  </data>
+  <data name="HPTagsHelp" xml:space="preserve">
+    <value>Qualificatifs facultatifs d'une attaque, par exemple magique ou argenté, qui permettent de restreindre une résistance.</value>
+  </data>
+  <data name="HPTagsTitle" xml:space="preserve">
+    <value>Attributs d'attaque</value>
+  </data>
+  <data name="HPTemporary" xml:space="preserve">
+    <value>PV temporaires</value>
+  </data>
+  <data name="HPTemporaryHint" xml:space="preserve">
+    <value>Remplace les PV temporaires actuels.</value>
+  </data>
+  <data name="HPTemporaryShort" xml:space="preserve">
+    <value>temp</value>
+  </data>
+  <data name="HPUndo" xml:space="preserve">
+    <value>Annuler la dernière modification</value>
   </data>
   <data name="MaxHPLabel" xml:space="preserve">
     <value>PV Max</value>
@@ -149,187 +335,5 @@
   </data>
   <data name="TextGridVertical" xml:space="preserve">
     <value>Vertical</value>
-  </data>
-
-  <!-- NEW: DetailedPopup edit button -->
-  <data name="DetailedPopupEditButton" xml:space="preserve">
-    <value>Éditer le contenu</value>
-  </data>
-  <data name="HPConfigureButton" xml:space="preserve">
-    <value>Configurer</value>
-  </data>
-  <data name="HPTemporaryShort" xml:space="preserve">
-    <value>temp</value>
-  </data>
-  <data name="HPMaxReductionLabel" xml:space="preserve">
-    <value>Réduction des PV maximum</value>
-  </data>
-  <data name="HPAllowNegative" xml:space="preserve">
-    <value>Autoriser les PV négatifs</value>
-  </data>
-  <data name="HPDamage" xml:space="preserve">
-    <value>Dégâts</value>
-  </data>
-  <data name="HPHeal" xml:space="preserve">
-    <value>Soin</value>
-  </data>
-  <data name="HPTemporary" xml:space="preserve">
-    <value>PV temporaires</value>
-  </data>
-  <data name="HPAmount" xml:space="preserve">
-    <value>Valeur</value>
-  </data>
-  <data name="HPKind" xml:space="preserve">
-    <value>Type de dégâts</value>
-  </data>
-  <data name="HPNoKind" xml:space="preserve">
-    <value>(aucun type)</value>
-  </data>
-  <data name="HPAddLine" xml:space="preserve">
-    <value>Ajouter une ligne de dégâts</value>
-  </data>
-  <data name="HPRemoveLine" xml:space="preserve">
-    <value>Supprimer cette ligne</value>
-  </data>
-  <data name="HPApplyButton" xml:space="preserve">
-    <value>Infliger des dégâts ou soigner</value>
-  </data>
-  <data name="HPApplyHint" xml:space="preserve">
-    <value>Appuyez sur OK pour appliquer toutes les lignes en une fois.</value>
-  </data>
-  <data name="HPUndo" xml:space="preserve">
-    <value>Annuler la dernière modification</value>
-  </data>
-  <data name="HPGeneralTitle" xml:space="preserve">
-    <value>Général</value>
-  </data>
-  <data name="HPKindsTitle" xml:space="preserve">
-    <value>Types de dégâts</value>
-  </data>
-  <data name="HPKindsHelp" xml:space="preserve">
-    <value>Les types de dégâts de votre système de jeu. Listez-les une fois ici, puis indiquez plus bas ceux auxquels cette créature résiste.</value>
-  </data>
-  <data name="HPAddKind" xml:space="preserve">
-    <value>Ajouter un type</value>
-  </data>
-  <data name="HPRemoveKind" xml:space="preserve">
-    <value>Supprimer ce type</value>
-  </data>
-  <data name="HPTagsTitle" xml:space="preserve">
-    <value>Attributs d'attaque</value>
-  </data>
-  <data name="HPTagsHelp" xml:space="preserve">
-    <value>Qualificatifs facultatifs d'une attaque, par exemple magique ou argenté, qui permettent de restreindre une résistance.</value>
-  </data>
-  <data name="HPTag" xml:space="preserve">
-    <value>Attribut</value>
-  </data>
-  <data name="HPAddTag" xml:space="preserve">
-    <value>Ajouter un attribut</value>
-  </data>
-  <data name="HPRemoveTag" xml:space="preserve">
-    <value>Supprimer cet attribut</value>
-  </data>
-  <data name="HPRulesTitle" xml:space="preserve">
-    <value>Règles de réduction</value>
-  </data>
-  <data name="HPRulesHelp" xml:space="preserve">
-    <value>La part des dégâts qui passe. La valeur est multipliée par le facteur, arrondie, puis la réduction fixe est soustraite.</value>
-  </data>
-  <data name="HPRuleName" xml:space="preserve">
-    <value>Règle</value>
-  </data>
-  <data name="HPRuleFactor" xml:space="preserve">
-    <value>Facteur</value>
-  </data>
-  <data name="HPRuleFlat" xml:space="preserve">
-    <value>Réduction fixe</value>
-  </data>
-  <data name="HPRuleRounding" xml:space="preserve">
-    <value>Arrondi</value>
-  </data>
-  <data name="HPRoundDown" xml:space="preserve">
-    <value>Inférieur</value>
-  </data>
-  <data name="HPRoundUp" xml:space="preserve">
-    <value>Supérieur</value>
-  </data>
-  <data name="HPRoundNearest" xml:space="preserve">
-    <value>Au plus proche</value>
-  </data>
-  <data name="HPAddRule" xml:space="preserve">
-    <value>Ajouter une règle</value>
-  </data>
-  <data name="HPAddDefaultRules" xml:space="preserve">
-    <value>Ajouter les règles usuelles</value>
-  </data>
-  <data name="HPRemoveRule" xml:space="preserve">
-    <value>Supprimer cette règle</value>
-  </data>
-  <data name="HPMitigationsTitle" xml:space="preserve">
-    <value>Règles par type de dégâts</value>
-  </data>
-  <data name="HPMitigationsHelp" xml:space="preserve">
-    <value>Applique une règle à un type de dégâts. Une ligne restreinte à un attribut l'emporte sur une ligne sans restriction.</value>
-  </data>
-  <data name="HPAddMitigation" xml:space="preserve">
-    <value>Ajouter une règle pour un type</value>
-  </data>
-  <data name="HPRemoveMitigation" xml:space="preserve">
-    <value>Supprimer cette ligne</value>
-  </data>
-  <data name="HPRequiredTag" xml:space="preserve">
-    <value>Seulement si</value>
-  </data>
-  <data name="HPAnyAttack" xml:space="preserve">
-    <value>Toute attaque</value>
-  </data>
-  <data name="HPTagCondition" xml:space="preserve">
-    <value>Condition</value>
-  </data>
-  <data name="HPTagPresent" xml:space="preserve">
-    <value>Attribut présent</value>
-  </data>
-  <data name="HPTagAbsent" xml:space="preserve">
-    <value>Attribut absent</value>
-  </data>
-  <data name="HPKindColor" xml:space="preserve">
-    <value>Couleur</value>
-  </data>
-  <data name="HPKindIcon" xml:space="preserve">
-    <value>Icône</value>
-  </data>
-  <data name="HPPickKind" xml:space="preserve">
-    <value>Type de dégâts</value>
-  </data>
-  <data name="HPHealHint" xml:space="preserve">
-    <value>Le soin ignore les types de dégâts.</value>
-  </data>
-  <data name="HPTemporaryHint" xml:space="preserve">
-    <value>Remplace les PV temporaires actuels.</value>
-  </data>
-  <data name="HPMaxReductionHint" xml:space="preserve">
-    <value>Abaisse le plafond que le soin peut atteindre.</value>
-  </data>
-  <data name="CancelBtn" xml:space="preserve">
-    <value>Annuler</value>
-  </data>
-  <data name="HPApplyShort" xml:space="preserve">
-    <value>Appliquer</value>
-  </data>
-  <data name="HPReorderKind" xml:space="preserve">
-    <value>Glisser pour réordonner</value>
-  </data>
-  <data name="HPCalcAbsorbed" xml:space="preserve">
-    <value>absorbés par les PV temporaires</value>
-  </data>
-  <data name="HPTagWhen" xml:space="preserve">
-    <value>si</value>
-  </data>
-  <data name="HPTagUnless" xml:space="preserve">
-    <value>sauf</value>
-  </data>
-  <data name="HPChangeKind" xml:space="preserve">
-    <value>cliquez sur le type pour le changer</value>
   </data>
 </root>

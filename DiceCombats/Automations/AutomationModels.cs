@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace DiceCombats.Automations;
@@ -25,6 +25,11 @@ public static class DiceEventTypes
     public const string TimerStarted = "combat.timer.started";
     public const string TimerPaused = "combat.timer.paused";
     public const string TimerStopped = "combat.timer.stopped";
+    public const string AttackApplied = "combat.attack.applied";
+    public const string DamageApplied = "combat.damage.applied";
+    public const string HealApplied = "combat.heal.applied";
+    public const string SessionStarted = "combat.session.started";
+    public const string SessionEnded = "combat.session.ended";
     public const string CustomFieldChanged = "combat.customField.changed";
     public const string CustomFieldNumericChanged = "combat.customField.numeric.changed";
     public const string CustomFieldHitPointsChanged = "combat.customField.hitPoints.changed";
@@ -51,6 +56,11 @@ public static class EventTriggerKinds
     public const string TimerStarted = "TimerStarted";
     public const string TimerPaused = "TimerPaused";
     public const string TimerStopped = "TimerStopped";
+    public const string AttackApplied = "AttackApplied";
+    public const string DamageApplied = "DamageApplied";
+    public const string HealApplied = "HealApplied";
+    public const string SessionStarted = "SessionStarted";
+    public const string SessionEnded = "SessionEnded";
     public const string AnyCustomFieldChanged = "AnyCustomFieldChanged";
     public const string NumericChanged = "NumericChanged";
     public const string NumericIncreased = "NumericIncreased";
@@ -96,6 +106,8 @@ public sealed class EventTriggerCatalogEntry
     public string DisplayName { get; set; } = "";
     public string FieldType { get; set; } = "";
     public bool SupportsCreatureFilter { get; set; }
+    public bool SupportsSourceFilter { get; set; }
+    public bool SupportsDamageKindFilter { get; set; }
     public bool NeedsField { get; set; }
     public bool NeedsOption { get; set; }
     public bool NeedsStat { get; set; }
@@ -121,6 +133,11 @@ public static class EventTriggerCatalog
         new() { Kind = EventTriggerKinds.TimerStarted, EventType = DiceEventTypes.TimerStarted, Category = "Combat timer", DisplayName = "Timer started" },
         new() { Kind = EventTriggerKinds.TimerPaused, EventType = DiceEventTypes.TimerPaused, Category = "Combat timer", DisplayName = "Timer paused" },
         new() { Kind = EventTriggerKinds.TimerStopped, EventType = DiceEventTypes.TimerStopped, Category = "Combat timer", DisplayName = "Timer stopped" },
+        new() { Kind = EventTriggerKinds.AttackApplied, EventType = DiceEventTypes.AttackApplied, Category = "Combat log", DisplayName = "Attack applied", SupportsCreatureFilter = true, SupportsSourceFilter = true, SupportsDamageKindFilter = true },
+        new() { Kind = EventTriggerKinds.DamageApplied, EventType = DiceEventTypes.DamageApplied, Category = "Combat log", DisplayName = "Damage applied", SupportsCreatureFilter = true, SupportsSourceFilter = true, SupportsDamageKindFilter = true },
+        new() { Kind = EventTriggerKinds.HealApplied, EventType = DiceEventTypes.HealApplied, Category = "Combat log", DisplayName = "Healing applied", SupportsCreatureFilter = true, SupportsSourceFilter = true },
+        new() { Kind = EventTriggerKinds.SessionStarted, EventType = DiceEventTypes.SessionStarted, Category = "Combat log", DisplayName = "Combat started" },
+        new() { Kind = EventTriggerKinds.SessionEnded, EventType = DiceEventTypes.SessionEnded, Category = "Combat log", DisplayName = "Combat ended" },
         new() { Kind = EventTriggerKinds.AnyCustomFieldChanged, EventType = DiceEventTypes.CustomFieldChanged, Category = "Custom fields", DisplayName = "Custom field changed", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.NumericChanged, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field changed", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true },
         new() { Kind = EventTriggerKinds.NumericIncreased, EventType = DiceEventTypes.CustomFieldNumericChanged, Category = "Custom fields", DisplayName = "Numeric field increased", FieldType = "Numeric", SupportsCreatureFilter = true, NeedsField = true, RequiredChangeDirection = "Increased" },
@@ -163,6 +180,9 @@ public sealed class EventTriggerDefinition
 {
     public string Kind { get; set; } = EventTriggerKinds.InitiativeNext;
     public List<string> CreatureNames { get; set; } = new();
+    // Damage only: who deals it, and of which kind. Empty means any.
+    public List<string> SourceNames { get; set; } = new();
+    public string DamageKind { get; set; } = "";
     public string FieldTitle { get; set; } = "";
     public string OptionName { get; set; } = "";
     public string StatName { get; set; } = "";

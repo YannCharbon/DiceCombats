@@ -67,6 +67,19 @@
                 a.dispatchEvent(new Event('input', { bubbles: true })); // nudge Mud's handler
             });
         };
+
+        window.dcCopyText = async (text) => {
+            try {
+                await navigator.clipboard.writeText(text);
+            } catch {
+                const area = document.createElement('textarea');
+                area.value = text;
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                area.remove();
+            }
+        };
     </script>
 
     <div class="status-bar-safe-area"></div>

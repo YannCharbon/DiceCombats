@@ -157,7 +157,7 @@ else
             <MudIconButton Icon="@Icons.Material.Filled.Add" Color="@Color.Success" OnClick="QuickHeal" title="@Loc["HPHeal"]" />
             <MudButton Variant="Variant.Filled" Color="@Color.Primary" Size="Size.Small"
                        StartIcon="@Icons.Material.Filled.Calculate"
-                       OnClick="@(() => _applyModal?.ShowAsync() ?? Task.CompletedTask)" title="@Loc["HPApplyButton"]">
+                       OnClick="OpenApplyModal" title="@Loc["HPApplyButton"]">
                 @Loc["HPApplyShort"]
             </MudButton>
             @if (Field.CanUndo)
@@ -173,6 +173,7 @@ else
     [Parameter] public bool EditionMode { get; set; } = false;
     [Parameter] public EventCallback OnChange { get; set; }
     [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
+    [CascadingParameter] public DCDamageSourceContext? SourceContext { get; set; }
 
     private GenericModal<HitPointsConfigPopup>? _configModal;
     private GenericModal<HitPointsApplyPopup>? _applyModal;
@@ -218,10 +219,20 @@ else
         if (rule != null) amount = rule.Apply(amount);
 
         uint absorbed = Field.ApplyDamage(amount);
+        var tags = new List<string>(_quickTags);
         _quickAmount = 0;
         _quickTags.Clear();
 
-        await NotifyChanged(oldValue, "CurrentChanged", kind, raw, amount, 0, (int)absorbed);
+        var line = new DCDamageLineInfo
+        {
+            Kind = kind,
+            RuleName = rule?.Name ?? string.Empty,
+            RawAmount = raw,
+            AppliedAmount = amount,
+            Tags = tags
+        };
+
+        await NotifyChanged(oldValue, "CurrentChanged", kind, raw, amount, 0, (int)absorbed, line);
     }
 
     private async Task QuickHeal()
@@ -266,6 +277,18 @@ else
             await OnChange.InvokeAsync();
     }
 
+    /// The popup lives with the card rather than being created on each open, so
+    /// it is put back to a clean state on the way in.
+    private async Task OpenApplyModal()
+    {
+        _applyPopup?.Reset();
+
+        if (_applyModal != null)
+        {
+            await _applyModal.ShowAsync();
+        }
+    }
+
     /// The modal's OK button is what commits the staged lines.
     private async Task OnApplyModalClose(bool result)
     {
@@ -284,7 +307,7 @@ else
             await OnChange.InvokeAsync();
     }
 
-    private async Task NotifyChanged(int oldValue, string action, string? kind, int rawDamage, int appliedDamage, int appliedHeal, int temporaryAbsorbed)
+    private async Task NotifyChanged(int oldValue, string action, string? kind, int rawDamage, int appliedDamage, int appliedHeal, int temporaryAbsorbed, DCDamageLineInfo? line = null)
     {
         var info = new CustomFieldChangeInfo
         {
@@ -292,8 +315,14 @@ else
             OldValue = oldValue,
             NewValue = Field.CurrentHP,
             Action = action,
-            ChangeDirection = Field.CurrentHP > oldValue ? "Increased" : (Field.CurrentHP < oldValue ? "Decreased" : "Unchanged")
+            ChangeDirection = Field.CurrentHP > oldValue ? "Increased" : (Field.CurrentHP < oldValue ? "Decreased" : "Unchanged"),
+            // Nobody was asked here, so the source is whoever holds the
+            // initiative and the entry is flagged as a guess.
+            SourceName = SourceContext?.SuggestedSource ?? string.Empty,
+            SourceInferred = true,
+            SourceIsPlayer = SourceContext?.IsPlayer(SourceContext.SuggestedSource) ?? false
         };
+        if (line != null) info.DamageLines.Add(line);
         info.Data["damageKinds"] = string.IsNullOrEmpty(kind) ? null : kind;
         info.Data["rawDamage"] = rawDamage;
         info.Data["appliedDamage"] = appliedDamage;

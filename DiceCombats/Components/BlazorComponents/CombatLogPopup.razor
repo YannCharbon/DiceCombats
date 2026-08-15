@@ -1,0 +1,406 @@
+@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@using System.Text.Json
+
+@inject DiceCombatsService CombatService
+@inject DiceCombats.Automations.CombatLogService CombatLog
+@inject IStringLocalizer<Resources.Localization.CombatManager> Loc
+@inject IDialogService DialogService
+@inject IFileHandler FileHandler
+@inject PopupNotificationService PopupNotificationService
+
+<style>
+    .cl-popup {
+        width: 900px;
+        max-width: 100%;
+    }
+
+    .cl-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .cl-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .cl-summary span {
+        background-color: #383838;
+        border: 1px solid #505050;
+        border-radius: 30px;
+        padding: 2px 10px;
+        font-size: 0.85rem;
+        color: #C0C0C0;
+    }
+
+    .cl-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 6px;
+    }
+
+    .cl-table th {
+        text-align: left;
+        font-size: 0.8rem;
+        color: #A0A0A0;
+        font-weight: normal;
+        border-bottom: 1px solid #505050;
+        padding: 4px 6px;
+    }
+
+    .cl-table td {
+        padding: 4px 6px;
+        border-bottom: 1px solid #3A3A3A;
+    }
+
+    .cl-num {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .cl-kind {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 30px;
+        padding: 1px 8px;
+        margin-right: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .cl-timeline {
+        max-height: 260px;
+        overflow-y: auto;
+        border: 1px solid #505050;
+        border-radius: 8px;
+        padding: 6px 10px;
+    }
+
+    .cl-entry {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 0;
+        border-bottom: 1px solid #3A3A3A;
+        font-size: 0.85rem;
+    }
+
+    .cl-round {
+        color: #A0A0A0;
+        font-size: 0.8rem;
+        margin-top: 8px;
+    }
+
+    .cl-inferred {
+        color: #909090;
+        font-style: italic;
+        font-size: 0.75rem;
+    }
+
+    @@media screen and (max-width: 768px) {
+        .cl-popup {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="cl-popup">
+    <h2>@Loc["LogTitle"]</h2>
+
+    @if (_sessions.Count == 0)
+    {
+        <p style="color:#A0A0A0;">@Loc["LogEmpty"]</p>
+    }
+    else
+    {
+        <div class="cl-head">
+            <div style="width:340px;">
+                <MudSelect T="Guid" Value="_selectedId" ValueChanged="SelectSession" Variant="Variant.Outlined" Margin="Margin.Dense" Label="@Loc["LogSession"]">
+                    @foreach (var session in _sessions)
+                    {
+                        <MudSelectItem T="Guid" Value="@session.Id">@DescribeSession(session)</MudSelectItem>
+                    }
+                </MudSelect>
+            </div>
+            @if (_selected != null)
+            {
+                <MudButton OnClick="ExportSelectedSession" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Small">
+                    @Loc["LogExportBtn"]
+                </MudButton>
+            }
+            <MudButton OnClick="ExportAllSessions" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary" Size="Size.Small">
+                @Loc["LogExportAllBtn"]
+            </MudButton>
+            @if (_selected != null && !IsLive(_selected))
+            {
+                <MudButton OnClick="DeleteSelectedSession" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small">
+                    @Loc["LogDeleteBtn"]
+                </MudButton>
+            }
+        </div>
+    }
+
+    @if (_selected != null)
+    {
+        var bySource = DCCombatLogStatistics.BySource(_selected);
+        var byTarget = DCCombatLogStatistics.ByTarget(_selected);
+
+        <div class="cl-summary">
+            <span>@string.Format(Loc["LogRoundsCount"], _selected.Rounds)</span>
+            <span>@string.Format(Loc["LogEntriesCount"], _selected.Entries.Count)</span>
+            <span>@string.Format(Loc["LogTotalDamage"], bySource.Sum(x => x.DamageDealt))</span>
+            <span>@string.Format(Loc["LogTotalHealing"], bySource.Sum(x => x.HealingGiven))</span>
+        </div>
+
+        <h3>@Loc["LogDamageDealt"]</h3>
+        @if (bySource.Count == 0)
+        {
+            <p style="color:#A0A0A0;">@Loc["LogNoData"]</p>
+        }
+        else
+        {
+            <table class="cl-table">
+                <tr>
+                    <th>@Loc["LogSource"]</th>
+                    <th class="cl-num">@Loc["LogDamage"]</th>
+                    <th class="cl-num">@Loc["LogHits"]</th>
+                    <th class="cl-num">@Loc["LogBestHit"]</th>
+                    <th class="cl-num">@Loc["LogAverageHit"]</th>
+                    <th class="cl-num">@Loc["LogHealing"]</th>
+                    <th>@Loc["LogByKind"]</th>
+                </tr>
+                @foreach (var summary in bySource)
+                {
+                    <tr>
+                        <td>
+                            @summary.SourceName
+                            @if (summary.InferredHits > 0)
+                            {
+                                <div class="cl-inferred">@string.Format(Loc["LogInferredHits"], summary.InferredHits)</div>
+                            }
+                        </td>
+                        <td class="cl-num">@summary.DamageDealt</td>
+                        <td class="cl-num">@summary.Hits</td>
+                        <td class="cl-num">@summary.BestHit</td>
+                        <td class="cl-num">@summary.AverageHit.ToString("0.0")</td>
+                        <td class="cl-num">@summary.HealingGiven</td>
+                        <td>
+                            @foreach (var kind in summary.DamageByKind.OrderByDescending(x => x.Value))
+                            {
+                                <span class="cl-kind" style="@KindStyle(kind.Key)">@kind.Key @kind.Value</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+
+        <h3>@Loc["LogDamageTaken"]</h3>
+        @if (byTarget.Count == 0)
+        {
+            <p style="color:#A0A0A0;">@Loc["LogNoData"]</p>
+        }
+        else
+        {
+            <table class="cl-table">
+                <tr>
+                    <th>@Loc["LogTarget"]</th>
+                    <th class="cl-num">@Loc["LogDamage"]</th>
+                    <th class="cl-num">@Loc["LogHealing"]</th>
+                </tr>
+                @foreach (var summary in byTarget)
+                {
+                    <tr>
+                        <td>@summary.TargetName</td>
+                        <td class="cl-num">@summary.DamageTaken</td>
+                        <td class="cl-num">@summary.HealingReceived</td>
+                    </tr>
+                }
+            </table>
+        }
+
+        <h3>@Loc["LogTimeline"]</h3>
+        <div class="cl-timeline">
+            @foreach (var round in _selected.Entries.GroupBy(x => x.Round).OrderBy(x => x.Key))
+            {
+                <div class="cl-round">@string.Format(Loc["LogRound"], round.Key)</div>
+                @foreach (var entry in round.OrderBy(x => x.Sequence))
+                {
+                    <div class="cl-entry">
+                        @if (entry.Type == DCCombatLogEntryTypes.Turn)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Style="font-size:16px;color:#A0A0A0;" />
+                            <span style="color:#A0A0A0;">@string.Format(Loc["LogTurnOf"], entry.SourceName)</span>
+                        }
+                        else if (entry.Type == DCCombatLogEntryTypes.Heal)
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Favorite" Style="font-size:16px;color:#4CAF50;" />
+                            <span>@DescribeActor(entry) @string.Format(Loc["LogHealed"], entry.TargetName, entry.AppliedAmount)</span>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:16px;color:#E04545;" />
+                            <span>@DescribeActor(entry) @string.Format(Loc["LogDamaged"], entry.TargetName, entry.AppliedAmount)</span>
+                            @if (!string.IsNullOrEmpty(entry.DamageKind))
+                            {
+                                <span class="cl-kind" style="@KindStyle(entry.DamageKind)">@entry.DamageKind</span>
+                            }
+                            @if (!string.IsNullOrEmpty(entry.RuleName) && entry.RawAmount != entry.AppliedAmount)
+                            {
+                                <span class="cl-inferred">@entry.RuleName (@entry.RawAmount &rarr; @entry.AppliedAmount)</span>
+                            }
+                        }
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DCCombat Combat { get; set; } = new DCCombat("Default");
+
+    private List<DCCombatLogSession> _sessions = new List<DCCombatLogSession>();
+    private DCCombatLogSession? _selected;
+    private Guid _selectedId = Guid.Empty;
+
+    protected override void OnParametersSet()
+    {
+        // Reloaded every time the modal is shown, so a session that just ended
+        // (or the one being recorded) is always the one on screen.
+        _sessions = CombatService.GetCombatLogSessions(Combat.Id);
+
+        var live = CombatLog.CurrentSession;
+        if (live != null && live.CombatId == Combat.Id)
+        {
+            _sessions.Insert(0, live);
+        }
+
+        if (_sessions.Find(x => x.Id == _selectedId) == null)
+        {
+            _selected = _sessions.FirstOrDefault();
+            _selectedId = _selected?.Id ?? Guid.Empty;
+        }
+        else
+        {
+            _selected = _sessions.Find(x => x.Id == _selectedId);
+        }
+    }
+
+    private void SelectSession(Guid id)
+    {
+        _selectedId = id;
+        _selected = _sessions.Find(x => x.Id == id);
+    }
+
+    private bool IsLive(DCCombatLogSession session)
+    {
+        return CombatLog.CurrentSession != null && CombatLog.CurrentSession.Id == session.Id;
+    }
+
+    private string DescribeSession(DCCombatLogSession session)
+    {
+        string when = session.StartedAt.ToLocalTime().ToString("g");
+        return IsLive(session) ? $"{when} ({Loc["LogRecording"]})" : when;
+    }
+
+    private static string DescribeActor(DCCombatLogEntry entry)
+    {
+        return string.IsNullOrEmpty(entry.SourceName) ? "?" : entry.SourceName;
+    }
+
+    /// The statistics travel with the entries: an external tool would otherwise
+    /// have to redo the aggregation to get the same numbers as the screen.
+    private static object BuildExport(DCCombatLogSession session)
+    {
+        return new
+        {
+            session.Id,
+            session.CombatId,
+            session.CombatName,
+            session.StartedAt,
+            session.EndedAt,
+            session.Rounds,
+            session.Entries,
+            BySource = DCCombatLogStatistics.BySource(session),
+            ByTarget = DCCombatLogStatistics.ByTarget(session)
+        };
+    }
+
+    private async Task ExportSelectedSession()
+    {
+        if (_selected == null) return;
+
+        await ExportAsync(BuildExport(_selected), $"DC_combatlog_{Combat.Name}_{_selected.StartedAt.ToLocalTime():yyyyMMdd_HHmm}.json");
+    }
+
+    private async Task ExportAllSessions()
+    {
+        if (_sessions.Count == 0) return;
+
+        await ExportAsync(_sessions.Select(BuildExport).ToList(), $"DC_combatlogs_{Combat.Name}.json");
+    }
+
+    private async Task ExportAsync(object content, string fileName)
+    {
+        var options = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
+        };
+        string json = JsonSerializer.Serialize(content, options);
+
+        await FileHandler.SaveFileAsync(fileName, System.Text.Encoding.UTF8.GetBytes(json));
+
+        PopupNotificationService.Show(Loc["LogExportTitle"], Loc["LogExportDone"], PopupNotificationService.Type.SUCCESS, 3000);
+    }
+
+    private async Task DeleteSelectedSession()
+    {
+        if (_selected == null || IsLive(_selected)) return;
+
+        bool? confirm = await DialogService.ShowMessageBoxAsync(
+            Loc["LogDeleteTitle"],
+            Loc["LogDeleteQuestion"],
+            yesText: Loc["LogDeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);
+        if (confirm != true) return;
+
+        CombatService.DeleteCombatLogSession(_selected);
+        _selectedId = Guid.Empty;
+        OnParametersSet();
+    }
+
+    /// The kinds live on the creatures, so their colours are looked up there
+    /// rather than stored a second time in the log.
+    private string KindStyle(string kindName)
+    {
+        foreach (DCCreature creature in Combat.CreaturesList)
+        {
+            foreach (var field in creature.CustomFields)
+            {
+                if (field is not DCCreatureHitPointsField hitPoints) continue;
+
+                var kind = hitPoints.DamageKinds.Find(x => x.Name == kindName);
+                if (kind != null)
+                {
+                    return $"background-color:{kind.Color};color:{kind.TextColor};";
+                }
+            }
+        }
+
+        return "background-color:#505050;color:white;";
+    }
+}

@@ -120,11 +120,17 @@
   <data name="DeleteBtn" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="EditMarkdownBtn" xml:space="preserve">
+    <value>Edit Markdown</value>
+  </data>
   <data name="EditionModeChkbx" xml:space="preserve">
     <value>Edition mode</value>
   </data>
-  <data name="EditMarkdownBtn" xml:space="preserve">
-    <value>Edit Markdown</value>
+  <data name="LinkOpenInBrowser" xml:space="preserve">
+    <value>Open in the browser</value>
+  </data>
+  <data name="OpenLinksInAppChkbx" xml:space="preserve">
+    <value>Open sheet links in the app</value>
   </data>
   <data name="StopEditingBtn" xml:space="preserve">
     <value>Stop editing</value>

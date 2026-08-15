@@ -120,11 +120,17 @@
   <data name="DeleteBtn" xml:space="preserve">
     <value>Supprimer</value>
   </data>
+  <data name="EditMarkdownBtn" xml:space="preserve">
+    <value>Éditer le Markdown</value>
+  </data>
   <data name="EditionModeChkbx" xml:space="preserve">
     <value>Mode d'édition</value>
   </data>
-  <data name="EditMarkdownBtn" xml:space="preserve">
-    <value>Éditer le Markdown</value>
+  <data name="LinkOpenInBrowser" xml:space="preserve">
+    <value>Ouvrir dans le navigateur</value>
+  </data>
+  <data name="OpenLinksInAppChkbx" xml:space="preserve">
+    <value>Ouvrir les liens de la fiche dans l'application</value>
   </data>
   <data name="StopEditingBtn" xml:space="preserve">
     <value>Arrêter l'édition</value>

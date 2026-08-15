@@ -293,13 +293,13 @@
                         }
                         else if (creature.HtmlSheet != string.Empty)
                         {
-                            <div style="color:black">
+                            <div style="color:black" class="@SheetLinkClass(creature)">
                                 @((MarkupString)creature.HtmlSheet)
                             </div>
                         }
                         else if (creature.MarkdownSheet != string.Empty)
                         {
-                            <div id="markdown-rendered-div" class="markdown-content">
+                            <div id="markdown-rendered-div" class="markdown-content @SheetLinkClass(creature)">
                                 @((MarkupString)creature.GetMarkdownSheetAsHtml())
                             </div>
                         }
@@ -536,6 +536,13 @@
     private void OpenCreaturesSelectorModal()
     {
         CreaturesSelectorModalRef?.Show();
+    }
+
+    /// The creature carries the choice, so a sheet keeps behaving the same way
+    /// whether it is read from the bestiary or in the middle of a fight.
+    private static string SheetLinkClass(DCCreature creature)
+    {
+        return creature.OpenLinksInApp ? "dc-sheet-inapp" : string.Empty;
     }
 
     private void OpenCombatLogModal()

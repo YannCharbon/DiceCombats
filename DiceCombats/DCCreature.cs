@@ -35,6 +35,10 @@ namespace DiceCombats
         public List<DCCreatureCustomField> CustomFields { get; set; } = new List<DCCreatureCustomField>();
         public uint InCombatInstanceCount { get; set; } = 1;
         public bool IsPlayer { get; set; } = false;
+        // Sheets imported from aidedd.org link to the spells they use. True opens
+        // those links in a window of the app instead of handing them to the
+        // system browser, which is what a creature saved before this existed gets.
+        public bool OpenLinksInApp { get; set; } = true;
         public bool IsManual { get; set; } = false;
         public int InitiativeRank { get; set; } = 0;
         public int InitiativeRoll { get; set; } = 0;

@@ -68,6 +68,34 @@
             });
         };
 
+        // Links of a creature sheet marked as "open in app" are handed to the
+        // Blazor side instead of being followed, which would otherwise send them
+        // to the system browser.
+        window.dcRegisterSheetLinks = (reference) => {
+            window.dcSheetLinksRef = reference;
+
+            if (window.dcSheetLinksBound) return;
+            window.dcSheetLinksBound = true;
+
+            document.addEventListener('click', (event) => {
+                if (!window.dcSheetLinksRef) return;
+
+                const anchor = event.target.closest ? event.target.closest('a') : null;
+                if (!anchor) return;
+
+                const href = anchor.getAttribute('href');
+                if (!href || !/^https?:/i.test(href)) return;
+                if (!anchor.closest('.dc-sheet-inapp')) return;
+
+                event.preventDefault();
+                window.dcSheetLinksRef.invokeMethodAsync('OpenLink', href);
+            }, true);
+        };
+
+        window.dcUnregisterSheetLinks = () => {
+            window.dcSheetLinksRef = null;
+        };
+
         window.dcCopyText = async (text) => {
             try {
                 await navigator.clipboard.writeText(text);

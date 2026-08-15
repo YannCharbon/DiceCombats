@@ -58,6 +58,10 @@
         <MudButton OnClick="Save" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Size="Size.Large">@Loc["StopEditingBtn"]</MudButton>
         <MudButton OnClick="Delete" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" Size="Size.Large">@Loc["DeleteBtn"]</MudButton>
         <MudCheckBox Label="@Loc["EditionModeChkbx"]" @bind-Value="_editionMode"></MudCheckBox>
+        @if (HasSheetLinks)
+        {
+            <MudCheckBox Label="@Loc["OpenLinksInAppChkbx"]" @bind-Value="creature.OpenLinksInApp"></MudCheckBox>
+        }
     </MudStack>
 
     <div style="padding:10px">
@@ -67,7 +71,7 @@
         }
         else if (creature.HtmlSheet != string.Empty)
         {
-            <div style="color:black;">
+            <div style="color:black;" class="@SheetLinkClass">
                 @((MarkupString)creature.HtmlSheet)
             </div>
         }
@@ -79,13 +83,13 @@
                     <div class="one-column-item" style="padding:10px;">
                         <MudTextField DebounceInterval="500" Sizing="InputSizing.Auto" MaxLines="20" Label="@Loc["EditMarkdownBtn"]" Variant="Variant.Outlined" T="string" Value="@creature.MarkdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
                     </div>
-                    <div class="markdown-content one-column-item" style="padding:10px;">
+                    <div class="markdown-content one-column-item @SheetLinkClass" style="padding:10px;">
                         @((MarkupString)creature.GetMarkdownSheetAsHtml())
                     </div>
                 </div>
             } else
             {
-                <div class="markdown-content">
+                <div class="markdown-content @SheetLinkClass">
                     @((MarkupString)creature.GetMarkdownSheetAsHtml())
                 </div>
             }
@@ -113,6 +117,11 @@
 
     private DCCreature? creature = null;
     private bool _editionMode = true;
+
+    /// Only worth offering on a sheet that actually links somewhere.
+    private bool HasSheetLinks => creature != null && (creature.HtmlSheet.Contains("<a ") || creature.MarkdownSheet.Contains("http"));
+
+    private string SheetLinkClass => creature?.OpenLinksInApp == true ? "dc-sheet-inapp" : string.Empty;
 
     protected override void OnInitialized()
     {

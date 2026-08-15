@@ -456,5 +456,55 @@ dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-windows10.0.19041.0 -c 
         </div>
     </footer>
 
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged screenshot">
+        <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+        <img src="" alt="" />
+    </div>
+
+    <script>
+        // Click a screenshot to see it full size. Only the screenshots are
+        // concerned, not the logos and the badges.
+        (function () {
+            var box = document.getElementById("lightbox");
+            var full = box.querySelector("img");
+            var close = box.querySelector(".lightbox-close");
+            var opener = null;
+
+            function open(image) {
+                opener = image;
+                full.src = image.currentSrc || image.src;
+                full.alt = image.alt;
+                box.classList.add("open");
+                document.body.classList.add("lightbox-open");
+                close.focus();
+            }
+
+            function hide() {
+                box.classList.remove("open");
+                document.body.classList.remove("lightbox-open");
+                full.src = "";
+                if (opener) { opener.focus(); opener = null; }
+            }
+
+            var images = document.querySelectorAll(".hero-shot, .shot-media img, .ftype img, .fields-split img");
+            Array.prototype.forEach.call(images, function (image) {
+                image.classList.add("zoomable");
+                image.tabIndex = 0;
+                image.addEventListener("click", function () { open(image); });
+                image.addEventListener("keydown", function (event) {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        open(image);
+                    }
+                });
+            });
+
+            box.addEventListener("click", hide);
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape" && box.classList.contains("open")) hide();
+            });
+        })();
+    </script>
+
 </body>
 </html>

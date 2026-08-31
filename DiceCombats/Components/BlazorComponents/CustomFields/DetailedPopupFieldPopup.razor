@@ -40,6 +40,9 @@
         display: block;
         width: calc(50% - 1rem);
         margin-bottom: 1rem;
+        /* See the combat manager: a transform here would make this element the
+           containing block of the surrounding position:fixed modal. */
+        transform: none !important;
     }
 
     @@media screen and (max-width: 768px) {
@@ -93,6 +96,17 @@
 </style>
 
 <script>
+    // Also defined by the combat manager; either component may render first, and this
+    // popup is used from the creature manager too, where the other script is absent.
+    window.dcMasonrySignature = window.dcMasonrySignature || function (grid, itemSelector) {
+        const items = grid.querySelectorAll(itemSelector);
+        let sig = grid.clientWidth + ':' + items.length;
+        for (let i = 0; i < items.length; i++) {
+            sig += '|' + items[i].offsetHeight;
+        }
+        return sig;
+    };
+
     // Kept separate from the combat manager's initializeMasonry: both scripts are
     // global, so a shared name meant whichever component rendered last defined it.
     // Takes the popup's own root element: one popup exists per creature card, so
@@ -103,6 +117,11 @@
         }
         root.querySelectorAll('.dpf-masonry-layout').forEach(grid => {
             if (grid.dcMasonry) {
+                const signature = window.dcMasonrySignature(grid, '.dpf-masonry-item');
+                if (signature === grid.dcMasonrySignatureValue) {
+                    return;
+                }
+                grid.dcMasonrySignatureValue = signature;
                 grid.dcMasonry.reloadItems();
                 grid.dcMasonry.layout();
                 return;
@@ -111,8 +130,13 @@
                 itemSelector: '.dpf-masonry-item',
                 columnWidth: '.dpf-masonry-item',
                 percentPosition: true,
-                gutter: 10
+                gutter: 10,
+                // No animated relayout: the transform Outlayer uses to animate a move
+                // would make the item the containing block of this popup's own
+                // position:fixed modal. See the note in CombatManager.razor.
+                transitionDuration: 0
             });
+            grid.dcMasonrySignatureValue = window.dcMasonrySignature(grid, '.dpf-masonry-item');
         });
     };
 </script>

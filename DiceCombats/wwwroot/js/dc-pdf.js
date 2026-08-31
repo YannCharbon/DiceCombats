@@ -21,11 +21,22 @@ function __dc_el(tag, cls, text) {
     return e;
 }
 
+// One live ResizeObserver per PDF container. Re-rendering a page used to leave its
+// observer behind, so repeated calls stacked observers on the same element and a single
+// size change fanned out into several redundant renders.
+const __dc_pdfObservers = new WeakMap();
+
 // ===== Page renderer (per piece) =====
 // Options: { initialScale: 'fit-width' | number }
 window.DC_pdfRenderPage = function (containerId, base64Data, pageNumber, opts) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    // Rendering clears the container and refills it asynchronously, which makes the page
+    // flash and resets the reader's zoom. Never redo it for content already shown.
+    const token = pageNumber + ":" + ((base64Data && base64Data.length) || 0);
+    if (container.dataset.dcPdfToken === token && container.childElementCount > 0) return;
+    container.dataset.dcPdfToken = token;
 
     // Reset any transform leftovers that could mirror content
     container.style.transform = "none";
@@ -41,7 +52,8 @@ window.DC_pdfRenderPage = function (containerId, base64Data, pageNumber, opts) {
             dpiScale: Math.max(1, window.devicePixelRatio || 1), // render scale multiplier
             pdf: null,
             page: null,
-            viewportAt1: null
+            viewportAt1: null,
+            lastUiScale: null
         };
 
         const loadingTask = window.pdfjsLib.getDocument({ data: bytes });
@@ -84,10 +96,10 @@ window.DC_pdfRenderPage = function (containerId, base64Data, pageNumber, opts) {
                 //    render();
                 //}, { passive: false });
 
-                btnFit.onclick = () => { state.uiScale = "fit-width"; render(); };
-                btn100.onclick = () => { state.uiScale = 1.0; render(); };
-                btnMinus.onclick = () => { state.uiScale = Math.max(0.25, (typeof state.uiScale === "number" ? state.uiScale : 1.0) / 1.15); render(); };
-                btnPlus.onclick = () => { state.uiScale = Math.min(6.0, (typeof state.uiScale === "number" ? state.uiScale : 1.0) * 1.15); render(); };
+                btnFit.onclick = () => { state.uiScale = "fit-width"; render(true); };
+                btn100.onclick = () => { state.uiScale = 1.0; render(true); };
+                btnMinus.onclick = () => { state.uiScale = Math.max(0.25, (typeof state.uiScale === "number" ? state.uiScale : 1.0) / 1.15); render(true); };
+                btnPlus.onclick = () => { state.uiScale = Math.min(6.0, (typeof state.uiScale === "number" ? state.uiScale : 1.0) * 1.15); render(true); };
 
                 // Initial scale
                 state.uiScale = (opts.initialScale === "fit-width") ? "fit-width" :
@@ -98,14 +110,23 @@ window.DC_pdfRenderPage = function (containerId, base64Data, pageNumber, opts) {
                         const styles = getComputedStyle(container);
                         const pad = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
                         const usable = container.clientWidth - pad;
+                        // While the popup is still hidden the container measures 0; keep the
+                        // last good scale instead of snapping to the minimum and back.
+                        if (!(usable > 0)) return state.lastUiScale || 1.2;
                         const s = usable / state.viewportAt1.width;
                         return Math.max(0.5, Math.min(4.0, s));
                     }
                     return state.uiScale || 1.2;
                 }
 
-                function render() {
+                function render(force) {
                     const ui = computeUiScale();
+                    // render() resizes the canvas inside the observed subtree; without this
+                    // guard every relayout bounced the page between two sizes.
+                    if (!force && state.lastUiScale !== null && Math.abs(ui - state.lastUiScale) < 0.005) {
+                        return;
+                    }
+                    state.lastUiScale = ui;
                     const renderScale = ui * state.dpiScale;
 
                     const vp = state.page.getViewport({ scale: renderScale });
@@ -132,12 +153,21 @@ window.DC_pdfRenderPage = function (containerId, base64Data, pageNumber, opts) {
                     });
                 }
 
-                const ro = new ResizeObserver(() => {
-                    if (state.uiScale === "fit-width") render();
-                });
-                ro.observe(container);
+                const previousObserver = __dc_pdfObservers.get(container);
+                if (previousObserver) { previousObserver.disconnect(); }
 
-                render();
+                let relayoutPending = false;
+                const ro = new ResizeObserver(() => {
+                    if (state.uiScale !== "fit-width" || relayoutPending) return;
+                    relayoutPending = true;
+                    requestAnimationFrame(() => { relayoutPending = false; render(false); });
+                });
+                // Observe the parent: its width is what drives the fit, and unlike the
+                // container it is not resized by render() itself.
+                ro.observe(container.parentElement || container);
+                __dc_pdfObservers.set(container, ro);
+
+                render(true);
             });
         }, reason => {
             container.innerHTML = '<div style="color:#f55">Failed to load PDF: ' +

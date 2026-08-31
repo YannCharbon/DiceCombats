@@ -91,6 +91,10 @@
     display: block;
     width: calc(50% - 1rem); /* Adjust width for 3 items per row */
     margin-bottom: 1rem;
+    /* Masonry places items with left/top. A transform here would turn the card into
+    the containing block of every position:fixed descendant - which is how the
+    detailed popup modal ended up thrown off the right edge of the screen. */
+    transform: none !important;
     }
 
     @@media screen and (max-width: 768px) {
@@ -171,6 +175,17 @@
 </style>
 
 <script>
+    // Fingerprint of everything the layout depends on, so a render that changed
+    // nothing does not trigger a relayout.
+    window.dcMasonrySignature = window.dcMasonrySignature || function (grid, itemSelector) {
+    const items = grid.querySelectorAll(itemSelector);
+    let sig = grid.clientWidth + ':' + items.length;
+    for (let i = 0; i < items.length; i++) {
+    sig += '|' + items[i].offsetHeight;
+    }
+    return sig;
+    };
+
     window.initializeMasonry = (selector) => {
     const grid = document.querySelector(selector);
     if (!grid) {
@@ -179,6 +194,11 @@
     // Called after every render: relayout the instance the element already has
     // instead of stacking a new one (and another resize listener) on top of it.
     if (grid.dcMasonry) {
+    const signature = window.dcMasonrySignature(grid, '.masonry-item');
+    if (signature === grid.dcMasonrySignatureValue) {
+    return;
+    }
+    grid.dcMasonrySignatureValue = signature;
     grid.dcMasonry.reloadItems();
     grid.dcMasonry.layout();
     return;
@@ -187,8 +207,17 @@
     itemSelector: '.masonry-item',
     columnWidth: '.masonry-item',
     percentPosition: true,
-    gutter: 10
+    gutter: 10,
+    // Never animate. Outlayer animates a move by putting a transform on each item
+    // for the duration of the transition, and a transformed element becomes the
+    // containing block for its position:fixed descendants. The detailed popup modal
+    // is rendered inside a creature card, so every animated relayout re-anchored it
+    // to that card - it jumped to the right, overflowed the screen, then snapped
+    // back when the transition ended. Only the first layout was ever instant, which
+    // is why this appeared once instances started being reused across renders.
+    transitionDuration: 0
     });
+    grid.dcMasonrySignatureValue = window.dcMasonrySignature(grid, '.masonry-item');
     };
 </script>
 

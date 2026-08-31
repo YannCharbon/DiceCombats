@@ -47,3 +47,16 @@
 
 - **Build and warnings**
   The project builds again after the package update, and all build warnings have been cleared.
+
+- **PDF pages rebuilt every second**
+  A PDF inside a detailed popup was torn down and rendered again on every render of the
+  page holding it - about once a second while a combat timer runs - which made it flash,
+  jump and lose the zoom level. Each page now keeps a stable identity so it is rendered
+  once, and the zoom-to-fit no longer re-triggers itself.
+
+- **Detailed popup jumping off the screen**
+  Opening a detailed popup no longer makes the creature cards slide and the modal shoot off
+  the right edge of the screen before snapping back. Relayouts of the masonry grids are now
+  instantaneous instead of animated: the animation put a temporary transform on the creature
+  card, which made the card - rather than the window - the reference for the popup placed
+  inside it.

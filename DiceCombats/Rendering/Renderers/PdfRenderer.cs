@@ -32,6 +32,14 @@ namespace DiceCombats.Rendering.Renderers
 
             var base64 = Convert.ToBase64String(bytes);
 
+            // The element id has to be stable across renders. RenderMany runs again on
+            // every render of the hosting component (the combat timer alone re-renders
+            // once a second), and a fresh id made the emitted markup differ every time,
+            // so Blazor replaced the node, the embedded script re-ran, and the page was
+            // cleared and rendered from scratch - visibly, and leaking a ResizeObserver
+            // each round.
+            var docKey = ComputeDocKey(item, bytes);
+
             // Try to index with PdfPig
             var pageTexts = new List<(int page, string text)>();
             if (bytes.Length > 0)
@@ -54,7 +62,7 @@ namespace DiceCombats.Rendering.Renderers
             if (pageTexts.Count == 0)
             {
                 // Fallback: single failure piece
-                var id = "pdf_" + Guid.NewGuid().ToString("N");
+                var id = "pdf_" + docKey;
                 var html = $@"<div class='pdf-doc' id='{id}'>
 <div class='pdf-page'><div class='pdf-page-header'>PDF</div>
 <div style='color:#f55'>No pages or parsing failed.</div></div></div>";
@@ -65,7 +73,7 @@ namespace DiceCombats.Rendering.Renderers
 
             foreach (var (pageNo, text) in pageTexts)
             {
-                var id = $"pdf_{pageNo}_{Guid.NewGuid():N}";
+                var id = $"pdf_{pageNo}_{docKey}";
                 var html = $@"<div class='pdf-doc' id='{id}'></div>
 <script>
 (function(){{
@@ -92,6 +100,24 @@ namespace DiceCombats.Rendering.Renderers
                 var idx = new SimpleIndex(new[] { ($"page-{pageNo}", text ?? string.Empty) });
                 yield return new RenderPiece(frag, idx, $"page-{pageNo}");
             }
+        }
+
+        /// <summary>
+        /// Deterministic short key for this document, so that repeated renders of the
+        /// same content produce byte-identical markup and Blazor leaves the DOM alone.
+        /// </summary>
+        private static string ComputeDocKey(IContentItem item, byte[] bytes)
+        {
+            using var hash = System.Security.Cryptography.IncrementalHash.CreateHash(
+                System.Security.Cryptography.HashAlgorithmName.SHA256);
+
+            var header = System.Text.Encoding.UTF8.GetBytes(
+                $"{item.Name}|{item.Path}|{bytes.Length}");
+
+            hash.AppendData(header);
+            hash.AppendData(bytes);
+
+            return Convert.ToHexString(hash.GetHashAndReset()).Substring(0, 16).ToLowerInvariant();
         }
     }
 }

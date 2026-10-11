@@ -7,246 +7,286 @@
 *@
 
 @using DiceCombats
-@using MudBlazor.Utilities
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 <style>
-    /* Two columns as soon as there is room, so the configuration fits a screen. */
-    .hp-config-grid {
+    /* The kinds list scrolls (.dc-mscroll), and .dc-pop is position:absolute, so
+       a floating palette would be clipped by that scroller. These two pickers
+       open in flow under their own row instead. */
+    .hp-inline-pop {
+        position: static;
+        width: auto;
+        max-width: none;
+        margin: -1px 0 6px;
+    }
+
+    /* The 24 icons, six to a row, so the icon picker is as wide as .dc-palette. */
+    .hp-icon-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-        gap: 10px;
-        align-items: start;
+        grid-template-columns: repeat(6, 32px);
+        gap: 4px;
     }
 
-    .hp-config-section {
-        background-color: #2A2A2A;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        border: 1px solid #808080;
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-
-    .hp-config-head {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 6px;
-    }
-
-    .hp-config-title {
-        padding: 4px 12px;
-        background-color: darkcyan;
-        border-radius: 10px;
-        font-size: 17px;
-        font-weight: bold;
-    }
-
-    .hp-config-help {
-        color: grey;
-        font-size: 13px;
-        margin: 0 0 8px 0;
-    }
-
-    .hp-config-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 6px;
-        padding: 6px;
-        border-radius: 5px;
-        background-color: #404040;
-    }
-
-    .hp-scroll {
-        max-height: 260px;
-        overflow-y: auto;
-        overflow-x: hidden;
-    }
-
-    .hp-kind-preview {
+    /* SortableList's drag handle. It stays a plain element and never a button,
+       so a drag started on it is not swallowed by a click target. */
+    .hp-drag {
         display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-weight: bold;
-        white-space: nowrap;
+        cursor: move;
+        color: var(--t3);
+        flex: none;
     }
 </style>
 
 <h4 style="text-align:center;margin-bottom:10px;">@Field.Title</h4>
 
-<div class="hp-config-section">
-    <div class="hp-config-head">
-        <span class="hp-config-title">@Loc["HPGeneralTitle"]</span>
+<div class="dc-msec" style="margin-bottom:12px;">
+    <div class="dc-msec-head">
+        <span class="dc-msec-title">@Loc["HPGeneralTitle"]</span>
         @* Temporary hit points and the maximum reduction are effects applied
            during play, so they live in the damage popup, not here. *@
-        <div style="width:130px;">
-            <MudNumericField T="uint" Value="@Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["MaxHPLabel"]</span>
+            <div class="dc-step">
+                <button type="button" @onclick="@(() => StepMaximumHp(-1))">&minus;</button>
+                <input type="number" class="dc-num" min="0" value="@Field.MaximumHP" @onchange="OnMaximumHpInput" />
+                <button type="button" @onclick="@(() => StepMaximumHp(1))">+</button>
+            </div>
         </div>
-        <MudCheckBox T="bool" @bind-Value="Field.AllowNegative" Label="@Loc["HPAllowNegative"]" Color="@Color.Primary" Dense="true" />
+        <label class="dc-chk">
+            <input type="checkbox" @bind="Field.AllowNegative" />
+            @Loc["HPAllowNegative"]
+        </label>
     </div>
 </div>
 
 
-<div class="hp-config-grid">
-    <div class="hp-config-section">
-        <div class="hp-config-head">
-            <span class="hp-config-title">@Loc["HPKindsTitle"]</span>
-            <MudButton OnClick="@(() => Field.AddDamageKind())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddKind"]</MudButton>
+<div class="dc-mgrid">
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            <span class="dc-msec-title">@Loc["HPKindsTitle"]</span>
+            <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Field.AddDamageKind())">
+                <DcIcon Name="add" Size="16" />@Loc["HPAddKind"]
+            </button>
         </div>
-        <p class="hp-config-help">@Loc["HPKindsHelp"]</p>
+        <p class="dc-msec-help">@Loc["HPKindsHelp"]</p>
 
         @* Bounded height for long lists. Dragging uses the handle so the text
            fields stay usable. *@
-        <div class="hp-scroll">
+        <div class="dc-mscroll">
             <SortableList Id="hpKindsSortable" Items="Field.DamageKinds" OnUpdate="@SortKinds" Handle=".hp-drag" Context="kind">
                 <SortableItemTemplate>
-                    <div class="hp-config-row">
-                        <MudIcon Icon="@Icons.Material.Filled.DragIndicator" Class="hp-drag" Style="cursor:move;color:grey;" title="@Loc["HPReorderKind"]" />
-                        <div style="width:150px;">
-                            <MudTextField Immediate="true" T="string" Value="@kind.Name" ValueChanged="@((string v) => RenameKind(kind, v))" Label="@Loc["HPKind"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                    <div>
+                        <div class="dc-mrow dc-irow-wrap">
+                            <span class="hp-drag" title="@Loc["HPReorderKind"]"><DcIcon Name="drag" Size="18" /></span>
+                            <div class="dc-field" style="width:144px;">
+                                <span class="dc-flabel">@Loc["HPKind"]</span>
+                                <input class="dc-inp" type="text" spellcheck="false" value="@kind.Name"
+                                       @oninput="@((ChangeEventArgs e) => RenameKind(kind, e.Value?.ToString() ?? string.Empty))" />
+                            </div>
+                            <div class="dc-field">
+                                <span class="dc-flabel">@Loc["HPKindColor"]</span>
+                                <button type="button" class="dc-swbtn" style="@($"background-color:{kind.Color};")"
+                                        title="@Loc["HPKindColor"]" aria-label="@Loc["HPKindColor"]" @onclick="@(() => ToggleColorPicker(kind))"></button>
+                            </div>
+                            <div class="dc-field">
+                                <span class="dc-flabel">@Loc["HPKindIcon"]</span>
+                                <button type="button" class="dc-ib" title="@Loc["HPKindIcon"]" aria-label="@Loc["HPKindIcon"]" @onclick="@(() => ToggleIconPicker(kind))">
+                                    <DcIcon Name="@kind.Icon" Size="18" />
+                                </button>
+                            </div>
+                            <span class="dc-kchip dc-static" style="@($"background-color:{kind.Color};color:{kind.TextColor};")">
+                                <DcIcon Name="@kind.Icon" Size="16" />
+                                @kind.Name
+                            </span>
+                            <button type="button" class="dc-ib dc-danger" style="margin-left:auto;"
+                                    title="@Loc["HPRemoveKind"]" aria-label="@Loc["HPRemoveKind"]" @onclick="@(() => Field.RemoveDamageKind(kind))">
+                                <DcIcon Name="delete" Size="16" />
+                            </button>
                         </div>
-                        <div style="width:130px;">
-                            <MudColorPicker Variant="Variant.Outlined" Margin="Margin.Dense" ColorPickerView="ColorPickerView.GridCompact"
-                                            Palette="@_palette" Label="@Loc["HPKindColor"]"
-                                            Text="@kind.Color" TextChanged="@((string v) => kind.Color = v)" Style="@($"color:{kind.Color};")" />
-                        </div>
-                        <div style="width:100px;">
-                            <MudSelect T="string" @bind-Value="kind.Icon" Label="@Loc["HPKindIcon"]" Variant="Variant.Outlined" Margin="Margin.Dense">
-                                @foreach (string icon in DCHitPointsIcons.Names)
-                                {
-                                    <MudSelectItem T="string" Value="@icon">
-                                        <MudIcon Icon="@DCHitPointsIcons.Resolve(icon)" />
-                                    </MudSelectItem>
-                                }
-                            </MudSelect>
-                        </div>
-                        <span class="hp-kind-preview" style="@($"background-color:{kind.Color};color:{kind.TextColor};")">
-                            <MudIcon Icon="@DCHitPointsIcons.Resolve(kind.Icon)" Style="font-size:18px;" />
-                            @kind.Name
-                        </span>
-                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveDamageKind(kind))" title="@Loc["HPRemoveKind"]" />
+
+                        @if (ReferenceEquals(_colorPickerFor, kind))
+                        {
+                            <div class="dc-pop hp-inline-pop">
+                                <h5>@Loc["HPKindColor"]</h5>
+                                <div class="dc-palette">
+                                    @foreach (string swatch in _palette)
+                                    {
+                                        var c = swatch;
+                                        <button type="button" style="@($"background-color:{c};")" title="@c"
+                                                @onclick="@(() => SetKindColor(kind, c))"></button>
+                                    }
+                                </div>
+                                @* Still free-form, as the picker's text box was. *@
+                                <input class="dc-inp" type="text" spellcheck="false" style="margin-top:8px;" value="@kind.Color" placeholder="#RRGGBB"
+                                       @oninput="@((ChangeEventArgs e) => kind.Color = e.Value?.ToString() ?? string.Empty)" />
+                            </div>
+                        }
+
+                        @if (ReferenceEquals(_iconPickerFor, kind))
+                        {
+                            <div class="dc-pop hp-inline-pop">
+                                <h5>@Loc["HPKindIcon"]</h5>
+                                <div class="hp-icon-grid">
+                                    @foreach (string icon in DCHitPointsIcons.Names)
+                                    {
+                                        var ic = icon;
+                                        <button type="button" class="dc-ib" title="@ic" @onclick="@(() => SetKindIcon(kind, ic))">
+                                            <DcIcon Name="@ic" Size="18" />
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 </SortableItemTemplate>
             </SortableList>
         </div>
     </div>
 
-    <div class="hp-config-section">
-        <div class="hp-config-head">
-            <span class="hp-config-title">@Loc["HPTagsTitle"]</span>
-            <MudButton OnClick="@(() => Field.AddTag())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddTag"]</MudButton>
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            <span class="dc-msec-title">@Loc["HPTagsTitle"]</span>
+            <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Field.AddTag())">
+                <DcIcon Name="add" Size="16" />@Loc["HPAddTag"]
+            </button>
         </div>
-        <p class="hp-config-help">@Loc["HPTagsHelp"]</p>
+        <p class="dc-msec-help">@Loc["HPTagsHelp"]</p>
 
         @foreach (int i in Enumerable.Range(0, Field.Tags.Count))
         {
             var index = i;
-            <div class="hp-config-row">
-                <div style="width:200px;">
-                    <MudTextField Immediate="true" T="string" Value="@Field.Tags[index]" ValueChanged="@((string v) => RenameTag(index, v))" Label="@Loc["HPTag"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <div class="dc-mrow dc-irow-wrap">
+                <div class="dc-field" style="width:200px;">
+                    <span class="dc-flabel">@Loc["HPTag"]</span>
+                    <input class="dc-inp" type="text" spellcheck="false" value="@Field.Tags[index]"
+                           @oninput="@((ChangeEventArgs e) => RenameTag(index, e.Value?.ToString() ?? string.Empty))" />
                 </div>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveTag(Field.Tags[index]))" title="@Loc["HPRemoveTag"]" />
+                <button type="button" class="dc-ib dc-danger" style="margin-left:auto;"
+                        title="@Loc["HPRemoveTag"]" aria-label="@Loc["HPRemoveTag"]" @onclick="@(() => Field.RemoveTag(Field.Tags[index]))">
+                    <DcIcon Name="delete" Size="16" />
+                </button>
             </div>
         }
     </div>
 
-    <div class="hp-config-section">
-        <div class="hp-config-head">
-            <span class="hp-config-title">@Loc["HPRulesTitle"]</span>
-            <MudButton OnClick="@(() => Field.AddMitigationRule())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddRule"]</MudButton>
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            <span class="dc-msec-title">@Loc["HPRulesTitle"]</span>
+            <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Field.AddMitigationRule())">
+                <DcIcon Name="add" Size="16" />@Loc["HPAddRule"]
+            </button>
             @if (Field.MitigationRules.Count == 0)
             {
-                <MudButton OnClick="@(() => Field.AddDefaultMitigationRules())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.AutoMode" Color="@Color.Primary" Size="Size.Small">@Loc["HPAddDefaultRules"]</MudButton>
+                <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => Field.AddDefaultMitigationRules())">
+                    <DcIcon Name="auto-mode" Size="16" />@Loc["HPAddDefaultRules"]
+                </button>
             }
         </div>
-        <p class="hp-config-help">@Loc["HPRulesHelp"]</p>
+        <p class="dc-msec-help">@Loc["HPRulesHelp"]</p>
 
         @foreach (var rule in Field.MitigationRules)
         {
             var r = rule;
-            <div class="hp-config-row">
-                <div style="width:130px;">
-                    <MudTextField Immediate="true" T="string" Value="@r.Name" ValueChanged="@((string v) => RenameRule(r, v))" Label="@Loc["HPRuleName"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+            <div class="dc-mrow dc-irow-wrap">
+                <div class="dc-field" style="width:124px;">
+                    <span class="dc-flabel">@Loc["HPRuleName"]</span>
+                    <input class="dc-inp" type="text" spellcheck="false" value="@r.Name"
+                           @oninput="@((ChangeEventArgs e) => RenameRule(r, e.Value?.ToString() ?? string.Empty))" />
                 </div>
-                <div style="width:100px;">
-                    <MudNumericField T="double" @bind-Value="r.Factor" Label="@Loc["HPRuleFactor"]" Variant="Variant.Outlined" Margin="Margin.Dense" Step="0.1" />
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["HPRuleFactor"]</span>
+                    <div class="dc-step">
+                        <button type="button" @onclick="@(() => StepFactor(r, -0.1))">&minus;</button>
+                        <input type="number" class="dc-num" step="0.1" @bind="r.Factor" />
+                        <button type="button" @onclick="@(() => StepFactor(r, 0.1))">+</button>
+                    </div>
                 </div>
-                <div style="width:100px;">
-                    <MudNumericField T="int" @bind-Value="r.FlatReduction" Label="@Loc["HPRuleFlat"]" Variant="Variant.Outlined" Margin="Margin.Dense" />
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["HPRuleFlat"]</span>
+                    <div class="dc-step">
+                        <button type="button" @onclick="@(() => StepFlat(r, -1))">&minus;</button>
+                        <input type="number" class="dc-num" @bind="r.FlatReduction" />
+                        <button type="button" @onclick="@(() => StepFlat(r, 1))">+</button>
+                    </div>
                 </div>
-                <div style="width:120px;">
-                    <MudSelect T="string" @bind-Value="r.Rounding" Label="@Loc["HPRuleRounding"]" Variant="Variant.Outlined" Margin="Margin.Dense">
-                        <MudSelectItem T="string" Value="@("Down")">@Loc["HPRoundDown"]</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("Up")">@Loc["HPRoundUp"]</MudSelectItem>
-                        <MudSelectItem T="string" Value="@("Nearest")">@Loc["HPRoundNearest"]</MudSelectItem>
-                    </MudSelect>
+                <div class="dc-field" style="width:112px;">
+                    <span class="dc-flabel">@Loc["HPRuleRounding"]</span>
+                    <select class="dc-inp" @bind="r.Rounding">
+                        <option value="Down">@Loc["HPRoundDown"]</option>
+                        <option value="Up">@Loc["HPRoundUp"]</option>
+                        <option value="Nearest">@Loc["HPRoundNearest"]</option>
+                    </select>
                 </div>
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveMitigationRule(r))" title="@Loc["HPRemoveRule"]" />
+                <button type="button" class="dc-ib dc-danger" style="margin-left:auto;"
+                        title="@Loc["HPRemoveRule"]" aria-label="@Loc["HPRemoveRule"]" @onclick="@(() => Field.RemoveMitigationRule(r))">
+                    <DcIcon Name="delete" Size="16" />
+                </button>
             </div>
         }
     </div>
 
-    <div class="hp-config-section">
-        <div class="hp-config-head">
-            <span class="hp-config-title">@Loc["HPMitigationsTitle"]</span>
-            <MudButton OnClick="@(() => Field.AddMitigation())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small"
-                       Disabled="@(Field.DamageKinds.Count == 0 || Field.MitigationRules.Count == 0)">
-                @Loc["HPAddMitigation"]
-            </MudButton>
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            <span class="dc-msec-title">@Loc["HPMitigationsTitle"]</span>
+            <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Field.AddMitigation())"
+                    disabled="@(Field.DamageKinds.Count == 0 || Field.MitigationRules.Count == 0)">
+                <DcIcon Name="add" Size="16" />@Loc["HPAddMitigation"]
+            </button>
         </div>
-        <p class="hp-config-help">@Loc["HPMitigationsHelp"]</p>
+        <p class="dc-msec-help">@Loc["HPMitigationsHelp"]</p>
 
         @foreach (var mitigation in Field.Mitigations)
         {
             var m = mitigation;
-            <div class="hp-config-row">
-                <div style="width:130px;">
-                    <MudSelect T="string" @bind-Value="m.Kind" Label="@Loc["HPKind"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+            <div class="dc-mrow dc-irow-wrap">
+                <div class="dc-field" style="width:124px;">
+                    <span class="dc-flabel">@Loc["HPKind"]</span>
+                    <select class="dc-inp" @bind="m.Kind">
                         @foreach (var kind in Field.DamageKinds)
                         {
-                            <MudSelectItem T="string" Value="@kind.Name">@kind.Name</MudSelectItem>
+                            <option value="@kind.Name">@kind.Name</option>
                         }
-                    </MudSelect>
+                    </select>
                 </div>
-                <div style="width:130px;">
-                    <MudSelect T="string" @bind-Value="m.RuleName" Label="@Loc["HPRuleName"]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                <div class="dc-field" style="width:124px;">
+                    <span class="dc-flabel">@Loc["HPRuleName"]</span>
+                    <select class="dc-inp" @bind="m.RuleName">
                         @foreach (var rule in Field.MitigationRules)
                         {
-                            <MudSelectItem T="string" Value="@rule.Name">@rule.Name</MudSelectItem>
+                            <option value="@rule.Name">@rule.Name</option>
                         }
-                    </MudSelect>
+                    </select>
                 </div>
 
                 @if (Field.Tags.Count > 0)
                 {
-                    <div style="width:130px;">
-                        <MudSelect T="string" @bind-Value="m.RequiredTag" Label="@Loc["HPRequiredTag"]" Variant="Variant.Outlined" Margin="Margin.Dense">
-                            <MudSelectItem T="string" Value="@("")">@Loc["HPAnyAttack"]</MudSelectItem>
+                    <div class="dc-field" style="width:124px;">
+                        <span class="dc-flabel">@Loc["HPRequiredTag"]</span>
+                        <select class="dc-inp" @bind="m.RequiredTag">
+                            <option value="">@Loc["HPAnyAttack"]</option>
                             @foreach (string tag in Field.Tags)
                             {
-                                <MudSelectItem T="string" Value="@tag">@tag</MudSelectItem>
+                                <option value="@tag">@tag</option>
                             }
-                        </MudSelect>
+                        </select>
                     </div>
 
                     @if (!string.IsNullOrEmpty(m.RequiredTag))
                     {
-                        <div style="width:130px;">
-                            <MudSelect T="bool" @bind-Value="m.TagMustBePresent" Label="@Loc["HPTagCondition"]" Variant="Variant.Outlined" Margin="Margin.Dense">
-                                <MudSelectItem T="bool" Value="@true">@Loc["HPTagPresent"]</MudSelectItem>
-                                <MudSelectItem T="bool" Value="@false">@Loc["HPTagAbsent"]</MudSelectItem>
-                            </MudSelect>
+                        <div class="dc-field" style="width:124px;">
+                            <span class="dc-flabel">@Loc["HPTagCondition"]</span>
+                            <select class="dc-inp" @bind="m.TagMustBePresent">
+                                <option value="true">@Loc["HPTagPresent"]</option>
+                                <option value="false">@Loc["HPTagAbsent"]</option>
+                            </select>
                         </div>
                     }
                 }
 
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="@(() => Field.RemoveMitigation(m))" title="@Loc["HPRemoveMitigation"]" />
+                <button type="button" class="dc-ib dc-danger" style="margin-left:auto;"
+                        title="@Loc["HPRemoveMitigation"]" aria-label="@Loc["HPRemoveMitigation"]" @onclick="@(() => Field.RemoveMitigation(m))">
+                    <DcIcon Name="delete" Size="16" />
+                </button>
             </div>
         }
     </div>
@@ -256,19 +296,73 @@
     [Parameter] public DCCreatureHitPointsField Field { get; set; } = default!;
 
     /// Palette spanning the whole colour wheel, greens included.
-    private readonly IEnumerable<MudColor> _palette = new MudColor[]
+    private readonly string[] _palette = new string[]
     {
-        new MudColor("#e53935"), new MudColor("#f4511e"), new MudColor("#fb8c00"), new MudColor("#ffb300"),
-        new MudColor("#fdd835"), new MudColor("#c0ca33"), new MudColor("#7cb342"), new MudColor("#43a047"),
-        new MudColor("#00897b"), new MudColor("#00acc1"), new MudColor("#039be5"), new MudColor("#1e88e5"),
-        new MudColor("#3949ab"), new MudColor("#5e35b1"), new MudColor("#8e24aa"), new MudColor("#d81b60"),
-        new MudColor("#6d4c41"), new MudColor("#546e7a"), new MudColor("#757575"), new MudColor("#212121"),
-        new MudColor("#9ccc65"), new MudColor("#26a69a"), new MudColor("#ef9a9a"), new MudColor("#ffffff")
+        "#e53935", "#f4511e", "#fb8c00", "#ffb300",
+        "#fdd835", "#c0ca33", "#7cb342", "#43a047",
+        "#00897b", "#00acc1", "#039be5", "#1e88e5",
+        "#3949ab", "#5e35b1", "#8e24aa", "#d81b60",
+        "#6d4c41", "#546e7a", "#757575", "#212121",
+        "#9ccc65", "#26a69a", "#ef9a9a", "#ffffff"
     };
+
+    // Which row, if any, has its colour or its icon picker open. One of each at
+    // most, so the list never grows two panels deep.
+    private DCHitPointsDamageKind? _colorPickerFor;
+    private DCHitPointsDamageKind? _iconPickerFor;
+
+    private void ToggleColorPicker(DCHitPointsDamageKind kind)
+    {
+        _iconPickerFor = null;
+        _colorPickerFor = ReferenceEquals(_colorPickerFor, kind) ? null : kind;
+    }
+
+    private void ToggleIconPicker(DCHitPointsDamageKind kind)
+    {
+        _colorPickerFor = null;
+        _iconPickerFor = ReferenceEquals(_iconPickerFor, kind) ? null : kind;
+    }
+
+    private void SetKindColor(DCHitPointsDamageKind kind, string color)
+    {
+        kind.Color = color;
+        _colorPickerFor = null;
+    }
+
+    private void SetKindIcon(DCHitPointsDamageKind kind, string icon)
+    {
+        kind.Icon = icon;
+        _iconPickerFor = null;
+    }
 
     private void OnMaximumHpChanged(uint value)
     {
         Field.SetMaximumHP(value);
+    }
+
+    private void OnMaximumHpInput(ChangeEventArgs e)
+    {
+        // An empty box is not a maximum of zero: it is a half-typed number.
+        if (uint.TryParse(e.Value?.ToString(), out uint value))
+            OnMaximumHpChanged(value);
+    }
+
+    private void StepMaximumHp(int delta)
+    {
+        long next = (long)Field.MaximumHP + delta;
+        OnMaximumHpChanged((uint)Math.Max(0, next));
+    }
+
+    /// Steps of a tenth, rounded back to two decimals: 0.1 added three times to a
+    /// double otherwise shows up as 0.30000000000000004 in the box.
+    private static void StepFactor(DCHitPointsMitigationRule rule, double delta)
+    {
+        rule.Factor = Math.Round(rule.Factor + delta, 2);
+    }
+
+    private static void StepFlat(DCHitPointsMitigationRule rule, int delta)
+    {
+        rule.FlatReduction += delta;
     }
 
     private void SortKinds((int oldIndex, int newIndex) indices)

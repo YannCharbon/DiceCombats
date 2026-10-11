@@ -1,16 +1,26 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 @if (EditionMode)
 {
-    <MudTextField T="string" Sizing="InputSizing.Auto" Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" />
+    <div class="dc-fbody">
+        <div class="dc-field" style="flex:1 1 auto;">
+            <span class="dc-flabel">@Field.Title</span>
+            <input class="dc-inp" type="text" spellcheck="false" value="@Field.Text"
+                   @onchange="@(e => OnTextChanged(e.Value?.ToString() ?? string.Empty))" />
+        </div>
+    </div>
 }
 else
 {
-    <div style="zoom: 0.85;">
-        <MudTextField T="string" Sizing="InputSizing.Auto" spellcheck="false" Value="@Field.Text" ValueChanged="OnTextChanged" Label="@Field.Title" Variant="Variant.Outlined" style="min-width:300px;" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+    @* The box is sized by what is in it: --dc-grow-w is set from the outside,
+       and data-dc-grow marks the textarea that measurement looks for. *@
+    <div class="dc-fgrp dc-fgrp-grow">
+        <span class="dc-flabel">@Field.Title</span>
+        <textarea class="dc-inp dc-gta" rows="1" data-dc-grow="true" spellcheck="false"
+                  style="flex:1 1 auto;" value="@Field.Text"
+                  @onchange="@(e => OnTextChanged(e.Value?.ToString() ?? string.Empty))"></textarea>
     </div>
 }
 

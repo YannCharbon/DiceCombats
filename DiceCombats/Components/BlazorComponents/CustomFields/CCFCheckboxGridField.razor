@@ -1,82 +1,75 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 @if (EditionMode)
 {
-    <div class="d-flex flex-wrap gap-2">
-        <MudNumericField Style="max-width:150px;" @bind-Value="Field.Columns" Label="@Loc["CBGridHorizontal"]" Variant="Variant.Outlined" Min="1" />
-        <MudNumericField Style="max-width:150px;" @bind-Value="Field.Rows" Label="@Loc["CBGridVertical"]" Variant="Variant.Outlined" Min="1" />
-        <MudCheckBox T="bool" @bind-Value="Field.HasColumnHeaders" Label="@Loc["CBGridColumnLabels"]"></MudCheckBox>
-        <MudCheckBox T="bool" @bind-Value="Field.HasRowHeaders" Label="@Loc["CBGridRowLabels"]"></MudCheckBox>
-    </div>
+    <div class="dc-fbody dc-fbody-col">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:11px;">
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["CBGridHorizontal"]</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => SetColumns(Field.Columns - 1))">&minus;</button>
+                    <input class="dc-num" type="number" min="1" value="@Field.Columns"
+                           @onchange="@(e => SetColumns(ParseInt(e.Value, Field.Columns)))" />
+                    <button type="button" @onclick="@(() => SetColumns(Field.Columns + 1))">+</button>
+                </div>
+            </div>
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["CBGridVertical"]</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => SetRows(Field.Rows - 1))">&minus;</button>
+                    <input class="dc-num" type="number" min="1" value="@Field.Rows"
+                           @onchange="@(e => SetRows(ParseInt(e.Value, Field.Rows)))" />
+                    <button type="button" @onclick="@(() => SetRows(Field.Rows + 1))">+</button>
+                </div>
+            </div>
+            <label class="dc-chk">
+                <input type="checkbox" @bind="Field.HasColumnHeaders" />
+                @Loc["CBGridColumnLabels"]
+            </label>
+            <label class="dc-chk">
+                <input type="checkbox" @bind="Field.HasRowHeaders" />
+                @Loc["CBGridRowLabels"]
+            </label>
+        </div>
 
-    <div style="padding:10px;overflow-x:auto;">
-        <table>
-            @if (Field.HasColumnHeaders)
-            {
-                <tr>
-                    @if (Field.HasRowHeaders)
-                    {
-                        <td>&nbsp;</td>
-                    }
-                    @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
-                    {
-                        <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="Field.ColumnHeaders[i]" Label="@Loc["CBGridColumnName"]" Variant="Variant.Outlined" /></td>
-                    }
-                </tr>
-            }
-            @foreach (int i in Enumerable.Range(0, Field.Rows))
-            {
-                <tr>
-                    @if (Field.HasRowHeaders)
-                    {
-                        <td><MudTextField style="min-width:100px;" Immediate="true" @bind-Value="Field.RowHeaders[i]" Label="@Loc["CBGridRowName"]" Variant="Variant.Outlined" /></td>
-                    }
-                    @foreach (int j in Enumerable.Range(0, Field.Columns))
-                    {
-                        <td>
-                            <input type="checkbox" @bind="Field.GridState[i][j]" />
-                        </td>
-                    }
-                </tr>
-            }
-        </table>
-    </div>
-}
-else
-{
-    <div style="zoom: 0.85;">
-        <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
-        <div style="padding:10px;">
-            <table>
+        <div style="overflow-x:auto;width:100%;">
+            <table class="dc-gtab">
                 @if (Field.HasColumnHeaders)
                 {
                     <tr>
                         @if (Field.HasRowHeaders)
                         {
-                            <td>&nbsp;</td>
+                            <th class="dc-row">&nbsp;</th>
                         }
                         @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
                         {
-                            <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.ColumnHeaders[i]</span></td>
+                            <th>
+                                <input class="dc-inp" type="text" style="min-width:100px;"
+                                       title="@Loc["CBGridColumnName"]" placeholder="@Loc["CBGridColumnName"]"
+                                       @bind="Field.ColumnHeaders[i]" @bind:event="oninput" />
+                            </th>
                         }
                     </tr>
                 }
                 @foreach (int i in Enumerable.Range(0, Field.Rows))
                 {
-                    var rowIndex = i;
                     <tr>
                         @if (Field.HasRowHeaders)
                         {
-                            <td><span class="CreatureCustomFieldRendererCheckBoxGridLabels">@Field.RowHeaders[rowIndex]</span></td>
+                            <th class="dc-row">
+                                <input class="dc-inp" type="text" style="min-width:100px;"
+                                       title="@Loc["CBGridRowName"]" placeholder="@Loc["CBGridRowName"]"
+                                       @bind="Field.RowHeaders[i]" @bind:event="oninput" />
+                            </th>
                         }
                         @foreach (int j in Enumerable.Range(0, Field.Columns))
                         {
-                            var columnIndex = j;
-                            <td style="padding:3px;">
-                                <input type="checkbox" checked="@Field.GridState[rowIndex][columnIndex]" @onchange="@(e => OnCellChanged(rowIndex, columnIndex, e.Value is bool value && value))" />
+                            <td>
+                                <label class="dc-chk">
+                                    <input type="checkbox" @bind="Field.GridState[i][j]" />
+                                </label>
                             </td>
                         }
                     </tr>
@@ -85,12 +78,62 @@ else
         </div>
     </div>
 }
+else
+{
+    <div class="dc-fgrp dc-fgrp-col">
+        <span class="dc-flabel">@Field.Title</span>
+        <table class="dc-gtab">
+            @if (Field.HasColumnHeaders)
+            {
+                <tr>
+                    @if (Field.HasRowHeaders)
+                    {
+                        <th class="dc-row">&nbsp;</th>
+                    }
+                    @foreach (int i in Enumerable.Range(0, Field.ColumnHeaders.Count))
+                    {
+                        <th>@Field.ColumnHeaders[i]</th>
+                    }
+                </tr>
+            }
+            @foreach (int i in Enumerable.Range(0, Field.Rows))
+            {
+                var rowIndex = i;
+                <tr>
+                    @if (Field.HasRowHeaders)
+                    {
+                        <th class="dc-row">@Field.RowHeaders[rowIndex]</th>
+                    }
+                    @foreach (int j in Enumerable.Range(0, Field.Columns))
+                    {
+                        var columnIndex = j;
+                        <td>
+                            <label class="dc-chk">
+                                <input type="checkbox" checked="@Field.GridState[rowIndex][columnIndex]"
+                                       @onchange="@(e => OnCellChanged(rowIndex, columnIndex, e.Value is bool value && value))" />
+                            </label>
+                        </td>
+                    }
+                </tr>
+            }
+        </table>
+    </div>
+}
 
 @code {
     [Parameter] public DCCreatureCheckboxGridField Field { get; set; } = default!;
     [Parameter] public bool EditionMode { get; set; } = false;
     [Parameter] public EventCallback OnChange { get; set; }
     [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
+
+    private static int ParseInt(object? raw, int fallback)
+        => int.TryParse(raw?.ToString(), out var parsed) ? parsed : fallback;
+
+    // The stepper draws its own buttons, so the Min="1" the numeric field used
+    // to enforce is enforced here instead.
+    private void SetRows(int value) => Field.Rows = value < 1 ? 1 : value;
+
+    private void SetColumns(int value) => Field.Columns = value < 1 ? 1 : value;
 
     private async Task OnCellChanged(int rowIndex, int columnIndex, bool newValue)
     {

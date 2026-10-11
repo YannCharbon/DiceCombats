@@ -1,36 +1,45 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 @if (EditionMode)
 {
-    <MudColorPicker Variant="Variant.Outlined" ColorPickerView="ColorPickerView.GridCompact" Label="@Loc["ColorPickerName"]" Text="@Field.Value" TextChanged="OnColorChanged" Style="@($"color: {Field.Value};")" Placeholder="Select Color" />
+    @* MudColorPicker stays: nothing in the Verdant vocabulary replaces a full
+       colour picker, and CombatManager reads this value to tint a card. *@
+    <div class="dc-fbody">
+        <MudColorPicker Variant="Variant.Outlined" ColorPickerView="ColorPickerView.GridCompact" Label="@Loc["ColorPickerName"]" Text="@Field.Value" TextChanged="OnColorChanged" Style="@($"color: {Field.Value};")" Placeholder="Select Color" />
+    </div>
 }
 else
 {
-    <div style="zoom: 0.85;">
-        <MudStack Row="true" Wrap="Wrap.Wrap">
-            @if (_showColorPicker)
-            {
-                <div @onclick="ToggleColorPicker">
-                    <MudColorPicker PickerVariant="PickerVariant.Static"
-                                    ColorPickerView="ColorPickerView.GridCompact"
-                                    Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
-                                    Text="@Field.Value"
-                                    TextChanged="OnColorChanged"
-                                    Style="@($"color: {Field.Value ?? ""};")" Placeholder="Select Color" />
-                </div>
-                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="ToggleColorPicker">&nbsp;Close&nbsp;</span>
-            }
-            else
-            {
-                <span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span>
-                <span style="@($"cursor:pointer;background-color:{Field.Value ?? ""};border-radius:5px;border-width:1px;border-color:grey;width:50px;height:50px;")" @onclick="ToggleColorPicker">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            }
-
-        </MudStack>
-    </div>
+    @if (_showColorPicker)
+    {
+        <div class="dc-fgrp dc-fgrp-col">
+            <span class="dc-flabel">@Field.Title</span>
+            <div @onclick="ToggleColorPicker">
+                <MudColorPicker PickerVariant="PickerVariant.Static"
+                                ColorPickerView="ColorPickerView.GridCompact"
+                                Variant="Variant.Outlined" Label="@Loc["ColorPickerName"]"
+                                Text="@Field.Value"
+                                TextChanged="OnColorChanged"
+                                Style="@($"color: {Field.Value ?? ""};background-color:var(--s4);border-radius:var(--r-panel);")" Placeholder="Select Color" />
+            </div>
+            <button type="button" class="dc-btn dc-btn-out" @onclick="ToggleColorPicker">
+                <span class="dc-sw2" style="@($"background-color:{Field.Value ?? ""};")"></span>
+                Close
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="dc-fgrp">
+            <span class="dc-flabel">@Field.Title</span>
+            <button type="button" title="@Field.Title"
+                    class="dc-swbtn @(string.IsNullOrEmpty(Field.Value) ? "dc-none" : "")"
+                    style="@(string.IsNullOrEmpty(Field.Value) ? "" : $"background-color:{Field.Value};")"
+                    @onclick="ToggleColorPicker"></button>
+        </div>
+    }
 }
 
 @code {

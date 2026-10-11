@@ -138,4 +138,10 @@
   <data name="TypePlayer" xml:space="preserve">
     <value>Player</value>
   </data>
+  <data name="CreatureMissing" xml:space="preserve">
+    <value>No creature with id {0}</value>
+  </data>
+  <data name="SheetUnavailable" xml:space="preserve">
+    <value>Could not render this creature sheet</value>
+  </data>
 </root>

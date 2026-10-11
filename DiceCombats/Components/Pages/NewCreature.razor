@@ -18,22 +18,12 @@
 @inject NavigationManager Navigation
 @inject IStringLocalizer<Resources.Localization.NewCreature> Loc
 
-<h3>@Loc["Title"]</h3>
+<h1 class="dc-h1" style="margin-bottom:14px;">@Loc["Title"]</h1>
 
 <style>
-    .selected-button {
-    box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 0.9);
-    border: 2px solid #505050;
-    }
-
-    .unselected-button {
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    border: 2px solid #505050;
-    }
-
     .markdown-html-preview {
     border-radius: 10px;
-    background-color: #404040;
+    background-color: var(--s5);
     padding:10px;
     margin-top:10px;
     }
@@ -42,7 +32,7 @@
     border-radius: 60px;
     padding: 0px 20px 0px 0px;
     margin:10px;
-    background-color: darkcyan;
+    background-color: var(--a3);
     display: flex;
     align-items: center;
     }
@@ -60,7 +50,7 @@
 
     .markdown-content th,
     .markdown-content td {
-    background-color: var(--mud-palette-primary);
+    background-color: var(--s4);
     }
 
     .one-column-item {
@@ -76,42 +66,36 @@
     }
 </style>
 
+@* The five source kinds, as a row of tiles: the chosen one is the filled
+   button, the rest are outlined. That replaces the white glow the old pair of
+   .selected-button / .unselected-button rules drew, which was the look
+   .dc-panel and the button variants were introduced to retire. *@
 <div style="display:flex; flex-wrap:wrap; margin-bottom:20px;">
-    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Local image" ? "selected-button" : "unselected-button")"
-    title="@Loc["TypeLocalImage"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Local image";})">
-        <MudStack Row="false" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Material.Filled.Image" />
-            <MudItem>@Loc["TypeLocalImage"]</MudItem>
-        </MudStack>
-    </MudButton>
-    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "aidedd.org website" ? "selected-button" : "unselected-button")"
-    title="@Loc["TypeAidedd"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "aidedd.org website";})">
-        <MudStack Row="false" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Custom.Uncategorized.ChessRook" />
-            <MudItem>@Loc["TypeAidedd"]</MudItem>
-        </MudStack>
-    </MudButton>
-    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Markdown" ? "selected-button" : "unselected-button")"
-    title="@Loc["TypeMarkdown"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Markdown";})">
-        <MudStack Row="false" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Material.Filled.TextSnippet" />
-            <MudItem>@Loc["TypeMarkdown"]</MudItem>
-        </MudStack>
-    </MudButton>
-    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Manual creature" ? "selected-button" : "unselected-button")"
-    title="@Loc["TypeManual"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Manual creature";})">
-        <MudStack Row="false" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Material.Filled.Architecture" />
-            <MudItem>@Loc["TypeManual"]</MudItem>
-        </MudStack>
-    </MudButton>
-    <MudButton Variant="Variant.Filled" style="margin:5px;width:130px;" Class="@(_layoutMode == "Player" ? "selected-button" : "unselected-button")"
-    title="@Loc["TypePlayer"]" Color="Color.Primary" OnClick="@(() => {_layoutMode = "Player";})">
-        <MudStack Row="false" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Material.Filled.Person" />
-            <MudItem>@Loc["TypePlayer"]</MudItem>
-        </MudStack>
-    </MudButton>
+    <button type="button" class="dc-btn @(ModeClass("Local image"))" style="@ModeStyle"
+            title="@Loc["TypeLocalImage"]" @onclick="@(() => {_layoutMode = "Local image";})">
+        <DcIcon Name="image" Size="20" />
+        <span>@Loc["TypeLocalImage"]</span>
+    </button>
+    <button type="button" class="dc-btn @(ModeClass("aidedd.org website"))" style="@ModeStyle"
+            title="@Loc["TypeAidedd"]" @onclick="@(() => {_layoutMode = "aidedd.org website";})">
+        <DcIcon Name="chess-rook" Size="20" />
+        <span>@Loc["TypeAidedd"]</span>
+    </button>
+    <button type="button" class="dc-btn @(ModeClass("Markdown"))" style="@ModeStyle"
+            title="@Loc["TypeMarkdown"]" @onclick="@(() => {_layoutMode = "Markdown";})">
+        <DcIcon Name="text-snippet" Size="20" />
+        <span>@Loc["TypeMarkdown"]</span>
+    </button>
+    <button type="button" class="dc-btn @(ModeClass("Manual creature"))" style="@ModeStyle"
+            title="@Loc["TypeManual"]" @onclick="@(() => {_layoutMode = "Manual creature";})">
+        <DcIcon Name="architecture" Size="20" />
+        <span>@Loc["TypeManual"]</span>
+    </button>
+    <button type="button" class="dc-btn @(ModeClass("Player"))" style="@ModeStyle"
+            title="@Loc["TypePlayer"]" @onclick="@(() => {_layoutMode = "Player";})">
+        <DcIcon Name="person" Size="20" />
+        <span>@Loc["TypePlayer"]</span>
+    </button>
 </div>
 
 <div>
@@ -122,10 +106,10 @@
                so the button can open the picker itself. *@
             <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" MaximumFileCount="1">
                 <CustomContent Context="upload">
-                    <MudFab Color="Color.Secondary"
-                    StartIcon="@Icons.Material.Filled.Image"
-                    Label="@Loc["LoadPictureBtnLabel"]"
-                    OnClick="@(() => upload.OpenFilePickerAsync())" />
+                    <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => upload.OpenFilePickerAsync())">
+                        <DcIcon Name="image" />
+                        @Loc["LoadPictureBtnLabel"]
+                    </button>
                 </CustomContent>
             </MudFileUpload>
         </div>
@@ -134,17 +118,19 @@
             <div style="padding:20px;">
                 <img src="@_localImageBase64" height="500px" />
             </div>
-            <div class="row">
-                <div class="col col-md-4">
-                    <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
+            <div class="dc-irow dc-irow-wrap" style="align-items:flex-end;">
+                <div class="dc-field" style="flex:0 1 320px; min-width:240px;">
+                    <label class="dc-flabel" for="image-creature-name">@Loc["CreatureNameEditLabel"]</label>
+                    <input class="dc-inp" id="image-creature-name" type="text" spellcheck="false"
+                           @bind="_creatureName" @bind:event="oninput" />
                 </div>
                 @if (_creatureName != "N/A" && _creatureName != "")
                 {
-                    <div class="col col-md-2">
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]e</MudButton>
-                    </div>
+                    <button type="button" class="dc-btn dc-btn-fill" @onclick="_registerNewCreature">
+                        @Loc["RegisterCreatureBtn"]
+                        <DcIcon Name="add" />
+                    </button>
                 }
-
             </div>
         }
     }
@@ -152,14 +138,19 @@
     @if (_layoutMode == "aidedd.org website")
     {
         <div>
-            <div>
-                <MudTextField DebounceInterval="500" Label="@Loc["AideddURLtfLabel"]" Variant="Variant.Outlined" T="string" Value="@_aideDDCreatureUrl" ValueChanged="@_getAideDDCreatureSheet"></MudTextField>
+            <div class="dc-field" style="max-width:520px;">
+                @* The URL field fetches the sheet, so the keystroke-to-request
+                   debounce MudTextField gave it is kept in C# below rather than
+                   dropped: see OnAideDDUrlInput / DebounceAsync. *@
+                <label class="dc-flabel" for="aidedd-url">@Loc["AideddURLtfLabel"]</label>
+                <input class="dc-inp" id="aidedd-url" type="text" spellcheck="false"
+                       value="@_aideDDCreatureUrl" @oninput="OnAideDDUrlInput" />
                 @if (CombatService.IsCurrentCulture("fr"))
                 {
-                    <MudLink Href="https://www.aidedd.org/">Se rendre sur aidedd.org</MudLink>
+                    <a class="dc-crumb" href="https://www.aidedd.org/">Se rendre sur aidedd.org</a>
                 } else
                 {
-                    <MudLink Href="https://www.aidedd.org/en/">Visit aidedd.org</MudLink>
+                    <a class="dc-crumb" href="https://www.aidedd.org/en/">Visit aidedd.org</a>
                 }
 
             </div>
@@ -169,10 +160,10 @@
                     <div style="padding:10px;">
                         @if (CombatService.IsCurrentCulture("fr"))
                         {
-                            <span>Détecté : @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                            <span>Détecté : @_aideDDCreatureName <DcIcon Name="check-circle" Class="dc-i-accent" /></span>
                         } else
                         {
-                            <span>Found @_aideDDCreatureName <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
+                            <span>Found @_aideDDCreatureName <DcIcon Name="check-circle" Class="dc-i-accent" /></span>
                         }
                     </div>
                 }
@@ -181,36 +172,47 @@
         <div style="padding:20px;color:black;">
             @((MarkupString)_aideDDCreatureSheet)
         </div>
-        <div class="row">
-            <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["OptionalCreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
+        <div class="dc-irow dc-irow-wrap" style="align-items:flex-end;">
+            <div class="dc-field" style="flex:0 1 320px; min-width:240px;">
+                <label class="dc-flabel" for="aidedd-creature-name">@Loc["OptionalCreatureNameEditLabel"]</label>
+                <input class="dc-inp" id="aidedd-creature-name" type="text" spellcheck="false"
+                       @bind="_creatureName" @bind:event="oninput" />
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
-                <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]</MudButton>
-                </div>
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="_registerNewCreature">
+                    @Loc["RegisterCreatureBtn"]
+                    <DcIcon Name="add" />
+                </button>
             }
-
         </div>
     }
 
     @if (_layoutMode == "Markdown")
     {
-        <div class="row">
-            <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
+        <div class="dc-irow dc-irow-wrap" style="align-items:flex-end;">
+            <div class="dc-field" style="flex:0 1 320px; min-width:240px;">
+                <label class="dc-flabel" for="md-creature-name">@Loc["CreatureNameEditLabel"]</label>
+                <input class="dc-inp" id="md-creature-name" type="text" spellcheck="false"
+                       @bind="_creatureName" @bind:event="oninput" />
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
-                <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]</MudButton>
-                </div>
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="_registerNewCreature">
+                    @Loc["RegisterCreatureBtn"]
+                    <DcIcon Name="add" />
+                </button>
             }
         </div>
         <div style="display:flex;flex-wrap:wrap;">
             <div class="one-column-item" style="padding-right:10px;">
-                <MudTextField DebounceInterval="500" Sizing="InputSizing.Auto" MaxLines="20" Label="@Loc["MarkdownLabel"]" Variant="Variant.Outlined" T="string" Value="@_markdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
+                <div class="dc-field" style="width:100%;">
+                    <label class="dc-flabel" for="md-source">@Loc["MarkdownLabel"]</label>
+                    @* The box keeps what is typed at once; only the render beside
+                       it waits out the 500 ms the MudTextField debounced. *@
+                    <textarea class="dc-inp" id="md-source" rows="20" spellcheck="false"
+                              value="@_markdownSheet" @oninput="OnMarkdownInput"></textarea>
+                </div>
             </div>
             <div class="markdown-html-preview one-column-item" style="padding-left:10px;">
                 <div class="markdown-content">
@@ -222,30 +224,36 @@
 
     @if (_layoutMode == "Manual creature")
     {
-        <div class="row">
-            <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["CreatureNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
+        <div class="dc-irow dc-irow-wrap" style="align-items:flex-end;">
+            <div class="dc-field" style="flex:0 1 320px; min-width:240px;">
+                <label class="dc-flabel" for="manual-creature-name">@Loc["CreatureNameEditLabel"]</label>
+                <input class="dc-inp" id="manual-creature-name" type="text" spellcheck="false"
+                       @bind="_creatureName" @bind:event="oninput" />
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
-                <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterCreatureBtn"]</MudButton>
-                </div>
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="_registerNewCreature">
+                    @Loc["RegisterCreatureBtn"]
+                    <DcIcon Name="add" />
+                </button>
             }
         </div>
     }
 
     @if (_layoutMode == "Player")
     {
-        <div class="row">
-            <div class="col col-md-4">
-                <MudTextField Immediate="true" Label="@Loc["PlayerNameEditLabel"]" Variant="Variant.Outlined" T="string" @bind-Value="_creatureName"></MudTextField>
+        <div class="dc-irow dc-irow-wrap" style="align-items:flex-end;">
+            <div class="dc-field" style="flex:0 1 320px; min-width:240px;">
+                <label class="dc-flabel" for="player-name">@Loc["PlayerNameEditLabel"]</label>
+                <input class="dc-inp" id="player-name" type="text" spellcheck="false"
+                       @bind="_creatureName" @bind:event="oninput" />
             </div>
             @if (_creatureName != "N/A" && _creatureName != "")
             {
-                <div class="col col-md-2">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="_registerNewCreature">@Loc["RegisterPlayerBtn"]</MudButton>
-                </div>
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="_registerNewCreature">
+                    @Loc["RegisterPlayerBtn"]
+                    <DcIcon Name="add" />
+                </button>
             }
         </div>
     }
@@ -265,6 +273,60 @@
 
     private string _markdownHtmlPreview = "";
 
+    /// The five source tiles are one choice, so the chosen one is the filled
+    /// button and the other four are outlined.
+    private const string ModeStyle =
+        "flex-direction:column;height:auto;width:130px;padding:10px 6px;margin:5px;white-space:normal;text-align:center;";
+
+    private string ModeClass(string mode) => _layoutMode == mode ? "dc-btn-fill" : "dc-btn-out";
+
+    private CancellationTokenSource? _aideDDDebounce;
+    private CancellationTokenSource? _markdownDebounce;
+
+    /// MudTextField's DebounceInterval, kept by hand: the URL field triggers a
+    /// web request, so firing it on every keystroke would hammer aidedd.org.
+    private void OnAideDDUrlInput(ChangeEventArgs e)
+    {
+        var url = e.Value?.ToString() ?? string.Empty;
+        _aideDDCreatureUrl = url;
+
+        _aideDDDebounce?.Cancel();
+        _aideDDDebounce = new CancellationTokenSource();
+        _ = DebounceAsync(_aideDDDebounce.Token, async () =>
+        {
+            await _getAideDDCreatureSheet(url);
+            StateHasChanged();
+        });
+    }
+
+    /// Same debounce for the markdown box: the text itself is kept on every
+    /// keystroke so the box never fights the typist, and only the render of the
+    /// preview beside it waits.
+    private void OnMarkdownInput(ChangeEventArgs e)
+    {
+        _markdownSheet = e.Value?.ToString() ?? string.Empty;
+        var markdown = _markdownSheet;
+
+        _markdownDebounce?.Cancel();
+        _markdownDebounce = new CancellationTokenSource();
+        _ = DebounceAsync(_markdownDebounce.Token, () => _previewMarkdownSheet(markdown));
+    }
+
+    private async Task DebounceAsync(CancellationToken token, Func<Task> action)
+    {
+        try
+        {
+            await Task.Delay(500, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        if (token.IsCancellationRequested) return;
+
+        await InvokeAsync(action);
+    }
 
     private async Task UploadFiles(IBrowserFile file)
     {

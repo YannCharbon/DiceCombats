@@ -1,48 +1,102 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 @if (EditionMode)
 {
-    <div class="d-flex flex-wrap" style="padding-top:5px;padding-bottom:5px;">
-        <MudButton OnClick="@(() => Field.AddOption())" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Large">@Loc["CBFieldAddOption"]</MudButton>
-        <MudCheckBox T="bool" @bind-Value="Field.ShowFieldName" Label="@Loc["CBFieldShowFieldName"]"></MudCheckBox>
-        <MudCheckBox T="bool" @bind-Value="Field.ShowTextFields" Label="@Loc["CBFieldShowTextFields"]"></MudCheckBox>
-    </div>
-    <div class="d-flex flex-wrap gap-3">
-        @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
-        {
-            <div class="d-flex flex-wrap gap-4" style="padding:5px;background-color:#404040;border-radius:5px;">
-                <MudTextField Immediate="true" @bind-Value="Field.Labels[i]" Label="Name" Variant="Variant.Outlined" />
-                <MudCheckBox Label="@Field.Labels[i]" @bind-Value="Field.SelectedOptions[i]"></MudCheckBox>
-                @if (Field.ShowTextFields == true)
-                {
-                    <MudTextField Immediate="true" @bind-Value="Field.TextFieldsLabels[i]" Label="Text label" Variant="Variant.Outlined" />
-                }
-                <MudButton OnClick="@(() => Field.RemoveOption(Field.Labels[i]))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="@Color.Secondary" Size="Size.Medium">Delete</MudButton>
-            </div>
-        }
+    <div class="dc-fbody dc-fbody-col">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:11px;">
+            <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Field.AddOption())">
+                <DcIcon Name="add" />
+                @Loc["CBFieldAddOption"]
+            </button>
+            <label class="dc-chk">
+                <input type="checkbox" @bind="Field.ShowFieldName" />
+                @Loc["CBFieldShowFieldName"]
+            </label>
+            <label class="dc-chk">
+                <input type="checkbox" @bind="Field.ShowTextFields" />
+                @Loc["CBFieldShowTextFields"]
+            </label>
+            @* New: a ticked option may light its whole cell in play mode. *@
+            <label class="dc-chk">
+                <input type="checkbox" @bind="Field.HighlightWhenChecked" />
+                @Loc["CBFieldHighlightWhenChecked"]
+            </label>
+        </div>
+
+        <div class="dc-opt-grid" style="width:100%;">
+            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+            {
+                <div class="dc-opt" style="flex-wrap:wrap;">
+                    <div class="dc-field" style="flex:1 1 90px;">
+                        <span class="dc-flabel">Name</span>
+                        <input class="dc-inp" type="text" @bind="Field.Labels[i]" @bind:event="oninput" />
+                    </div>
+                    <label class="dc-chk">
+                        <input type="checkbox" @bind="Field.SelectedOptions[i]" />
+                        @Field.Labels[i]
+                    </label>
+                    @if (Field.ShowTextFields == true)
+                    {
+                        <div class="dc-field" style="flex:1 1 90px;">
+                            <span class="dc-flabel">@Loc["CBFieldTextLabels"]</span>
+                            <input class="dc-inp" type="text" @bind="Field.TextFieldsLabels[i]" @bind:event="oninput" />
+                        </div>
+                    }
+                    <button type="button" class="dc-ib dc-danger" title="Delete"
+                            @onclick="@(() => Field.RemoveOption(Field.Labels[i]))">
+                        <DcIcon Name="delete" />
+                    </button>
+                </div>
+            }
+        </div>
     </div>
 }
 else
 {
-    <div style="zoom:0.85">
+    <div class="dc-fgrp" style="flex-wrap:wrap;">
         @if (Field.ShowFieldName)
         {
-            <b><span class="CreatureCustomFieldRendererFieldTitle">@Field.Title</span></b>
+            <span class="dc-flabel">@Field.Title</span>
         }
-        <MudStack Row="true">
-            @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+        @foreach (int i in Enumerable.Range(0, Field.Labels.Count))
+        {
+            var index = i;
+            @if (Field.HighlightWhenChecked)
             {
-                var index = i;
-                <MudCheckBox T="bool" Label="@Field.Labels[index]" Value="@Field.SelectedOptions[index]" ValueChanged="@((bool v) => OnOptionChanged(index, v))"></MudCheckBox>
+                @* The whole cell lights, name and value included. *@
+                <div class="dc-ohl @(Field.SelectedOptions[index] ? "dc-on" : "")">
+                    <label class="dc-chk">
+                        <input type="checkbox" checked="@Field.SelectedOptions[index]"
+                               @onchange="@(e => OnOptionChanged(index, e.Value is bool v && v))" />
+                        <span class="dc-ohl-name">@Field.Labels[index]</span>
+                    </label>
+                    @if (Field.ShowTextFields == true)
+                    {
+                        <input class="dc-inp" type="text" spellcheck="false" style="width:110px;flex:0 1 110px;"
+                               placeholder="@Field.TextFieldsLabels[index]" title="@Field.TextFieldsLabels[index]"
+                               value="@Field.TextFields[index]"
+                               @onchange="@(e => OnTextChanged(index, e.Value?.ToString() ?? string.Empty))" />
+                    }
+                </div>
+            }
+            else
+            {
+                <label class="dc-chk">
+                    <input type="checkbox" checked="@Field.SelectedOptions[index]"
+                           @onchange="@(e => OnOptionChanged(index, e.Value is bool v && v))" />
+                    @Field.Labels[index]
+                </label>
                 @if (Field.ShowTextFields == true)
                 {
-                    <MudTextField T="string" Sizing="InputSizing.Auto" spellcheck="false" Value="@Field.TextFields[index]" ValueChanged="@((string v) => OnTextChanged(index, v))" Label="@Field.TextFieldsLabels[index]" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+                    <input class="dc-inp" type="text" spellcheck="false" style="width:110px;flex:0 1 110px;"
+                           placeholder="@Field.TextFieldsLabels[index]" title="@Field.TextFieldsLabels[index]"
+                           value="@Field.TextFields[index]"
+                           @onchange="@(e => OnTextChanged(index, e.Value?.ToString() ?? string.Empty))" />
                 }
             }
-        </MudStack>
+        }
     </div>
 }
 

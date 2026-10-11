@@ -1,57 +1,77 @@
 ﻿@using DiceCombats
-@using MudBlazor.Utilities
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
+@* The quick-damage chips keep their own rule: a chip is painted with the kind
+   colour the GM chose, and its ink comes from kind.TextColor, which the model
+   computes by luminance. White on a pale yellow kind is unreadable. *@
 <style>
-    .hp-bar {
-        position: relative;
-        height: 22px;
-        border-radius: 5px;
-        background-color: #202020;
-        border: 1px solid #505050;
-        overflow: hidden;
-        min-width: 110px;
-        flex: 1;
+    /* The menu is a chip strip, not a list: a creature with a dozen kinds has
+       to fit next to the card it belongs to, so the width is capped and the
+       chips wrap instead of each one claiming a row of its own. */
+    .hp-qmenu {
+        width: max-content;
+        max-width: min(340px, 86vw);
+        max-height: min(70vh, 460px);
+        overflow-y: auto;
+        padding: 8px 10px;
+        box-sizing: border-box;
     }
 
-    .hp-bar-fill {
-        height: 100%;
-        background-color: #1E867F;
-        transition: width 0.2s;
+    .hp-qhead {
+        margin: 0 0 5px;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: .07em;
+        text-transform: uppercase;
+        color: var(--t3);
+        line-height: 1;
     }
 
-    .hp-bar-text {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 13px;
-        color: white;
+    .hp-qrow + .hp-qhead { margin-top: 9px; }
+    .hp-qrow { display: flex; flex-wrap: wrap; gap: 5px; }
+    .hp-qrow .dc-kchip { cursor: pointer; }
+
+    /* MudMenuItem keeps the click that closes the menu; what it does not keep
+       is its 8px of padding plus 4px of text margin around a 24px chip. */
+    .hp-qrow .mud-menu-item,
+    .hp-qfoot .mud-menu-item {
+        width: auto;
+        min-height: 0;
+        padding: 0;
+        border-radius: var(--r-pill);
     }
 
-    .hp-temporary {
-        color: #23aba0;
-        font-weight: bold;
-        white-space: nowrap;
+    .hp-qrow .mud-menu-item .mud-menu-item-text,
+    .hp-qfoot .mud-menu-item .mud-menu-item-text {
+        flex: 0 0 auto;
+        margin: 0;
+        margin-inline-start: 0;
+        margin-inline-end: 0;
     }
 
-    .hp-quick-off {
-        opacity: 0.45;
-    }
+    .hp-qfoot { display: flex; justify-content: flex-end; margin-top: 8px; }
+    .hp-qfoot .mud-menu-item { padding: 3px 8px; border-radius: var(--r-btn); }
+    .hp-qcancel { font-size: 12px; font-weight: 600; color: var(--t3); }
 
-    .hp-quick-kind {
+    .hp-quick-tag {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
-        border-radius: 999px;
-        color: white;
-        font-weight: bold;
+        gap: 5px;
+        height: 24px;
+        padding: 0 9px;
+        border-radius: var(--r-pill);
+        color: #FFFFFF;
+        background-color: #4A5A7A;
+        font-size: 11.5px;
+        font-weight: 700;
+        line-height: 1;
         white-space: nowrap;
+        cursor: pointer;
+        opacity: .45;
     }
+
+    .hp-quick-tag.dc-on { opacity: 1; }
 </style>
 
 @if (EditionMode)
@@ -60,22 +80,34 @@
         <HitPointsConfigPopup Field="Field" />
     </GenericModal>
 
-    <MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Style="gap:10px;">
-        <MudNumericField T="uint" Value="@Field.MaximumHP" ValueChanged="OnMaximumHpChanged" Label="@Loc["MaxHPLabel"]" Variant="Variant.Outlined" Style="width:150px;" />
-        <MudButton OnClick="@(() => _configModal?.ShowAsync() ?? Task.CompletedTask)" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">
+    <div class="dc-fbody">
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["MaxHPLabel"]</span>
+            <span class="dc-step">
+                <button type="button" @onclick="@(() => OnMaximumHpChanged(Field.MaximumHP > 0 ? Field.MaximumHP - 1 : 0))" aria-label="@Loc["MaxHPLabel"]">&minus;</button>
+                <input class="dc-num" type="number" min="0" value="@Field.MaximumHP"
+                       @onchange="@(e => OnMaximumHpChanged(ParseMax(e.Value)))" aria-label="@Loc["MaxHPLabel"]" />
+                <button type="button" @onclick="@(() => OnMaximumHpChanged(Field.MaximumHP + 1))" aria-label="@Loc["MaxHPLabel"]">+</button>
+            </span>
+        </div>
+
+        <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => _configModal?.ShowAsync() ?? Task.CompletedTask)">
+            <DcIcon Name="edit" />
             @Loc["HPConfigureButton"]
-        </MudButton>
-    </MudStack>
+        </button>
+    </div>
 
     @* One chip per rule of this creature, so a kind carrying both a general and
-       a tag restricted rule shows both. *@
-    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+       a tag restricted rule shows both. Inside the body, so it keeps the same
+       padding as the controls above it. *@
+    <div class="dc-fbody" style="padding-top:0;">
+        <div class="dc-irow dc-irow-wrap">
         @foreach (var mitigation in ResistedMitigations)
         {
             var m = mitigation;
             var kind = Field.GetKind(m.Kind);
-            <span class="hp-quick-kind" style="@($"background-color:{kind!.Color};color:{kind.TextColor};")">
-                <MudIcon Icon="@DCHitPointsIcons.Resolve(kind.Icon)" Style="font-size:18px;" />
+            <span class="dc-kchip dc-static" style="@($"background-color:{kind!.Color};color:{kind.TextColor};")">
+                <DcIcon Name="@kind.Icon" Size="16" />
                 @kind.Name
                 <span style="opacity:0.75;font-weight:normal;">@m.RuleName</span>
                 @if (!string.IsNullOrEmpty(m.RequiredTag))
@@ -86,6 +118,7 @@
                 }
             </span>
         }
+        </div>
     </div>
 }
 else
@@ -94,77 +127,112 @@ else
         <HitPointsApplyPopup Field="Field" OnApplied="OnApplied" @ref="_applyPopup" />
     </GenericModal>
 
-    <div style="zoom: 0.85;">
-        <MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Style="gap:6px;">
-            <div class="hp-bar">
-                <div class="hp-bar-fill" style="width:@(FillPercentage)%;"></div>
-                <div class="hp-bar-text">@Field.CurrentHP / @Field.EffectiveMaximumHP @Loc["HP"]</div>
+    <div class="dc-fgrp dc-fgrp-hp">
+        <span class="dc-flabel">@Field.Title</span>
+
+        <div class="dc-hpbar">
+            <div class="dc-hpfill @FillTone" style="width:@(FillPercentage)%;"></div>
+            <div class="dc-hptxt">
+                @Field.CurrentHP / @Field.EffectiveMaximumHP @Loc["HP"]
+                @if (Field.TemporaryHP > 0)
+                {
+                    <span class="dc-hptemp">+@Field.TemporaryHP</span>
+                }
             </div>
+        </div>
 
-            @if (Field.TemporaryHP > 0)
-            {
-                <span class="hp-temporary">+@Field.TemporaryHP</span>
-            }
+        <span class="dc-step">
+            <button type="button" @onclick="@(() => _quickAmount = Math.Max(0, _quickAmount - 1))" aria-label="@Loc["HPDamage"]">&minus;</button>
+            <input class="dc-num" type="number" min="0" @bind="_quickAmount" @bind:event="oninput" aria-label="@Loc["HPAmount"]" />
+            <button type="button" @onclick="@(() => _quickAmount = _quickAmount + 1)" aria-label="@Loc["HPHeal"]">+</button>
+        </span>
 
-            <MudNumericField T="int" @bind-Value="_quickAmount" Variant="Variant.Outlined" Min="0" Style="width:80px;" Class="CreatureCustomFieldRendererFieldBackground" />
-
-            @if (Field.Mitigations.Count == 0)
-            {
-                @* Nothing could change the amount, so do not ask. *@
-                <MudIconButton Icon="@Icons.Material.Filled.Remove" Color="@Color.Error" OnClick="() => QuickDamage(string.Empty)" title="@Loc["HPDamage"]" />
-            }
-            else
-            {
-                @* The menu draws its own activator: an icon button inside
-                   ActivatorContent would swallow the click. *@
-                <MudMenu Icon="@Icons.Material.Filled.Remove" Color="@Color.Error" title="@Loc["HPDamage"]">
-                    @* Plain divs, not menu items: clicking a menu item closes the
-                       menu, and a tag has to stay togglable before picking a kind. *@
-                    @if (Field.Tags.Count > 0)
-                    {
-                        <div style="padding:8px 12px;color:grey;">@Loc["HPTagsTitle"]</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 8px 12px;">
-                            @foreach (string tag in Field.Tags)
+        @if (Field.Mitigations.Count == 0)
+        {
+            @* Nothing could change the amount, so do not ask. *@
+            <button type="button" class="dc-ib dc-danger" style="color:var(--danger);"
+                    title="@Loc["HPDamage"]" aria-label="@Loc["HPDamage"]"
+                    @onclick="() => QuickDamage(string.Empty)">
+                <DcIcon Name="remove" />
+            </button>
+        }
+        else
+        {
+            @* MudMenu stays — nothing cheap replaces a popover — but it no longer
+               draws its own Material button: the activator is a Verdant icon
+               button that calls the menu context itself. *@
+            <MudMenu>
+                <ActivatorContent>
+                    <button type="button" class="dc-ib dc-danger" style="color:var(--danger);"
+                            title="@Loc["HPDamage"]" aria-label="@Loc["HPDamage"]"
+                            @onclick="@(args => context.ToggleAsync(args))" @onclick:stopPropagation="true">
+                        <DcIcon Name="remove" />
+                    </button>
+                </ActivatorContent>
+                <ChildContent>
+                    <div class="hp-qmenu">
+                        @* Plain spans, not menu items: clicking a menu item closes the
+                           menu, and a tag has to stay togglable before picking a kind. *@
+                        @if (Field.Tags.Count > 0)
+                        {
+                            <div class="hp-qhead">@Loc["HPTagsTitle"]</div>
+                            <div class="hp-qrow">
+                                @foreach (string tag in Field.Tags)
+                                {
+                                    var t = tag;
+                                    <span class="hp-quick-tag @(_quickTags.Contains(t) ? "dc-on" : "")"
+                                          @onclick="() => ToggleQuickTag(t)">
+                                        @t
+                                    </span>
+                                }
+                            </div>
+                        }
+                        <div class="hp-qhead">@Loc["HPPickKind"]</div>
+                        @* The kinds stay MudMenuItems — that click is what closes the
+                           menu — but they are laid out as one wrapping strip, and the
+                           item's own padding is stripped locally. *@
+                        <div class="hp-qrow">
+                            @foreach (var kind in Field.DamageKinds)
                             {
-                                var t = tag;
-                                <span class="hp-quick-kind @(_quickTags.Contains(t) ? "" : "hp-quick-off")"
-                                      style="background-color:#4A5A7A;color:#FFFFFF;cursor:pointer;"
-                                      @onclick="() => ToggleQuickTag(t)">
-                                    @t
-                                </span>
+                                var k = kind;
+                                <MudMenuItem OnClick="() => QuickDamage(k.Name)">
+                                    <span class="dc-kchip dc-static" style="@($"background-color:{k.Color};color:{k.TextColor};")">
+                                        <DcIcon Name="@k.Icon" Size="16" />
+                                        @k.Name
+                                    </span>
+                                </MudMenuItem>
                             }
+                            <MudMenuItem OnClick="() => QuickDamage(string.Empty)">
+                                <span class="dc-kchip dc-static" style="background-color:var(--b2);color:var(--t1);">@Loc["HPNoKind"]</span>
+                            </MudMenuItem>
                         </div>
-                    }
-                    <div style="padding:8px 12px;color:grey;">@Loc["HPPickKind"]</div>
-                    @foreach (var kind in Field.DamageKinds)
-                    {
-                        var k = kind;
-                        <MudMenuItem OnClick="() => QuickDamage(k.Name)">
-                            <span class="hp-quick-kind" style="@($"background-color:{k.Color};color:{k.TextColor};")">
-                                <MudIcon Icon="@DCHitPointsIcons.Resolve(k.Icon)" Style="font-size:18px;" />
-                                @k.Name
-                            </span>
-                        </MudMenuItem>
-                    }
-                    <MudMenuItem OnClick="() => QuickDamage(string.Empty)">
-                        <span class="hp-quick-kind" style="background-color:#555555;">@Loc["HPNoKind"]</span>
-                    </MudMenuItem>
-                    <MudMenuItem>
-                        <span style="color:grey;">@Loc["CancelBtn"]</span>
-                    </MudMenuItem>
-                </MudMenu>
-            }
-            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="@Color.Success" OnClick="QuickHeal" title="@Loc["HPHeal"]" />
-            <MudButton Variant="Variant.Filled" Color="@Color.Primary" Size="Size.Small"
-                       StartIcon="@Icons.Material.Filled.Calculate"
-                       OnClick="OpenApplyModal" title="@Loc["HPApplyButton"]">
-                @Loc["HPApplyShort"]
-            </MudButton>
-            @if (Field.CanUndo)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.Restore" Color="@Color.Warning" OnClick="UndoLast" title="@Loc["HPUndo"]" />
-            }
-        </MudStack>
+                        <div class="hp-qfoot">
+                            <MudMenuItem>
+                                <span class="hp-qcancel">@Loc["CancelBtn"]</span>
+                            </MudMenuItem>
+                        </div>
+                    </div>
+                </ChildContent>
+            </MudMenu>
+        }
+
+        <button type="button" class="dc-ib" style="color:var(--a1);"
+                title="@Loc["HPHeal"]" aria-label="@Loc["HPHeal"]" @onclick="QuickHeal">
+            <DcIcon Name="add" />
+        </button>
+
+        <button type="button" class="dc-btn dc-btn-fill" @onclick="OpenApplyModal" title="@Loc["HPApplyButton"]">
+            <DcIcon Name="calculate" />
+            @Loc["HPApplyShort"]
+        </button>
+
+        @if (Field.CanUndo)
+        {
+            <button type="button" class="dc-ib" style="color:var(--warn);"
+                    title="@Loc["HPUndo"]" aria-label="@Loc["HPUndo"]" @onclick="UndoLast">
+                <DcIcon Name="restore" />
+            </button>
+        }
     </div>
 }
 
@@ -202,6 +270,20 @@ else
             int percentage = Field.CurrentHP * 100 / Field.EffectiveMaximumHP;
             return Math.Clamp(percentage, 0, 100);
         }
+    }
+
+    /// Wounded and critical read as colour as well as length, so the state of a
+    /// creature is legible at a glance down a column of cards rather than only
+    /// by reading the numbers.
+    private string FillTone => FillPercentage <= 25 ? "dc-crit"
+                             : FillPercentage <= 50 ? "dc-low"
+                             : string.Empty;
+
+    /// The maximum is a uint and the box hands back whatever was typed, so a
+    /// blank or a negative lands on 0 rather than throwing.
+    private static uint ParseMax(object? value)
+    {
+        return uint.TryParse(value?.ToString(), out uint parsed) ? parsed : 0u;
     }
 
     /// The quick box covers the common single hit. The kind comes from the small

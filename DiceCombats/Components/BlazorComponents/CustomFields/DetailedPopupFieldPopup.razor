@@ -17,15 +17,6 @@
 @inject IDialogService DialogService
 
 <style>
-    .DetailedPopupSubFieldBox {
-        background-color: #2A2A2A;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        border: 1px solid #808080;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px;
-    }
-
     /* Own class names on purpose: this popup is rendered inside a creature card
        of the combat manager's own masonry grid, and Masonry collects items from
        the whole subtree of its container. Sharing '.masonry-item' made the outer
@@ -57,41 +48,41 @@
         }
     }
 
-    .chip {
-        padding: 5px;
-        background-color: darkcyan;
-        border-radius: 10px;
-        font-size: 20px;
-    }
-
-    .group-title {
-        margin: 14px 6px 4px 6px;
-        font-weight: 700;
-        opacity: .85;
-    }
-
-    .assist-callout {
-        background: #34343e;
-        border: 1px solid #5e5e6b;
-        border-radius: 10px;
-        padding: 14px;
-    }
-
-    .kbd {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #2d2d34;
-        border: 1px solid #666;
-        font-family: monospace;
-        font-size: 90%;
-    }
-
-    .pick-btn-cell {
+    /* The search box keeps its leading icon inside the well, which a plain
+       .dc-inp has no slot for. */
+    .dpf-search {
+        position: relative;
         display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        gap: 4px;
+        align-items: center;
+        flex: 1 1 240px;
+        min-width: 0;
+    }
+
+    .dpf-search-ico {
+        position: absolute;
+        left: 9px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-flex;
+        color: var(--t3);
+        pointer-events: none;
+    }
+
+    .dpf-search input {
+        padding-left: 32px;
+    }
+
+    /* The eight help panels are the one MudBlazor widget left in this popup:
+       nothing in the vocabulary expands and collapses. app.css drags
+       .mud-expand-panel onto a Verdant surface only inside .dc-fbody /
+       .dc-panel, neither of which wraps this block, so the surface is set
+       here instead of widening that rule. */
+    .dpf-help {
+        margin-bottom: 12px;
+    }
+
+    .dpf-help .mud-expand-panel {
+        background-color: var(--s4);
     }
 </style>
 
@@ -152,64 +143,66 @@
 
 @if (EditionMode)
 {
-    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Class="mb-2" Style="justify-content:space-between;">
-        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-            <MudSwitch T="bool" @bind-Value="_showEditorHelp" Color="Color.Info" />
-            <MudText Typo="Typo.subtitle2">@Loc["DetailedPopupShowEditorHelp"]</MudText>
-        </MudStack>
-    </MudStack>
+    <div class="dc-irow" style="margin-bottom:10px;">
+        <label class="dc-chk">
+            <input type="checkbox" @bind="_showEditorHelp" />
+            @Loc["DetailedPopupShowEditorHelp"]
+        </label>
+    </div>
 
     @if (_showEditorHelp)
     {
-        <MudExpansionPanels MultiExpansion="true" Dense="true" Elevation="0" Class="mb-3">
-            <MudExpansionPanel Text="@Loc["DetailedPopupOverviewTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupOverviewBody"].Value)
-                </div>
-            </MudExpansionPanel>
+        <div class="dpf-help">
+            <MudExpansionPanels MultiExpansion="true" Dense="true" Elevation="0">
+                <MudExpansionPanel Text="@Loc["DetailedPopupOverviewTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupOverviewBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupTextTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupTextBody"].Value)
-                </div>
-            </MudExpansionPanel>
+                <MudExpansionPanel Text="@Loc["DetailedPopupTextTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupTextBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupMarkdownTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupMarkdownBody"].Value)
-                </div>
-            </MudExpansionPanel>
+                <MudExpansionPanel Text="@Loc["DetailedPopupMarkdownTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupMarkdownBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupPdfTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupPdfBody"].Value)
-                </div>
-            </MudExpansionPanel>
+                <MudExpansionPanel Text="@Loc["DetailedPopupPdfTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupPdfBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupHtmlHowItWorksTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupHtmlHowItWorksBody"].Value)
-                </div>
-            </MudExpansionPanel>
+                <MudExpansionPanel Text="@Loc["DetailedPopupHtmlHowItWorksTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupHtmlHowItWorksBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupHtmlTipsTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupHtmlTipsBody"].Value)
-                </div>
-            </MudExpansionPanel>
+                <MudExpansionPanel Text="@Loc["DetailedPopupHtmlTipsTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupHtmlTipsBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupHtmlQuickStartTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupHtmlQuickStartBody"].Value)
-                </div>
-            </MudExpansionPanel>
+                <MudExpansionPanel Text="@Loc["DetailedPopupHtmlQuickStartTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupHtmlQuickStartBody"].Value)
+                    </div>
+                </MudExpansionPanel>
 
-            <MudExpansionPanel Text="@Loc["DetailedPopupTroubleshootingTitle"]">
-                <div class="assist-callout">
-                    @((MarkupString)Loc["DetailedPopupTroubleshootingBody"].Value)
-                </div>
-            </MudExpansionPanel>
-        </MudExpansionPanels>
+                <MudExpansionPanel Text="@Loc["DetailedPopupTroubleshootingTitle"]">
+                    <div class="dc-note">
+                        @((MarkupString)Loc["DetailedPopupTroubleshootingBody"].Value)
+                    </div>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        </div>
     }
 
     <hr />
@@ -219,43 +212,44 @@
 {
     @foreach (var entry in DetailedPopupField.Contents)
     {
-        <div class="DetailedPopupSubFieldBox">
-            <div style="display: flex; justify-content: flex-end;">
-                <MudTooltip Text="@Loc["DetailedPopupDeleteTooltip"]">
-                    <MudButton StartIcon="@Icons.Material.Filled.Delete"
-                               Color="Color.Error"
-                               Disabled="entry.ReadOnly"
-                               OnClick="() => DeleteContent(entry)">
-                        @Loc["DetailedPopupDeleteButton"]
-                    </MudButton>
-                </MudTooltip>
+        <div class="dc-msec" style="margin-bottom:12px;">
+            <div class="dc-msec-head">
+                <div class="dc-field" style="flex:1 1 200px;min-width:160px;">
+                    <span class="dc-flabel">@Loc["DetailedPopupContentNameLabel"]</span>
+                    <input class="dc-inp" type="text" value="@entry.Name" @onchange="@((ChangeEventArgs e) => entry.Name = e.Value?.ToString() ?? string.Empty)" />
+                </div>
+                <div class="dc-field" style="width:170px;">
+                    <span class="dc-flabel">@Loc["DetailedPopupKindLabel"]</span>
+                    <select class="dc-inp" @bind="entry.Kind">
+                        <option value="text">@Loc["DetailedPopupKindTextLabel"]</option>
+                        <option value="markdown">@Loc["DetailedPopupKindMarkdownLabel"]</option>
+                        <option value="html">@Loc["DetailedPopupKindHtmlLabel"]</option>
+                        <option value="pdf">@Loc["DetailedPopupKindPdfLabel"]</option>
+                    </select>
+                </div>
+                <button type="button" class="dc-btn dc-btn-danger" style="margin-left:auto;"
+                        disabled="@entry.ReadOnly"
+                        title="@Loc["DetailedPopupDeleteTooltip"]"
+                        @onclick="() => DeleteContent(entry)">
+                    <DcIcon Name="delete" Size="16" />@Loc["DetailedPopupDeleteButton"]
+                </button>
             </div>
-
-            <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
-                <MudTextField @bind-Value="entry.Name" Label="@Loc["DetailedPopupContentNameLabel"]" Variant="Variant.Outlined" />
-                <MudSelect @bind-Value="entry.Kind" Label="@Loc["DetailedPopupKindLabel"]" Variant="Variant.Outlined" Class="kind-select">
-                    <MudSelectItem Value="@("text")">@Loc["DetailedPopupKindTextLabel"]</MudSelectItem>
-                    <MudSelectItem Value="@("markdown")">@Loc["DetailedPopupKindMarkdownLabel"]</MudSelectItem>
-                    <MudSelectItem Value="@("html")">@Loc["DetailedPopupKindHtmlLabel"]</MudSelectItem>
-                    <MudSelectItem Value="@("pdf")">@Loc["DetailedPopupKindPdfLabel"]</MudSelectItem>
-                </MudSelect>
-            </MudStack>
 
             @* === TEXT === *@
             @if (entry.Kind == "text")
             {
-                <MudTextField @bind-Value="entry.Inline"
-                              Label="@Loc["DetailedPopupTextContentLabel"]"
-                              Variant="Variant.Outlined"
-                              Sizing="InputSizing.Auto" MaxLines="20" />
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["DetailedPopupTextContentLabel"]</span>
+                    <textarea class="dc-inp" rows="8" @bind="entry.Inline"></textarea>
+                </div>
             }
             @* === MARKDOWN === *@
             else if (entry.Kind == "markdown")
             {
-                <MudTextField @bind-Value="entry.Inline"
-                              Label="@Loc["DetailedPopupMarkdownContentLabel"]"
-                              Variant="Variant.Outlined"
-                              Sizing="InputSizing.Auto" MaxLines="20" />
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["DetailedPopupMarkdownContentLabel"]</span>
+                    <textarea class="dc-inp" rows="10" @bind="entry.Inline"></textarea>
+                </div>
             }
             @* === HTML (templated) === *@
             else if (entry.Kind == "html")
@@ -263,154 +257,157 @@
                 @* Inline help for this entry only *@
                 @if (_showEditorHelp)
                 {
-                    <div class="assist-callout mb-2">
+                    <div class="dc-note" style="margin-bottom:10px;">
                         @((MarkupString)Loc["DetailedPopupInlineHelpHtml"].Value)
                     </div>
                 }
 
-                <MudGrid Class="mt-2">
-                    <MudItem xs="12" md="6">
-                        <MudTextField Value="@(GetMeta(entry, "selector"))"
-                                      ValueChanged="@( (string? v) => SetMeta(entry, "selector", v) )"
-                                      Label="@Loc["DetailedPopupSelectorLabel"]"
-                                      Variant="Variant.Outlined" />
-                    </MudItem>
+                var selector = GetMeta(entry, "selector");
+                var template = GetMeta(entry, "template");
+                var css = GetMeta(entry, "css");
+                var mapJson = GetMeta(entry, "map.json");
+                var source = GetHtmlSource(entry);
 
-                    <MudItem xs="12">
-                        <MudTextField Value="@(GetMeta(entry, "template"))"
-                                      ValueChanged="@( (string? v) => SetMeta(entry, "template", v) )"
-                                      Label="@Loc["DetailedPopupTemplateLabel"]"
-                                      Variant="Variant.Outlined" Sizing="InputSizing.Auto" MaxLines="20" />
-                    </MudItem>
+                <div class="dc-dgrid" style="margin-top:4px;align-items:end;">
+                    <div class="dc-field">
+                        <span class="dc-flabel">@Loc["DetailedPopupSelectorLabel"]</span>
+                        <input class="dc-inp" type="text" spellcheck="false" value="@selector"
+                               @onchange="@((ChangeEventArgs e) => SetMeta(entry, "selector", e.Value?.ToString()))" />
+                    </div>
 
-                    <MudItem xs="12">
-                        <MudTextField Value="@(GetMeta(entry, "css"))"
-                                      ValueChanged="@( (string? v) => SetMeta(entry, "css", v) )"
-                                      Label="@Loc["DetailedPopupCssLabel"]"
-                                      Variant="Variant.Outlined" Sizing="InputSizing.Auto" MaxLines="16" />
-                    </MudItem>
+                    @* Two chips rather than two radio buttons: the same two states
+                       through the same handler, and the vocabulary has a toggle but
+                       no radio. *@
+                    <div class="dc-irow" style="gap:6px;">
+                        <button type="button" class="dc-tog @(source == "inline" ? "dc-on" : "")"
+                                @onclick="@(() => OnHtmlSourceChanged(entry, "inline"))">
+                            @Loc["DetailedPopupHtmlSourceInlineLabel"]
+                        </button>
+                        <button type="button" class="dc-tog @(source == "file" ? "dc-on" : "")"
+                                @onclick="@(() => OnHtmlSourceChanged(entry, "file"))">
+                            @Loc["DetailedPopupHtmlSourceFileLabel"]
+                        </button>
+                    </div>
+                </div>
 
-                    <MudItem xs="12">
-                        <MudTextField Value="@(GetMeta(entry, "map.json"))"
-                                      ValueChanged="@( (string? v) => SetMeta(entry, "map.json", v) )"
-                                      Label="@Loc["DetailedPopupMapJsonLabel"]"
-                                      Variant="Variant.Outlined" Sizing="InputSizing.Auto" MaxLines="16" />
-                    </MudItem>
+                <div class="dc-field" style="margin-top:10px;">
+                    <span class="dc-flabel">@Loc["DetailedPopupTemplateLabel"]</span>
+                    <textarea class="dc-inp" rows="10" value="@template"
+                              @onchange="@((ChangeEventArgs e) => SetMeta(entry, "template", e.Value?.ToString()))"></textarea>
+                </div>
 
-                    <MudItem xs="12" md="6">
-                        @* MudRadioGroup lost its Row parameter, the row layout comes from the stack now. *@
-                        <MudRadioGroup T="string"
-                                       Value="@GetHtmlSource(entry)"
-                                       ValueChanged="@( (string v) => OnHtmlSourceChanged(entry, v) )">
-                            <MudStack Row="true">
-                                <MudRadio T="string" Value="@("inline")">@Loc["DetailedPopupHtmlSourceInlineLabel"]</MudRadio>
-                                <MudRadio T="string" Value="@("file")">@Loc["DetailedPopupHtmlSourceFileLabel"]</MudRadio>
-                            </MudStack>
-                        </MudRadioGroup>
-                    </MudItem>
+                <div class="dc-field" style="margin-top:10px;">
+                    <span class="dc-flabel">@Loc["DetailedPopupCssLabel"]</span>
+                    <textarea class="dc-inp" rows="8" value="@css"
+                              @onchange="@((ChangeEventArgs e) => SetMeta(entry, "css", e.Value?.ToString()))"></textarea>
+                </div>
 
-                    @if (GetHtmlSource(entry) == "inline")
-                    {
-                        <MudItem xs="12">
-                            <MudTextField @bind-Value="entry.Inline"
-                                          Label="@Loc["DetailedPopupHtmlContentLabel"]"
-                                          Variant="Variant.Outlined"
-                                          Sizing="InputSizing.Auto" MaxLines="25" />
-                        </MudItem>
-                    }
-                    else
-                    {
-                        <MudItem xs="12" md="9">
-                            <MudTextField @bind-Value="entry.FilePath"
-                                          Label="@Loc["DetailedPopupFilePathLabel"]"
-                                          ReadOnly="true"
-                                          Variant="Variant.Outlined" />
-                        </MudItem>
-                        <MudItem xs="12" md="3" Class="pick-btn-cell">
-                            <MudButton Variant="Variant.Filled"
-                                       Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.UploadFile"
-                                       OnClick="() => PickFileAsync(entry)">
-                                @Loc["DetailedPopupPickFileButton"]
-                            </MudButton>
+                <div class="dc-field" style="margin-top:10px;">
+                    <span class="dc-flabel">@Loc["DetailedPopupMapJsonLabel"]</span>
+                    <textarea class="dc-inp" rows="8" value="@mapJson"
+                              @onchange="@((ChangeEventArgs e) => SetMeta(entry, "map.json", e.Value?.ToString()))"></textarea>
+                </div>
+
+                @if (source == "inline")
+                {
+                    <div class="dc-field" style="margin-top:10px;">
+                        <span class="dc-flabel">@Loc["DetailedPopupHtmlContentLabel"]</span>
+                        <textarea class="dc-inp" rows="12" @bind="entry.Inline"></textarea>
+                    </div>
+                }
+                else
+                {
+                    <div class="dc-irow dc-irow-wrap" style="margin-top:10px;align-items:flex-end;">
+                        <div class="dc-field" style="flex:1 1 260px;min-width:180px;">
+                            <span class="dc-flabel">@Loc["DetailedPopupFilePathLabel"]</span>
+                            <input class="dc-inp" type="text" readonly value="@entry.FilePath" />
+                        </div>
+                        <div class="dc-field">
+                            <button type="button" class="dc-btn dc-btn-fill" @onclick="() => PickFileAsync(entry)">
+                                <DcIcon Name="upload-file" Size="16" />@Loc["DetailedPopupPickFileButton"]
+                            </button>
                             @if (entry.Blob is { Length: > 0 })
                             {
-                                <MudText Typo="Typo.caption">
+                                <span class="dc-flabel">
                                     @string.Format(Loc["DetailedPopupLoadedBytesCaption"], entry.Blob.Length)
-                                </MudText>
+                                </span>
                             }
-                        </MudItem>
-                    }
-                </MudGrid>
+                        </div>
+                    </div>
+                }
             }
             @* === PDF === *@
             else if (entry.Kind == "pdf")
             {
                 @if (_showEditorHelp)
                 {
-                    <div class="assist-callout mb-2">
+                    <div class="dc-note" style="margin-bottom:10px;">
                         @((MarkupString)Loc["DetailedPopupPdfInlineHelp"].Value)
                     </div>
                 }
 
-                <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="mt-2">
-                    <MudTextField @bind-Value="entry.FilePath"
-                                  Label="@Loc["DetailedPopupFilePathLabel"]"
-                                  ReadOnly="true"
-                                  Variant="Variant.Outlined" />
-                    <MudButton Variant="Variant.Filled"
-                               Color="Color.Primary"
-                               StartIcon="@Icons.Material.Filled.UploadFile"
-                               OnClick="() => PickFileAsync(entry)">
-                        @Loc["DetailedPopupPickFileButton"]
-                    </MudButton>
+                <div class="dc-irow dc-irow-wrap" style="margin-top:4px;align-items:flex-end;">
+                    <div class="dc-field" style="flex:1 1 260px;min-width:180px;">
+                        <span class="dc-flabel">@Loc["DetailedPopupFilePathLabel"]</span>
+                        <input class="dc-inp" type="text" readonly value="@entry.FilePath" />
+                    </div>
+                    <button type="button" class="dc-btn dc-btn-fill" @onclick="() => PickFileAsync(entry)">
+                        <DcIcon Name="upload-file" Size="16" />@Loc["DetailedPopupPickFileButton"]
+                    </button>
                     @if (entry.Blob is { Length: > 0 })
                     {
-                        <MudText Typo="Typo.caption">
+                        <span class="dc-flabel">
                             @string.Format(Loc["DetailedPopupLoadedBytesCaption"], entry.Blob.Length)
-                        </MudText>
+                        </span>
                     }
-                </MudStack>
+                </div>
             }
         </div>
     }
 
-    <MudButton Variant="Variant.Filled"
-               Color="Color.Primary"
-               StartIcon="@Icons.Material.Filled.Add"
-               OnClick="() => DetailedPopupField.AddNewContent()">
-        @Loc["DetailedPopupAddNewContentButton"]
-    </MudButton>
+    <button type="button" class="dc-btn dc-btn-fill" @onclick="() => DetailedPopupField.AddNewContent()">
+        <DcIcon Name="add" Size="16" />@Loc["DetailedPopupAddNewContentButton"]
+    </button>
 }
 else
 {
-    <div style="display:flex;flex-direction:row; margin-bottom:10px; gap:15px; margin-bottom:10px;">
-        <MudIconButton Variant="Variant.Filled"
-                       Color="Color.Dark"
-                       Icon="@(DetailedPopupField.RenderModeGridEnabled ? Icons.Material.Filled.GridView : Icons.Material.Filled.FormatListBulleted)"
-                       OnClick="ToggleGrid"
-                       title="@Loc["DetailedPopupToggleGridTooltip"]" />
-        <MudTextField @bind-Value="Query"
-                      Placeholder="@Loc["DetailedPopupSearchPlaceholder"]"
-                      Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Filled.Search"
-                      Immediate="true"
-                      DebounceInterval="1000" />
+    <div class="dc-irow dc-irow-wrap" style="margin-bottom:10px;gap:10px;">
+        @* Three presentations, one switch. Bound to DisplayMode: its setter is what
+           keeps the legacy RenderModeGridEnabled flag in step. *@
+        <div class="dc-irow" style="gap:6px;flex:none;" title="@Loc["DetailedPopupToggleGridTooltip"]">
+            <button type="button" class="dc-tog @(Mode == DCDetailedPopupDisplayMode.Tabs ? "dc-on" : "")"
+                    @onclick="@(() => SetDisplayMode(DCDetailedPopupDisplayMode.Tabs))">
+                <DcIcon Name="tab" Size="14" />
+            </button>
+            <button type="button" class="dc-tog @(Mode == DCDetailedPopupDisplayMode.List ? "dc-on" : "")"
+                    @onclick="@(() => SetDisplayMode(DCDetailedPopupDisplayMode.List))">
+                <DcIcon Name="list" Size="14" />
+            </button>
+            <button type="button" class="dc-tog @(Mode == DCDetailedPopupDisplayMode.Grid ? "dc-on" : "")"
+                    @onclick="@(() => SetDisplayMode(DCDetailedPopupDisplayMode.Grid))">
+                <DcIcon Name="grid-view" Size="14" />
+            </button>
+        </div>
+        <div class="dpf-search">
+            <span class="dpf-search-ico"><DcIcon Name="search" Size="16" /></span>
+            <input class="dc-inp" type="text" placeholder="@Loc["DetailedPopupSearchPlaceholder"]"
+                   value="@_queryDraft" @oninput="OnQueryInput" />
+        </div>
     </div>
 
     @* Wrapper so the initializer can reach this popup's grids without ids: there
        is one html/pdf grid per group, and one popup per creature card. *@
     <div @ref="_gridsRoot">
-    @if (DetailedPopupField.RenderModeGridEnabled)
+    @if (Mode == DCDetailedPopupDisplayMode.Grid)
     {
         @foreach (var g in _visibleGroups.Where(g => g.Kind == "html" || g.Kind == "pdf"))
         {
-            <div style="margin:10px;"><span class="chip">@g.Title</span></div>
+            <div style="margin:14px 6px 6px;"><span class="dc-msec-title">@g.Title</span></div>
             <div class="dpf-masonry-layout" data-kind="@g.Kind">
                 @foreach (var p in g.Pieces)
                 {
                     <div class="dpf-masonry-item">
-                        <div class="DetailedPopupSubFieldBox">
+                        <div class="dc-msec">
                             @if (!string.IsNullOrWhiteSpace(p.ParentName))
                             {
                                 <hr />
@@ -431,11 +428,11 @@ else
                 @foreach (var g in tmGroups)
                 {
                     <div class="dpf-masonry-item">
-                        <div style="margin:10px;"><span class="chip">@g.Title</span></div>
+                        <div style="margin:14px 6px 6px;"><span class="dc-msec-title">@g.Title</span></div>
 
                         @foreach (var p in g.Pieces)
                         {
-                            <div class="DetailedPopupSubFieldBox">
+                            <div class="dc-msec" style="margin-bottom:10px;">
                                 @if (!string.IsNullOrWhiteSpace(p.ParentName))
                                 {
                                     <hr />
@@ -448,18 +445,49 @@ else
             </div>
         }
     }
+    else if (Mode == DCDetailedPopupDisplayMode.Tabs)
+    {
+        @* One group at a time. The chips are the group titles, and the pick falls
+           back to the first group whenever the filter drops the chosen one. *@
+        <div class="dc-irow dc-irow-wrap" style="gap:6px;margin-bottom:11px;">
+            @foreach (var g in _visibleGroups)
+            {
+                var grp = g;
+                <button type="button" class="dc-tog @(GroupKey(grp) == ActiveTabKey ? "dc-on" : "")"
+                        @onclick="@(() => SelectTab(grp))">
+                    @grp.Title
+                </button>
+            }
+        </div>
+
+        var active = ActiveGroup;
+
+        @if (active != null)
+        {
+            <div class="dc-dstack">
+                @foreach (var p in active.Pieces)
+                {
+                    <div class="dc-msec">
+                        @p.UI
+                    </div>
+                }
+            </div>
+        }
+    }
     else
     {
-        @foreach (var g in _visibleGroups)
-        {
-            <div style="margin:10px;"><span class="chip">@g.Title</span></div>
-            @foreach (var p in g.Pieces)
+        <div class="dc-dstack">
+            @foreach (var g in _visibleGroups)
             {
-                <div class="DetailedPopupSubFieldBox">
-                    @p.UI
-                </div>
+                <div style="margin:14px 6px 6px;"><span class="dc-msec-title">@g.Title</span></div>
+                @foreach (var p in g.Pieces)
+                {
+                    <div class="dc-msec">
+                        @p.UI
+                    </div>
+                }
             }
-        }
+        </div>
     }
     </div>
 }
@@ -478,8 +506,15 @@ else
     private List<GroupVM> _visibleGroups = new();
 
     private string _query = string.Empty;
+    private string _queryDraft = string.Empty;
+    private System.Threading.CancellationTokenSource? _searchDebounce;
     private string _combinedCss = string.Empty;
     private bool _showEditorHelp = false;
+
+    // Which group the tabs mode is showing, as "<kind>||<title>".
+    private string? _activeTabKey;
+
+    private DCDetailedPopupDisplayMode Mode => DetailedPopupField.DisplayMode;
 
     private string Query
     {
@@ -490,8 +525,72 @@ else
             if (_query == v) return;
             _query = v;
             _visibleGroups = FilterGroups(_allGroups, _query);
+            EnsureActiveTab();
             StateHasChanged();
         }
+    }
+
+    /// <summary>
+    /// The presentation is written to <see cref="DCCreatureDetailedPopupField.DisplayMode"/>
+    /// and never to the legacy boolean: the enum's setter is what keeps that flag in step.
+    /// </summary>
+    private void SetDisplayMode(DCDetailedPopupDisplayMode mode)
+    {
+        DetailedPopupField.DisplayMode = mode;
+        EnsureActiveTab();
+        StateHasChanged();
+    }
+
+    private static string GroupKey(GroupVM group) => $"{group.Kind}||{group.Title}";
+
+    private string? ActiveTabKey => ActiveGroup is null ? null : GroupKey(ActiveGroup);
+
+    private GroupVM? ActiveGroup
+        => _visibleGroups.FirstOrDefault(g => GroupKey(g) == _activeTabKey) ?? _visibleGroups.FirstOrDefault();
+
+    private void SelectTab(GroupVM group)
+    {
+        _activeTabKey = GroupKey(group);
+        StateHasChanged();
+    }
+
+    /// Opens on the first group, and falls back to it when a re-filter drops the
+    /// one that was selected.
+    private void EnsureActiveTab()
+    {
+        if (_visibleGroups.Count == 0)
+        {
+            _activeTabKey = null;
+            return;
+        }
+
+        if (_activeTabKey is null || !_visibleGroups.Any(g => GroupKey(g) == _activeTabKey))
+            _activeTabKey = GroupKey(_visibleGroups[0]);
+    }
+
+    /// The box types freely and the filter runs a second later: rebuilding every
+    /// group on each keystroke is what the debounce was there to avoid.
+    private async Task OnQueryInput(ChangeEventArgs e)
+    {
+        _queryDraft = e.Value?.ToString() ?? string.Empty;
+
+        _searchDebounce?.Cancel();
+        var cts = new System.Threading.CancellationTokenSource();
+        _searchDebounce = cts;
+
+        try
+        {
+            await Task.Delay(1000, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // A later keystroke took over.
+            return;
+        }
+
+        if (cts.IsCancellationRequested) return;
+
+        Query = _queryDraft;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -546,6 +645,7 @@ else
         _allGroups = groupMap.Values.ToList();
 
         _visibleGroups = FilterGroups(_allGroups, _query);
+        EnsureActiveTab();
     }
 
     private static DiceCombats.Rendering.BasicContentItem ToContentItem(DCCreatureDetailedPopupField.ContentEntry e)
@@ -624,12 +724,6 @@ else
                 sb.Append(ch);
         }
         return sb.ToString().Normalize(System.Text.NormalizationForm.FormC).ToLowerInvariant();
-    }
-
-    private void ToggleGrid()
-    {
-        DetailedPopupField.RenderModeGridEnabled = !DetailedPopupField.RenderModeGridEnabled;
-        StateHasChanged();
     }
 
     private static string GetMeta(DCCreatureDetailedPopupField.ContentEntry entry, string key)

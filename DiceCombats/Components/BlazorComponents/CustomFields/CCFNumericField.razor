@@ -1,32 +1,65 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 @if (EditionMode)
 {
-    <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" />
-    <MudCheckBox T="bool" @bind-Value="Field.ShowMaxValue" Label="Show max value"></MudCheckBox>
-    @if (Field.ShowMaxValue == true)
-    {
-        <MudNumericField T="int" @bind-value="Field.MaxValue" Label="Max value" Variant="Variant.Outlined" />
-    }
-    <MudCheckBox T="bool" @bind-Value="Field.ShowUnit" Label="Show unit"></MudCheckBox>
-    @if (Field.ShowUnit == true)
-    {
-        <MudTextField T="string" spellcheck="false" @bind-value="Field.Unit" Label="Unit" Variant="Variant.Outlined" />
-    }
+    <div class="dc-fbody">
+        <div class="dc-field">
+            <span class="dc-flabel">@Field.Title</span>
+            <div class="dc-step">
+                <button type="button" @onclick="@(() => OnValueChanged(Field.Value - 1))">&minus;</button>
+                <input class="dc-num" type="number" value="@Field.Value"
+                       @onchange="@(e => OnValueChanged(ParseInt(e.Value, Field.Value)))" />
+                <button type="button" @onclick="@(() => OnValueChanged(Field.Value + 1))">+</button>
+            </div>
+        </div>
+
+        <label class="dc-chk">
+            <input type="checkbox" @bind="Field.ShowMaxValue" />
+            Show max value
+        </label>
+
+        @if (Field.ShowMaxValue == true)
+        {
+            <div class="dc-field">
+                <span class="dc-flabel">Max value</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => Field.MaxValue--)">&minus;</button>
+                    <input class="dc-num" type="number" @bind="Field.MaxValue" />
+                    <button type="button" @onclick="@(() => Field.MaxValue++)">+</button>
+                </div>
+            </div>
+        }
+
+        <label class="dc-chk">
+            <input type="checkbox" @bind="Field.ShowUnit" />
+            Show unit
+        </label>
+
+        @if (Field.ShowUnit == true)
+        {
+            <div class="dc-field">
+                <span class="dc-flabel">Unit</span>
+                <input class="dc-inp" type="text" spellcheck="false" style="width:110px;" @bind="Field.Unit" />
+            </div>
+        }
+    </div>
 }
 else
 {
-    <div style="zoom: 0.85;">
+    <div class="dc-fgrp">
+        <span class="dc-flabel">@Field.Title</span>
+        <div class="dc-step">
+            <button type="button" @onclick="@(() => OnValueChanged(Field.Value - 1))">&minus;</button>
+            <input class="dc-num" type="number" value="@Field.Value"
+                   @onchange="@(e => OnValueChanged(ParseInt(e.Value, Field.Value)))" />
+            <button type="button" @onclick="@(() => OnValueChanged(Field.Value + 1))">+</button>
+        </div>
         @if (Field.ShowMaxValue)
         {
-            <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Style="width:150px;" Adornment="Adornment.End" AdornmentText="@(" / " + Field.MaxValue.ToString() + (Field.ShowUnit == true ? (" " + Field.Unit) : ""))" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
-        }
-        else
-        {
-            <MudNumericField T="int" Value="@Field.Value" ValueChanged="OnValueChanged" Label="@Field.Title" Variant="Variant.Outlined" Class="CreatureCustomFieldRendererFieldLabel CreatureCustomFieldRendererFieldBackground" />
+            @* Same text the end adornment carried: " / max" plus the unit when asked. *@
+            <span class="dc-flabel dc-num">@(" / " + Field.MaxValue.ToString() + (Field.ShowUnit == true ? (" " + Field.Unit) : ""))</span>
         }
     </div>
 }
@@ -36,6 +69,9 @@ else
     [Parameter] public bool EditionMode { get; set; } = false;
     [Parameter] public EventCallback OnChange { get; set; }
     [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
+
+    private static int ParseInt(object? raw, int fallback)
+        => int.TryParse(raw?.ToString(), out var parsed) ? parsed : fallback;
 
     private async Task OnValueChanged(int value)
     {

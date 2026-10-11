@@ -8,66 +8,59 @@
 
 @using DiceCombats
 @using DiceCombats.Automations
-@using MudBlazor.Utilities
 @inject DiceCombatsService CombatService
 @inject IDiceEventPublisher EventPublisher
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
-<style>
-    .CreatureCustomFieldRendererFieldTitle {
-    padding:10px;
-    font-weight:700;
-    }
-
-    .CreatureCustomFieldRendererCheckBoxGridLabels {
-    font-size:10pt;
-    padding: 4px;
-    }
-
-    .DnDConditionsFieldItem {
-    border-radius: 100px;
-    padding: 5px;
-    display: flex; /* Enables Flexbox */
-    align-items: center; /* Aligns content vertically */
-    justify-content: center; /* Aligns content horizontally (optional) */
-    text-align: center;
-    font-weight: 400;
-    font-size: 18px;
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-    }
-
-    .CreatureCustomFieldRendererFieldLabel label {
-    background-color: #004D40;
-    color: white;
-    padding: 2px;
-    border-radius: 4px;
-    }
-
-    .CreatureCustomFieldRendererFieldBackground {
-    background-color: #4A4A5A;
-    border-radius:4px;
-    }
-</style>
+@*
+ * The five field-renderer classes this file used to declare now live in
+ * wwwroot/css/app.css, so every field renderer shares one copy of them.
+*@
 
 @if (EditionMode)
 {
-    <MudGrid>
-        <MudItem sm="4">
-            <MudTextField Immediate="true" @bind-Value="Field.Title" Label="@Loc["FieldNameLabel"]" Variant="Variant.Outlined" />
-        </MudItem>
-        <MudItem sm="4">
-            @if (CombatService.GetUserCreatureCustomFieldByName(Field.Title) == null)
-            {
-                <MudButton OnClick="SaveUserCustomField" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
-            } else
-            {
-                <MudButton OnClick="RemoveUserCustomField" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonRemove" Color="@Color.Error" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
-            }
-        </MudItem>
-        <MudItem sm="2">
-            <MudCheckBox @bind-Value="Field.SharedAcrossCreatureInstances" Label="@Loc["SharedField"]" />
-        </MudItem>
-    </MudGrid>
+    <div class="dc-fhead">
+        @* The drag handle must stay a non-button element: SortableList's JS
+           filter is 'input, button, select, textarea, .no-drag'. An <svg> is fine. *@
+        <DcIcon Name="drag" Size="18" Class="dc-grab dc-field-drag" />
+        <span class="dc-ftype">@Field.FieldType</span>
+        @* The kind pill carries the kind now, so the name box only needs the
+           field-name label for assistive technology and on hover. *@
+        <input class="dc-inp" type="text" aria-label="@Loc["FieldNameLabel"]" title="@Loc["FieldNameLabel"]"
+               @bind="Field.Title" @bind:event="oninput" />
+        @* Saving a field to the library and deleting it from this creature are
+           the two things you do TO a field rather than inside it, so they sit
+           together at the end of its head rather than in a tray underneath.
+           A bookmark says "library" far better than the person glyph did. *@
+        @if (CombatService.GetUserCreatureCustomFieldByName(Field.Title) == null)
+        {
+            <button type="button" class="dc-ib dc-fhead-sep" title="@Loc["LibraryAddBtn"]" aria-label="@Loc["LibraryAddBtn"]"
+                    @onclick="SaveUserCustomField">
+                <DcIcon Name="bookmark" />
+            </button>
+        }
+        else
+        {
+            <button type="button" class="dc-ib dc-fhead-sep" style="color:var(--a1);" title="@Loc["LibraryRemoveBtn"]" aria-label="@Loc["LibraryRemoveBtn"]"
+                    @onclick="RemoveUserCustomField">
+                <DcIcon Name="bookmark" Filled="true" />
+            </button>
+        }
+
+        @if (OnRemove.HasDelegate)
+        {
+            <button type="button" class="dc-ib dc-danger" title="@Loc["FieldRemoveBtn"]" aria-label="@Loc["FieldRemoveBtn"]"
+                    @onclick="OnRemove">
+                <DcIcon Name="delete" />
+            </button>
+        }
+    </div>
+    <div class="dc-fsub">
+        <label class="dc-chk">
+            <input type="checkbox" @bind="Field.SharedAcrossCreatureInstances" />
+            @Loc["SharedField"]
+        </label>
+    </div>
 }
 
 @if (Field is DCCreatureHitPointsField hitPointsField)
@@ -120,6 +113,11 @@ else if (Field is DCCreatureDetailedPopupField detailedPopupField)
     public EventCallback OnChange { get; set; }
     [Parameter]
     public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
+
+    /// Supplied only by the field editor. On a combat card there is nothing to
+    /// delete a field from, so the head draws no delete button at all.
+    [Parameter]
+    public EventCallback OnRemove { get; set; }
 
     private async Task NotifyParentOnChange()
     {

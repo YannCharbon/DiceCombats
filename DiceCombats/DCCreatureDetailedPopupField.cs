@@ -9,9 +9,24 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace DiceCombats
 {
+    /// <summary>
+    /// How a detailed-popup field presents its entries when it opens.
+    /// Serialised by name, so adding a mode later cannot renumber the existing ones.
+    /// List is deliberately the zero value: it is what every creature saved before this
+    /// enum existed was using.
+    /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum DCDetailedPopupDisplayMode
+    {
+        List = 0,
+        Grid = 1,
+        Tabs = 2
+    }
+
     public class DCCreatureDetailedPopupField : DCCreatureCustomField
     {
         public override string FieldType => "DetailedPopup";
@@ -49,7 +64,39 @@ namespace DiceCombats
 
         public List<ContentEntry> Contents { get; set; } = new List<ContentEntry>();
 
+        /// <summary>
+        /// Legacy storage for the presentation mode: false = list, true = grid. Kept as a
+        /// real stored property so that files written by this version still open in older
+        /// builds, and so that files written by older builds still land on the right mode
+        /// here. <see cref="DisplayMode"/> is the authoritative one.
+        /// </summary>
         public bool RenderModeGridEnabled { get; set; } = false;
+
+        private DCDetailedPopupDisplayMode? _displayMode;
+
+        /// <summary>
+        /// How the entries are presented when the popup opens: every entry stacked, every
+        /// entry side by side, or one at a time behind tabs.
+        ///
+        /// The backing field is nullable on purpose. When it is null — which is every
+        /// creature saved before this property existed — the getter falls back to the
+        /// legacy <see cref="RenderModeGridEnabled"/> boolean, so an old creature opens in
+        /// exactly the mode it was saved in. Because the fallback lives in the getter
+        /// rather than in a migration step, it does not matter which of the two properties
+        /// System.Text.Json happens to apply first.
+        /// </summary>
+        public DCDetailedPopupDisplayMode DisplayMode
+        {
+            get => _displayMode ?? (RenderModeGridEnabled
+                ? DCDetailedPopupDisplayMode.Grid
+                : DCDetailedPopupDisplayMode.List);
+            set
+            {
+                _displayMode = value;
+                // keep the legacy flag in step so a downgrade still reads sensibly
+                RenderModeGridEnabled = value == DCDetailedPopupDisplayMode.Grid;
+            }
+        }
 
         public DCCreatureDetailedPopupField()
         {
@@ -64,7 +111,11 @@ namespace DiceCombats
             {
                 Title = this.Title,
                 Contents = this.Contents, // shallow copy (OK for current usage)
-                RenderModeGridEnabled = this.RenderModeGridEnabled
+                DisplayMode = this.DisplayMode,
+                // Every other field type copies this; omitting it here meant a shared
+                // detailed-popup field stopped being shared as soon as DCCombat cloned
+                // it per instance.
+                SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }
 

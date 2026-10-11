@@ -21,6 +21,15 @@ namespace DiceCombats
         public bool ShowFieldName { get; set; } = false;
         public bool ShowTextFields { get; set; } = false;
 
+        /// <summary>
+        /// When set, a ticked option lights its whole cell — the option's name and its
+        /// text box included, not just the tick box — so an active option is obvious at a
+        /// glance on a crowded combat strip. Field-level rather than per-option, so there
+        /// is no fifth parallel list to keep in step with <see cref="Labels"/>.
+        /// Absent from older creatures.json, where it lands on false and nothing changes.
+        /// </summary>
+        public bool HighlightWhenChecked { get; set; } = false;
+
         public override object GetValue()
         {
             return SelectedOptions;
@@ -37,6 +46,7 @@ namespace DiceCombats
                 TextFields = new List<string>(this.TextFields),
                 ShowFieldName = this.ShowFieldName,
                 ShowTextFields = this.ShowTextFields,
+                HighlightWhenChecked = this.HighlightWhenChecked,
                 SharedAcrossCreatureInstances = this.SharedAcrossCreatureInstances
             };
         }

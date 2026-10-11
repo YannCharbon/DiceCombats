@@ -10,161 +10,31 @@
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 <style>
-    .hp-section {
-        background-color: #2A2A2A;
-        border: 1px solid #505050;
-        border-radius: 10px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-
-    .hp-section-title {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 4px 12px;
-        border-radius: 999px;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-
-    /* Heal, temporary hit points and the maximum reduction are one number each,
-       so they sit side by side instead of stacking three near empty rows. */
-    .hp-small-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 10px;
-        align-items: start;
-    }
-
-    .hp-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* Sized to keep a system of a dozen kinds within two rows of one line. */
-    .hp-kind-strip {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        max-height: 76px;
-        overflow-y: auto;
-        padding: 2px;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .hp-kind-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 3px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: bold;
-        cursor: pointer;
-        opacity: 0.45;
-        border: 2px solid transparent;
-        transition: opacity .15s, border-color .15s;
-        white-space: nowrap;
-    }
-
-        .hp-kind-btn:hover {
-            opacity: 0.8;
-        }
-
-        .hp-kind-btn.selected {
-            opacity: 1;
-            border-color: white;
-        }
-
-    .hp-damage-line {
-        padding: 8px;
-        border-radius: 8px;
-        background-color: #333333;
-        margin-bottom: 8px;
-    }
-
-    /* The whole calculation, kept at the top so it is the first thing read. */
-    .hp-total {
-        border-radius: 10px;
-        background-color: #12201d;
-        border: 1px solid #24463f;
-        padding: 12px;
-        margin-bottom: 10px;
-    }
-
-    /* One line, read left to right: current, every applied term, result. */
-    .hp-calc {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        justify-content: center;
-        gap: 14px;
-    }
-
-    .hp-term {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        max-width: 190px;
-    }
-
-    .hp-term-main {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 30px;
-        font-weight: bold;
-        line-height: 1;
-        white-space: nowrap;
-    }
-
-    .hp-term-sub {
-        margin-top: 4px;
-        font-size: 11px;
-        font-weight: 300;
-        color: grey;
-        text-align: center;
-        line-height: 1.3;
-    }
-
-    .hp-term-max {
-        color: grey;
-        font-size: 15px;
-        font-weight: normal;
-    }
-
+    /* Outside the equation, so it takes a line of its own at the foot of
+       .dc-hptotal. Violet to match the maximum-reduction section head: this note
+       is what that control did. */
     .hp-max-note {
+        flex: 0 0 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 6px;
-        margin-top: 10px;
-        padding-top: 8px;
-        border-top: 1px solid #24463f;
-        color: #b39ddb;
+        margin-top: 2px;
+        padding-top: 9px;
+        border-top: 1px solid var(--b1);
+        color: #B39DDB;
         font-size: 13px;
     }
 
-    .hp-op {
-        font-size: 26px;
-        color: grey;
-        line-height: 1;
-        padding-top: 4px;
-    }
-
-    .hp-chip {
+    /* A term of the equation carries an icon next to its number, and the bold
+       element holding it is inline by default, so without this the icon would
+       sit on the text baseline.
+       (Written without an angle-bracket tag name on purpose: Razor parses the
+       contents of a style block as markup and would read one as a real tag.) */
+    .hp-eq {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: bold;
-        color: white;
         white-space: nowrap;
     }
 </style>
@@ -172,64 +42,62 @@
 <h4 style="text-align:center;margin-bottom:10px;">@Field.Title</h4>
 
 @* ---------------- The calculation, first ---------------- *@
-<div class="hp-total">
-    <div class="hp-calc">
-        <div class="hp-term">
-            <span class="hp-term-main">@Field.CurrentHP<span class="hp-term-max">/ @Field.EffectiveMaximumHP</span></span>
-        </div>
+@* One line, read left to right: current, every applied term, result. *@
+<div class="dc-hptotal" style="margin-bottom:12px;">
+    <div class="dc-hpterm">
+        <b class="hp-eq">@Field.CurrentHP<small>/ @Field.EffectiveMaximumHP</small></b>
+    </div>
 
-        @foreach (var line in _damageLines.Where(x => x.Amount > 0))
-        {
-            var l = line;
-            var kind = Field.GetKind(l.Kind);
-            var rule = string.IsNullOrEmpty(l.Kind) ? null : Field.ResolveRule(l.Kind, l.Tags);
-            <span class="hp-op">−</span>
-            <div class="hp-term">
-                <span class="hp-term-main" style="@($"color:{(kind == null ? "#e57373" : kind.Color)};")">
-                    @if (kind != null)
-                    {
-                        <MudIcon Icon="@DCHitPointsIcons.Resolve(kind.Icon)" Style="font-size:24px;" />
-                    }
-                    @MitigatedAmount(l)
-                </span>
-                @if (rule != null && MitigatedAmount(l) != l.Amount)
+    @foreach (var line in _damageLines.Where(x => x.Amount > 0))
+    {
+        var l = line;
+        var kind = Field.GetKind(l.Kind);
+        var rule = string.IsNullOrEmpty(l.Kind) ? null : Field.ResolveRule(l.Kind, l.Tags);
+        <span class="dc-hpop">−</span>
+        <div class="dc-hpterm">
+            <b class="hp-eq" style="@($"color:{(kind == null ? "#e57373" : kind.Color)};")">
+                @if (kind != null)
                 {
-                    <span class="hp-term-sub">@rule.Name<br />@FormulaFor(l)</span>
+                    <DcIcon Name="@kind.Icon" Size="20" />
                 }
-            </div>
-        }
-
-        @if (TemporaryAbsorbed > 0)
-        {
-            <span class="hp-op">+</span>
-            <div class="hp-term">
-                <span class="hp-term-main" style="color:#23aba0;">
-                    <MudIcon Icon="@Icons.Material.Filled.Shield" Style="font-size:24px;" />@TemporaryAbsorbed
-                </span>
-                <span class="hp-term-sub">@Loc["HPCalcAbsorbed"]</span>
-            </div>
-        }
-
-        @if (_heal > 0)
-        {
-            <span class="hp-op">+</span>
-            <div class="hp-term">
-                <span class="hp-term-main" style="color:#66bb6a;">
-                    <MudIcon Icon="@Icons.Material.Filled.Add" Style="font-size:24px;" />@_heal
-                </span>
-                <span class="hp-term-sub">@Loc["HPHeal"]</span>
-            </div>
-        }
-
-        <span class="hp-op">=</span>
-        <div class="hp-term">
-            <span class="hp-term-main" style="@($"color:{ResultColor};")">@PreviewCurrentHP<span class="hp-term-max">/ @PreviewMaximum</span></span>
-            @if (PreviewTemporaryHP > 0)
+                @MitigatedAmount(l)
+            </b>
+            @if (rule != null && MitigatedAmount(l) != l.Amount)
             {
-                <span class="hp-term-sub" style="color:#23aba0;">+@PreviewTemporaryHP @Loc["HPTemporaryShort"]</span>
+                <span>@rule.Name<br />@FormulaFor(l)</span>
             }
         </div>
+    }
 
+    @if (TemporaryAbsorbed > 0)
+    {
+        <span class="dc-hpop">+</span>
+        <div class="dc-hpterm">
+            <b class="hp-eq" style="color:var(--a3);">
+                <DcIcon Name="shield" Size="20" />@TemporaryAbsorbed
+            </b>
+            <span>@Loc["HPCalcAbsorbed"]</span>
+        </div>
+    }
+
+    @if (_heal > 0)
+    {
+        <span class="dc-hpop">+</span>
+        <div class="dc-hpterm">
+            <b class="hp-eq" style="color:#66bb6a;">
+                <DcIcon Name="add" Size="20" />@_heal
+            </b>
+            <span>@Loc["HPHeal"]</span>
+        </div>
+    }
+
+    <span class="dc-hpop">=</span>
+    <div class="dc-hpterm">
+        <b class="hp-eq" style="@($"color:{ResultColor};")">@PreviewCurrentHP<small>/ @PreviewMaximum</small></b>
+        @if (PreviewTemporaryHP > 0)
+        {
+            <span style="color:var(--a3);">+@PreviewTemporaryHP @Loc["HPTemporaryShort"]</span>
+        }
     </div>
 
     @* Outside the equation: this moves the ceiling, the denominator above, not
@@ -237,48 +105,50 @@
     @if (_maximumReduction > 0)
     {
         <div class="hp-max-note">
-            <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:16px;" />
+            <DcIcon Name="remove" Size="16" />
             @Loc["HPMaxReductionLabel"] : @Field.MaximumHP − @_maximumReduction = @PreviewMaximum
         </div>
     }
 </div>
 
 @* ---------------- Damage ---------------- *@
-<div class="hp-section">
-    <div class="hp-row" style="margin-bottom:8px;">
-        <span class="hp-section-title" style="background-color:#8B2C3B;">
-            <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:18px;" />@Loc["HPDamage"]
+<div class="dc-msec" style="margin-bottom:12px;">
+    <div class="dc-msec-head">
+        @* Dark red needs white ink; .dc-msec-title's default ink is the near-black
+           one that reads on the accent green. *@
+        <span class="dc-msec-title" style="background-color:#8B2C3B;color:#FFFFFF;">
+            <DcIcon Name="remove" Size="16" />@Loc["HPDamage"]
         </span>
-        <MudButton OnClick="AddLine" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary" Size="Size.Small">
-            @Loc["HPAddLine"]
-        </MudButton>
+        <button type="button" class="dc-btn dc-btn-out" @onclick="AddLine">
+            <DcIcon Name="add" Size="16" />@Loc["HPAddLine"]
+        </button>
     </div>
 
     @* Who gets credited. Defaults to whoever holds the initiative, which is
        right most of the time and leaves the common case at zero clicks. *@
     @if (SourceContext != null && SourceContext.Candidates.Count > 0)
     {
-        <div class="hp-row" style="margin-bottom:8px;">
-            <span style="color:grey;font-size:12px;">@Loc["HPSource"]</span>
-            <div class="hp-kind-strip">
+        <div class="dc-irow dc-irow-wrap" style="margin-bottom:8px;">
+            <span class="dc-flabel">@Loc["HPSource"]</span>
+            <div class="dc-kstrip">
                 @foreach (var candidate in SourceContext.Candidates)
                 {
                     var c = candidate;
-                    <div class="hp-kind-btn @(_sourceName == c.Name ? "selected" : "")"
-                         style="background-color:@(c.IsPlayer ? "#00695C" : "#4A4A4A");color:#FFFFFF;"
-                         @onclick="() => _sourceName = c.Name">
+                    <button type="button" class="dc-kchip @(_sourceName == c.Name ? "dc-on" : "")"
+                            style="background-color:@(c.IsPlayer ? "#00695C" : "var(--s5)");color:#FFFFFF;"
+                            @onclick="() => _sourceName = c.Name">
                         @if (c.IsPlayer)
                         {
-                            <MudIcon Icon="@Icons.Material.Filled.Person" Style="font-size:15px;" />
+                            <DcIcon Name="person" Size="14" />
                         }
                         @c.Name
-                    </div>
+                    </button>
                 }
-                <div class="hp-kind-btn @(string.IsNullOrEmpty(_sourceName) ? "selected" : "")"
-                     style="background-color:#555555;color:#FFFFFF;"
-                     @onclick="() => _sourceName = string.Empty">
+                <button type="button" class="dc-kchip @(string.IsNullOrEmpty(_sourceName) ? "dc-on" : "")"
+                        style="background-color:var(--b2);color:#FFFFFF;"
+                        @onclick="() => _sourceName = string.Empty">
                     @Loc["HPNoSource"]
-                </div>
+                </button>
             </div>
         </div>
     }
@@ -286,61 +156,70 @@
     @foreach (var line in _damageLines)
     {
         var l = line;
-        <div class="hp-damage-line">
-            <div class="hp-row">
-                <div style="width:100px;">
-                    <MudNumericField T="int" @bind-Value="l.Amount" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
+        <div class="dc-hpline">
+            <div class="dc-irow dc-irow-wrap">
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["HPAmount"]</span>
+                    <div class="dc-step">
+                        <button type="button" @onclick="@(() => StepAmount(l, -1))">&minus;</button>
+                        <input type="number" class="dc-num" min="0" value="@l.Amount"
+                               @oninput="@((ChangeEventArgs e) => SetAmount(l, e.Value?.ToString()))" />
+                        <button type="button" @onclick="@(() => StepAmount(l, 1))">+</button>
+                    </div>
                 </div>
 
                 @if (Field.DamageKinds.Count > 0)
                 {
                     @* Once a kind is picked the rest fold away; clicking the
                        picked one again brings them back. *@
-                    <div class="hp-kind-strip">
+                    <div class="dc-kstrip">
                         @foreach (var kind in Field.DamageKinds)
                         {
                             var k = kind;
                             @if (l.KindsExpanded || l.Kind == k.Name)
                             {
-                                <div class="hp-kind-btn @(l.Kind == k.Name ? "selected" : "")"
-                                     style="@($"background-color:{k.Color};color:{k.TextColor};")"
-                                     @onclick="() => SelectKind(l, k.Name)">
-                                    <MudIcon Icon="@DCHitPointsIcons.Resolve(k.Icon)" Style="font-size:15px;" />
+                                <button type="button" class="dc-kchip @(l.Kind == k.Name ? "dc-on" : "")"
+                                        style="@($"background-color:{k.Color};color:{k.TextColor};")"
+                                        @onclick="() => SelectKind(l, k.Name)">
+                                    <DcIcon Name="@k.Icon" Size="14" />
                                     @k.Name
-                                </div>
+                                </button>
                             }
                         }
                         @if (l.KindsExpanded)
                         {
-                            <div class="hp-kind-btn @(string.IsNullOrEmpty(l.Kind) ? "selected" : "")"
-                                 style="background-color:#555555;color:#FFFFFF;"
-                                 @onclick="() => SelectKind(l, string.Empty)">
+                            <button type="button" class="dc-kchip @(string.IsNullOrEmpty(l.Kind) ? "dc-on" : "")"
+                                    style="background-color:var(--b2);color:#FFFFFF;"
+                                    @onclick="() => SelectKind(l, string.Empty)">
                                 @Loc["HPNoKind"]
-                            </div>
+                            </button>
                         }
                         else
                         {
-                            <span style="color:grey;font-size:12px;align-self:center;">@Loc["HPChangeKind"]</span>
+                            <span class="dc-flabel" style="align-self:center;">@Loc["HPChangeKind"]</span>
                         }
                     </div>
                 }
 
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" Size="Size.Small" OnClick="() => RemoveLine(l)" title="@Loc["HPRemoveLine"]" />
+                <button type="button" class="dc-ib dc-danger" style="margin-left:auto;"
+                        title="@Loc["HPRemoveLine"]" aria-label="@Loc["HPRemoveLine"]" @onclick="() => RemoveLine(l)">
+                    <DcIcon Name="delete" Size="16" />
+                </button>
             </div>
 
             @* Shown whenever the system has tags, kind selected or not. *@
             @if (Field.Tags.Count > 0)
             {
-                <div class="hp-row" style="margin-top:6px;gap:5px;">
-                    <span style="color:grey;font-size:12px;">@Loc["HPTagsTitle"]</span>
+                <div class="dc-irow dc-irow-wrap" style="margin-top:6px;gap:5px;">
+                    <span class="dc-flabel">@Loc["HPTagsTitle"]</span>
                     @foreach (string tag in Field.Tags)
                     {
                         var t = tag;
-                        <div class="hp-kind-btn @(l.Tags.Contains(t) ? "selected" : "")"
-                             style="background-color:#4A5A7A;color:#FFFFFF;"
-                             @onclick="() => ToggleTag(l, t, !l.Tags.Contains(t))">
+                        <button type="button" class="dc-kchip @(l.Tags.Contains(t) ? "dc-on" : "")"
+                                style="background-color:#4A5A7A;color:#FFFFFF;"
+                                @onclick="() => ToggleTag(l, t, !l.Tags.Contains(t))">
                             @t
-                        </div>
+                        </button>
                     }
                 </div>
             }
@@ -348,46 +227,67 @@
     }
 </div>
 
-@* ------- Heal, temporary hit points, maximum reduction, side by side ------- *@
-<div class="hp-small-grid">
-    <div class="hp-section">
-        <div class="hp-row">
-            <span class="hp-section-title" style="background-color:#1E867F;">
-                <MudIcon Icon="@Icons.Material.Filled.Add" Style="font-size:18px;" />@Loc["HPHeal"]
+@* ------- Heal, temporary hit points, maximum reduction, side by side -------
+   One number each, so they sit side by side instead of stacking three near
+   empty rows. *@
+<div class="dc-mgrid3">
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            <span class="dc-msec-title" style="background-color:var(--a3);">
+                <DcIcon Name="add" Size="16" />@Loc["HPHeal"]
             </span>
-            <div style="width:100px;">
-                <MudNumericField T="int" @bind-Value="_heal" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["HPAmount"]</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => StepHeal(-1))">&minus;</button>
+                    <input type="number" class="dc-num" min="0" value="@_heal"
+                           @oninput="@((ChangeEventArgs e) => _heal = ParseAmount(e.Value?.ToString()))" />
+                    <button type="button" @onclick="@(() => StepHeal(1))">+</button>
+                </div>
             </div>
         </div>
-        <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPHealHint"]</div>
+        <p class="dc-msec-help" style="margin-bottom:0;">@Loc["HPHealHint"]</p>
     </div>
 
-    <div class="hp-section">
-        <div class="hp-row">
-            <span class="hp-section-title" style="background-color:#23aba0;">
-                <MudIcon Icon="@Icons.Material.Filled.Shield" Style="font-size:18px;" />@Loc["HPTemporary"]
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            <span class="dc-msec-title" style="background-color:var(--a3);">
+                <DcIcon Name="shield" Size="16" />@Loc["HPTemporary"]
             </span>
-            <div style="width:100px;">
-                <MudNumericField T="int" @bind-Value="_temporary" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["HPAmount"]</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => StepTemporary(-1))">&minus;</button>
+                    <input type="number" class="dc-num" min="0" value="@_temporary"
+                           @oninput="@((ChangeEventArgs e) => _temporary = ParseAmount(e.Value?.ToString()))" />
+                    <button type="button" @onclick="@(() => StepTemporary(1))">+</button>
+                </div>
             </div>
         </div>
-        <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPTemporaryHint"]</div>
+        <p class="dc-msec-help" style="margin-bottom:0;">@Loc["HPTemporaryHint"]</p>
     </div>
 
-    <div class="hp-section">
-        <div class="hp-row">
-            <span class="hp-section-title" style="background-color:#6A4C93;">
-                <MudIcon Icon="@Icons.Material.Filled.Remove" Style="font-size:18px;" />@Loc["HPMaxReductionLabel"]
+    <div class="dc-msec">
+        <div class="dc-msec-head">
+            @* Violet, white ink: the near-black default would vanish on it. *@
+            <span class="dc-msec-title" style="background-color:#6A4C93;color:#FFFFFF;">
+                <DcIcon Name="remove" Size="16" />@Loc["HPMaxReductionLabel"]
             </span>
-            <div style="width:100px;">
-                <MudNumericField T="int" @bind-Value="_maximumReduction" Label="@Loc["HPAmount"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0" Immediate="true" DebounceInterval="200" />
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["HPAmount"]</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => StepMaximumReduction(-1))">&minus;</button>
+                    <input type="number" class="dc-num" min="0" value="@_maximumReduction"
+                           @oninput="@((ChangeEventArgs e) => _maximumReduction = ParseAmount(e.Value?.ToString()))" />
+                    <button type="button" @onclick="@(() => StepMaximumReduction(1))">+</button>
+                </div>
             </div>
         </div>
-        <div style="color:grey;font-size:12px;margin-top:4px;">@Loc["HPMaxReductionHint"]</div>
+        <p class="dc-msec-help" style="margin-bottom:0;">@Loc["HPMaxReductionHint"]</p>
     </div>
 </div>
 
-<MudText Typo="Typo.caption" Style="color:grey;display:block;text-align:center;margin-top:8px;">@Loc["HPApplyHint"]</MudText>
+<p class="dc-msec-help" style="text-align:center;margin:8px 0 0;">@Loc["HPApplyHint"]</p>
 
 @code {
     [Parameter] public DCCreatureHitPointsField Field { get; set; } = default!;
@@ -460,6 +360,27 @@
         _damageLines.Remove(line);
         if (_damageLines.Count == 0) AddLine();
     }
+
+    /// Every box in this popup is a count, so a half-typed or emptied box reads
+    /// as zero and never as a negative number.
+    private static int ParseAmount(string? text)
+        => int.TryParse(text, out int value) ? Math.Max(0, value) : 0;
+
+    private void SetAmount(DamageLine line, string? text)
+    {
+        line.Amount = ParseAmount(text);
+    }
+
+    private static void StepAmount(DamageLine line, int delta)
+    {
+        line.Amount = Math.Max(0, line.Amount + delta);
+    }
+
+    private void StepHeal(int delta) => _heal = Math.Max(0, _heal + delta);
+
+    private void StepTemporary(int delta) => _temporary = Math.Max(0, _temporary + delta);
+
+    private void StepMaximumReduction(int delta) => _maximumReduction = Math.Max(0, _maximumReduction + delta);
 
     private void SelectKind(DamageLine line, string kind)
     {

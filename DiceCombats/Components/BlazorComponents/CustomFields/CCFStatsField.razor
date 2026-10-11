@@ -1,43 +1,78 @@
-﻿@using DiceCombats
-@using MudBlazor.Utilities
+@using DiceCombats
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldRenderer> Loc
 
 @if (EditionMode)
 {
-    <MudNumericField @bind-Value="Field.Count" Label="@Loc["CreatureStatsCount"]" style="max-width:200px;" Variant="Variant.Outlined" />
-    <MudCheckBox Label="@Loc["CreatureStatsKeepValuesEditable"]" @bind-Value="Field.ValuesAreEditable"></MudCheckBox>
-    <MudStack Row="true" style="overflow:auto;">
-        @foreach (int i in Enumerable.Range(0, Field.Count))
-        {
-            <MudStack Row="false">
-                <MudTextField style="min-width:100px;" Immediate="true" @bind-Value="Field.StatsLabels[i]" Label="@Loc["CreatureStatsStatLabel"]" Variant="Variant.Outlined" />
-                <MudNumericField @bind-Value="Field.StatsValues[i]" Label="@Field.StatsLabels[i]" Variant="Variant.Outlined" />
-            </MudStack>
-        }
-    </MudStack>
+    <div class="dc-fbody dc-fbody-col">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:11px;">
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["CreatureStatsCount"]</span>
+                <div class="dc-step">
+                    <button type="button" @onclick="@(() => SetCount(Field.Count - 1))">&minus;</button>
+                    <input class="dc-num" type="number" min="0" value="@Field.Count"
+                           @onchange="@(e => SetCount(ParseInt(e.Value, Field.Count)))" />
+                    <button type="button" @onclick="@(() => SetCount(Field.Count + 1))">+</button>
+                </div>
+            </div>
+            <label class="dc-chk">
+                <input type="checkbox" @bind="Field.ValuesAreEditable" />
+                @Loc["CreatureStatsKeepValuesEditable"]
+            </label>
+        </div>
+
+        <div style="display:flex;gap:6px;overflow:auto;width:100%;">
+            @foreach (int i in Enumerable.Range(0, Field.Count))
+            {
+                <div class="dc-opt" style="flex-direction:column;align-items:stretch;gap:5px;">
+                    <div class="dc-field">
+                        <span class="dc-flabel">@Loc["CreatureStatsStatLabel"]</span>
+                        <input class="dc-inp" type="text" style="min-width:100px;"
+                               @bind="Field.StatsLabels[i]" @bind:event="oninput" />
+                    </div>
+                    <div class="dc-field">
+                        <span class="dc-flabel">@Field.StatsLabels[i]</span>
+                        <div class="dc-step">
+                            <button type="button" @onclick="@(() => Field.StatsValues[i]--)">&minus;</button>
+                            <input class="dc-num" type="number" @bind="Field.StatsValues[i]" />
+                            <button type="button" @onclick="@(() => Field.StatsValues[i]++)">+</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
 }
 else
 {
-    <div style="zoom: 0.85;">
-        <MudStack Row="true">
+    <div class="dc-fgrp">
+        <span class="dc-flabel">@Field.Title</span>
+        <div class="dc-stats">
             @foreach (int i in Enumerable.Range(0, Field.Count))
             {
                 var index = i;
-                <MudStack Row="false" Style="border-radius:5px;border-width:thin;background-color:darkcyan;">
-                    @if (Field.ValuesAreEditable)
-                    {
-                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[index]</MudItem>
-                        <MudNumericField T="int" Value="@Field.StatsValues[index]" ValueChanged="@((int v) => OnStatValueChanged(index, v))" style="max-width:90px;" Variant="Variant.Outlined" />
-                    }
-                    else
-                    {
-                        <MudItem Style="text-align:center;font-weight:400;font-size:18px;">@Field.StatsValues[index]</MudItem>
-                        <MudItem Style="padding-left:5px;padding-right:5px;text-align:center;font-weight:200;font-size:14px;">@Field.StatsLabels[index]</MudItem>
-                    }
-                </MudStack>
+                @if (Field.ValuesAreEditable)
+                {
+                    <div class="dc-stat">
+                        <span class="dc-flabel">@Field.StatsLabels[index]</span>
+                        <div class="dc-step">
+                            <button type="button" @onclick="@(() => OnStatValueChanged(index, Field.StatsValues[index] - 1))">&minus;</button>
+                            <input class="dc-num" type="number" value="@Field.StatsValues[index]"
+                                   @onchange="@(e => OnStatValueChanged(index, ParseInt(e.Value, Field.StatsValues[index])))" />
+                            <button type="button" @onclick="@(() => OnStatValueChanged(index, Field.StatsValues[index] + 1))">+</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    @* Read-only tile: the value reads first, its name under it. *@
+                    <div class="dc-stat" title="@Loc["NonEditableField"]">
+                        <b>@Field.StatsValues[index]</b>
+                        <span class="dc-flabel">@Field.StatsLabels[index]</span>
+                    </div>
+                }
             }
-        </MudStack>
+        </div>
     </div>
 }
 
@@ -46,6 +81,12 @@ else
     [Parameter] public bool EditionMode { get; set; } = false;
     [Parameter] public EventCallback OnChange { get; set; }
     [Parameter] public EventCallback<CustomFieldChangeInfo> OnFieldChanged { get; set; }
+
+    private static int ParseInt(object? raw, int fallback)
+        => int.TryParse(raw?.ToString(), out var parsed) ? parsed : fallback;
+
+    // Enumerable.Range throws on a negative count, so the stepper stops at zero.
+    private void SetCount(int value) => Field.Count = value < 0 ? 0 : value;
 
     private async Task OnStatValueChanged(int index, int value)
     {

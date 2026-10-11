@@ -15,14 +15,6 @@
 @inject IJSRuntime JS
 
 <style>
-    .CreatureCustomFieldsEditorCustomField {
-        padding: 10px;
-        margin: 15px;
-        background-color: #505050;
-        border-radius: 10px;
-        max-width: 100%;
-    }
-
     @@keyframes ImageFadeIn {
         from {
             opacity: 0;
@@ -41,24 +33,6 @@
         position: relative;
         padding-bottom: 10px;
     }
-
-    .assist-box {
-        background: #3d3d46;
-        border: 1px solid #5f5f6d;
-        border-radius: 10px;
-        padding: 14px;
-        margin: 10px 0;
-    }
-
-    .kbd {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #2d2d34;
-        border: 1px solid #666;
-        font-family: monospace;
-        font-size: 90%;
-    }
 </style>
 
 <div>
@@ -66,161 +40,196 @@
     {
         <h3>@Loc["AddAdditionalFieldsTitle"]</h3>
 
-        <MudExpansionPanel Expanded="false">
-            <TitleContent>
-                <div class="d-flex">
-                    <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
-                    <MudText class="mr-3">Assistance</MudText>
-                </div>
-            </TitleContent>
-            <ChildContent>
-                <p>
-                    @Loc["AssitanceGeneral1"]
-                </p>
-                <h4>@Loc["AssistanceGeneralSharedFieldsTitle"]</h4>
-                <MudCheckBox T="bool" Label="@Loc["SharedField"]" />
-                <p>
-                    @((MarkupString)Loc["AssistanceGeneralSharedFieldsDesc"].Value)
-                </p>
-                <h4>@Loc["AssistanceUserCustomFieldTitle"]</h4>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAddAlt1" Color="@Color.Primary" Size="Size.Large">@Loc["CustomFieldBtn"]</MudButton>
-                <p>
-                    @((MarkupString)Loc["AssistanceUserCustomFieldDesc"].Value)
-                </p>
-                <h4>@Loc["AssistanceGeneralExamplesTitle"]</h4>
-                <p>
-                    @((MarkupString)Loc["AssistanceGeneralExamplesDesc"].Value)
-                </p>
-                <div style="display:flex;flex-wrap:wrap;">
-                    <img class="image-reveal" style="width:300px;padding:5px;" src="img/creatures_examples/aidedd_example_1.png" />
-                    <img class="image-reveal" style="width:300px;padding:5px;" src="img/creatures_examples/manual_creature_example_2.png" />
-                </div>
-            </ChildContent>
-        </MudExpansionPanel>
+        @* dc-assist keeps the panel off the field wall below it: without it the
+           two touch and read as one broken block. *@
+        <div class="dc-assist">
+            <MudExpansionPanel Expanded="false">
+                <TitleContent>
+                    <div class="dc-irow" style="gap:10px;">
+                        <span style="display:inline-flex;color:var(--a1);"><DcIcon Name="help" Size="18" /></span>
+                        <span>Assistance</span>
+                    </div>
+                </TitleContent>
+                <ChildContent>
+                    <div class="dc-note">
+                        @Loc["AssitanceGeneral1"]
+                    </div>
+                    <h4>@Loc["AssistanceGeneralSharedFieldsTitle"]</h4>
+                    <label class="dc-chk">
+                        <input type="checkbox" />
+                        @Loc["SharedField"]
+                    </label>
+                    <div class="dc-note">
+                        @((MarkupString)Loc["AssistanceGeneralSharedFieldsDesc"].Value)
+                    </div>
+                    <h4>@Loc["AssistanceUserCustomFieldTitle"]</h4>
+                    <button type="button" class="dc-btn dc-btn-fill">
+                        <DcIcon Name="person-add" />
+                        @Loc["CustomFieldBtn"]
+                    </button>
+                    <div class="dc-note">
+                        @((MarkupString)Loc["AssistanceUserCustomFieldDesc"].Value)
+                    </div>
+                    <h4>@Loc["AssistanceGeneralExamplesTitle"]</h4>
+                    <div class="dc-note">
+                        @((MarkupString)Loc["AssistanceGeneralExamplesDesc"].Value)
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;">
+                        <img class="image-reveal" style="width:300px;padding:5px;" src="img/creatures_examples/aidedd_example_1.png" />
+                        <img class="image-reveal" style="width:300px;padding:5px;" src="img/creatures_examples/manual_creature_example_2.png" />
+                    </div>
+                </ChildContent>
+            </MudExpansionPanel>
+        </div>
     }
 
-    <div class="d-flex flex-wrap" style="align-items:center;">
-        @foreach (var field in Fields)
+    @*
+      The field wall. In edition mode a card is reordered by dragging the handle
+      in its header. SortableList's JS filter leaves inputs, buttons and selects
+      usable inside a card, so the handle has to stay a non-button element (the
+      DcIcon <svg>).
+      Play mode keeps the plain flowing wall: there is no handle to grab there.
+    *@
+    <div class="dc-fgrid">
+        @if (EditionMode)
         {
-            <div class="CreatureCustomFieldsEditorCustomField">
-                <div>
-                    <CreatureCustomFieldRenderer Field="field" EditionMode="EditionMode" />
-                </div>
-                @if (EditionMode)
-                {
-                    <div style="display:flex; justify-content:right; padding:5px;">
-                        <MudIconButton title="@Loc["MoveBackward"]" Icon="@Icons.Material.Filled.ArrowCircleLeft" @onclick="() => MoveField(field, true)" />
-                        <MudIconButton title="@Loc["MoveForward"]" Icon="@Icons.Material.Filled.ArrowCircleRight" @onclick="() => MoveField(field, false)" />
-                        <MudButton style="padding-top:10px;" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Secondary" OnClick="() => RemoveField(field)">@Loc["FieldRemove"]</MudButton>
+            <SortableList T="DCCreatureCustomField"
+                          Id="creatureFieldsSortable"
+                          Class="dc-fgrid"
+                          Handle=".dc-field-drag"
+                          Items="Fields"
+                          OnUpdate="OnFieldsReordered"
+                          Context="field">
+                <SortableItemTemplate>
+                    <div @key="field" class="dc-fcard" style="@FieldCardStyle(field)">
+                        @* Reordering is the drag handle's job and deleting is the
+                           head's, so the card has no tray under it any more. *@
+                        <CreatureCustomFieldRenderer Field="field" EditionMode="true"
+                                                     OnRemove="() => RemoveField(field)" />
                     </div>
-                }
-            </div>
+                </SortableItemTemplate>
+            </SortableList>
+        }
+        else
+        {
+            @foreach (var field in Fields)
+            {
+                <div @key="field">
+                    <CreatureCustomFieldRenderer Field="field" EditionMode="false" />
+                </div>
+            }
         }
 
         @if (EditionMode)
         {
             <div style="display:flex; flex-wrap:wrap; max-width:900px;">
                 <div style="padding:10px;">
-                    <MudStack Row="true">
-                        <MudItem>
-                            <MudSelect Style="min-width: 220px;" T="string" Label="@Loc["FieldType"]" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" @bind-Value="newFieldType">
-                                <MudSelectItem T="string" Value="@("Hit Points")" />
-                                <MudSelectItem T="string" Value="@("Numeric")" />
-                                <MudSelectItem T="string" Value="@("Checkbox")" />
-                                <MudSelectItem T="string" Value="@("Checkbox Grid")" />
-                                <MudSelectItem T="string" Value="@("Text Grid")" />
-                                <MudSelectItem T="string" Value="@("Text")" />
-                                <MudSelectItem T="string" Value="@("Color")" />
-                                <MudSelectItem T="string" Value="@("Conditions")"></MudSelectItem>
-                                <MudSelectItem T="string" Value="@("Stats")"></MudSelectItem>
-                                <MudSelectItem T="string" Value="@("DetailedPopup")"></MudSelectItem>
-                                @foreach (DCCreatureCustomField customField in CombatService.GetUserCreatureCustomFields())
-                                {
-                                    <MudSelectItem T="string" Value="@(customField.Title)">
-                                        <MudIcon Icon="@Icons.Material.Filled.PersonAddAlt1"></MudIcon> @(customField.Title)
-                                    </MudSelectItem>
+                    <div class="dc-irow dc-irow-wrap" style="align-items:flex-end;">
+                        @* A native select on the Verdant input well. The saved user
+                           fields keep their own group instead of a per-item icon. *@
+                        <div class="dc-field" style="min-width:220px;">
+                            <span class="dc-flabel">@Loc["FieldType"]</span>
+                            <select class="dc-inp" aria-label="@Loc["FieldType"]" @bind="newFieldType">
+                                <option value="Hit Points">Hit Points</option>
+                                <option value="Numeric">Numeric</option>
+                                <option value="Checkbox">Checkbox</option>
+                                <option value="Checkbox Grid">Checkbox Grid</option>
+                                <option value="Text Grid">Text Grid</option>
+                                <option value="Text">Text</option>
+                                <option value="Color">Color</option>
+                                <option value="Conditions">Conditions</option>
+                                <option value="Stats">Stats</option>
+                                <option value="DetailedPopup">DetailedPopup</option>
+                                @{
+                                    var userFields = CombatService.GetUserCreatureCustomFields();
                                 }
-                            </MudSelect>
-                        </MudItem>
-                        <MudItem>
-                            <div style="padding-top:5px">
-                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddField">@Loc["AddField"]</MudButton>
-                            </div>
-                        </MudItem>
-                    </MudStack>
+                                @if (userFields.Count > 0)
+                                {
+                                    <optgroup label="@Loc["AssistanceUserCustomFieldTitle"]">
+                                        @foreach (DCCreatureCustomField customField in userFields)
+                                        {
+                                            <option value="@customField.Title">@customField.Title</option>
+                                        }
+                                    </optgroup>
+                                }
+                            </select>
+                        </div>
+                        <button type="button" class="dc-btn dc-btn-fill" @onclick="AddField">
+                            <DcIcon Name="add" />
+                            @Loc["AddField"]
+                        </button>
+                    </div>
                 </div>
 
-                <div style="flex:1 1 500px;">
+                @* The per-kind help panel gets the same breathing room as the
+                   assistance panel above the wall. *@
+                <div class="dc-assist" style="flex:1 1 500px;">
                     <MudExpansionPanel Expanded="@_fieldHelpExpanded" ExpandedChanged="() => _fieldHelpExpanded = !_fieldHelpExpanded">
                         <TitleContent>
-                            <div class="d-flex">
-                                <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
-                                <MudText class="mr-3">@newFieldType @Loc["AssistanceFieldTitle"]</MudText>
+                            <div class="dc-irow" style="gap:10px;">
+                                <span style="display:inline-flex;color:var(--a1);"><DcIcon Name="help" Size="18" /></span>
+                                <span>@newFieldType @Loc["AssistanceFieldTitle"]</span>
                             </div>
                         </TitleContent>
                         <ChildContent>
                             @switch (newFieldType)
                             {
                                 case "Hit Points":
-                                    <div>
-                                        <p>@Loc["AssistanceHitPointsField"]</p>
-                                    </div>
+                                    <div class="dc-note">@Loc["AssistanceHitPointsField"]</div>
                                     <img class="image-reveal" style="width:150px;" src="img/fields_examples/hitpointsfield_example_1.png" />
                                     break;
 
                                 case "Numeric":
-                                    <div>
-                                        <p>@Loc["AssistanceNumericField"]</p>
-                                    </div>
+                                    <div class="dc-note">@Loc["AssistanceNumericField"]</div>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/numericfield_example_1.png" />
                                     break;
 
                                 case "Checkbox":
-                                    <div><p>@Loc["AssistanceCheckboxField"]</p></div>
-                                    <p>@Loc["AssistanceCheckboxField2"]</p>
+                                    <div class="dc-note">@Loc["AssistanceCheckboxField"]</div>
+                                    <div class="dc-note">@Loc["AssistanceCheckboxField2"]</div>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/checkboxfield_example_2.png" />
-                                    <p>@Loc["AssistanceCheckboxField3"]</p>
+                                    <div class="dc-note">@Loc["AssistanceCheckboxField3"]</div>
                                     <img class="image-reveal" style="width:350px;" src="img/fields_examples/checkboxfield_example_1.png" />
                                     break;
 
                                 case "Checkbox Grid":
-                                    <div><p>@Loc["AssistanceCheckboxGridField"]</p></div>
+                                    <div class="dc-note">@Loc["AssistanceCheckboxGridField"]</div>
                                     <img class="image-reveal" style="width:250px;" src="img/fields_examples/checkboxgridfield_example_1.png" />
-                                    <p>@Loc["AssistanceCheckboxGridField2"]</p>
+                                    <div class="dc-note">@Loc["AssistanceCheckboxGridField2"]</div>
                                     <img class="image-reveal" style="width:250px;" src="img/fields_examples/checkboxgridfield_example_2.png" />
                                     break;
 
                                 case "Text Grid":
-                                    <div><p>@Loc["AssistanceTextGridField"]</p></div>
+                                    <div class="dc-note">@Loc["AssistanceTextGridField"]</div>
                                     <img class="image-reveal" style="width:300px;" src="img/fields_examples/textgridfield_example_1.png" />
                                     break;
 
                                 case "Text":
-                                    <div><p>@Loc["AssistanceTextField"]</p></div>
+                                    <div class="dc-note">@Loc["AssistanceTextField"]</div>
                                     <img class="image-reveal" style="width:300px;" src="img/fields_examples/textfield_example_1.png" />
                                     break;
 
                                 case "Color":
-                                    <div><p>@Loc["AssistanceColorField"]</p></div>
+                                    <div class="dc-note">@Loc["AssistanceColorField"]</div>
                                     <img class="image-reveal" style="width:350px;" src="img/fields_examples/colorfield_example_1.png" />
                                     break;
 
                                 case "Conditions":
-                                    <div><p>@Loc["AssistanceConditionsField"]</p></div>
+                                    <div class="dc-note">@Loc["AssistanceConditionsField"]</div>
                                     <img class="image-reveal" style="width:350px;" src="img/fields_examples/conditions_example_2.png" />
-                                    <p>@Loc["AssistanceConditionsField2"]</p>
+                                    <div class="dc-note">@Loc["AssistanceConditionsField2"]</div>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/conditions_example_1.png" />
                                     break;
 
                                 case "Stats":
-                                    <div><p>@Loc["AssistanceStatsField"]</p></div>
+                                    <div class="dc-note">@Loc["AssistanceStatsField"]</div>
                                     <img class="image-reveal" style="width:200px;" src="img/fields_examples/statsfield_example_1.png" />
-                                    <p>@Loc["AssistanceStatsField2"]</p>
+                                    <div class="dc-note">@Loc["AssistanceStatsField2"]</div>
                                     <img class="image-reveal" style="width:150px;" src="img/fields_examples/statsfield_example_2.png" />
                                     break;
 
                                 case "DetailedPopup":
-                                    <div>
+                                    <div class="dc-note">
                                         @((MarkupString)Loc["AssistanceDetailedPopupField"].Value)
                                     </div>
                                     break;
@@ -250,6 +259,23 @@
         set => Preferences.Set("AssistanceField", value);
     }
 
+    // Each kind asks for the width it actually needs, so a Colour field never
+    // takes a full row to say one thing.
+    private static string FieldCardStyle(DCCreatureCustomField field) => field.FieldType switch
+    {
+        "HitPoints" => "--dc-fb:560px;--dc-fm:720px",
+        "Color" => "--dc-fb:320px;--dc-fm:380px",
+        "Checkbox" => "--dc-fb:400px;--dc-fm:500px",
+        "Text" => "--dc-fb:290px;--dc-fm:360px",
+        "Numeric" => "--dc-fb:420px;--dc-fm:520px",
+        "Stats" => "--dc-fb:560px;--dc-fm:700px",
+        "DnDConditions" => "--dc-fb:700px;--dc-fm:100%",
+        "CheckboxGrid" => "--dc-fb:640px;--dc-fm:100%",
+        "TextGrid" => "--dc-fb:700px;--dc-fm:100%",
+        "DetailedPopup" => "--dc-fb:400px;--dc-fm:520px",
+        _ => "--dc-fb:420px;--dc-fm:520px",
+    };
+
     private void AddField()
     {
         DCCreatureCustomField? newField = null;
@@ -272,14 +298,15 @@
 
     private void RemoveField(DCCreatureCustomField field) => Fields.Remove(field);
 
-    private void MoveField(DCCreatureCustomField field, bool upNotDown)
+    // Dragging a card's handle lands here. It is the only way to reorder now.
+    private void OnFieldsReordered((int oldIndex, int newIndex) indices)
     {
-        int idx = Fields.IndexOf(field);
-        if ((idx <= 0 && upNotDown) || (idx + 1 >= Fields.Count && !upNotDown)) return;
+        if (indices.oldIndex < 0 || indices.oldIndex >= Fields.Count) return;
+        if (indices.newIndex < 0 || indices.newIndex >= Fields.Count) return;
 
-        Fields.RemoveAt(idx);
-        if (upNotDown) Fields.Insert(idx - 1, field);
-        else Fields.Insert(idx + 1, field);
+        var field = Fields[indices.oldIndex];
+        Fields.RemoveAt(indices.oldIndex);
+        Fields.Insert(indices.newIndex, field);
     }
 
     protected override Task OnAfterRenderAsync(bool firstRender)

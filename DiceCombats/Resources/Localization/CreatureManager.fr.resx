@@ -138,4 +138,10 @@
   <data name="TypePlayer" xml:space="preserve">
     <value>Personnage joueur</value>
   </data>
+  <data name="CreatureMissing" xml:space="preserve">
+    <value>Aucune créature avec l’identifiant {0}</value>
+  </data>
+  <data name="SheetUnavailable" xml:space="preserve">
+    <value>Impossible d’afficher cette fiche de créature</value>
+  </data>
 </root>

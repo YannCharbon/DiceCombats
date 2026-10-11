@@ -32,7 +32,7 @@
 
     .markdown-content th,
     .markdown-content td {
-    background-color: #004D40;
+    background-color: rgba(35, 170, 128, 0.22);
     }
 
     .one-column-item {
@@ -50,19 +50,33 @@
 
 @if (creature == null)
 {
-    <p>@(CreatureGuid) does not exist</p>
+    <p class="dc-sub">@string.Format(Loc["CreatureMissing"], CreatureGuid)</p>
 } else
 {
-    <MudStack Row="true" Wrap="Wrap.Wrap">
-        <h1>@creature.Name</h1>
-        <MudButton OnClick="Save" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Check" IconColor="Color.Primary" Size="Size.Large">@Loc["StopEditingBtn"]</MudButton>
-        <MudButton OnClick="Delete" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Error" Size="Size.Large">@Loc["DeleteBtn"]</MudButton>
-        <MudCheckBox Label="@Loc["EditionModeChkbx"]" @bind-Value="_editionMode"></MudCheckBox>
+    @* Verdant chrome: the same five controls, in the shared vocabulary. The two
+       icons stay on the two buttons they were on. *@
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+        <h1 class="dc-h1" style="margin:0;">@creature.Name</h1>
+        <button type="button" class="dc-btn dc-btn-fill" @onclick="Save">
+            <DcIcon Name="check" />
+            @Loc["StopEditingBtn"]
+        </button>
+        <button type="button" class="dc-btn dc-btn-danger" @onclick="Delete">
+            <DcIcon Name="delete" />
+            @Loc["DeleteBtn"]
+        </button>
+        <label class="dc-chk">
+            <input type="checkbox" @bind="_editionMode" />
+            @Loc["EditionModeChkbx"]
+        </label>
         @if (HasSheetLinks)
         {
-            <MudCheckBox Label="@Loc["OpenLinksInAppChkbx"]" @bind-Value="creature.OpenLinksInApp"></MudCheckBox>
+            <label class="dc-chk">
+                <input type="checkbox" @bind="creature.OpenLinksInApp" />
+                @Loc["OpenLinksInAppChkbx"]
+            </label>
         }
-    </MudStack>
+    </div>
 
     <div style="padding:10px">
         @if (creature.ImageSheetBas64 != string.Empty)
@@ -81,7 +95,14 @@
             {
                 <div style="display:flex;flex-wrap:wrap;">
                     <div class="one-column-item" style="padding:10px;">
-                        <MudTextField DebounceInterval="500" Sizing="InputSizing.Auto" MaxLines="20" Label="@Loc["EditMarkdownBtn"]" Variant="Variant.Outlined" T="string" Value="@creature.MarkdownSheet" ValueChanged="@_previewMarkdownSheet"></MudTextField>
+                        <div class="dc-field" style="width:100%;">
+                            <label class="dc-flabel" for="md-source">@Loc["EditMarkdownBtn"]</label>
+                            @* @oninput rather than a debounce: the preview beside it is
+                               a string render, not a request, so there is nothing to throttle. *@
+                            <textarea class="dc-inp" id="md-source" rows="20" spellcheck="false"
+                                      value="@creature.MarkdownSheet"
+                                      @oninput="@(e => _previewMarkdownSheet(e.Value?.ToString() ?? string.Empty))"></textarea>
+                        </div>
                     </div>
                     <div class="markdown-content one-column-item @SheetLinkClass" style="padding:10px;">
                         @((MarkupString)creature.GetMarkdownSheetAsHtml())
@@ -102,7 +123,7 @@
         {}
         else
         {
-            <p>Could not render creature sheet</p>
+            <p class="dc-sub">@Loc["SheetUnavailable"]</p>
         }
     </div>
     <div style="padding:10px;">

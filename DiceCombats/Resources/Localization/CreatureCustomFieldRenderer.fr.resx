@@ -69,6 +69,9 @@
   <data name="CBFieldShowTextFields" xml:space="preserve">
     <value>Afficher les titres</value>
   </data>
+  <data name="CBFieldHighlightWhenChecked" xml:space="preserve">
+    <value>Mettre en évidence une option cochée</value>
+  </data>
   <data name="CBFieldTextLabels" xml:space="preserve">
     <value>Titre</value>
   </data>
@@ -335,5 +338,14 @@
   </data>
   <data name="TextGridVertical" xml:space="preserve">
     <value>Vertical</value>
+  </data>
+  <data name="LibraryAddBtn" xml:space="preserve">
+    <value>Enregistrer dans la bibliothèque</value>
+  </data>
+  <data name="LibraryRemoveBtn" xml:space="preserve">
+    <value>Enregistré dans la bibliothèque</value>
+  </data>
+  <data name="FieldRemoveBtn" xml:space="preserve">
+    <value>Supprimer ce champ</value>
   </data>
 </root>

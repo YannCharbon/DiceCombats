@@ -16,20 +16,20 @@
         <DetailedPopupFieldPopup DetailedPopupField="Field" EditionMode="true" />
     </GenericModal>
 
-    <MudButton OnClick="@(() => _modal?.ShowAsync() ?? Task.CompletedTask)" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Edit">
-        @Loc["DetailedPopupEditButton"]
-    </MudButton>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => _modal?.ShowAsync() ?? Task.CompletedTask)">
+        <DcIcon Name="edit" Size="17" />@Loc["DetailedPopupEditButton"]
+    </button>
 
-    <div style="display:flex; flex-wrap:wrap; margin-top:10px;">
+    <div class="dc-irow dc-irow-wrap" style="gap:6px;margin-top:10px;">
         @foreach (var c in Field.Contents)
         {
             @if (!string.IsNullOrWhiteSpace(c.Name))
             {
-                <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@c.Name</div>
+                <span class="dc-tag">@c.Name</span>
             }
             else
             {
-                <div style="padding:5px;margin:5px;border-radius:5px;background-color:var(--mud-palette-primary)">@c.Kind</div>
+                <span class="dc-tag">@c.Kind</span>
             }
         }
     </div>
@@ -40,7 +40,9 @@ else
         <DetailedPopupFieldPopup DetailedPopupField="Field" />
     </GenericModal>
 
-    <MudButton OnClick="OpenPopup" Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Lightbulb">@Field.Title</MudButton>
+    <button type="button" class="dc-btn dc-btn-fill" @onclick="OpenPopup">
+        <DcIcon Name="lightbulb" Size="17" />@Field.Title
+    </button>
 }
 
 @code {

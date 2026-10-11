@@ -1,29 +1,73 @@
-@using DiceCombats.Automations
+﻿@using DiceCombats.Automations
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
 
-<div style="display:flex;align-items:center;">
-    <div style="margin:15px;">
-        <h4>@Loc["ExternalApps"]</h4>
-    </div>
-    <div>
-        <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => OnAdd.InvokeAsync())">@Loc["AddExternalApp"]</MudButton>
-    </div>
+<style>
+    /* The card is .dc-panel.automation-app-item — Automations.razor owns its
+       width and its --ctl edge (--s3). What is here is the nesting inside one
+       card, which used to be invisible because the name, the fields and the
+       enable switch all sat straight on the card's own step: the name is an
+       inset bar on the card (--s5) and the settings are a surface on it
+       (--s4), with the inputs themselves a well (--s2) as everywhere else. */
+    .eae-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 8px 10px;
+        margin-bottom: 10px;
+        background: var(--s5);
+        border: 1px solid var(--b1);
+        border-radius: var(--r-bar);
+    }
+
+    /* Operable block, so a boundary that clears 3:1 rather than --b1's 2.6. */
+    .eae-body { border-color: var(--ctl); }
+</style>
+
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:22px 0 4px 0;">
+    <h2 class="dc-h2" style="border:0;padding-bottom:0;">@Loc["ExternalApps"]</h2>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => OnAdd.InvokeAsync())">
+        <DcIcon Name="add" />
+        @Loc["AddExternalApp"]
+    </button>
 </div>
 
+@* A grid that fills the width instead of a 30%-wide column with two thirds
+   of the page left blank beside it. *@
+<div class="automation-apps">
 @foreach (var app in ExternalApps.ToList())
 {
-    <MudPaper Class="pa-2 my-2 automation-app-item">
-        <MudStack Row="true" Justify="Justify.SpaceBetween">
-            <MudText Typo="Typo.h6">@app.Name</MudText>
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(app))">@Loc["Delete"]</MudButton>
-        </MudStack>
+    var a = app;
+    <div class="dc-panel automation-app-item">
+        <div class="eae-head">
+            <span class="dc-strip-name">@a.Name</span>
+            <button type="button" class="dc-btn dc-btn-danger" @onclick="@(() => OnRemove.InvokeAsync(a))">
+                <DcIcon Name="delete" />
+                @Loc["Delete"]
+            </button>
+        </div>
 
-        <MudTextField @bind-Value="app.Name" Label="@Loc["AppName"]" />
-        <MudTextField @bind-Value="app.BaseUrl" Label="@Loc["BaseUrl"]" />
-        <MudSwitch @bind-Value="app.IsEnabled" Color="Color.Primary" Label="@(app.IsEnabled == true ? Loc["Enabled"].Value : Loc["Disabled"].Value)" />
-    </MudPaper>
+        <div class="dc-msec eae-body">
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["AppName"]</span>
+                <input type="text" class="dc-inp" @bind="a.Name" />
+            </div>
+
+            <div class="dc-field" style="margin-top:8px;">
+                <span class="dc-flabel">@Loc["BaseUrl"]</span>
+                <input type="text" class="dc-inp" @bind="a.BaseUrl" />
+            </div>
+
+            <label class="dc-chk" style="margin-top:10px;">
+                <input type="checkbox" @bind="a.IsEnabled" />
+                <span>@(a.IsEnabled == true ? Loc["Enabled"].Value : Loc["Disabled"].Value)</span>
+            </label>
+        </div>
+    </div>
 }
 
+</div>
 @code {
     [Parameter] public List<ExternalAppDefinition> ExternalApps { get; set; } = new();
     [Parameter] public EventCallback OnAdd { get; set; }

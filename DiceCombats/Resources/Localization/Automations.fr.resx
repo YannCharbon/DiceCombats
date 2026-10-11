@@ -88,7 +88,7 @@
     <value>Nom de l’automatisation</value>
   </data>
   <data name="AutomationsSectionTitle" xml:space="preserve">
-    <value>Automatisations</value>
+    <value>Vos automatisations</value>
   </data>
   <data name="AvailableVariables" xml:space="preserve">
     <value>Variables disponibles pour ce déclencheur ({0})</value>
@@ -593,5 +593,8 @@
   </data>
   <data name="WhenAvailableColumn" xml:space="preserve">
     <value>Disponibilité</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>Quand quelque chose se passe dans un combat, l'envoyer ailleurs.</value>
   </data>
 </root>

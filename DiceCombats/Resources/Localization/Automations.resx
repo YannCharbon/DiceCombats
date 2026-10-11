@@ -88,7 +88,7 @@
     <value>Automation name</value>
   </data>
   <data name="AutomationsSectionTitle" xml:space="preserve">
-    <value>Automations</value>
+    <value>Your automations</value>
   </data>
   <data name="AvailableVariables" xml:space="preserve">
     <value>Variables available for this trigger ({0})</value>
@@ -593,5 +593,8 @@
   </data>
   <data name="WhenAvailableColumn" xml:space="preserve">
     <value>When available</value>
+  </data>
+  <data name="Subtitle" xml:space="preserve">
+    <value>When something happens in a combat, send it somewhere.</value>
   </data>
 </root>

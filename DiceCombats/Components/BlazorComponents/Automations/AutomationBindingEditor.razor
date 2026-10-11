@@ -1,24 +1,64 @@
-@using DiceCombats.Automations
+﻿@using DiceCombats.Automations
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
 
 @{
     var trigger = EnsureTrigger();
 }
 
+<style>
+    .aut-ident {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 10px 14px;
+        border-color: var(--ctl);
+        margin: 14px 0 10px;
+    }
+
+    /* The name takes whatever is left, so on a narrow card the enable and the
+       delete wrap onto their own line instead of squeezing the input. */
+    .aut-ident-name { flex: 1 1 200px; min-width: 0; }
+
+    /* Sit on the input's line, not on the label above it. */
+    .aut-ident-end { margin-bottom: 1px; }
+</style>
+
+@* MudExpansionPanels stays: app.css already restyles .mud-expand-panel, and an
+   automation card is the one place that genuinely needs a collapsible header.
+   Automations.razor's style block puts .automation-item's panel on --s3 and its
+   header on an --s5 bar, so the --s4 sections below (this identity block, the
+   trigger, the actions) read as surfaces ON the card instead of as the card. *@
 <MudExpansionPanels Class="automation-item">
     <MudExpansionPanel>
         <TitleContent>
-            <div style="display:flex;">
-                <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" class="mr-3"
-                         Color="@(Binding.IsEnabled == true ? Color.Primary : Color.Dark)"></MudIcon>
-                <MudText Style="font-size: 20px; font-weight:700;">@(string.IsNullOrWhiteSpace(Binding.Name) ? Loc["AutomationFallback"].Value : Binding.Name)</MudText>
+            <div class="dc-irow" style="gap:12px;">
+                <DcIcon Name="electric-bolt" Size="18" Class="@(Binding.IsEnabled == true ? "dc-i-accent" : "dc-i-muted")" />
+                <span style="font-size: 20px; font-weight:700;">@(string.IsNullOrWhiteSpace(Binding.Name) ? Loc["AutomationFallback"].Value : Binding.Name)</span>
             </div>
         </TitleContent>
         <ChildContent>
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => OnRemove.InvokeAsync(Binding))">@Loc["DeleteAutomation"]</MudButton>
+            @* Identity: what the automation is called, whether it runs, and the
+               way to get rid of it. The label used to share a row with the
+               delete button while the input sat underneath, so the button read
+               as belonging to the name field. The label now sits on its own
+               field and the two controls that act on the whole automation sit
+               at the far end of the same line, clear of it. *@
+            <div class="dc-msec aut-ident">
+                <div class="dc-field aut-ident-name">
+                    <label class="dc-flabel" for="@($"{_id}-name")">@Loc["AutomationName"]</label>
+                    <input type="text" class="dc-inp" id="@($"{_id}-name")" @bind="Binding.Name" />
+                </div>
 
-            <MudTextField @bind-Value="Binding.Name" Label="@Loc["AutomationName"]" />
-            <MudSwitch @bind-Value="Binding.IsEnabled" Color="Color.Primary" Label="@(Binding.IsEnabled == true ? Loc["Enabled"].Value : Loc["Disabled"].Value)" />
+                <label class="dc-chk aut-ident-end">
+                    <input type="checkbox" @bind="Binding.IsEnabled" />
+                    <span>@(Binding.IsEnabled == true ? Loc["Enabled"].Value : Loc["Disabled"].Value)</span>
+                </label>
+
+                <button type="button" class="dc-btn dc-btn-danger aut-ident-end" @onclick="@(() => OnRemove.InvokeAsync(Binding))">
+                    <DcIcon Name="delete" />
+                    @Loc["DeleteAutomation"]
+                </button>
+            </div>
 
             <TriggerEditor Trigger="trigger" />
             <ActionSequenceEditor Binding="Binding" ExternalApps="ExternalApps" />
@@ -30,6 +70,8 @@
     [Parameter] public EventActionBinding Binding { get; set; } = new();
     [Parameter] public List<ExternalAppDefinition> ExternalApps { get; set; } = new();
     [Parameter] public EventCallback<EventActionBinding> OnRemove { get; set; }
+
+    private readonly string _id = "aut-" + Guid.NewGuid().ToString("N")[..8];
 
     private EventTriggerDefinition EnsureTrigger()
     {

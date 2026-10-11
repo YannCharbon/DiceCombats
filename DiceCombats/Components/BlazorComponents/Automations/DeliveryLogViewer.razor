@@ -1,26 +1,54 @@
 @using DiceCombats.Automations
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
 
-<div class="settings-group">
+<style>
+    /* .dc-panel is --s3 and .dc-mrow is --s3 too, so every log line used to
+       land on the exact surface of the panel holding it and the list read as a
+       block of loose text. Three steps now: panel --s3 → the log itself a
+       surface on it (--s4, and scrollable, so it carries a --ctl edge you can
+       find) → one line per delivery on top of that (--s5). */
+    .dlv-log { border-color: var(--ctl); }
+
+    .dlv-line {
+        background: var(--s5);
+        flex-wrap: wrap;
+        font-size: 12.5px;
+        color: var(--t2);
+    }
+
+    .dlv-line:last-child { margin-bottom: 0; }
+    .dlv-line b { color: var(--t1); }
+
+    /* Whether a delivery worked is the one thing you scan a log for. */
+    .dlv-ok { color: var(--a1); font-weight: 700; }
+    .dlv-fail { color: var(--danger); font-weight: 700; }
+</style>
+
+@* The .settings-group / .settings-group-name pair this used to carry was
+   retired from app.css, so the panel was rendering unstyled: it is the
+   standard dc-panel + dc-pill header the other sections already use. *@
+<div class="dc-panel">
     <div style="display:flex;">
-        <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Dvr" Size="@Size.Large" style="color:white;margin:10px;" />
+        <div class="dc-pill">
+            <DcIcon Name="dvr" Size="26" />
             <h3>@Loc["DeliveryLogs"]</h3>
         </div>
     </div>
-    <div>
+    <div class="dc-msec dc-mscroll dlv-log" style="margin-top:10px;">
         @if (EventPublisher is DiceEventDispatcher dispatcher)
         {
             @foreach (var log in dispatcher.Logs)
             {
-                <MudPaper Class="pa-2 my-1">
-                    <b>@log.Timestamp.ToLocalTime()</b> |
-                    @log.AutomationName |
-                    @log.EventType |
-                    @(log.Success ? Loc["LogSuccess"].Value : Loc["LogFailed"].Value) |
-                    @log.StatusCode |
-                    @log.ErrorMessage
-                </MudPaper>
+                <div class="dc-mrow dlv-line">
+                    <span>
+                        <b>@log.Timestamp.ToLocalTime()</b> |
+                        @log.AutomationName |
+                        @log.EventType |
+                        <span class="@(log.Success ? "dlv-ok" : "dlv-fail")">@(log.Success ? Loc["LogSuccess"].Value : Loc["LogFailed"].Value)</span> |
+                        @log.StatusCode |
+                        @log.ErrorMessage
+                    </span>
+                </div>
             }
         }
     </div>

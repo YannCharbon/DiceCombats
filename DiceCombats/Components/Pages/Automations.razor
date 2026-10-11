@@ -7,130 +7,141 @@
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
 
 <style>
-    .settings-group-name {
-    border-radius: 60px;
-    padding: 0px 20px 0px 0px;
-    margin:10px;
-    background-color: darkcyan;
-    display: flex;
-    align-items: center;
-    }
+    /* .dc-panel, .dc-pill, .assist-box, .assist-grid, .assist-example, .kbd and
+       .placeholder-table now come from wwwroot/css/app.css, which is where the
+       other pages were each re-declaring their own copy. What is left here is
+       this page's two column widths, plus the surface steps of its nesting.
 
-    .settings-group {
-    margin:10px;
-    padding:10px;
-    border-radius:10px;
-    background-color:#505050;
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
-    }
+       The nesting is the point: MudBlazor paints every expansion panel from a
+       single Surface colour (--s4), and .dc-msec is also --s4, so a whole
+       automation — card, trigger block, action rows — landed on one step and
+       read as one flat slab. Each level below takes its own step of the --s*
+       ramp, and anything operable gets a --ctl edge (3.4:1) rather than a
+       decorative --b1 one (2.6:1). */
 
-    .automation-app-item {
-        padding-top: 10px;
-        padding-right: 10px;
-        min-width: 30%;
-        max-width: 30%;
-    }
-
-    @@media screen and (max-width: 768px) {
-        .automation-app-item {
-            min-width: 100%; /* Adjust for smaller screens */
-            max-width: 100%;
-        }
-    }
-
-    .automation-item {
-        padding-top: 10px;
-        padding-right: 10px;
-        min-width: 40%;
-        max-width: 50%;
-    }
-
-    .assist-box {
-        background: #3d3d46;
-        border: 1px solid #5f5f6d;
-        border-radius: 10px;
-        padding: 14px;
-        margin: 10px 0;
-    }
-
-    .assist-grid {
+    /* Both lists are grids that fill the width. The old fixed 30% / 40-50%
+       widths left most of the page empty, and an expanded automation - which
+       carries a trigger editor and a sequence diagram - was squeezed into half
+       a column while the other half stayed blank. */
+    .automation-apps,
+    .automations-list {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 12px;
+        align-items: start;
     }
 
-    .assist-example {
-        background: #2d2d34;
-        border-radius: 8px;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 90%;
-        white-space: pre-wrap;
-    }
+    .automation-apps { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+    .automations-list { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); }
 
-    .kbd {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #2d2d34;
-        border: 1px solid #666;
-        font-family: monospace;
-        font-size: 90%;
-    }
+    .automation-app-item,
+    .automation-item { min-width: 0; }
 
-    .placeholder-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 8px;
-    }
-
-    .placeholder-table th,
-    .placeholder-table td {
-        border-top: 1px solid #5f5f6d;
-        padding: 7px;
-        vertical-align: top;
-    }
-
-    .placeholder-table th {
-        text-align: left;
-    }
+    /* An open automation deliberately does NOT take the whole row. Letting it
+       span made a trigger picker, a sequence diagram and a handful of short
+       text fields stretch across 1300px, which gained nothing and left the eye
+       travelling a long way between a label and its control. Confined to its
+       column it reads as a form of ordinary width, and the card beside it
+       stays put instead of being bumped to the next row. */
 
     @@media screen and (max-width: 768px) {
-        .automation-item {
-            min-width: 100%; /* Adjust for smaller screens */
-            max-width: 100%;
-        }
+        .automation-apps,
+        .automations-list { grid-template-columns: minmax(0, 1fr); }
     }
+
+    /* An external app is a card you type into, so its edge is operable. */
+    .dc-panel.automation-app-item { border-color: var(--ctl); }
+
+    /* ── one automation ───────────────────────────────────────────────────
+       The ramp ALTERNATES rather than climbing. s3→s4 is 5.2 L*, which is
+       below what reads as a boundary once a border is also competing for
+       attention; s3→s5 is 9.9 L* and unmistakable. So:
+
+         page --s0 → card --s3 → head --s5 → section --s5 → row back to --s3
+         → input --s2
+
+       Each boundary is ~10 L* in one direction or the other, instead of four
+       nested things all sitting within 5 L* of each other. */
+    .automation-item.mud-expansion-panels > .mud-expand-panel {
+        background-color: var(--s3);
+        border: 1px solid var(--ctl);
+        border-radius: var(--r-card);
+    }
+
+    /* Sections inside the card (.dc-msec from the trigger and action editors). */
+    .automation-item .dc-msec {
+        background: var(--s5);
+        border-color: var(--ctl);
+    }
+
+    /* A row inside a section drops back down, so its edge is a real step. */
+    .automation-item .dc-msec .dc-msec,
+    .automation-item .as-action,
+    .automation-item .dc-mrow,
+    .automation-item .dc-opt {
+        background: var(--s3);
+        border-color: var(--ctl);
+    }
+
+    .automation-item .mud-expand-panel-header {
+        background: var(--s5);
+        border-bottom: 1px solid var(--ctl);
+    }
+
+    /* ── the assistance tree ──────────────────────────────────────────────
+       card --s3 → its boxes and its nested panels --s4 → the boxes inside
+       those --s5 → and the two things that sit on an --s5 box (a kbd chip,
+       a code example) stepped off it again. */
+    .automations-assist.mud-expansion-panels > .mud-expand-panel {
+        background-color: var(--s3);
+        border: 1px solid var(--ctl);
+        border-radius: var(--r-panel);
+    }
+
+    .automations-assist .assist-box { background: var(--s4); }
+
+    .automations-assist.mud-expansion-panels .mud-expansion-panels > .mud-expand-panel {
+        background-color: var(--s4);
+        border: 1px solid var(--ctl);
+        border-radius: var(--r-btn);
+        margin-bottom: 6px;
+    }
+
+    .automations-assist .mud-expansion-panels .assist-box { background: var(--s5); }
+    .automations-assist .mud-expansion-panels .assist-box .kbd { background: var(--s6); }
+    .automations-assist .mud-expansion-panels .assist-box .assist-example { background: var(--s3); }
 </style>
 
-<div class="settings-group">
-    <div style="display:flex;align-items:center;">
-        <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.AutoMode" Size="@Size.Large" style="color:white;margin:10px;" />
-            <h3>@Loc["Title"]</h3>
-        </div>
-        <div>
-            <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Success" OnClick="Save">@Loc["Save"]</MudButton>
-        </div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+    <div>
+        <h1 class="dc-h1">@Loc["Title"]</h1>
+        <p class="dc-sub">@Loc["Subtitle"]</p>
     </div>
+    <button type="button" class="dc-btn dc-btn-fill" @onclick="Save">
+        <DcIcon Name="save" />
+        @Loc["Save"]
+    </button>
+</div>
+
+<div class="dc-stack">
 
 
+    <MudExpansionPanels Class="automations-assist">
     <MudExpansionPanel Expanded="@_assistanceExpanded" ExpandedChanged="() => _assistanceExpanded = !_assistanceExpanded">
         <TitleContent>
-            <div class="d-flex">
-                <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Color="@Color.Primary" class="mr-3"></MudIcon>
-                <MudText class="mr-3">@Loc["Assistance"]</MudText>
+            <div class="dc-irow" style="gap:10px;">
+                <DcIcon Name="help" Size="18" Class="dc-i-accent" />
+                <span>@Loc["Assistance"]</span>
             </div>
         </TitleContent>
         <ChildContent>
             <div class="assist-box">
-                <MudText Typo="Typo.h6">@Loc["AssistanceWhatAutomationsDoTitle"]</MudText>
+                <h4 style="margin:0 0 6px;">@Loc["AssistanceWhatAutomationsDoTitle"]</h4>
                 <p>@Loc["AssistanceWhatAutomationsDoText"]</p>
             </div>
 
             <div class="assist-grid">
                 <div class="assist-box">
-                    <MudText Typo="Typo.h6">@Loc["AssistanceExternalAppsTitle"]</MudText>
+                    <h4 style="margin:0 0 6px;">@Loc["AssistanceExternalAppsTitle"]</h4>
                     <p>
                         @Loc["AssistanceExternalAppsText1"]
                         <span class="kbd">http://localhost:5000</span>.
@@ -141,12 +152,12 @@
                 </div>
 
                 <div class="assist-box">
-                    <MudText Typo="Typo.h6">@Loc["AssistanceAutomationsTitle"]</MudText>
+                    <h4 style="margin:0 0 6px;">@Loc["AssistanceAutomationsTitle"]</h4>
                     <p>@Loc["AssistanceAutomationsText"]</p>
                 </div>
 
                 <div class="assist-box">
-                    <MudText Typo="Typo.h6">@Loc["AssistanceActionsTitle"]</MudText>
+                    <h4 style="margin:0 0 6px;">@Loc["AssistanceActionsTitle"]</h4>
                     <p>
                         @Loc["AssistanceActionsText1"]
                         <span class="kbd">@Loc["ContinueOnFailure"]</span>
@@ -155,7 +166,7 @@
                 </div>
 
                 <div class="assist-box">
-                    <MudText Typo="Typo.h6">@Loc["AssistanceSaveLogsTitle"]</MudText>
+                    <h4 style="margin:0 0 6px;">@Loc["AssistanceSaveLogsTitle"]</h4>
                     <p>
                         @Loc["AssistanceSaveLogsText1"]
                         <span class="kbd">@Loc["Save"]</span>
@@ -175,7 +186,7 @@
                             @Loc["PlaceholderCatalogueIntro3"]
                         </p>
 
-                        <MudText Typo="Typo.subtitle2">@Loc["PlaceholderMetadataTitle"]</MudText>
+                        <h5 style="margin:12px 0 4px;">@Loc["PlaceholderMetadataTitle"]</h5>
                         <table class="placeholder-table">
                             <tr>
                                 <th>@Loc["PlaceholderColumn"]</th>
@@ -190,7 +201,7 @@
                     </div>
 
                     <div class="assist-box">
-                        <MudText Typo="Typo.subtitle2">@Loc["EventDataPlaceholdersTitle"]</MudText>
+                        <h5 style="margin:12px 0 4px;">@Loc["EventDataPlaceholdersTitle"]</h5>
                         <table class="placeholder-table">
                             <tr>
                                 <th>@Loc["WhenAvailableColumn"]</th>
@@ -297,20 +308,19 @@
             </MudExpansionPanels>
         </ChildContent>
     </MudExpansionPanel>
-
+    </MudExpansionPanels>
 
     <ExternalAppsEditor ExternalApps="_config.ExternalApps" OnAdd="AddExternalApp" OnRemove="RemoveExternalApp" />
 
-    <div style="display:flex;align-items:center;">
-        <div style="margin:15px;">
-            <h4>@Loc["AutomationsSectionTitle"]</h4>
-        </div>
-        <div>
-            <MudButton Style="padding-top:10px;" StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Secondary" OnClick="AddBinding">@Loc["AddAutomation"]</MudButton>
-        </div>
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:22px 0 4px 0;">
+        <h2 class="dc-h2" style="border:0;padding-bottom:0;">@Loc["AutomationsSectionTitle"]</h2>
+        <button type="button" class="dc-btn dc-btn-out" @onclick="AddBinding">
+            <DcIcon Name="add" />
+            @Loc["AddAutomation"]
+        </button>
     </div>
 
-    <div style="display:flex; flex-wrap:wrap">
+    <div class="automations-list">
         @foreach (var binding in _config.Bindings.ToList())
         {
             <AutomationBindingEditor Binding="binding" ExternalApps="_config.ExternalApps" OnRemove="RemoveBinding" />

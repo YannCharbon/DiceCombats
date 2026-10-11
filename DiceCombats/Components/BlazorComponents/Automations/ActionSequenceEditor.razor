@@ -1,105 +1,263 @@
-@using DiceCombats.Automations
+﻿@using DiceCombats.Automations
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
 
-<MudText Typo="Typo.h6" Class="mt-4">@Loc["ActionsSequence"]</MudText>
+<style>
+    /* Surfaces. The actions are a section of the automation card, which
+       Automations.razor puts on --s3, so the section is --s4 (.dc-msec) and
+       everything inside it steps off that: the diagram is a well below it and
+       the per-action editors are rows above it. Before this the card, the
+       section and each action row were all --s4 and read as one slab.
 
-<div style="display:flex; padding:20px; overflow-x: scroll;">
-    <div style="padding:10px; border-radius:30px; height:80px; width:120px; min-width:120px; background-color:deeppink; font-weight:700; text-align:center; font-size:12px;">
-        <div style="justify-content:center;">
-            <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Title="@Loc["EventTitle"]" />
-        </div>
-        <div style="justify-content:center;">
-            @Binding.Name
-        </div>
+       The sequence diagram keeps both the geometry and the colours this
+       component always had (120x80 nodes, a 65px arrow gutter). */
+
+    /* A read-only canvas, so it is sunk below the section (--s2) and the nodes
+       — tinted or gradient — read as objects standing on it. */
+    .as-flow {
+        display: flex;
+        padding: 16px;
+        overflow-x: auto;
+        background: var(--s2);
+        border: 1px solid var(--b1);
+        border-radius: var(--r-bar);
+        margin-bottom: 11px;
+    }
+
+    /* One action's editor: a row on the section, with an operable edge. */
+    .as-action {
+        background: var(--s5);
+        border-color: var(--ctl);
+    }
+
+    .as-node {
+        padding: 10px;
+        height: 80px;
+        width: 120px;
+        min-width: 120px;
+        box-sizing: border-box;
+        border-radius: var(--r-panel);
+        font-weight: 700;
+        text-align: center;
+        font-size: 14px;
+        color: #FFFFFF;
+        border: 1px solid var(--b1);
+        background: var(--s4);
+    }
+
+    /* The node colours are the legacy ones, deliberately. They are a legend,
+       not decoration: pink is a terminal (the event that starts the run and the
+       end of it), teal is an HTTP call, goldenrod is a wait. Recolouring them
+       into the app accents made every node the same family and the diagram
+       stopped being readable at a glance, which is the only thing it is for. */
+    .as-node-event,
+    .as-node-end {
+        border-radius: var(--r-pill);
+        border-color: transparent;
+        background: deeppink;
+    }
+
+    .as-node-event { font-size: 12px; }
+    .as-node-end { width: 60px; min-width: 60px; }
+
+    .as-node-http {
+        border-color: transparent;
+        background: teal;
+    }
+
+    .as-node-delay {
+        border-color: transparent;
+        background: darkgoldenrod;
+    }
+
+    /* The fields of one action, laid out as a wall. Short controls sit three
+       or four to a row; only the two templates take the full width. */
+    .as-fields {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 12px;
+        align-items: end;
+        margin-top: 12px;
+    }
+
+    .as-fields > .as-span { grid-column: 1 / -1; }
+    .as-fields > .as-inline { align-self: center; min-height: 32px; }
+    .as-fields .as-wide { width: 100%; }
+
+    .as-arrow {
+        padding: 30px 10px 0 10px;
+        width: 65px;
+        min-width: 65px;
+        height: 60px;
+        font-weight: 700;
+        color: var(--t3);
+    }
+</style>
+
+@* The actions are one section of the automation card: title band, the
+   sequence diagram, the two add buttons, then one editor per action. *@
+<div class="dc-msec" style="margin:10px 0;border-color:var(--ctl);">
+    <div class="dc-msec-head">
+        <h3 class="dc-msec-title" style="margin:0;">@Loc["ActionsSequence"]</h3>
     </div>
-    <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
-        - - - - &gt;
-    </div>
-    @foreach (var action in Binding.Actions.ToList())
-    {
-        @if (action is HttpRequestActionDefinition http)
-        {
-            <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:teal; font-weight:700; text-align:center; font-size:14px;">
-                <div style="justify-content:center;">
-                    <MudIcon Icon="@Icons.Material.Filled.RocketLaunch" Title="@Loc["ActionTitle"]" />
-                </div>
-                <div style="justify-content:center;">
-                    @http.Name
-                </div>
+
+    <div class="as-flow">
+        <div class="as-node as-node-event">
+            <div style="justify-content:center;">
+                <DcIcon Name="electric-bolt" title="@Loc["EventTitle"]" />
             </div>
-        }
-        else if (action is DelayActionDefinition delay)
-        {
-            <div style="padding:10px; border-radius:10px; height:80px; width:120px; min-width:120px; background-color:darkgoldenrod; font-weight:700; text-align:center; font-size:14px;">
-                <div style="justify-content:center;">
-                    <MudIcon Icon="@Icons.Material.Filled.AccessTime" Title="@Loc["ActionTitle"]" />
-                </div>
-                <div style="justify-content:center;">
-                    @delay.Milliseconds
-                </div>
+            <div style="justify-content:center;">
+                @Binding.Name
             </div>
-        }
-        <div style="padding-left:10px; padding-right:10px; padding-top:30px; width:65px; min-width:65px; height:60px; font-weight:700;">
+        </div>
+        <div class="as-arrow">
             - - - - &gt;
         </div>
-    }
-    <div style="padding:10px; border-radius:30px; height:80px; width:60px; min-width:60px; background-color:deeppink; font-weight:700; text-align:center; font-size:14px;">
-        <div style="justify-content:center;">
-            <MudIcon Icon="@Icons.Material.Filled.Stop" Title="@Loc["EndTitle"]" />
-        </div>
-        <div style="justify-content:center;">
-            @Loc["End"]
+        @foreach (var action in Binding.Actions.ToList())
+        {
+            @if (action is HttpRequestActionDefinition http)
+            {
+                <div class="as-node as-node-http">
+                    <div style="justify-content:center;">
+                        <DcIcon Name="rocket" title="@Loc["ActionTitle"]" />
+                    </div>
+                    <div style="justify-content:center;">
+                        @http.Name
+                    </div>
+                </div>
+            }
+            else if (action is DelayActionDefinition delay)
+            {
+                <div class="as-node as-node-delay">
+                    <div style="justify-content:center;">
+                        <DcIcon Name="access-time" title="@Loc["ActionTitle"]" />
+                    </div>
+                    <div style="justify-content:center;">
+                        @delay.Milliseconds
+                    </div>
+                </div>
+            }
+            <div class="as-arrow">
+                - - - - &gt;
+            </div>
+        }
+        <div class="as-node as-node-end">
+            <div style="justify-content:center;">
+                <DcIcon Name="stop" title="@Loc["EndTitle"]" />
+            </div>
+            <div style="justify-content:center;">
+                @Loc["End"]
+            </div>
         </div>
     </div>
+
+    <div class="dc-irow dc-irow-wrap" style="gap:9px;">
+        <button type="button" class="dc-btn dc-btn-fill" @onclick="AddHttp">
+            <DcIcon Name="launch" />
+            @Loc["AddHttpRequest"]
+        </button>
+        <button type="button" class="dc-btn dc-btn-fill" @onclick="AddDelay">
+            <DcIcon Name="access-time" />
+            @Loc["AddDelay"]
+        </button>
+    </div>
+
+    @foreach (var action in Binding.Actions.ToList())
+    {
+        var a = action;
+        <div class="dc-msec as-action" style="margin:10px 0 0;">
+            <div class="dc-irow dc-irow-wrap" style="gap:7px;">
+                <button type="button" class="dc-ib" @onclick="@(() => MoveActionUp(a))">
+                    <DcIcon Name="circle-up" />
+                </button>
+                <button type="button" class="dc-ib" @onclick="@(() => MoveActionDown(a))">
+                    <DcIcon Name="circle-down" />
+                </button>
+                <button type="button" class="dc-btn dc-btn-danger" @onclick="@(() => RemoveAction(a))">
+                    <DcIcon Name="delete" />
+                    @Loc["DeleteAction"]
+                </button>
+            </div>
+
+            @* A field wall, not a single column. A method of "POST" and a
+               timeout do not each need 1300px; only the two templates do. *@
+            <div class="as-fields">
+            <div class="dc-field">
+                <span class="dc-flabel">@Loc["ActionName"]</span>
+                <input type="text" class="dc-inp" @bind="a.Name" />
+            </div>
+
+            <label class="dc-chk as-inline">
+                <input type="checkbox" @bind="a.ContinueOnFailure" />
+                <span>@Loc["ContinueOnFailure"]</span>
+            </label>
+
+            @if (a is HttpRequestActionDefinition http)
+            {
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["ExternalAppOptional"]</span>
+                    @* Guid? through an explicit parse rather than @bind: the "no app"
+                       option has to come back as null, not Guid.Empty. *@
+                    <select class="dc-inp" value="@(http.ExternalAppId?.ToString() ?? string.Empty)"
+                            @onchange="@(e => SetExternalApp(http, e.Value?.ToString()))">
+                        <option value="">@Loc["ExternalAppNoneAbsolute"]</option>
+                        @foreach (var app in ExternalApps)
+                        {
+                            <option value="@app.Id">@app.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["Method"]</span>
+                    <select class="dc-inp" @bind="http.Method">
+                        @foreach (var method in _methods)
+                        {
+                            <option value="@method">@method</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="dc-field">
+                    <span class="dc-flabel">@(http.ExternalAppId == null ? Loc["EndpointAbsoluteUrl"].Value : Loc["EndpointRelativePath"].Value)</span>
+                    <input type="text" class="dc-inp" @bind="http.Url" />
+                </div>
+
+                <div class="dc-field as-span">
+                    <span class="dc-flabel">@Loc["BodyTemplate"]</span>
+                    <textarea class="dc-inp as-wide" rows="3" @bind="http.BodyTemplate"></textarea>
+                </div>
+
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["TimeoutMs"]</span>
+                    <div class="dc-step">
+                        <button type="button" @onclick="@(() => StepTimeout(http, -100))">&minus;</button>
+                        <input type="number" class="dc-num" @bind="http.TimeoutMs" />
+                        <button type="button" @onclick="@(() => StepTimeout(http, 100))">+</button>
+                    </div>
+                </div>
+
+                <div class="dc-field as-span">
+                    <span class="dc-flabel">@Loc["HeadersOnePerLine"]</span>
+                    <textarea class="dc-inp as-wide" rows="4"
+                              value="@GetHeadersText(http.Headers)"
+                              @onchange="@(e => SetHeadersFromText(http, e.Value?.ToString() ?? string.Empty))"></textarea>
+                </div>
+            }
+            else if (a is DelayActionDefinition delay)
+            {
+                <div class="dc-field">
+                    <span class="dc-flabel">@Loc["DelayMilliseconds"]</span>
+                    <div class="dc-step">
+                        <button type="button" @onclick="@(() => StepDelay(delay, -100))">&minus;</button>
+                        <input type="number" class="dc-num" @bind="delay.Milliseconds" />
+                        <button type="button" @onclick="@(() => StepDelay(delay, 100))">+</button>
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    }
 </div>
-
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Launch" OnClick="AddHttp">@Loc["AddHttpRequest"]</MudButton>
-<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AccessTime" OnClick="AddDelay">@Loc["AddDelay"]</MudButton>
-
-@foreach (var action in Binding.Actions.ToList())
-{
-    <MudPaper Class="pa-2 my-2" Style="padding:10px;background-color:#202020;border-radius:10px;">
-        <MudStack Row="true">
-            <MudButton OnClick="@(() => MoveActionUp(action))">↑</MudButton>
-            <MudButton OnClick="@(() => MoveActionDown(action))">↓</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveAction(action))">@Loc["DeleteAction"]</MudButton>
-        </MudStack>
-
-        <MudTextField @bind-Value="action.Name" Label="@Loc["ActionName"]" />
-        <MudSwitch @bind-Value="action.ContinueOnFailure" Color="Color.Primary" Label="@Loc["ContinueOnFailure"]" />
-
-        @if (action is HttpRequestActionDefinition http)
-        {
-            <MudSelect T="Guid?" @bind-Value="http.ExternalAppId" Label="@Loc["ExternalAppOptional"]">
-                <MudSelectItem T="Guid?" Value="@((Guid?)null)">@Loc["ExternalAppNoneAbsolute"]</MudSelectItem>
-                @foreach (var app in ExternalApps)
-                {
-                    <MudSelectItem T="Guid?" Value="@((Guid?)app.Id)">@app.Name</MudSelectItem>
-                }
-            </MudSelect>
-
-            <MudSelect T="string" @bind-Value="http.Method" Label="@Loc["Method"]">
-                @foreach (var method in _methods)
-                {
-                    <MudSelectItem T="string" Value="@method">@method</MudSelectItem>
-                }
-            </MudSelect>
-
-            <MudTextField @bind-Value="http.Url" Label="@(http.ExternalAppId == null ? Loc["EndpointAbsoluteUrl"].Value : Loc["EndpointRelativePath"].Value)" />
-            <MudTextField @bind-Value="http.BodyTemplate" Label="@Loc["BodyTemplate"]" Lines="3" />
-            <MudNumericField T="int" @bind-Value="http.TimeoutMs" Label="@Loc["TimeoutMs"]" />
-            <MudTextField T="string"
-                          Value="@GetHeadersText(http.Headers)"
-                          ValueChanged="@((string value) => SetHeadersFromText(http, value ?? string.Empty))"
-                          Label="@Loc["HeadersOnePerLine"]"
-                          Lines="4" />
-        }
-        else if (action is DelayActionDefinition delay)
-        {
-            <MudNumericField T="int" @bind-Value="delay.Milliseconds" Label="@Loc["DelayMilliseconds"]" />
-        }
-    </MudPaper>
-}
 
 @code {
     [Parameter] public EventActionBinding Binding { get; set; } = new();
@@ -151,6 +309,25 @@
         }
 
         (Binding.Actions[index + 1], Binding.Actions[index]) = (Binding.Actions[index], Binding.Actions[index + 1]);
+    }
+
+    /// The stepper the page draws itself has no native spin buttons behind it
+    /// (app.css strips them), so the buttons step the value here. 100 ms, not
+    /// MudNumericField's 1: a single millisecond is not a useful increment for
+    /// either of these two fields.
+    private static void StepTimeout(HttpRequestActionDefinition action, int delta)
+    {
+        action.TimeoutMs = Math.Max(0, action.TimeoutMs + delta);
+    }
+
+    private static void StepDelay(DelayActionDefinition action, int delta)
+    {
+        action.Milliseconds = Math.Max(0, action.Milliseconds + delta);
+    }
+
+    private static void SetExternalApp(HttpRequestActionDefinition action, string? value)
+    {
+        action.ExternalAppId = Guid.TryParse(value, out var id) ? id : null;
     }
 
     private static string GetHeadersText(Dictionary<string, string> headers)

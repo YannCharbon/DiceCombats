@@ -8,6 +8,16 @@
 }
 
 <style>
+    /* Surfaces. The trigger block is a .dc-msec, which is --s4, and it sits on
+       an automation card that Automations.razor puts on --s3 — so the block
+       itself already steps. What did not step is everything inside it: the
+       option cells are --s4 too, and MudBlazor paints the variables panel from
+       the same --s4 Surface. Each one takes its own step here, and the blocks
+       you operate carry a --ctl edge (3.4:1) rather than --b1's 2.6:1. */
+
+    /* The whole block is controls, so its edge is an operable one. */
+    .trigger-sec { border-color: var(--ctl); }
+
     .trigger-variables {
         display: flex;
         flex-wrap: wrap;
@@ -15,119 +25,206 @@
         margin-bottom: 8px;
     }
 
+    /* A chip you click to copy: operable edge, and a step above the --s5 panel
+       it is laid out on. */
     .trigger-variable {
         cursor: pointer;
+        background: var(--s6);
+        border-color: var(--ctl);
     }
 
         .trigger-variable:hover {
-            border-color: var(--mud-palette-primary);
+            border-color: var(--a1);
         }
 
         .trigger-variable.copied {
-            border-color: var(--mud-palette-primary);
-            color: var(--mud-palette-primary);
+            border-color: var(--a1);
+            color: var(--a1);
         }
+
+    /* The creature / source filters are multi-selection, so they are a wall of
+       tick boxes rather than a listbox: nothing has to be opened to see what is
+       selected, and the selection stays readable while the trigger is edited.
+       The wall is a well (--s2) a step below the block, which is what makes the
+       scroll region and its edge visible; the cells sit on top of it at --s5. */
+    .trigger-names {
+        max-height: 168px;
+        overflow-y: auto;
+        padding: 6px;
+        background: var(--s2);
+        border: 1px solid var(--b1);
+        border-radius: var(--r-btn);
+    }
+
+    .trigger-names .dc-opt {
+        background: var(--s5);
+        border-color: var(--ctl);
+    }
+
+    /* MudBlazor has one Surface colour, so this panel arrived at --s4 — the
+       exact step of the block it is nested in. --s5, and an operable edge
+       because the whole point of it is to be opened. */
+    .trigger-fields {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 12px;
+        align-items: end;
+    }
+
+    .trigger-fields > .tg-span { grid-column: 1 / -1; }
+    .trigger-fields > .tg-inline { align-self: center; min-height: 32px; }
+
+    .trigger-vars.mud-expansion-panels > .mud-expand-panel {
+        background-color: var(--s5);
+        border: 1px solid var(--ctl);
+        border-radius: var(--r-btn);
+    }
 </style>
 
 
-<MudPaper Class="pa-2 my-2" Style="background-color:#202020;border-radius:10px;">
-    <MudText Typo="Typo.h6">@Loc["When"]</MudText>
-    <MudSelect T="string" Value="@Trigger.Kind" ValueChanged="SetTriggerKind" Label="@Loc["Trigger"]">
-        @foreach (var ev in EventTriggerCatalog.Entries)
-        {
-            <MudSelectItem T="string" Value="@ev.Kind">@GetTriggerSelectText(ev)</MudSelectItem>
-        }
-    </MudSelect>
+<div class="dc-msec trigger-sec" style="margin:10px 0;">
+    <div class="dc-msec-head">
+        <span class="dc-msec-title">@Loc["When"]</span>
+    </div>
+
+    @* The same field wall as an action editor: a comparison or a stat picker
+       does not need the full card width to itself. The two name filters do,
+       because they are grids of tick boxes. *@
+    <div class="trigger-fields">
+    <div class="dc-field tg-span">
+        <span class="dc-flabel">@Loc["Trigger"]</span>
+        <select class="dc-inp" value="@Trigger.Kind"
+                @onchange="@(e => SetTriggerKind(e.Value?.ToString() ?? string.Empty))">
+            @foreach (var ev in EventTriggerCatalog.Entries)
+            {
+                <option value="@ev.Kind">@GetTriggerSelectText(ev)</option>
+            }
+        </select>
+    </div>
 
     @if (triggerEntry.SupportsCreatureFilter)
     {
-        <MudSelect T="string"
-                   MultiSelection="true"
-                   SelectedValues="@Trigger.CreatureNames"
-                   SelectedValuesChanged="@((IReadOnlyCollection<string> values) => Trigger.CreatureNames = values.ToList())"
-                   Label="@Loc["CreaturesEmptyAnyCreature"]">
-            @foreach (var creatureName in GetCreatureNames())
-            {
-                <MudSelectItem T="string" Value="@creatureName">@creatureName</MudSelectItem>
-            }
-        </MudSelect>
+        <div class="dc-field tg-span">
+            <span class="dc-flabel">@Loc["CreaturesEmptyAnyCreature"]</span>
+            <div class="dc-opt-grid trigger-names">
+                @foreach (var creatureName in GetCreatureNames())
+                {
+                    var n = creatureName;
+                    <label class="dc-opt dc-chk">
+                        <input type="checkbox" checked="@Trigger.CreatureNames.Contains(n)"
+                               @onchange="@(e => ToggleName(Trigger.CreatureNames, n, e.Value is bool v && v))" />
+                        <span>@n</span>
+                    </label>
+                }
+            </div>
+        </div>
     }
 
     @if (triggerEntry.SupportsSourceFilter)
     {
-        <MudSelect T="string"
-                   MultiSelection="true"
-                   SelectedValues="@Trigger.SourceNames"
-                   SelectedValuesChanged="@((IReadOnlyCollection<string> values) => Trigger.SourceNames = values.ToList())"
-                   Label="@Loc["SourcesEmptyAnySource"]">
-            @foreach (var creatureName in GetCreatureNames())
-            {
-                <MudSelectItem T="string" Value="@creatureName">@creatureName</MudSelectItem>
-            }
-        </MudSelect>
+        <div class="dc-field tg-span">
+            <span class="dc-flabel">@Loc["SourcesEmptyAnySource"]</span>
+            <div class="dc-opt-grid trigger-names">
+                @foreach (var creatureName in GetCreatureNames())
+                {
+                    var n = creatureName;
+                    <label class="dc-opt dc-chk">
+                        <input type="checkbox" checked="@Trigger.SourceNames.Contains(n)"
+                               @onchange="@(e => ToggleName(Trigger.SourceNames, n, e.Value is bool v && v))" />
+                        <span>@n</span>
+                    </label>
+                }
+            </div>
+        </div>
     }
 
     @if (triggerEntry.SupportsDamageKindFilter)
     {
-        <MudSelect T="string" @bind-Value="Trigger.DamageKind" Label="@Loc["DamageKindEmptyAnyKind"]">
-            <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-            @foreach (var kindName in GetDamageKindNames())
-            {
-                <MudSelectItem T="string" Value="@kindName">@kindName</MudSelectItem>
-            }
-        </MudSelect>
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["DamageKindEmptyAnyKind"]</span>
+            <select class="dc-inp" @bind="Trigger.DamageKind">
+                <option value=""></option>
+                @foreach (var kindName in GetDamageKindNames())
+                {
+                    <option value="@kindName">@kindName</option>
+                }
+            </select>
+        </div>
     }
 
     @if (triggerEntry.NeedsField)
     {
-        <MudSelect T="string" @bind-Value="Trigger.FieldTitle" Label="@Loc["CustomFieldEmptyAnyMatchingField"]">
-            <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-            @foreach (var field in GetFieldChoices(triggerEntry))
-            {
-                <MudSelectItem T="string" Value="@field.Title">@GetFieldChoiceDisplayName(field)</MudSelectItem>
-            }
-        </MudSelect>
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["CustomFieldEmptyAnyMatchingField"]</span>
+            <select class="dc-inp" @bind="Trigger.FieldTitle">
+                <option value=""></option>
+                @foreach (var field in GetFieldChoices(triggerEntry))
+                {
+                    <option value="@field.Title">@GetFieldChoiceDisplayName(field)</option>
+                }
+            </select>
+        </div>
     }
 
     @if (triggerEntry.NeedsOption)
     {
-        <MudSelect T="string" @bind-Value="Trigger.OptionName" Label="@Loc["OptionEmptyAnyOption"]">
-            <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-            @foreach (var optionName in GetOptionNames(triggerEntry.FieldType, Trigger.FieldTitle))
-            {
-                <MudSelectItem T="string" Value="@optionName">@optionName</MudSelectItem>
-            }
-        </MudSelect>
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["OptionEmptyAnyOption"]</span>
+            <select class="dc-inp" @bind="Trigger.OptionName">
+                <option value=""></option>
+                @foreach (var optionName in GetOptionNames(triggerEntry.FieldType, Trigger.FieldTitle))
+                {
+                    <option value="@optionName">@optionName</option>
+                }
+            </select>
+        </div>
     }
 
     @if (triggerEntry.NeedsStat)
     {
-        <MudSelect T="string" @bind-Value="Trigger.StatName" Label="@Loc["StatEmptyAnyStat"]">
-            <MudSelectItem T="string" Value="@String.Empty"></MudSelectItem>
-            @foreach (var statName in GetStatNames(Trigger.FieldTitle))
-            {
-                <MudSelectItem T="string" Value="@statName">@statName</MudSelectItem>
-            }
-        </MudSelect>
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["StatEmptyAnyStat"]</span>
+            <select class="dc-inp" @bind="Trigger.StatName">
+                <option value=""></option>
+                @foreach (var statName in GetStatNames(Trigger.FieldTitle))
+                {
+                    <option value="@statName">@statName</option>
+                }
+            </select>
+        </div>
     }
 
     @if (triggerEntry.NeedsThreshold)
     {
-        <MudSelect T="string" @bind-Value="Trigger.ThresholdOperator" Label="@Loc["Comparison"]">
-            @foreach (var op in _thresholdOperators)
-            {
-                <MudSelectItem T="string" Value="@op">@GetThresholdOperatorDisplay(op)</MudSelectItem>
-            }
-        </MudSelect>
-        <MudNumericField T="double?" @bind-Value="Trigger.ThresholdValue" Label="@GetThresholdLabel(triggerEntry)" />
-        <MudSwitch @bind-Value="Trigger.TriggerOnlyOnCrossing" Color="Color.Primary" Label="@Loc["OnlyWhenValueCrossesThreshold"]" />
+        <div class="dc-field">
+            <span class="dc-flabel">@Loc["Comparison"]</span>
+            <select class="dc-inp" @bind="Trigger.ThresholdOperator">
+                @foreach (var op in _thresholdOperators)
+                {
+                    <option value="@op">@GetThresholdOperatorDisplay(op)</option>
+                }
+            </select>
+        </div>
+        <div class="dc-field">
+            <span class="dc-flabel">@GetThresholdLabel(triggerEntry)</span>
+            <div class="dc-step">
+                <button type="button" @onclick="@(() => StepThreshold(-1))">&minus;</button>
+                <input type="number" class="dc-num" step="any" @bind="Trigger.ThresholdValue" />
+                <button type="button" @onclick="@(() => StepThreshold(1))">+</button>
+            </div>
+        </div>
+        <label class="dc-chk tg-inline">
+            <input type="checkbox" @bind="Trigger.TriggerOnlyOnCrossing" />
+            <span>@Loc["OnlyWhenValueCrossesThreshold"]</span>
+        </label>
     }
+    </div>
 
-    <MudText Typo="Typo.caption">@GetTriggerSummary(Trigger)</MudText>
+    <p class="dc-msec-help" style="margin:10px 0 0;">@GetTriggerSummary(Trigger)</p>
 
     @* Collapsed by default: the list is long and only needed while writing a
-       body or a condition. *@
-    <MudExpansionPanels Class="mt-2">
+       body or a condition. MudExpansionPanels stays — app.css restyles it. *@
+    <MudExpansionPanels Class="trigger-vars mt-2">
         <MudExpansionPanel Text="@Loc["AvailableVariables", GetPlaceholders(triggerEntry).Count]">
             <div class="trigger-variables">
                 @foreach (var placeholder in GetPlaceholders(triggerEntry))
@@ -138,10 +235,10 @@
                     </span>
                 }
             </div>
-            <MudText Typo="Typo.caption">@Loc["AvailableVariablesHint"]</MudText>
+            <p class="dc-msec-help" style="margin:8px 0 0;">@Loc["AvailableVariablesHint"]</p>
         </MudExpansionPanel>
     </MudExpansionPanels>
-</MudPaper>
+</div>
 
 @code {
     [Parameter] public EventTriggerDefinition Trigger { get; set; } = new();
@@ -166,6 +263,28 @@
     {
         _copiedPlaceholder = path;
         await JS.InvokeVoidAsync("dcCopyText", AsPlaceholder(path));
+    }
+
+    /// The MudSelect these replaced handed back a fresh collection; a tick box
+    /// toggles one name, so the bound list is edited in place instead.
+    private static void ToggleName(List<string> names, string name, bool selected)
+    {
+        if (selected)
+        {
+            if (!names.Contains(name))
+            {
+                names.Add(name);
+            }
+        }
+        else
+        {
+            names.Remove(name);
+        }
+    }
+
+    private void StepThreshold(double delta)
+    {
+        Trigger.ThresholdValue = (Trigger.ThresholdValue ?? 0) + delta;
     }
 
     private void SetTriggerKind(string kind)

@@ -159,8 +159,8 @@
   <data name="RoundsMeta" xml:space="preserve">
     <value>tour(s)</value>
   </data>
-  <data name="FavoriteBtn" xml:space="preserve">
-    <value>Favori</value>
+  <data name="PinnedBtn" xml:space="preserve">
+    <value>Épingler</value>
   </data>
   <data name="SearchCombat" xml:space="preserve">
     <value>Rechercher un combat</value>
@@ -184,7 +184,7 @@
     <value>Campagnes</value>
   </data>
   <data name="LooseCombatsTitle" xml:space="preserve">
-    <value>Combats</value>
+    <value>Combats sans campagne</value>
   </data>
   <data name="CombatsMeta" xml:space="preserve">
     <value>combat(s)</value>
@@ -206,5 +206,11 @@
   </data>
   <data name="NoCampaignTitle" xml:space="preserve">
     <value>Sans campagne</value>
+  </data>
+  <data name="RootCrumb" xml:space="preserve">
+    <value>Racine</value>
+  </data>
+  <data name="PlayersMeta" xml:space="preserve">
+    <value>joueur(s)</value>
   </data>
 </root>

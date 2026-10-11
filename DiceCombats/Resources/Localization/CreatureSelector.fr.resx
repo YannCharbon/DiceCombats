@@ -165,4 +165,7 @@
   <data name="UnnamedPlayerGroup" xml:space="preserve">
     <value>(groupe sans nom)</value>
   </data>
+  <data name="CombatNameLabel" xml:space="preserve">
+    <value>Nom du combat</value>
+  </data>
 </root>

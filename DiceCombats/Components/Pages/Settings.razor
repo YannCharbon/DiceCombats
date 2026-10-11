@@ -12,107 +12,137 @@
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.Settings> Loc
 
-<style>
-    .settings-group-name {
-    border-radius: 60px;
-    padding: 0px 20px 0px 0px;
-    margin:10px;
-    background-color: darkcyan;
-    display: flex;
-    align-items: center;
-    }
+@* Read against Home.razor and CreaturesExplorer.razor: a dc-h1 title over a
+   dc-sub, sections introduced by a dc-pill, content on dc-panel with its
+   nested blocks a step up the surface ramp, secondary lines in dc-meta and
+   every button in the dc-btn family. What this page carried instead was bare
+   bootstrap h5/h6 headings, a <br /> for spacing and an inline opacity on the
+   disabled language button. *@
 
-    .settings-group {
-    margin:10px;
-    padding:10px;
-    border-radius:10px;
-    background-color:#505050;
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
-    }
-</style>
+<h1 class="dc-h1">@Loc["TitleSettings"]</h1>
+<p class="dc-sub" style="margin-bottom:18px;">@Loc["SettingsSubtitle"]</p>
 
-<div class="settings-group">
-    <div style="display:flex;">
-        <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" />
-            <h3>@Loc["TitleLanguages"]</h3>
+<div class="dc-stack">
+
+    <div class="dc-panel">
+        <div style="display:flex;">
+            <div class="dc-pill">
+                <DcIcon Name="public" Size="26" />
+                <h3>@Loc["TitleLanguages"]</h3>
+            </div>
+        </div>
+
+        @* The language of a language button is the point of it, so these two labels
+           are deliberately not localised: each one says, in its own language, what
+           it switches to. The active one is shown as an inert outlined button —
+           app.css has a real .dc-btn:disabled rule, so the class does the dimming. *@
+        <div class="dc-irow dc-irow-wrap" style="gap:10px;margin-top:14px;">
+            @if (CombatService.IsCurrentCulture("en"))
+            {
+                <button type="button" class="dc-btn dc-btn-out" disabled>
+                    <DcIcon Name="check" />
+                    English
+                </button>
+            }
+            else
+            {
+                <button type="button" class="dc-btn dc-btn-fill"
+                        @onclick="@(() => (Application.Current as App)?.SetCultureAndReload("en"))">Switch to English</button>
+            }
+
+            @if (CombatService.IsCurrentCulture("fr"))
+            {
+                <button type="button" class="dc-btn dc-btn-out" disabled>
+                    <DcIcon Name="check" />
+                    Français
+                </button>
+            }
+            else
+            {
+                <button type="button" class="dc-btn dc-btn-fill"
+                        @onclick="@(() => (Application.Current as App)?.SetCultureAndReload("fr"))">Passer au français</button>
+            }
         </div>
     </div>
 
-    @if (CombatService.IsCurrentCulture("en"))
-    {
-        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Outlined" Disabled="true">English</MudButton>
-    }
-    else
-    {
-        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => (Application.Current as App)?.SetCultureAndReload("en"))">Switch to English</MudButton>
-    }
+    <div class="dc-panel">
+        <div style="display:flex;">
+            <div class="dc-pill">
+                <DcIcon Name="sync" Size="26" />
+                <h3>@Loc["TitleUpdates"]</h3>
+            </div>
+        </div>
 
-    @if (CombatService.IsCurrentCulture("fr"))
-    {
-        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Outlined" Disabled="true">Français</MudButton>
-    }
-    else
-    {
-        <MudButton Style="margin-right:5px;" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => (Application.Current as App)?.SetCultureAndReload("fr"))">Passer au français</MudButton>
-    }
-</div>
-
-<div class="settings-group">
-    <div style="display:flex;">
-        <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" />
-            <h3>@Loc["TitleUpdates"]</h3>
+        @* The release check is a statement about the app, so it reads as a note
+           (--s4 on the panel's --s3) rather than as two stray headings. The
+           strings stay the hardcoded per-culture pairs they already were. *@
+        <div class="dc-note" style="margin-top:14px;">
+            @if (_updateAvailable)
+            {
+                <div class="dc-irow" style="gap:9px;">
+                    <DcIcon Name="download" Size="18" Class="dc-i-info" />
+                    @if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        <span>DiceCombats <b>@_updateInfos?.tag_name</b> est disponible</span>
+                    }
+                    else
+                    {
+                        <span>DiceCombats <b>@_updateInfos?.tag_name</b> is available.</span>
+                    }
+                </div>
+                <div class="dc-meta" style="margin-top:7px;">
+                    @if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        <text>Se rendre sur <a href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> pour télécharger la mise à jour.</text>
+                    }
+                    else
+                    {
+                        <text>Visit <a href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> to download the update.</text>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="dc-irow" style="gap:9px;">
+                    <DcIcon Name="check-circle" Size="18" Class="dc-i-accent" />
+                    @if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        <span>DiceCombats est à jour.</span>
+                    }
+                    else
+                    {
+                        <span>DiceCombats is up to date.</span>
+                    }
+                </div>
+            }
         </div>
     </div>
 
-    @if (_updateAvailable)
-    {
-        @if (CombatService.IsCurrentCulture("fr"))
-        {
-            <h5>DiceCombats <b>@_updateInfos?.tag_name</b> est disponible</h5>
-            <br />
-            <h5>Se rendre sur <a style="color:darkcyan;" href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> pour télécharger la mise à jour.</h5>
-        }
-        else
-        {
-            <h5>DiceCombats <b>@_updateInfos?.tag_name</b> is available.</h5>
-            <br />
-            <h5>Visit <a style="color:darkcyan;" href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> to download the update.</h5>
-        }
-    }
-    else
-    {
-        @if (CombatService.IsCurrentCulture("fr"))
-        {
-            <h5>DiceCombats est à jour.</h5>
-        }
-        else
-        {
-            <h5>DiceCombats is up to date.</h5>
-        }
-    }
-</div>
-
-<div class="settings-group" style="margin-bottom:20px;">
-    <div style="display:flex;">
-        <div class="settings-group-name">
-            <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;" />
-            <h3>@Loc["TitleAbout"]</h3>
+    <div class="dc-panel" style="margin-bottom:20px;">
+        <div style="display:flex;">
+            @* "help" read as an FAQ: this panel is the app's identity card —
+               version, copyright and the release notes document. *@
+            <div class="dc-pill">
+                <DcIcon Name="text-snippet" Size="26" />
+                <h3>@Loc["TitleAbout"]</h3>
+            </div>
         </div>
-    </div>
 
-    <div>
-        <MudStack Row="true" AlignItems="AlignItems.Center">
-            <MudItem>
-                <h5>@Loc["CurrentSoftware"] DiceCombats @CombatService.GetVersion()</h5>
-            </MudItem>
-            <MudItem>
-                <h6>&copy; Copyright Yann Charbon</h6>
-            </MudItem>
-        </MudStack>
+        <div class="dc-irow dc-irow-wrap" style="gap:13px;margin-top:14px;">
+            @* The app's own mark. A generic glyph here said nothing: this line
+               names the software and its version, so the identifying image is
+               the logo, and it carries no tile because the logo has its own
+               colours and shape. *@
+            <img src="dicecombats_logo.svg" width="46" height="46" alt="" />
+            <div class="dc-strip-body">
+                <div class="dc-strip-name">@Loc["CurrentSoftware"] DiceCombats @CombatService.GetVersion()</div>
+                <div class="dc-meta">&copy; Copyright Yann Charbon</div>
+            </div>
+        </div>
+
         <WelcomeMessage SettingsView="true" NewVersion="true" />
     </div>
+
 </div>
 
 <div>

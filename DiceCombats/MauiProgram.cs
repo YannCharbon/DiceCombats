@@ -94,7 +94,7 @@ namespace DiceCombats
                                 {
                                     diceService.SaveCreatures();
                                     diceService.SaveCombats();
-                                    _ = diceService.SaveFavoriteCombatsListAsync();
+                                    _ = diceService.SavePinnedCombatsListAsync();
                                     _ = diceService.SaveUserCreatureCustomFieldsListAsync();
                                 }
                             };
@@ -115,7 +115,7 @@ namespace DiceCombats
                             {
                                 diceService.SaveCreatures();
                                 diceService.SaveCombats();
-                                _ = diceService.SaveFavoriteCombatsListAsync();
+                                _ = diceService.SavePinnedCombatsListAsync();
                                 _ = diceService.SaveUserCreatureCustomFieldsListAsync();
                             }
                         });

@@ -55,6 +55,17 @@ namespace DiceCombats
                 RemoveAllOlElements(creatureSheetDiv);
                 RemoveDirectBrElements(creatureSheetDiv);
 
+                // The scraped node carries aidedd's own <style> block, and that
+                // block is not scoped to anything: it declares bare `a:link`,
+                // `a:hover`, `.source`, `.warning`, `.type` and an ad-blocker
+                // rule. Those are saved verbatim inside HtmlSheet and injected
+                // into the document every time the creature is shown, where
+                // `a:link` at specificity (0,1,1) beat the app's own (0,1,0)
+                // classes and turned the GitHub button in the title bar red.
+                // We substitute our own scoped stylesheet below, so the page's
+                // copy is pure liability.
+                RemoveAllStyleElements(creatureSheetDiv);
+
                 if (isDnd2024)
                 {
                     Rename2024Classes(creatureSheetDiv);
@@ -357,6 +368,21 @@ namespace DiceCombats
     text-decoration: underline;
 }
 ";
+        }
+
+        /// Strips every <style> the scraped page brought with it. Only affects
+        /// newly imported creatures; sheets already saved keep their copy, which
+        /// is why app.css also re-states the app's own anchors at a specificity
+        /// those rules cannot beat.
+        private static void RemoveAllStyleElements(HtmlNode root)
+        {
+            var nodes = root.SelectNodes(".//style");
+
+            if (nodes == null)
+                return;
+
+            foreach (var node in nodes.ToList())
+                node.Remove();
         }
 
         private static void RemoveDivByClass(HtmlNode root, string divClass)

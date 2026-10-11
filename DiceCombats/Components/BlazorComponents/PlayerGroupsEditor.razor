@@ -26,17 +26,18 @@
     }
 
     .pg-hint {
-        color: grey;
+        color: var(--t3);
         font-size: 13px;
     }
 </style>
 
 <h3>@Loc["PlayerGroupsTitle"]</h3>
-<MudText Typo="Typo.body2" Style="color:grey; margin-bottom:14px;">@Loc["PlayerGroupsSubtitle"]</MudText>
+<p class="dc-sub" style="margin-bottom:14px;">@Loc["PlayerGroupsSubtitle"]</p>
 
-<MudButton OnClick="AddGroup" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary">
+<button type="button" class="dc-btn dc-btn-fill" @onclick="AddGroup">
+    <DcIcon Name="add" />
     @Loc["NewPlayerGroupBtn"]
-</MudButton>
+</button>
 
 @if (Players.Count == 0)
 {
@@ -53,26 +54,36 @@ else if (CombatService.GetPlayerGroups().Count == 0)
         var g = group;
         <MudExpansionPanel Expanded="false">
             <TitleContent>
-                <div class="d-flex">
-                    <MudIcon Icon="@Icons.Material.Filled.Groups2" Color="@Color.Primary" class="mr-3"></MudIcon>
-                    <MudText class="mr-3">@(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name)</MudText>
-                    <MudText class="mr-3" Style="color:grey;">@CombatService.GetPlayerGroupMembers(g).Count @Loc["PlayersMeta"]</MudText>
+                <div class="dc-irow" style="gap:12px;">
+                    <DcIcon Name="groups" Size="18" Class="dc-i-accent" />
+                    <span>@(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name)</span>
+                    <span class="dc-sub" style="margin:0;">@CombatService.GetPlayerGroupMembers(g).Count @Loc["PlayersMeta"]</span>
                 </div>
             </TitleContent>
             <ChildContent>
                 <div class="pg-row">
-                    <MudTextField T="string" Label="@Loc["PlayerGroupName"]" Variant="Variant.Outlined"
-                                  Value="@g.Name" ValueChanged="@((string v) => Rename(g, v))" Immediate="true" />
-                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="@Color.Error"
-                                   OnClick="() => DeleteGroup(g)" title="@Loc["DeletePlayerGroupBtn"]" />
+                    @* Immediate="true" was the MudTextField behaviour: @oninput renames on
+                       every keystroke, where @onchange would only rename on blur. *@
+                    <div class="dc-field" style="flex:1 1 240px;">
+                        <span class="dc-flabel">@Loc["PlayerGroupName"]</span>
+                        <input type="text" class="dc-inp" value="@g.Name"
+                               @oninput="@(e => Rename(g, e.Value?.ToString() ?? string.Empty))" />
+                    </div>
+                    <button type="button" class="dc-ib dc-danger" style="align-self:flex-end;"
+                            title="@Loc["DeletePlayerGroupBtn"]" aria-label="@Loc["DeletePlayerGroupBtn"]"
+                            @onclick="() => DeleteGroup(g)">
+                        <DcIcon Name="delete" />
+                    </button>
                 </div>
                 <div class="pg-players">
                     @foreach (DCCreature player in Players)
                     {
                         var p = player;
-                        <MudCheckBox T="bool" Label="@p.Name" Color="@Color.Primary"
-                                     Value="@g.PlayerIds.Contains(p.Id)"
-                                     ValueChanged="@((bool v) => ToggleMember(g, p, v))" />
+                        <label class="dc-chk" style="padding:4px 0;">
+                            <input type="checkbox" checked="@g.PlayerIds.Contains(p.Id)"
+                                   @onchange="@(e => ToggleMember(g, p, e.Value is bool v && v))" />
+                            <span>@p.Name</span>
+                        </label>
                     }
                 </div>
             </ChildContent>

@@ -279,4 +279,7 @@
   <data name="StopBtn" xml:space="preserve">
     <value>Stop combat timer</value>
   </data>
+  <data name="SheetUnavailable" xml:space="preserve">
+    <value>Could not render this creature sheet</value>
+  </data>
 </root>

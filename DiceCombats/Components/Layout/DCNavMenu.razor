@@ -13,88 +13,11 @@
 @inject IStringLocalizer<Resources.Localization.DCNavMenu> Loc
 
 <style>
-    /* ── Bar (teal/green theme; height + shadow kept as before) ── */
-    .dc-bar {
-        display: flex;
-        height: calc(50px + var(--dc-safe-area-top));
-        padding-top: var(--dc-safe-area-top);
-        align-items: center;
-        gap: 22px; /* space between each capsule and the central logo notch */
-        /* Symmetric side padding keeps the bar's own centre on the page centre;
-           the right slot doubles as clearance for the absolutely positioned
-           utilities (and, above them, the OS caption buttons). */
-        padding-left: 60px;
-        padding-right: 60px;
-        background-image: linear-gradient(-45deg, rgba(85, 197, 109, 0.2), rgba(50, 200, 126, 0.6), rgba(0, 170, 170, 0.9), rgba(35, 170, 128, 1.0));
-        position: fixed;
-        top: 0;
-        width: 100%;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        border-bottom: 1px solid #505050;
-        z-index: 10; /* Ensures nav stays above other elements */
-    }
-
-    /* ── Side slots ──
-       The two capsules are not the same width ("Créatures | Combats" is much
-       narrower than "Automatisations | Réglages"). Centring the flex group as
-       a whole would therefore push the gem off-centre by half that difference,
-       so each side takes an equal share of the leftover space instead and the
-       logo lands on the bar's exact centre whatever the labels say. */
-    .dc-side {
-        flex: 1 1 0;
-        min-width: 0;
-        display: flex;
-        align-items: center;
-    }
-
-    .dc-side-left {
-        justify-content: flex-end;
-    }
-
-    .dc-side-right {
-        justify-content: flex-start;
-    }
-
-    /* ── Segmented glass capsule (one per pair) ── */
-    .dc-seg {
-        flex: 0 0 auto; /* never squash the labels to fit the slot */
-        display: inline-flex;
-        align-items: center;
-        border-radius: 999px;
-        overflow: hidden;
-        background: rgba(6, 18, 18, 0.34);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 1; /* below the logo if they overlap */
-    }
-
-    .dc-navlink {
-        text-decoration: none;
-        color: #ffffff;
-        font-size: 14px;
-        font-weight: 600;
-        white-space: nowrap;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 8px 16px;
-        transition: background .16s ease, color .16s ease;
-    }
-
-        .dc-navlink + .dc-navlink {
-            box-shadow: -1px 0 0 rgba(255, 255, 255, 0.14); /* hairline divider */
-        }
-
-        .dc-navlink:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-        }
-
-        .dc-navlink.active {
-            background: rgba(0, 170, 170, 0.45); /* app teal accent */
-        }
+    /* The bar's shared chrome — gradient, glass capsules, nav links, the
+       utility slot — lives in wwwroot/css/app.css, because DiceAudio's bar is
+       the same component with a different token block. What stays here is the
+       part that is genuinely this app's: the gem's geometry, the Windows
+       title strip, and where the labels collapse. */
 
     /* ── App icon / central logo ── */
     .nav-logo {
@@ -123,7 +46,7 @@
         left: 0;
         width: 100%;
         height: 32px;
-        background: #202020;
+        background: var(--s0);
         z-index: 9; /* under the bar and the gem */
         app-region: drag;
         -webkit-app-region: drag;
@@ -151,39 +74,6 @@
 
         .dc-bar-win .dc-util {
             top: 50%; /* the strip is outside the bar, so no inset to split */
-        }
-
-    /* ── Right-hand utilities ── */
-    .dc-util {
-        position: absolute;
-        right: 20px;
-        top: calc(50% + var(--dc-safe-area-top) / 2);
-        transform: translateY(-50%);
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        z-index: 6;
-    }
-
-    .dc-gear {
-        width: 32px;
-        height: 32px;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(6, 18, 18, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: #fff;
-        text-decoration: none;
-        cursor: pointer;
-        transition: background .16s, border-color .16s;
-    }
-
-        .dc-gear:hover {
-            background: rgba(6, 18, 18, 0.6);
-            border-color: rgba(255, 255, 255, 0.5);
-            color: #fff;
         }
 
     /* ── Narrow windows / phones: labels collapse to icons ──
@@ -238,11 +128,11 @@
     <div class="dc-side dc-side-left">
         <div class="dc-seg">
             <a class="dc-navlink @(IsActive("creaturesexplorer") ? "active" : "")" href="creaturesexplorer">
-                <MudIcon Icon="@Icons.Material.Filled.Pets" Color="Color.Inherit" Style="font-size:18px;" />
+                <DcIcon Name="pets" Size="18" />
                 <span>@Loc["CreaturesBtn"]</span>
             </a>
             <a class="dc-navlink @(IsActive("combatsexplorer") ? "active" : "")" href="combatsexplorer">
-                <MudIcon Icon="@Icons.Material.Filled.Shield" Color="Color.Inherit" Style="font-size:18px;" />
+                <DcIcon Name="shield" Size="18" />
                 <span>@Loc["CombatsBtn"]</span>
             </a>
         </div>
@@ -253,19 +143,19 @@
     <div class="dc-side dc-side-right">
         <div class="dc-seg">
             <a class="dc-navlink @(IsActive("automations") ? "active" : "")" href="automations">
-                <MudIcon Icon="@Icons.Material.Filled.AutoMode" Color="Color.Inherit" Style="font-size:18px;" />
+                <DcIcon Name="auto-mode" Size="18" />
                 <span>@Loc["AutomationsBtn"]</span>
             </a>
             <a class="dc-navlink @(IsActive("settings") ? "active" : "")" href="settings">
-                <MudIcon Icon="@Icons.Material.Filled.Tune" Color="Color.Inherit" Style="font-size:18px;" />
+                <DcIcon Name="tune" Size="18" />
                 <span>@Loc["SettingsBtn"]</span>
             </a>
         </div>
     </div>
 
     <div class="dc-util">
-        <a class="dc-gear" href="https://github.com/YannCharbon/DiceCombats" target="_blank" title="GitHub">
-            <MudIcon Icon="@Icons.Custom.Brands.GitHub" Style="font-size:18px;color:white;" />
+        <a class="dc-ub" href="https://github.com/YannCharbon/DiceCombats" target="_blank" title="GitHub">
+            <DcIcon Name="github" Size="18" />
         </a>
     </div>
 </nav>

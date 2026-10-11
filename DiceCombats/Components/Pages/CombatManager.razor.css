@@ -1,22 +1,11 @@
-﻿.current-initiative-creature-border {
-    position: relative;
-    border-radius: 10px;
-    /* angle of the conic gradient */
-    --current-initiative-angle: 0deg;
-    /* content padding inside the inner card */
-    background: conic-gradient( from var(--current-initiative-angle), #8a8a8a 0deg, #005f5f 90deg, #8a8a8a 180deg, #005f5f 270deg, #8a8a8a 360deg );
-    animation: border-rotate 8s linear infinite;
-}
+﻿/* The "this creature is acting" frame moved to wwwroot/css/app.css as
+   .dc-ccard.dc-acting, where it is a travelling Dice-suite gradient rather
+   than a rotating grey/teal conic one.
 
-/* make the angle animatable (Chromium/WebKit) */
-@property --current-initiative-angle {
-    syntax: "<angle>";
-    initial-value: 0deg;
-    inherits: false;
-}
+   It had to leave this file: Blazor CSS isolation scopes every rule here to
+   the b-xxxxx attribute this component happens to carry, so the moment the
+   card markup moves into a component of its own the frame silently vanishes.
+   The shared stylesheet has no such trap.
 
-@keyframes border-rotate {
-    to {
-        --current-initiative-angle: 360deg;
-    }
-}
+   Left in place with no rules rather than deleted, so the build keeps
+   emitting the scoped stylesheet reference. */

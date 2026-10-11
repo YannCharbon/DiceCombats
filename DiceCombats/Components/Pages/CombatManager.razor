@@ -23,8 +23,8 @@
     bottom: 50px;
     right: 10px;
     width: 450px;
-    background-color: #303030;
-    border: 1px solid #505050;
+    background-color: var(--s3);
+    border: 1px solid var(--b1);
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     padding: 10px;
@@ -42,23 +42,12 @@
     }
     }
 
-    .CombatEditorCreatureLayout {
-    background-color: #303030;
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-    border: 1px solid #505050;
-    padding: 5px;
-    border-radius: 10px;
-    }
-
-    .CombatEditorCustomFieldsLayout {
-    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-    border: 1px solid #505050;
-    padding: 5px;
-    border-radius: 10px;
-    }
+    /* The creature card and its per-instance boxes are now .dc-ccard / .dc-inst
+       in app.css. .CombatEditorCreatureLayout and .CombatEditorCustomFieldsLayout
+       were only ever used here and are gone with them. */
 
     .NotesLabel label {
-    background-color: #004D40;
+    background-color: rgba(35, 170, 128, 0.22);
     color: white;
     padding: 2px;
     border-radius: 4px;
@@ -77,7 +66,7 @@
 
     .markdown-content th,
     .markdown-content td {
-    background-color: #004D40;
+    background-color: rgba(35, 170, 128, 0.22);
     }
 
 
@@ -118,15 +107,8 @@
     cursor: pointer;
     }
 
-    .current-initiative-creature {
-        background: linear-gradient( -45deg, #8a8a8a 0%, /* dark cyan-ish */
-        #005f5f 50%, /* dark grey */
-        #8a8a8a 100% /* back to dark cyan-ish */
-        );
-        background-size: 200% 200%;
-        animation: gradient 8s ease-in-out infinite;
-        padding: 5px;
-    }
+    /* The acting row is styled in app.css now (.dc-inittab tr.current-initiative-creature),
+       where it can round its end cells and inset its content. */
 
     @@keyframes gradient {
     0% {
@@ -143,7 +125,7 @@
     }
 
     #markdown-rendered-div a:link {
-        color: #00B0B0;
+        color: var(--a2);
     }
 
     .combat-recording {
@@ -221,30 +203,34 @@
     };
 </script>
 
+<DcConfirm @ref="_confirm" />
+
 <GenericModal TContent="CreaturesSelector" OnClose="HandleCreaturesSelectorModalClose" @ref="CreaturesSelectorModalRef">
     <CreaturesSelector Combat="_combat" />
 </GenericModal>
 
 <div class="CombatEditorFloatingInitiativeWindow">
-    <MudGrid Style="padding:10px;">
-        <MudItem><h3>@Loc["InitiativeTitle"]</h3></MudItem>
+    <div class="dc-irow dc-irow-wrap" style="padding:4px 2px 10px;">
+        <h3 class="dc-h2" style="margin:0;flex:1 1 auto;">@Loc["InitiativeTitle"]</h3>
         @if (_initiativeWindowsMaximized)
         {
-            <MudItem><MudIcon @onclick="SortCreaturesInitiativeRankByRoll" Icon="@Icons.Material.Filled.Sort" Title="@Loc["InitiativeSort"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
-            <MudItem><MudIcon @onclick="CreaturesInitiativeReset" Icon="@Icons.Material.Filled.Sync" Title="@Loc["InitiativeReset"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
-            <MudItem><MudIcon @onclick="MoveToNextCreatureInInitiative" Icon="@Icons.Material.Filled.KeyboardDoubleArrowRight" Title="@Loc["InitiativeNext"]" Style="cursor:pointer;background-color:darkcyan;border-radius:5px;" Size="@Size.Large"></MudIcon></MudItem>
-            <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = false" Icon="@Icons.Material.Filled.ArrowCircleDown" Title="@Loc["InitiativeMinimize"]" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
+            <button type="button" class="dc-ib" @onclick="SortCreaturesInitiativeRankByRoll" title="@Loc["InitiativeSort"]" aria-label="@Loc["InitiativeSort"]"><DcIcon Name="sort" Size="20" /></button>
+            <button type="button" class="dc-ib" @onclick="CreaturesInitiativeReset" title="@Loc["InitiativeReset"]" aria-label="@Loc["InitiativeReset"]"><DcIcon Name="sync" Size="20" /></button>
+            @* Advancing the turn is the one thing this window exists for, so it is
+               the only filled control in the header. *@
+            <button type="button" class="dc-ib dc-ib-primary" @onclick="MoveToNextCreatureInInitiative" title="@Loc["InitiativeNext"]" aria-label="@Loc["InitiativeNext"]"><DcIcon Name="double-right" Size="22" /></button>
+            <button type="button" class="dc-ib" @onclick="() => _initiativeWindowsMaximized = false" title="@Loc["InitiativeMinimize"]" aria-label="@Loc["InitiativeMinimize"]"><DcIcon Name="circle-down" Size="20" /></button>
         }
         else
         {
-            <MudItem sm="2"><MudIcon @onclick="() => _initiativeWindowsMaximized = true" Icon="@Icons.Material.Filled.ArrowCircleUp" Title="@Loc["InitiativeMaximize"]" Style="cursor:pointer;" Size="@Size.Large"></MudIcon></MudItem>
+            <button type="button" class="dc-ib" @onclick="() => _initiativeWindowsMaximized = true" title="@Loc["InitiativeMaximize"]" aria-label="@Loc["InitiativeMaximize"]"><DcIcon Name="circle-up" Size="20" /></button>
         }
-    </MudGrid>
+    </div>
 
     @if (_initiativeWindowsMaximized)
     {
-        <table>
-            <tr style="border-bottom:solid; border-bottom-width:1px;">
+        <table class="dc-inittab">
+            <tr>
                 <th>@Loc["InitiativeCreature"]</th>
                 <th>@Loc["InitiativeRoll"]</th>
                 <th>@Loc["InitiativeOrder"]</th>
@@ -252,13 +238,25 @@
             </tr>
             @foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
             {
-                <tr style="border-bottom:solid; border-bottom-width:1px;"
-                class="@(creature.Name == _currentInitiativeCreature.Name ? "current-initiative-creature" : "")">
-                    <td style="width:240px;padding:5px;">@creature.Name</td>
-                    <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:#A0A0A0;" @bind-Value="creature.InitiativeRoll"></MudNumericField></td>
-                    <td style="width:60px;padding:5px;"><MudNumericField T="int" Style="color:white;font-weight:bold;font-size:16pt" @bind-Value="creature.InitiativeRank"></MudNumericField></td>
-                    <td style="width:120px;padding:5px;">
-                        <a style="cursor:pointer;border-radius:30px;padding:5px;background-color:darkcyan;" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">@Loc["InitiativeQuickLinkBtn"]</a>
+                var c = creature;
+                <tr class="@(creature.Name == _currentInitiativeCreature.Name ? "current-initiative-creature" : "")">
+                    <td style="width:240px;">@creature.Name</td>
+                    <td style="width:86px;">
+                        <span class="dc-step">
+                            <button type="button" @onclick="() => c.InitiativeRoll--" aria-label="@Loc["InitiativeRoll"]">&minus;</button>
+                            <input class="dc-num" type="number" @bind="c.InitiativeRoll" @bind:event="oninput" aria-label="@Loc["InitiativeRoll"]" />
+                            <button type="button" @onclick="() => c.InitiativeRoll++" aria-label="@Loc["InitiativeRoll"]">+</button>
+                        </span>
+                    </td>
+                    <td style="width:86px;">
+                        <span class="dc-step">
+                            <button type="button" @onclick="() => c.InitiativeRank--" aria-label="@Loc["InitiativeOrder"]">&minus;</button>
+                            <input class="dc-num dc-rank" type="number" @bind="c.InitiativeRank" @bind:event="oninput" aria-label="@Loc["InitiativeOrder"]" />
+                            <button type="button" @onclick="() => c.InitiativeRank++" aria-label="@Loc["InitiativeOrder"]">+</button>
+                        </span>
+                    </td>
+                    <td style="width:120px;">
+                        <a class="dc-jump" onclick="@($"scrollToElementById('{creature.Id.ToString()}')")">@Loc["InitiativeQuickLinkBtn"]</a>
                     </td>
                 </tr>
             }
@@ -266,35 +264,39 @@
     }
 </div>
 
-<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:start; padding-bottom:5px;">
-    <MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap">
-        <MudStack Row="true">
-            <h1>@_combat.Name</h1>
-            <MudButton OnClick="() => CreaturesSelectorModalRef?.Show()" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" IconColor="Color.Primary" Size="Size.Large">@Loc["EditBtn"]</MudButton>
-        </MudStack>
-    </MudStack>
-    <MudStack Row="true" AlignItems="AlignItems.Center">
+<div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding-bottom:5px;">
+    <div class="dc-irow dc-irow-wrap">
+        <h1 class="dc-h1" style="margin:0;">@_combat.Name</h1>
+        <button type="button" class="dc-btn dc-btn-out" @onclick="() => CreaturesSelectorModalRef?.Show()">
+            <DcIcon Name="edit" /> @Loc["EditBtn"]
+        </button>
+    </div>
+
+    <div class="dc-irow dc-irow-wrap">
         @if (_timer.Enabled)
         {
-            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="PauseTimer" Icon="@Icons.Material.Filled.Pause" Title="@Loc["PauseBtn"]" />
+            <button type="button" class="dc-ib dc-ib-round" @onclick="PauseTimer" title="@Loc["PauseBtn"]" aria-label="@Loc["PauseBtn"]"><DcIcon Name="pause" Size="18" /></button>
         }
         else
         {
-            <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StartTimer" Icon="@Icons.Material.Filled.PlayArrow" Title="@Loc["PlayBtn"]" />
+            <button type="button" class="dc-ib dc-ib-round" @onclick="StartTimer" title="@Loc["PlayBtn"]" aria-label="@Loc["PlayBtn"]"><DcIcon Name="play" Size="18" Filled="true" /></button>
         }
-        <MudIcon Class="play-pause-stop-button" Size="Size.Large" @onclick="StopTimer" Icon="@Icons.Material.Filled.Stop" Title="@Loc["StopBtn"]" />
-        <MudItem Style="font-size: large;">@GetDurationAsString()</MudItem>
+        <button type="button" class="dc-ib dc-ib-round" @onclick="StopTimer" title="@Loc["StopBtn"]" aria-label="@Loc["StopBtn"]"><DcIcon Name="stop" Size="18" /></button>
+
+        <span class="dc-num" style="font-size:16px;font-weight:700;color:var(--t1);">@GetDurationAsString()</span>
+
         @if (CombatLog.IsRecording)
         {
-            <MudItem>
-                <span class="combat-recording">
-                    <span class="combat-recording-dot"></span>
-                    @Loc["LogRecording"] @string.Format(Loc["LogRound"], CombatLog.CurrentRound)
-                </span>
-            </MudItem>
+            <span class="combat-recording">
+                <span class="combat-recording-dot"></span>
+                @Loc["LogRecording"] @string.Format(Loc["LogRound"], CombatLog.CurrentRound)
+            </span>
         }
-        <MudButton OnClick="OpenCombatLogModal" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Dvr" Color="@Color.Primary">@Loc["LogBtn"]</MudButton>
-    </MudStack>
+
+        <button type="button" class="dc-btn dc-btn-out" @onclick="OpenCombatLogModal">
+            <DcIcon Name="dvr" /> @Loc["LogBtn"]
+        </button>
+    </div>
 </div>
 
 <GenericModal TContent="CombatLogPopup" @ref="CombatLogModalRef">
@@ -302,8 +304,9 @@
 </GenericModal>
 
 
-<div style="margin-top:5px;margin-bottom:10px;">
-    <MudTextField Sizing="InputSizing.Auto" spellcheck="false" @bind-Value="_combat.Notes" Label="@Loc["NotesTb"]" Class="NotesLabel" Variant="Variant.Outlined"></MudTextField>
+<div class="dc-field" style="margin-top:5px;margin-bottom:10px;">
+    <label class="dc-flabel" for="combat-notes">@Loc["NotesTb"]</label>
+    <textarea class="dc-inp" id="combat-notes" rows="2" spellcheck="false" @bind="_combat.Notes"></textarea>
 </div>
 
 <CascadingValue Value="@BuildDamageSourceContext()" IsFixed="false">
@@ -311,10 +314,13 @@
     @foreach (DCCreature creature in _combat.CreaturesList)
     {
         <div class="masonry-item">
-            <div class="@(creature.Name == _currentInitiativeCreature.Name ? "current-initiative-creature-border" : "CombatEditorCreatureLayout")"
-                style="padding:8px;">
-                <div style="background-color:#303030; padding: 4px; border-radius: 5px;">
-                    <div id="@creature.Id.ToString()">
+            @* The card itself carries the frame now. When this creature is the one
+               acting, dc-acting swaps the border for the travelling Dice gradient
+               (app.css) — it replaced the scoped .current-initiative-creature-border
+               so that the rule survives any later move of this markup. *@
+            <div class="dc-ccard @(creature.Name == _currentInitiativeCreature.Name ? "dc-acting" : "")">
+                <div>
+                    <div id="@creature.Id.ToString()" class="dc-sheet">
                         @if (creature.ImageSheetBas64 != string.Empty)
                         {
                             <h1>@creature.Name</h1>
@@ -342,34 +348,39 @@
                         }
                         else
                         {
-                            <p>Could not render creature sheet</p>
+                            <p class="dc-sub">@Loc["SheetUnavailable"]</p>
                         }
                     </div>
                     @{
-                        // Prepare data for rendering
+                        // Prepare data for rendering.
+                        // FirstOrDefault, not First: GetCreatureInstancesCustomFields
+                        // legitimately returns an empty list for a creature with no
+                        // instances, and First() threw the whole board away.
                         var allInstanceCustomFields = _combat.GetCreatureInstancesCustomFields(creature);
-                        var sharedFields = allInstanceCustomFields.First()
+                        var firstInstanceFields = allInstanceCustomFields.FirstOrDefault() ?? new List<DCCreatureCustomField>();
+                        var sharedFields = firstInstanceFields
                             .Where(x => x.SharedAcrossCreatureInstances)
                             .ToList();
-                        var nonSharedFields = allInstanceCustomFields.First()
+                        var nonSharedFields = firstInstanceFields
                             .Where(x => !x.SharedAcrossCreatureInstances)
                             .ToList();
                     }
 
-                    <div style="padding:10px;">
-                        @* Render shared fields (once for all instances) *@
+                    <div class="dc-insts">
+                        @* Shared fields: one strip for the whole creature, so its
+                           instance badge stays blank. *@
                         @if (sharedFields.Any())
                         {
-                            <div class="CombatEditorCustomFieldsLayout" style="border-color:#F9F9F9;padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px #FFFFFF;">
-                                <div class="d-flex flex-wrap gap-2" style="align-items:center;">
-                                    @foreach (var field in sharedFields)
-                                    {
-                                        <div>
-                                            <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" OnFieldChanged="@(info => OnCustomFieldChanged(creature, 0, info))" />
-                                            </MudPaper>
-                                        </div>
-                                    }
+                            <div class="dc-inst">
+                                <span class="dc-inst-stripe"></span>
+                                <div class="dc-inst-body">
+                                    <div class="dc-irow dc-irow-wrap">
+                                        <span class="dc-inst-n"></span>
+                                        @foreach (var field in sharedFields)
+                                        {
+                                            <CreatureCustomFieldRenderer Field="field" EditionMode="false" OnChange="OnCustomFieldChanged" OnFieldChanged="@(info => OnCustomFieldChanged(creature, 0, info))" />
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         }
@@ -383,23 +394,29 @@
                             {
                                 var capturedInstanceIndex = instanceIndex;
                                 var instanceCustomFields = creatureInstancesCustomFields[instanceIndex];
+                                var instanceColour = InstanceColour(instanceCustomFields);
 
-                                <div class="CombatEditorCustomFieldsLayout" style="@($"border-color:{instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#F9F9F9"};padding:10px;border-radius:10px;border-width:2px;margin:10px;box-shadow: 0 2px 10px {instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() ?? "#FFFFFF"};")">
-                                    <div class="d-flex flex-wrap gap-2" style="align-items:center;">
-                                        @foreach (DCCreatureCustomField field in instanceCustomFields)
-                                        {
-                                            if (field.SharedAcrossCreatureInstances == false)
+                                @* The Colour field tints this instance's edge. It used to
+                                   paint border-color plus a glow on the whole box; the
+                                   stripe says the same thing without competing with the
+                                   card frame, and an empty colour now falls back cleanly
+                                   instead of emitting "border-color:;". *@
+                                <div class="dc-inst">
+                                    <span class="dc-inst-stripe" style="@(instanceColour is null ? "" : $"background:{instanceColour};")"></span>
+                                    <div class="dc-inst-body">
+                                        <div class="dc-irow dc-irow-wrap">
+                                            <span class="dc-inst-n">#@(capturedInstanceIndex + 1)</span>
+                                            @foreach (DCCreatureCustomField field in instanceCustomFields)
                                             {
-                                                <div>
-                                                    <MudPaper Class="d-flex align-center justify-center" Style="padding:5px;">
-                                                        <CreatureCustomFieldRenderer Field="field"
-                                                                                     EditionMode="false"
-                                                                                     OnChange="OnCustomFieldChanged"
-                                                                                     OnFieldChanged="@(info => OnCustomFieldChanged(creature, capturedInstanceIndex, info))" />
-                                                    </MudPaper>
-                                                </div>
+                                                if (field.SharedAcrossCreatureInstances == false)
+                                                {
+                                                    <CreatureCustomFieldRenderer Field="field"
+                                                                                 EditionMode="false"
+                                                                                 OnChange="OnCustomFieldChanged"
+                                                                                 OnFieldChanged="@(info => OnCustomFieldChanged(creature, capturedInstanceIndex, info))" />
+                                                }
                                             }
-                                        }
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -417,6 +434,8 @@
 
 
 @code {
+    private DcConfirm? _confirm;
+
     [Parameter]
     public string CombatGuid { get; set; } = "new";
 
@@ -574,6 +593,18 @@
         return creature.OpenLinksInApp ? "dc-sheet-inapp" : string.Empty;
     }
 
+    /// The Colour field an instance may carry, as a CSS colour, or null when there
+    /// is no Colour field or the user has not picked one yet.
+    ///
+    /// DCCreatureColorField.Value defaults to string.Empty rather than null, so the
+    /// old `?? "var(--b2)"` fallback never fired for an existing-but-unset field and
+    /// the card emitted the invalid declaration `border-color:;`.
+    private static string? InstanceColour(List<DCCreatureCustomField> instanceCustomFields)
+    {
+        var colour = instanceCustomFields.Find(x => x is DCCreatureColorField)?.GetValue() as string;
+        return string.IsNullOrWhiteSpace(colour) ? null : colour;
+    }
+
     private void OpenCombatLogModal()
     {
         CombatLogModalRef?.Show();
@@ -639,11 +670,12 @@
     {
         if (CombatLog.IsRecording) return;
 
-        bool? confirm = await DialogService.ShowMessageBoxAsync(
+        if (_confirm == null) return;
+        bool confirm = await _confirm.AskAsync(
             Loc["StartCombatTitle"],
             Loc["StartCombatQuestion"],
-            yesText: Loc["StartCombatConfirmBtn"], cancelText: Loc["CancelBtn"]);
-        if (confirm != true) return;
+            Loc["StartCombatConfirmBtn"], Loc["CancelBtn"]);
+        if (!confirm) return;
 
         await StartTimer();
     }

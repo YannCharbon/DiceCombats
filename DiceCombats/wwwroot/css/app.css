@@ -1,20 +1,116 @@
+﻿/* ═══════════════════════════════════════════════════════════════════════════
+   DiceCombats — shared visual layer.
+
+   Structurally identical to DiceAudio's app.css: same component vocabulary,
+   same surface ramp shape, same radii, same motion. The only app-specific
+   part is the :root token block below, which is what makes the two apps read
+   as one suite that differs by colour.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Registering the angle is what makes it animatable: an unregistered custom
+   property is a string to the engine and jumps from one value to the next. */
+@property --dc-acting-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
 :root {
     --dc-safe-area-top: env(safe-area-inset-top, 0px);
     /* viewport-fit=cover lets the page run under the Android navigation bar,
        so anything anchored to the bottom has to keep this much clear. */
     --dc-safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* ── the brand gradient: 4 stops, -45deg, animated at 400% 400% ──────────
+       The hue sweep spans 115°, matching DiceAudio's, so the animation reads
+       as movement. The faint lime stop plays the role DiceAudio's faint
+       orange plays; green stays the dominant identity. */
+    --g1: rgba(194, 209, 46, 0.20); /* #C2D12E lime       */
+    --g2: rgba(50, 200, 126, 0.60); /* #32C87E emerald    */
+    --g3: rgba(0, 170, 170, 0.90);  /* #00AAAA teal       */
+    --g4: rgba(35, 170, 128, 1.00); /* #23AA80 green-teal */
+    --brand: linear-gradient(-45deg, var(--g1), var(--g2), var(--g3), var(--g4));
+
+    /* ── three accents, every one a gradient stop (DiceAudio's rule) ──────── */
+    --a1: #32C87E;  /* Primary           ↔ DiceAudio #E73C7E */
+    --a2: #00AAAA;  /* Info / selection  ↔ DiceAudio #23A6D5 */
+    --a3: #23AA80;  /* Secondary / heads ↔ DiceAudio #23A6AB */
+    --ink: #06140E; /* dark text for use ON an accent fill */
+
+    /* ── surface ramp — green-tinted, stepped evenly in CIE L* ─────────────
+       Spacing matters more than the hex values: near black, equal hex steps
+       are perceptually tiny. Ground to panel is 9.0 L*, panel to the next
+       surface up 5.2, so a card reads as a card and anything MudBlazor
+       draws on top of one still separates from it. */
+    --s0: #09100E; /*  4.2  page ground, release notes, popup frame */
+    --s1: #0C1614; /*  6.3  tooltip / bubble                       */
+    --s2: #101C19; /*  9.1  card hero base, input well             */
+    --s3: #152521; /* 13.2  card, panel                            */
+    --s4: #1B312C; /* 18.4  a surface ON a panel; card hover       */
+    --s5: #223C36; /* 23.1  inset bar, assistance box              */
+    --s6: #26433C; /* 26.0  icon-button hover                      */
+    --s7: #1F3732; /* 21.0  round button                           */
+    --s8: #24413A; /* 25.1  round button, large                    */
+    --b1: #24463F; /* border, default                     */
+    --b2: #2E5A4E; /* border, mid                         */
+    --b3: #3C7A6C; /* border, hover                       */
+    --b4: #4E9E86; /* border, strong                      */
+
+    /* ── text ramp — replaces `color: grey`, which is 4.3:1 on a card ─────── */
+    --t1: #ffffff;
+    --t2: rgba(255, 255, 255, 0.88);
+    --t3: rgba(255, 255, 255, 0.60); /* meta  — 5.4:1 on the lightest surface */
+    --t4: rgba(255, 255, 255, 0.52); /* faint — 4.5:1 on the lightest surface */
+
+    --danger: #E04545;
+    --warn: #E0A33C;
+
+    /* ── radii, identical to DiceAudio ────────────────────────────────────── */
+    --r-card: 12px;
+    --r-panel: 10px;
+    --r-tile: 9px;
+    --r-bar: 8px;
+    --r-btn: 7px;
+    --r-chip: 5px;
+    --r-pill: 999px;
+
+    --fx: 160ms;
 }
 
+/* Kind tint — set on a card/strip root, inherited by everything inside it.
+   color-mix() is deliberately avoided: Android System WebView may predate it,
+   and a dropped background declaration would leave a transparent card. */
+.dc-k-pc  { --kc: #32C87E; --kc-a: rgba(50,200,126,.62); --kc-b: rgba(50,200,126,.18); --kc-e: rgba(50,200,126,.60); }
+.dc-k-npc { --kc: #00AAAA; --kc-a: rgba(0,170,170,.62);  --kc-b: rgba(0,170,170,.18);  --kc-e: rgba(0,170,170,.60); }
+
+@keyframes dc-gradient-shift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes dc-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .25; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dc-anim { animation: none !important; }
+}
+
+/* ═══ page shell ═══════════════════════════════════════════════════════════ */
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Helvetica Neue', Helvetica, system-ui, sans-serif;
     margin: 0;
     padding: 0;
     height: 100%;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
 .page {
-    /* This config avoids the scroll bar to appear over the NavBar */
+    /* This config avoids the scroll bar appearing over the nav bar. */
     margin-top: calc(50px + var(--dc-safe-area-top)); /* nav height + status bar inset */
     padding-top: 20px;
     padding-bottom: 20px;
@@ -22,20 +118,6 @@ html, body {
     overflow-y: auto;
     box-sizing: border-box;
     overflow-x: hidden;
-}
-
-a, .btn-link {
-    color: #006bb7;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -46,16 +128,563 @@ h1:focus {
     outline: none;
 }
 
+a, .btn-link {
+    color: var(--a2);
+}
+
+a:hover, .btn-link:hover {
+    color: #3FD0D0;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem var(--s2), 0 0 0 0.25rem var(--a2);
+}
+
+/* ═══ typography — two formal heading levels ═══════════════════════════════
+   Retires the pattern of overriding a 15px class with an inline 28px. */
+
+.dc-h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--t1);
+    letter-spacing: -.01em;
+}
+
+.dc-sub {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--t3);
+}
+
+.dc-h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--a3);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 0 2px 6px;
+    border-bottom: 1px solid var(--b1);
+}
+
+/* Alphabetical divider inside a section — quieter than a section heading. */
+.dc-alpha {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    color: var(--t4);
+    padding: 14px 2px 8px;
+}
+
+.dc-empty {
+    color: var(--t3);
+    padding: 20px 2px;
+}
+
+/* Stacks a page's sections without drawing a surface of its own. Sections
+   that need one carry it themselves. */
+.dc-stack {
+    display: flex;
+    flex-direction: column;
+}
+
+/* The home page is a column of generously spaced sections, centred. */
+.dc-home {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 34px 8px 20px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+}
+
+/* ═══ the gradient pill — replaces `background-color: darkcyan` ════════════ */
+
+.dc-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 18px 6px 8px;
+    border-radius: var(--r-pill);
+    background-image: var(--brand);
+    color: var(--t1);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.dc-pill h3, .dc-pill h4 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* ═══ panels ═══════════════════════════════════════════════════════════════
+   Replaces .settings-group (#505050) and the white-glow boxes: a 1px border
+   on a tinted surface, which is how DiceAudio draws every panel. */
+
+.dc-panel {
+    background: var(--s3);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-panel);
+    padding: 16px;
+    margin: 10px 0;
+}
+
+
+/* ═══ grids ════════════════════════════════════════════════════════════════ */
+
+/* The explorers' grid: 3 across on a desktop window, fewer as it narrows. */
+.dc-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 12px;
+    margin: 10px 2px 6px 2px;
+}
+
+
+/* ═══ strip ("List" view) ══════════════════════════════════════════════════
+   Not a full-width row: one horizontal strip per object, laid out by
+   .dc-grid-3, which is how both explorers already read. */
+
+.dc-strip {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: var(--s3);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-card);
+    padding: 12px 14px;
+    transition: border-color var(--fx), background var(--fx);
+}
+
+.dc-strip:hover { border-color: var(--b3); background: var(--s4); }
+
+.dc-clickable { cursor: pointer; }
+
+.dc-strip-body { flex: 1; min-width: 0; }
+
+.dc-strip-name {
+    font-weight: 700;
+    font-size: 14.5px;
+    color: var(--t1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ═══ tiles ════════════════════════════════════════════════════════════════ */
+
+/* 52px leading tile of a strip, and of a campaign folder: the full gradient. */
+.dc-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--r-panel);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--t1);
+    background-image: var(--brand);
+}
+
+/* Kind-tinted tile, for an object that carries a kind (creature, combat). */
+.dc-tile {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--r-panel);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--t1);
+    border: 1px solid var(--kc-e, var(--b2));
+    background-color: var(--s2);
+    background-image: linear-gradient(145deg, var(--kc-a), var(--kc-b) 72%, transparent);
+}
+
+/* ═══ roster — who is actually in the combat ═══════════════════════════════ */
+
+/* Third row of a combat strip: one line, never wrapping, so a combat with
+   nine kinds of creature does not make its strip three times the height of
+   its neighbours in the grid. When the row does not fit it drifts sideways
+   and back, the way a bus destination sign cycles its stops. dc-marquee.js
+   measures the overflow and sets the class and the two properties below;
+   without it the row simply clips. */
+.dc-roster {
+    display: flex;
+    margin-top: 5px;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 16px), transparent);
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 16px), transparent);
+}
+
+/* No mask while the row fits: it would fade chips for no reason. */
+.dc-roster:not(.dc-roster-marquee) {
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+
+.dc-roster-track {
+    display: flex;
+    gap: 4px;
+    flex: none;
+}
+
+.dc-roster-marquee .dc-roster-track {
+    animation: dc-marquee var(--dc-marquee-time, 10s) ease-in-out infinite alternate;
+}
+
+/* Hold at each end, so both the first and the last chip can be read. */
+@keyframes dc-marquee {
+    0%, 14%   { transform: translateX(0); }
+    86%, 100% { transform: translateX(var(--dc-marquee-shift, 0px)); }
+}
+
+.dc-strip:hover .dc-roster-marquee .dc-roster-track {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dc-roster-marquee .dc-roster-track { animation: none; }
+    .dc-roster { overflow-x: auto; scrollbar-width: none; }
+    .dc-roster::-webkit-scrollbar { display: none; }
+}
+
+.dc-mini {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    gap: 5px;
+    padding: 3px 7px;
+    border-radius: var(--r-chip);
+    background: var(--s2);
+    border: 1px solid var(--b1);
+    font-size: 11px;
+    line-height: 1.35;
+    color: var(--t2);
+    white-space: nowrap;
+}
+
+.dc-mini .dc-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--kc, var(--a2));
+    flex: none;
+}
+
+.dc-mini b {
+    color: var(--t1);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ═══ chips ════════════════════════════════════════════════════════════════ */
+
+.dc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: var(--r-chip);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    color: var(--cf);
+    background: var(--cb);
+    border: 1px solid var(--cl);
+}
+
+.dc-chip .dc-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cd); flex: none; }
+
+.dc-c-type { --cd:#23AA80; --cf:#8FE0C2; --cb:rgba(35,170,128,.15);  --cl:rgba(35,170,128,.38); }
+.dc-c-env  { --cd:#00AAAA; --cf:#8FDEDE; --cb:rgba(0,170,170,.15);   --cl:rgba(0,170,170,.38); }
+.dc-c-cond { --cd:#C2D12E; --cf:#E2EA9B; --cb:rgba(194,209,46,.15);  --cl:rgba(194,209,46,.38); }
+.dc-c-mute { --cd:#8B9A94; --cf:#CFD8D4; --cb:rgba(139,154,148,.15); --cl:rgba(139,154,148,.38); }
+
+/* ═══ buttons ══════════════════════════════════════════════════════════════ */
+
+.dc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: var(--r-btn);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background var(--fx), border-color var(--fx), color var(--fx);
+}
+
+/* Dark ink on the accent fill: white on #32C87E is 2.2:1 and fails. */
+.dc-btn-fill { background: var(--a1); color: var(--ink); }
+.dc-btn-fill:hover { background: #45D68D; }
+.dc-btn-out { background: transparent; border-color: var(--b2); color: var(--a1); }
+.dc-btn-out:hover { background: var(--s6); border-color: var(--b3); }
+.dc-btn-text { background: transparent; color: var(--t3); }
+.dc-btn-text:hover { background: var(--s6); color: var(--t1); }
+.dc-btn-danger { background: transparent; border-color: #5A2A2A; color: var(--danger); }
+.dc-btn-danger:hover { background: #2A1414; }
+
+.dc-btn:focus-visible,
+.dc-ib:focus-visible,
+.dc-ub:focus-visible {
+    outline: 2px solid var(--a2);
+    outline-offset: 2px;
+}
+
+.dc-ib {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-btn);
+    flex: none;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--t3);
+    cursor: pointer;
+    padding: 0;
+    transition: background var(--fx), color var(--fx), border-color var(--fx);
+}
+
+.dc-ib:hover { background: var(--s6); border-color: var(--b3); color: var(--t1); }
+.dc-ib.dc-danger:hover { color: var(--danger); border-color: #5A2A2A; }
+
+
+/* ═══ misc ═════════════════════════════════════════════════════════════════ */
+
+.kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--s5);
+    border: 1px solid var(--b2);
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 90%;
+    color: var(--t2);
+}
+
+.dc-num { font-variant-numeric: tabular-nums; }
+
+.dc-crumb { color: var(--a2); text-decoration: none; font-size: 13px; cursor: pointer; }
+.dc-crumb:hover { text-decoration: underline; }
+
+/* Assistance blocks — promoted out of the pages that each declared their own. */
+.assist-box {
+    background: var(--s5);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-panel);
+    padding: 14px;
+    margin: 10px 0;
+}
+
+.assist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.assist-example {
+    background: var(--s2);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-bar);
+    padding: 10px 12px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 90%;
+    color: var(--t2);
+    white-space: pre-wrap;
+}
+
+.placeholder-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.placeholder-table th,
+.placeholder-table td {
+    border-top: 1px solid var(--b1);
+    padding: 7px;
+    vertical-align: top;
+}
+
+.placeholder-table th {
+    text-align: left;
+    color: var(--t1);
+}
+
+/* ═══ the top bar ══════════════════════════════════════════════════════════
+   Shared suite chrome: a gradient bar with two glass capsules flanking the
+   gem, and a utility slot on the right. Only the gem geometry and the
+   Windows title strip live with the component (DCNavMenu.razor). */
+
+.dc-bar {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: calc(50px + var(--dc-safe-area-top));
+    padding-top: var(--dc-safe-area-top);
+    /* Symmetric side padding keeps the bar's own centre on the page centre;
+       the right slot doubles as clearance for the utilities. */
+    padding-left: 60px;
+    padding-right: 60px;
+    background-image: var(--brand);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+    border-bottom: 1px solid rgba(255, 255, 255, .14);
+    z-index: 10;
+}
+
+/* The two capsules are not the same width, so centring the flex group as a
+   whole would push the gem off-centre by half that difference. Each side
+   takes an equal share of the leftover space instead, and the gem lands on
+   the bar's exact centre whatever the labels say. */
+.dc-side {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+.dc-side-left { justify-content: flex-end; }
+.dc-side-right { justify-content: flex-start; }
+
+.dc-seg {
+    flex: 0 0 auto; /* never squash the labels to fit the slot */
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--r-pill);
+    overflow: hidden;
+    /* .55, not .34: white 14px labels over the #00AAAA stretch of the
+       gradient were 2.9:1. */
+    background: rgba(5, 18, 14, .55);
+    border: 1px solid rgba(255, 255, 255, .20);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1; /* below the gem if they overlap */
+}
+
+.dc-navlink {
+    text-decoration: none;
+    color: var(--t1);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    transition: background var(--fx), color var(--fx);
+}
+
+.dc-navlink + .dc-navlink {
+    box-shadow: -1px 0 0 rgba(255, 255, 255, .16); /* hairline divider */
+}
+
+.dc-navlink:hover { background: rgba(255, 255, 255, .14); color: var(--t1); }
+.dc-navlink.active { background: rgba(0, 170, 170, .50); }
+
+.dc-util {
+    position: absolute;
+    right: 20px;
+    top: calc(50% + var(--dc-safe-area-top) / 2);
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 6;
+}
+
+/* Round glass utility button in the bar's right slot. */
+.dc-ub {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-pill);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5, 18, 14, .55);
+    border: 1px solid rgba(255, 255, 255, .20);
+    color: var(--t1);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--fx), border-color var(--fx);
+}
+
+.dc-ub:hover { background: rgba(5, 18, 14, .75); border-color: rgba(255, 255, 255, .5); color: var(--t1); }
+
+/* Live-state chip — the counterpart of DiceAudio's now-playing chip. */
+.dc-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 12px 0 10px;
+    border-radius: var(--r-pill);
+    background: rgba(5, 18, 14, .62);
+    border: 1px solid rgba(255, 255, 255, .20);
+    color: var(--t1);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    max-width: 220px;
+}
+
+.dc-live:hover { background: rgba(5, 18, 14, .8); border-color: rgba(255, 255, 255, .5); color: var(--t1); }
+
+.dc-live-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dc-pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #C2D12E;
+    flex: none;
+    animation: dc-blink 1.8s ease-in-out infinite;
+}
+
+/* ═══ MudBlazor overlaps ═══════════════════════════════════════════════════ */
+
+/* MudBlazor has a single Surface colour, so an expansion panel nested in
+   another one disappears into its parent. The inner one takes the next step
+   up the ramp instead. */
+.mud-expand-panel .mud-expansion-panels .mud-expand-panel {
+    background-color: var(--s5);
+}
+
+/* MudBlazor popovers must render above the app's custom modal overlays
+   (which use z-index 2000–5000). Without this, selects and menus opened from
+   inside a modal appear behind it and cannot be interacted with. The theme's
+   own ZIndex block (MainLayout.razor) covers the rest. */
+.mud-popover { z-index: 6000 !important; }
+.mud-dialog-container { z-index: 6000 !important; }
+
+/* ═══ Blazor plumbing ══════════════════════════════════════════════════════ */
+
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    outline: 1px solid var(--a1);
 }
 
 .invalid {
-    outline: 1px solid #e50000;
+    outline: 1px solid var(--danger);
 }
 
 .validation-message {
-    color: #e50000;
+    color: var(--danger);
 }
 
 #blazor-error-ui {
@@ -97,7 +726,7 @@ h1:focus {
         position: sticky;
         top: 0;
         height: env(safe-area-inset-top);
-        background-color: #f7f7f7;
+        background-color: var(--s2);
         width: 100%;
         z-index: 1;
     }
@@ -107,11 +736,15 @@ h1:focus {
     }
 }
 
+/* ═══ startup loader ═══════════════════════════════════════════════════════
+   The ring was DiceAudio's navy (#303060) on a light grey track, which read
+   as the wrong app's colour under the DiceCombats logo. */
+
 .loading-page-circle-loader {
-    text-align:center;
-    font-size:x-large;
-    border: 16px solid #f3f3f3; /* Light grey */
-    border-top: 16px solid #303060; /* Blue */
+    text-align: center;
+    font-size: x-large;
+    border: 16px solid #14261F;
+    border-top: 16px solid #23AA80;
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -128,3 +761,1001 @@ h1:focus {
     }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VERDANT — the creature/combat vocabulary.
+
+   Ported from the CreatureManager mockup. Everything here keeps the existing
+   token ramp (--s*, --b*, --t*, --a*, radii) so the pages already harmonised
+   are untouched; only two tokens are new, and they are the point of the
+   exercise:
+
+     --ctl / --ctlhi   an operable boundary that actually clears WCAG 1.4.11.
+                       The --b* ramp tops out at 2.6:1 on a card, which is
+                       fine for a decorative edge and not fine for the edge of
+                       a control you have to find in a fight.
+
+   Class names are all dc- prefixed. The mockup used bare names (.btn, .card,
+   .modal); bootstrap.min.css is loaded before app.css and MudBlazor after it,
+   so bare names would have collided in both directions.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* 3.4:1 on --s3, 3.0:1 on --s4 — the boundary of anything operable */
+    --ctl: #61716B;
+    /* 6.1:1 — hover, focus, active */
+    --ctlhi: #8A9C95;
+
+    /* The acting creature's travelling border needs opaque stops: --brand's
+       first stop is 20% alpha, which would let the page through the border. */
+    /* The acting frame’s two colours. Legacy alternated a metallic grey with
+       a deep teal, which is what gave the ring its contrast; three shades of
+       the app green sat too close together to read as movement at all. */
+    --acting-light: #A6C1B9;
+    --acting-dark: #06585C;
+
+    --glow: 50, 200, 126;
+
+    /* hit-point bar tones */
+    --hp-ok: #23AA80;
+    --hp-low: #B8862A;
+    --hp-crit: #B33A3A;
+
+    /* a stat tile */
+    --stat-bg: linear-gradient(180deg, #1F5751 0%, #113A35 100%);
+    --stat-edge: #35827A;
+}
+
+/* ═══ controls the page draws itself ═══════════════════════════════════════
+   No OS spinner, no OS tick box: a native control arrives with a borrowed
+   look that nothing else on the page shares. */
+
+.dc-inp {
+    height: 32px;
+    padding: 0 9px;
+    border-radius: var(--r-btn);
+    background: var(--s2);
+    border: 1px solid var(--ctl);
+    color: var(--t1);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color var(--fx);
+}
+
+.dc-inp:hover { border-color: var(--ctlhi); }
+.dc-inp:focus-visible { outline: 2px solid var(--a2); outline-offset: 1px; border-color: var(--a2); }
+.dc-inp::placeholder { color: var(--t4); }
+.dc-inp:disabled { opacity: .45; cursor: default; }
+select.dc-inp { cursor: pointer; }
+textarea.dc-inp { height: auto; min-height: 56px; padding: 8px 9px; line-height: 1.5; resize: vertical; }
+.dc-num { font-variant-numeric: tabular-nums; }
+
+input[type="number"].dc-inp,
+.dc-step input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"].dc-inp::-webkit-outer-spin-button,
+input[type="number"].dc-inp::-webkit-inner-spin-button,
+.dc-step input[type="number"]::-webkit-outer-spin-button,
+.dc-step input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* the stepper, drawn here rather than left to MudNumericField's spin buttons */
+/* The number box.
+
+   The markup is still  <button>minus</button> <input> <button>plus</button>,
+   unchanged at every call site, but grid re-places those three into the
+   stacked spinner MudBlazor used: the value takes the full height and the two
+   steppers sit one above the other in an 18px gutter beside it. Side by side
+   the control ran about 106px and ate a third of a combat strip; this is
+   about 64px. The - and + captions are replaced by drawn chevrons.
+
+   plus is the LAST child and belongs on top, minus is the FIRST child and
+   belongs underneath, which is why the row assignments read inverted. */
+.dc-step {
+    display: inline-grid;
+    grid-template-columns: auto 18px;
+    grid-template-rows: 1fr 1fr;
+    height: 32px;
+    border: 1px solid var(--ctl);
+    border-radius: var(--r-btn);
+    overflow: hidden;
+    background: var(--s2);
+    transition: border-color var(--fx);
+    vertical-align: middle;
+}
+
+.dc-step:hover { border-color: var(--ctlhi); }
+
+.dc-step input {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--t1);
+    text-align: center;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    padding: 0 2px;
+    min-width: 0;
+}
+
+.dc-step input:focus-visible { outline: 2px solid var(--a2); outline-offset: -2px; }
+
+.dc-step button {
+    grid-column: 2;
+    width: auto;
+    min-width: 0;
+    border: 0;
+    border-left: 1px solid var(--b1);
+    background: transparent;
+    color: var(--t2);
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    font-size: 0;
+    line-height: 0;
+    transition: background var(--fx), color var(--fx);
+}
+
+.dc-step button:last-child { grid-row: 1; }
+.dc-step button:first-child { grid-row: 2; border-top: 1px solid var(--b1); }
+
+.dc-step button::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border: solid currentColor;
+    border-width: 0 1.5px 1.5px 0;
+}
+
+.dc-step button:last-child::after { transform: translate(-50%, -25%) rotate(-135deg); }
+.dc-step button:first-child::after { transform: translate(-50%, -75%) rotate(45deg); }
+
+.dc-step button:hover { background: var(--s5); color: var(--t1); }
+.dc-step button:active { background: var(--s6); }
+.dc-step button:disabled { opacity: .35; cursor: default; background: transparent; }
+
+/* a wider value box where the number runs long (hit points, factors) */
+.dc-step-wide input { width: 58px; }
+
+/* the tick box */
+.dc-chk {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--t1);
+    cursor: pointer;
+}
+
+.dc-chk input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex: none;
+    position: relative;
+    cursor: pointer;
+    border-radius: 3px;
+    background: var(--s2);
+    border: 1px solid var(--ctl);
+    transition: background var(--fx), border-color var(--fx);
+}
+
+.dc-chk input:hover { border-color: var(--ctlhi); }
+.dc-chk input:checked { background: var(--a3); border-color: var(--a3); }
+
+.dc-chk input:checked::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid var(--ink);
+    border-width: 0 2px 2px 0;
+    transform: rotate(42deg);
+}
+
+.dc-chk input:focus-visible { outline: 2px solid var(--a2); outline-offset: 2px; }
+.dc-chk input:disabled { opacity: .45; cursor: default; }
+
+/* An option cell that lights up while it is ticked. Optional per field
+   (DCCreatureCheckboxField.HighlightWhenChecked): the whole cell lights, the
+   option's name and its text box included, not just the box. */
+.dc-ohl {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    padding: 3px 8px;
+    border-radius: var(--r-btn);
+    border: 1px solid transparent;
+    transition: background var(--fx), border-color var(--fx);
+}
+
+.dc-ohl-name {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--t3);
+    white-space: nowrap;
+}
+
+.dc-ohl.dc-on { background: rgba(0,170,170,.20); border-color: var(--a2); }
+.dc-ohl.dc-on .dc-ohl-name { color: var(--t1); }
+
+/* a toggle chip — a condition that is set reads gold */
+.dc-tog {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 25px;
+    padding: 0 9px;
+    border-radius: var(--r-pill);
+    background: transparent;
+    border: 1px solid var(--ctl);
+    color: var(--t2);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--fx), border-color var(--fx), color var(--fx);
+}
+
+.dc-tog:hover { border-color: var(--ctlhi); color: var(--t1); }
+.dc-tog.dc-on { background: rgba(217,180,73,.20); border-color: #D9B449; color: #F3E3AE; }
+
+/* a read-only label chip */
+.dc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--r-chip);
+    background: var(--s4);
+    border: 1px solid var(--b1);
+    color: var(--t2);
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.dc-sw2 { width: 10px; height: 10px; border-radius: 2px; flex: none; display: inline-block; border: 1px solid rgba(255,255,255,.22); }
+
+/* A damage kind. Its background is the colour the GM chose, and its ink is
+   computed against that colour in C# (DCHitPointsIcons / the field itself) —
+   white on #fef881 is 1.1:1, so ink can never be assumed. */
+.dc-kchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: var(--r-pill);
+    border: 2px solid transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    opacity: .68;
+    transition: opacity var(--fx), border-color var(--fx);
+}
+
+.dc-kchip:hover { opacity: .9; }
+.dc-kchip.dc-on { opacity: 1; border-color: var(--t1); }
+.dc-kchip.dc-static { cursor: default; opacity: 1; }
+
+/* a colour swatch that opens a palette */
+.dc-swbtn {
+    width: 28px;
+    height: 24px;
+    border-radius: var(--r-chip);
+    border: 1px solid var(--ctl);
+    cursor: pointer;
+    padding: 0;
+    flex: none;
+    transition: border-color var(--fx);
+}
+
+.dc-swbtn:hover { border-color: var(--ctlhi); }
+.dc-swbtn.dc-none { background: repeating-conic-gradient(var(--s4) 0% 25%, var(--s2) 0% 50%) 50% / 7px 7px; }
+
+/* ═══ a field group on a combat strip ══════════════════════════════════════
+   Each custom field is a bounded cell carrying its own name, so a control is
+   never read as belonging to the field beside it. Three nested surfaces:
+   strip (--s4) › group (--s3) › input (--s2). */
+
+.dc-fgrp {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    position: relative;
+    padding: 5px 8px;
+    background: var(--s3);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-btn);
+}
+
+.dc-fgrp > .dc-flabel { flex: none; }
+.dc-fgrp-hp { flex: 1 1 auto; }
+.dc-fgrp-col { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+.dc-flabel {
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--t3);
+    white-space: nowrap;
+}
+
+/* The Text field is sized by what is in it: C#/JS measures the value and sets
+   --dc-grow-w; once that no longer fits, flex-wrap drops the whole group onto
+   its own row, where max-width clamps it and the box wraps its own lines. */
+.dc-fgrp-grow {
+    flex: 0 1 auto;
+    width: var(--dc-grow-w, 180px);
+    max-width: 100%;
+    min-width: 140px;
+    align-items: flex-start;
+}
+
+.dc-fgrp-grow > .dc-flabel { padding-top: 9px; }
+
+textarea.dc-gta {
+    height: 32px;
+    min-height: 32px;
+    padding: 7px 9px;
+    line-height: 16px;
+    resize: none;
+    overflow: hidden;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    font-family: inherit;
+}
+
+/* ═══ the hit-point bar ════════════════════════════════════════════════════ */
+
+.dc-hpbar {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 90px;
+    height: 26px;
+    border-radius: var(--r-btn);
+    background: var(--s2);
+    border: 1px solid var(--ctl);
+    overflow: hidden;
+}
+
+.dc-hpfill { height: 100%; background: var(--hp-ok); transition: width var(--fx); }
+.dc-hpfill.dc-low { background: var(--hp-low); }
+.dc-hpfill.dc-crit { background: var(--hp-crit); }
+
+.dc-hptxt {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 2px rgba(0,0,0,.8);
+    pointer-events: none;
+}
+
+/* temporary hit points ride on top of the bar */
+.dc-hptemp { color: var(--a2); }
+/* and a reduced maximum is called out in violet, as in the apply dialog */
+.dc-hpmax { color: #B39DDB; }
+
+/* ═══ a stat tile ══════════════════════════════════════════════════════════ */
+
+.dc-stats { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.dc-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 10px;
+    background: var(--stat-bg);
+    border: 1px solid var(--stat-edge);
+    border-radius: var(--r-btn);
+}
+
+.dc-stat b { font-size: 16px; font-weight: 700; color: var(--t1); font-variant-numeric: tabular-nums; line-height: 1; }
+.dc-stat .dc-flabel { font-size: 10px; color: var(--t2); }
+
+/* a grid field's table, in both modes */
+.dc-gtab { border-collapse: separate; border-spacing: 4px; }
+.dc-gtab th { font-size: 11px; font-weight: 700; color: var(--t3); text-align: center; padding: 2px 4px; }
+.dc-gtab th.dc-row { text-align: right; }
+.dc-gtab td { padding: 0; text-align: center; }
+
+/* ═══ the combat card ══════════════════════════════════════════════════════ */
+
+.dc-ccard {
+    position: relative;
+    background: var(--s3);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-card);
+}
+
+/* The creature whose turn it is takes the Dice gradient, travelling, plus a
+   halo that pulses on a layer of its own. Animating box-shadow on the card
+   repainted the whole card every frame and flickered against the moving
+   gradient; opacity on a sibling layer is composited instead. */
+/* The conic gradient is written out here rather than kept in a :root custom
+   property, and that is load-bearing: a custom property holding var(--angle) is
+   substituted at the point it is DECLARED. Parked on :root it resolved against
+   :root's angle, which nothing animates, so the ring sat perfectly still while
+   the keyframes dutifully rotated a value no one was reading. Declared on the
+   element that carries the animation, the substitution happens here and the
+   gradient actually turns.
+
+   Stops alternate light/dark twice around the circle, as the legacy ring did,
+   so the sweep reads from every edge. */
+.dc-ccard.dc-acting {
+    border: 3px solid transparent;
+    background:
+        linear-gradient(var(--s3), var(--s3)) padding-box,
+        conic-gradient(from var(--dc-acting-angle),
+            var(--acting-light) 0deg,
+            var(--acting-dark) 90deg,
+            var(--acting-light) 180deg,
+            var(--acting-dark) 270deg,
+            var(--acting-light) 360deg) border-box;
+    box-shadow: 0 0 0 1px rgba(var(--glow), .22);
+    animation: dc-acting-spin 8s linear infinite;
+}
+
+.dc-ccard.dc-acting::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: calc(var(--r-card) + 3px);
+    pointer-events: none;
+    will-change: opacity;
+    box-shadow: 0 0 32px -2px rgba(var(--glow), .9);
+    animation: dc-actingpulse 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes dc-acting-spin {
+    to { --dc-acting-angle: 360deg; }
+}
+
+@keyframes dc-actingpulse {
+    from { opacity: .22; }
+    to   { opacity: .8; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dc-ccard.dc-acting { animation: none; }
+    .dc-ccard.dc-acting::after { animation: none; opacity: .6; }
+}
+
+/* the imported sheet, always open */
+.dc-sheet {
+    padding: 11px;
+    background: var(--s2);
+    border-radius: calc(var(--r-card) - 2px) calc(var(--r-card) - 2px) 0 0;
+}
+
+/* ═══ an instance strip ════════════════════════════════════════════════════ */
+
+.dc-insts { padding: 10px 11px 11px; display: flex; flex-direction: column; gap: 9px; }
+
+/* No overflow:hidden — it clipped the colour palette open on a strip. The
+   stripe rounds its own left corners instead. */
+.dc-inst {
+    display: flex;
+    background: var(--s4);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-btn);
+}
+
+.dc-inst.dc-down { opacity: .68; }
+
+.dc-inst-stripe {
+    width: 6px;
+    flex: none;
+    background: var(--ctl);
+    border-radius: 6px 0 0 6px;
+}
+
+.dc-inst-body { flex: 1 1 auto; min-width: 0; padding: 8px 9px; display: flex; flex-direction: column; gap: 7px; }
+.dc-irow { display: flex; align-items: center; gap: 7px; }
+.dc-irow-wrap { flex-wrap: wrap; }
+
+.dc-inst-n {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--t3);
+    letter-spacing: .06em;
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    width: 22px;
+}
+
+/* ═══ a popover anchored to a control ══════════════════════════════════════ */
+
+.dc-pop {
+    position: absolute;
+    z-index: 60;
+    top: calc(100% + 6px);
+    left: 0;
+    width: max-content;
+    max-width: min(340px, 84vw);
+    background: var(--s4);
+    border: 1px solid var(--ctlhi);
+    border-radius: var(--r-panel);
+    padding: 10px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.65);
+}
+
+.dc-pop h5 {
+    margin: 0 0 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--t3);
+}
+
+.dc-palette { display: grid; grid-template-columns: repeat(6, 28px); gap: 6px; }
+.dc-palette button { width: 28px; height: 28px; border-radius: var(--r-chip); border: 1px solid var(--ctl); cursor: pointer; padding: 0; }
+.dc-palette button:hover { border-color: #fff; }
+.dc-condgrid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 4px 12px; width: 330px; max-width: 78vw; }
+
+/* ═══ the field editor — a flex wall, not a stack ══════════════════════════
+   Each kind declares the width it actually needs, so a Colour field never
+   takes a full row to say one thing. */
+
+.dc-fgrid { display: flex; flex-wrap: wrap; gap: 11px; align-items: flex-start; }
+
+.dc-fcard {
+    flex: 1 1 var(--dc-fb, 420px);
+    max-width: var(--dc-fm, 100%);
+    min-width: 0;
+    background: var(--s3);
+    border: 1px solid var(--ctl);
+    border-radius: var(--r-panel);
+}
+
+.dc-fhead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    padding: 8px 10px;
+    background: var(--s4);
+    border-bottom: 1px solid var(--ctl);
+    border-radius: calc(var(--r-panel) - 1px) calc(var(--r-panel) - 1px) 0 0;
+}
+
+.dc-fhead .dc-inp { flex: 1 1 60px; min-width: 0; width: auto; }
+.dc-fhead .dc-ftype { flex: none; }
+
+.dc-fsub { padding: 7px 10px; border-bottom: 1px solid var(--b1); }
+.dc-fsub .dc-chk { font-size: 12.5px; color: var(--t2); }
+
+.dc-fbody { padding: 11px 10px; display: flex; align-items: flex-end; gap: 11px; flex-wrap: wrap; }
+.dc-fbody-col { align-items: flex-start; flex-direction: column; }
+
+.dc-ftype {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 9px;
+    border-radius: var(--r-chip);
+    background: rgba(0,170,170,.16);
+    border: 1px solid rgba(0,170,170,.6);
+    color: var(--a2);
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.dc-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.dc-grab { color: var(--t3); cursor: grab; flex: none; }
+
+.dc-opt {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 7px;
+    background: var(--s4);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-btn);
+}
+
+.dc-opt .dc-inp { height: 28px; font-size: 12.5px; }
+.dc-opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 6px; }
+
+.dc-note {
+    background: var(--s4);
+    border: 1px solid var(--b1);
+    border-left: 3px solid var(--a2);
+    border-radius: var(--r-btn);
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--t2);
+}
+
+.dc-note b { color: var(--t1); }
+
+/* ═══ sections inside a modal ══════════════════════════════════════════════ */
+
+.dc-msec { background: var(--s4); border: 1px solid var(--b1); border-radius: var(--r-btn); padding: 12px; }
+.dc-msec-head { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; margin-bottom: 8px; }
+
+.dc-msec-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: var(--r-pill);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--a3);
+    white-space: nowrap;
+}
+
+.dc-msec-help { margin: 0 0 10px; font-size: 12.5px; color: var(--t3); line-height: 1.5; }
+.dc-mgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(430px, 1fr)); gap: 12px; align-items: start; }
+.dc-mgrid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; align-items: start; }
+.dc-mgrid3 .dc-msec-head { flex-direction: column; align-items: flex-start; gap: 9px; }
+
+.dc-mrow {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 7px;
+    background: var(--s3);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-btn);
+    margin-bottom: 5px;
+}
+
+.dc-mrow .dc-inp { height: 28px; font-size: 12.5px; }
+.dc-mrow .dc-step { height: 28px; }
+.dc-mrow .dc-step input { width: 46px; font-size: 12.5px; }
+.dc-mrow .dc-step button::after { width: 4px; height: 4px; }
+.dc-mscroll { max-height: 270px; overflow-y: auto; padding-right: 4px; }
+
+/* ═══ the damage dialog ════════════════════════════════════════════════════ */
+
+.dc-hptotal {
+    background: var(--s2);
+    border: 1px solid var(--b1);
+    border-radius: var(--r-panel);
+    padding: 13px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 15px;
+}
+
+.dc-hpterm { display: flex; flex-direction: column; align-items: center; max-width: 200px; }
+.dc-hpterm b { font-size: 29px; font-weight: 700; line-height: 1; color: var(--t1); font-variant-numeric: tabular-nums; }
+.dc-hpterm b small { font-size: 15px; font-weight: 400; color: var(--t3); }
+.dc-hpterm span { margin-top: 6px; font-size: 11.5px; color: var(--t3); text-align: center; line-height: 1.35; }
+.dc-hpop { font-size: 25px; color: var(--t3); padding-top: 5px; line-height: 1; }
+
+.dc-hpline { background: var(--s3); border: 1px solid var(--b1); border-radius: var(--r-btn); padding: 9px; margin-bottom: 8px; }
+.dc-kstrip { display: flex; flex-wrap: wrap; gap: 5px; flex: 1 1 270px; min-width: 0; max-height: 84px; overflow-y: auto; padding: 2px; }
+
+/* ═══ the detailed popup: tabs, list or grid ═══════════════════════════════ */
+
+.dc-dstack > .dc-msec { margin-bottom: 11px; }
+.dc-dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 11px; align-items: start; }
+
+/* ═══ the combat board keeps the masonry it already has ═════════════════
+   .masonry-layout / .masonry-item stay exactly as they are, in CombatManager's
+   own style block, and masonry.pkgd keeps positioning them. Two things there
+   are load-bearing and must never be "tidied" into this file:
+
+     .masonry-item { transform: none !important }   and   transitionDuration: 0
+
+   A GenericModal is rendered *inside* each card and is position:fixed. Any
+   transform on an ancestor makes that ancestor the containing block, which
+   throws every popup off the right edge of the screen.
+   ═════════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ field-renderer classes, hoisted out of CreatureCustomFieldRenderer ═══
+   They lived in a <style> block inside the dispatcher, which emits them once
+   per rendered field — a combat with twelve creatures shipped the same five
+   rules dozens of times. Kept byte-identical so nothing shifts. */
+
+.CreatureCustomFieldRendererFieldTitle { padding: 10px; font-weight: 700; }
+.CreatureCustomFieldRendererCheckBoxGridLabels { font-size: 10pt; padding: 4px; }
+
+.DnDConditionsFieldItem {
+    border-radius: 100px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 400;
+    font-size: 18px;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.CreatureCustomFieldRendererFieldLabel label {
+    background-color: rgba(35, 170, 128, 0.22);
+    color: white;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.CreatureCustomFieldRendererFieldBackground { background-color: var(--s5); border-radius: 4px; }
+
+/* An icon is a stroked line at the text colour, so it sits with the label
+   rather than shouting over it. DcIcon.razor draws them. */
+.dc-i { flex: none; display: inline-block; vertical-align: -0.15em; }
+
+/* MudBlazor still owns a few widgets with no cheap replacement (menus,
+   expansion panels, the colour wheel). Where one survives, it is dragged onto
+   the Verdant surfaces so it stops looking like a different app. */
+.mud-menu-list, .mud-list, .mud-paper.mud-popover {
+    background-color: var(--s4) !important;
+    border: 1px solid var(--ctl);
+    border-radius: var(--r-panel);
+}
+
+.mud-list-item:hover, .mud-menu-item:hover { background-color: var(--s6) !important; }
+
+.dpf-help .mud-expand-panel,
+.dc-assist .mud-expand-panel,
+.dc-fbody .mud-expand-panel,
+.dc-panel .mud-expand-panel { background-color: var(--s4); }
+
+/* An assistance panel is a sibling of the field wall, not part of it. */
+.dc-assist { margin-bottom: 18px; }
+.dc-assist + .dc-fgrid, .dc-assist + * > .dc-fgrid { margin-top: 18px; }
+
+/* A transport control reads as a round key rather than a square one. */
+.dc-ib-round {
+    border-radius: var(--r-pill);
+    border-color: var(--ctl);
+    color: var(--a1);
+}
+
+.dc-ib-round:hover { border-color: var(--a1); background: var(--s6); }
+
+/* the initiative table in the floating window */
+.dc-inittab { width: 100%; border-collapse: collapse; }
+
+.dc-inittab th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--t3);
+    padding: 0 6px 6px 0;
+    border-bottom: 1px solid var(--b1);
+}
+
+.dc-inittab td { padding: 5px 6px 5px 0; border-bottom: 1px solid var(--b1); }
+.dc-inittab .dc-step { height: 28px; }
+.dc-inittab .dc-step input { width: 34px; font-size: 12.5px; }
+.dc-inittab .dc-step button::after { width: 4px; height: 4px; }
+
+/* the order column is the one you read across the table, so it carries weight */
+.dc-rank { color: var(--t1) !important; font-weight: 800 !important; }
+
+/* the creatures selector: pick on the left, order on the right */
+.dc-selgrid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; align-items: start; }
+@media screen and (max-width: 900px) { .dc-selgrid { grid-template-columns: minmax(0, 1fr); } }
+
+.dc-selrow,
+.dc-selorder {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--b1);
+}
+
+.dc-selrow:hover { background: var(--s4); }
+.dc-selname { flex: 1 1 auto; min-width: 0; display: inline-flex; align-items: center; gap: 7px; color: var(--t1); }
+
+/* the ordering list is dragged by the row, so it says so */
+.dc-selorder { cursor: move; user-select: none; background: var(--s3); border-radius: var(--r-btn); margin-bottom: 5px; }
+.dc-selorder:hover { background: var(--s4); }
+.dc-selorder .dc-step { height: 28px; }
+.dc-selorder .dc-step input { width: 40px; font-size: 12.5px; }
+.dc-selorder .dc-step button::after { width: 4px; height: 4px; }
+
+/* Tinting an icon. DcIcon draws in currentColor, so these are just colours;
+   they exist so a caller does not have to wrap the svg in a coloured span. */
+.dc-i-accent { color: var(--a1); }
+.dc-i-info   { color: var(--a2); }
+.dc-i-danger { color: var(--danger); }
+.dc-i-warn   { color: var(--warn); }
+.dc-i-muted  { color: var(--t3); }
+
+/* MudColorPicker is kept for the Colour field because it is a real spectrum
+   picker and nothing here replaces it. Dragged onto the Verdant surfaces so it
+   stops reading as a panel borrowed from another app. */
+.mud-picker, .mud-picker-container, .mud-picker-content {
+    background-color: var(--s4) !important;
+    color: var(--t1);
+}
+
+.mud-picker-container { border: 1px solid var(--ctl); border-radius: var(--r-panel); }
+.mud-picker-toolbar, .mud-picker-colorpicker-view { background-color: var(--s4) !important; }
+
+/* ═══ a yes/no question ════════════════════════════════════════════════════
+   DcConfirm.razor. Above GenericModal (z 2000/2010) on purpose: a confirmation
+   is always raised from inside a modal, so it has to sit over the thing that
+   asked. */
+
+.dc-confirm-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    background: rgba(4, 8, 7, .74);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.dc-confirm {
+    width: min(460px, 100%);
+    background: var(--s3);
+    border: 1px solid var(--ctl);
+    border-radius: var(--r-card);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, .7);
+    padding: 18px 20px 16px;
+}
+
+.dc-confirm-title { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: var(--t1); }
+.dc-confirm-msg { margin: 0 0 18px; font-size: 13.5px; line-height: 1.55; color: var(--t2); }
+.dc-confirm-foot { display: flex; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+
+/* An option cell holds a name box, the tick that sets the option, and a
+   delete. Letting those three share a line made every cell wrap differently
+   depending on how long the name was, so the grid read as ragged. The name
+   takes the first row, the controls the second, in every cell. */
+.dc-opt-grid > .dc-opt { flex-wrap: wrap; align-items: center; row-gap: 6px; }
+.dc-opt-grid > .dc-opt > .dc-field { flex: 1 1 100%; }
+.dc-opt-grid > .dc-opt > .dc-chk { flex: 1 1 auto; min-width: 0; }
+.dc-opt-grid > .dc-opt > .dc-ib { margin-left: auto; }
+
+/* Secondary line under a strip or tile name. Used in six places across the
+   explorers and the home page and never actually defined, so it was
+   inheriting body size and reading as primary text. */
+.dc-meta { font-size: 12.5px; color: var(--t3); }
+
+.dc-btn:disabled { opacity: .45; cursor: default; }
+.dc-btn:disabled:hover { background: transparent; border-color: var(--ctl); }
+
+/* An edition body is a form, and a form reads as rows. Without an explicit
+   row-gap the wrapped lines sat flush against each other while the unwrapped
+   ones had the flex gap, which is where the ragged look came from. */
+.dc-fbody { row-gap: 11px; align-items: flex-end; }
+.dc-fbody > .dc-field { min-width: 0; }
+.dc-fbody-col { align-items: flex-start; }
+
+/* The delete button lives in the field head now, pushed to the far right
+   past the library toggle. */
+.dc-fhead-sep { margin-left: auto; }
+
+/* ═══ the aidedd sheets fight back ════════════════════════════════════════
+   A sheet scraped from aidedd carries the site’s own <style> block inside the
+   saved HTML, and 28 of the stored ones contain UNSCOPED `a:link` / `a:hover`
+   rules. Those are specificity (0,1,1) and they are injected after this file,
+   so they beat every (0,1,0) class here — which is why opening such a creature
+   turned the GitHub button in the title bar red.
+
+   Re-stating the app’s own anchors at (0,2,1) wins on specificity rather than
+   on order, so it holds no matter when the sheet is injected. */
+.dc-ub:link, .dc-ub:visited, .dc-ub:hover { color: var(--t1); text-decoration: none; }
+.dc-navlink:link, .dc-navlink:visited { color: var(--t2); text-decoration: none; }
+.dc-navlink.active:link, .dc-navlink.active:visited { color: var(--t1); }
+.dc-btn:link, .dc-btn:visited { color: var(--t1); text-decoration: none; }
+.dc-btn-fill:link, .dc-btn-fill:visited { color: var(--ink); }
+.dc-crumb:link, .dc-crumb:visited { color: var(--a2); }
+
+/* ═══ the initiative window ═══════════════════════════════════════════════ */
+
+/* The row for whoever is acting. It used to be a bare gradient on a <tr>:
+   no inset, square ends, and the outlined Quick-jump button on top of it
+   disappeared into the mid-tone. A table row cannot take a radius itself, so
+   the two end cells carry it. */
+.dc-inittab tr.current-initiative-creature td {
+    background: linear-gradient(-45deg,
+        rgba(50, 200, 126, .22), rgba(0, 170, 170, .34), rgba(50, 200, 126, .22));
+    border-bottom-color: transparent;
+}
+
+.dc-inittab tr.current-initiative-creature td:first-child {
+    border-radius: var(--r-btn) 0 0 var(--r-btn);
+    padding-left: 11px;
+    box-shadow: inset 3px 0 0 var(--a1);
+}
+
+.dc-inittab tr.current-initiative-creature td:last-child {
+    border-radius: 0 var(--r-btn) var(--r-btn) 0;
+    padding-right: 9px;
+}
+
+/* Every row gets the left inset, so the acting one does not shift sideways. */
+.dc-inittab td:first-child { padding-left: 11px; }
+
+/* Tighter cell padding buys the taller control back without growing the row. */
+.dc-inittab td { padding: 3px 6px 3px 0; }
+.dc-inittab .dc-step { height: 32px; }
+.dc-inittab .dc-step input { width: 36px; font-size: 14px; }
+
+/* Quick jump: solid, so it reads the same on a plain row and on the gradient. */
+.dc-jump {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    background: rgba(5, 18, 14, .62);
+    border: 1px solid var(--ctl);
+    color: var(--t1);
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--fx), border-color var(--fx);
+}
+
+.dc-jump:hover { background: var(--s6); border-color: var(--ctlhi); }
+.dc-jump:link, .dc-jump:visited { color: var(--t1); text-decoration: none; }
+
+/* A button sized to sit on a row of 32px inputs. */
+.dc-btn-sm { min-height: 32px; padding: 0 12px; font-size: 12.5px; }
+
+/* The initiative window sits at zoom:0.85, so its header controls were
+   rendering well under the 32px they ask for. Sized up to compensate. */
+.CombatEditorFloatingInitiativeWindow .dc-ib { width: 38px; height: 38px; }
+.CombatEditorFloatingInitiativeWindow .dc-ib:hover { border-color: var(--ctlhi); }
+
+/* The one icon button on a row that is the actual action, not a utility. */
+.dc-ib-primary {
+    background: var(--a1);
+    border-color: var(--a1);
+    color: var(--ink);
+}
+
+.dc-ib-primary:hover { background: #45D68D; border-color: #45D68D; color: var(--ink); }
+
+/* and a touch larger than the utilities beside it */
+.CombatEditorFloatingInitiativeWindow .dc-ib-primary { width: 44px; height: 44px; }

@@ -38,12 +38,41 @@
 </div>
 
 @code {
+    // Every colour below is a stop of the brand gradient or a step of the
+    // surface ramp defined in wwwroot/css/app.css, so MudBlazor's components
+    // sit in the same colour world as the app's own. The previous
+    // Colors.Teal.Darken1/Darken4 appeared nowhere in the gradient.
     MudTheme DCTheme = new MudTheme()
     {
         PaletteDark = new PaletteDark()
             {
-                Primary = Colors.Teal.Darken1,
-                Secondary = Colors.Teal.Darken4,
+                Primary = "#32C87E",   // gradient stop 2
+                Secondary = "#23AA80", // gradient stop 4
+                Tertiary = "#C2D12E",  // gradient stop 1
+                Info = "#00AAAA",      // gradient stop 3
+                Success = "#32C87E",
+                Warning = "#E0A33C",
+                Error = "#E04545",
+
+                Black = "#09100E",
+                Background = "#09100E",   // --s0, the page ground
+                BackgroundGray = "#152521",
+                // --s4, one step above .dc-panel: a MudPaper or expansion
+                // panel sitting on a panel has to separate from it.
+                Surface = "#1B312C",
+                DrawerBackground = "#09100E",
+                AppbarBackground = "#09100E",
+
+                TextPrimary = "rgba(255,255,255,0.88)",
+                TextSecondary = "rgba(255,255,255,0.54)",
+                ActionDefault = "rgba(255,255,255,0.54)",
+
+                LinesDefault = "#24463F",
+                LinesInputs = "#2E5A4E",
+                Divider = "#24463F",
+                TableLines = "#24463F",
+                TableHover = "#223C36",
+                OverlayDark = "rgba(4,20,14,0.6)",
             },
 
         ZIndex = new ZIndex

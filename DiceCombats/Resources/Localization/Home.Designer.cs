@@ -72,63 +72,63 @@ namespace DiceCombats.Resources.Localization {
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Create your first combat.
         /// </summary>
-        public static string FavoriteCombatsCreateFirstCombat {
+        public static string PinnedCombatsCreateFirstCombat {
             get {
-                return ResourceManager.GetString("FavoriteCombatsCreateFirstCombat", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsCreateFirstCombat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Create your first creature or player.
         /// </summary>
-        public static string FavoriteCombatsCreateFirstCreature {
+        public static string PinnedCombatsCreateFirstCreature {
             get {
-                return ResourceManager.GetString("FavoriteCombatsCreateFirstCreature", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsCreateFirstCreature", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à You don&apos;t have any combat yet..
         /// </summary>
-        public static string FavoriteCombatsNoCombats {
+        public static string PinnedCombatsNoCombats {
             get {
-                return ResourceManager.GetString("FavoriteCombatsNoCombats", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsNoCombats", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Recherche une chaîne localisée semblable à You don&apos;t have any creature yet which are required to create your first combat..
         /// </summary>
-        public static string FavoriteCombatsNoCreatures {
+        public static string PinnedCombatsNoCreatures {
             get {
-                return ResourceManager.GetString("FavoriteCombatsNoCreatures", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsNoCreatures", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à You don&apos;t have any combat added to favorites..
+        ///   Recherche une chaîne localisée semblable à You don&apos;t have any pinned combat yet..
         /// </summary>
-        public static string FavoriteCombatsNoFavorite {
+        public static string PinnedCombatsNoPinned {
             get {
-                return ResourceManager.GetString("FavoriteCombatsNoFavorite", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsNoPinned", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Select favorite combats.
+        ///   Recherche une chaîne localisée semblable à Pin some combats.
         /// </summary>
-        public static string FavoriteCombatsSelect {
+        public static string PinnedCombatsSelect {
             get {
-                return ResourceManager.GetString("FavoriteCombatsSelect", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsSelect", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Your favorite combats.
+        ///   Recherche une chaîne localisée semblable à Pinned combats.
         /// </summary>
-        public static string FavoriteCombatsTitle {
+        public static string PinnedCombatsTitle {
             get {
-                return ResourceManager.GetString("FavoriteCombatsTitle", resourceCulture);
+                return ResourceManager.GetString("PinnedCombatsTitle", resourceCulture);
             }
         }
         

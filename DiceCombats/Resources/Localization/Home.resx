@@ -117,37 +117,52 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FavoriteCombatsTitle" xml:space="preserve">
-    <value>Your favorite combats</value>
+  <data name="PinnedCombatsTitle" xml:space="preserve">
+    <value>Pinned combats</value>
   </data>
   <data name="Description" xml:space="preserve">
-    <value>This TTRPG tool to help you managing creatures and combats for any type of game system.</value>
+    <value>A TTRPG tool to help you manage creatures and combats, for any game system.</value>
   </data>
   <data name="Title" xml:space="preserve">
     <value>Welcome to DiceCombats!</value>
   </data>
-  <data name="FavoriteCombatsNoCreatures" xml:space="preserve">
-    <value>You don't have any creature yet which are required to create your first combat.</value>
+  <data name="PinnedCombatsNoCreatures" xml:space="preserve">
+    <value>You have no creatures yet, and a combat needs at least one.</value>
   </data>
-  <data name="FavoriteCombatsCreateFirstCreature" xml:space="preserve">
+  <data name="PinnedCombatsCreateFirstCreature" xml:space="preserve">
     <value>Create your first creature or player</value>
   </data>
-  <data name="FavoriteCombatsNoCombats" xml:space="preserve">
+  <data name="PinnedCombatsNoCombats" xml:space="preserve">
     <value>You don't have any combat yet.</value>
   </data>
-  <data name="FavoriteCombatsCreateFirstCombat" xml:space="preserve">
+  <data name="PinnedCombatsCreateFirstCombat" xml:space="preserve">
     <value>Create your first combat</value>
   </data>
-  <data name="FavoriteCombatsNoFavorite" xml:space="preserve">
-    <value>You don't have any combat added to favorites.</value>
+  <data name="PinnedCombatsNoPinned" xml:space="preserve">
+    <value>You don't have any pinned combat yet.</value>
   </data>
-  <data name="FavoriteCombatsSelect" xml:space="preserve">
-    <value>Select favorite combats</value>
-  </data>
-  <data name="SettingsTitle" xml:space="preserve">
-    <value>Settings</value>
+  <data name="PinnedCombatsSelect" xml:space="preserve">
+    <value>Pin some combats</value>
   </data>
   <data name="AutomationTitle" xml:space="preserve">
     <value>Automations</value>
+  </data>
+  <data name="AllCombatsLink" xml:space="preserve">
+    <value>All combats</value>
+  </data>
+  <data name="StartSomethingTitle" xml:space="preserve">
+    <value>Quick actions</value>
+  </data>
+  <data name="CreaturesMeta" xml:space="preserve">
+    <value>creature(s)</value>
+  </data>
+  <data name="PlayersMeta" xml:space="preserve">
+    <value>player(s)</value>
+  </data>
+  <data name="NewCombatBtn" xml:space="preserve">
+    <value>New combat</value>
+  </data>
+  <data name="NewCreatureBtn" xml:space="preserve">
+    <value>New creature</value>
   </data>
 </root>

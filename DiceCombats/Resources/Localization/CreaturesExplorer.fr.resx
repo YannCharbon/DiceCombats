@@ -130,13 +130,13 @@
     <value>Exporter les créatures</value>
   </data>
   <data name="ImportCreaturesBtn" xml:space="preserve">
-    <value>Importer une/plusieurs créature(s)</value>
+    <value>Importer les cr&#233;atures</value>
   </data>
   <data name="NewCreatureBtn" xml:space="preserve">
     <value>Nouvelle créature</value>
   </data>
   <data name="CreaturesTitle" xml:space="preserve">
-    <value>Créatures</value>
+    <value>Monstres et PNJ</value>
   </data>
   <data name="PlayersTitle" xml:space="preserve">
     <value>Personnages joueurs</value>
@@ -206,5 +206,14 @@
   </data>
   <data name="PlayersMeta" xml:space="preserve">
     <value>joueur(s)</value>
+  </data>
+  <data name="CreaturesCountLabel" xml:space="preserve">
+    <value>cr&#233;ature(s)</value>
+  </data>
+  <data name="ImportCreaturesBtnTitle" xml:space="preserve">
+    <value>Importer une ou plusieurs cr&#233;atures</value>
+  </data>
+  <data name="ExportCreaturesBtnTitle" xml:space="preserve">
+    <value>Exporter toutes les cr&#233;atures</value>
   </data>
 </root>

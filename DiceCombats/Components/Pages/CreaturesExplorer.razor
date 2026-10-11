@@ -13,111 +13,91 @@
 @inject NavigationManager Navigation
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
-@inject IDialogService DialogService
 @inject IStringLocalizer<Resources.Localization.CreaturesExplorer> Loc
 
-<style>
-    /* Card list with the same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
-    .dc-card {
-        border-radius: 12px;
-        background: #12201d;
-        border: 1px solid #24463f;
-        padding: 16px 18px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        transition: box-shadow 0.2s, border-color 0.2s;
-    }
+<h1 class="dc-h1">@Loc["ExplorerTitle"]</h1>
+<p class="dc-sub" style="margin-bottom:18px;">@Loc["ExplorerSubtitle"]</p>
 
-        .dc-card:hover {
-            box-shadow: 0 4px 16px rgba(255,255,255,0.08);
-            border-color: #3c7a6c;
-        }
-
-    .dc-card-clickable {
-        cursor: pointer;
-    }
-
-    .dc-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 10px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(-45deg, rgba(85,197,109,0.35), rgba(50,200,126,0.45), rgba(0,170,170,0.55), rgba(35,170,128,0.65));
-    }
-
-    .dc-body {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .dc-name {
-        font-weight: bold;
-        font-size: 15px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .dc-meta {
-        font-size: 12px;
-        color: grey;
-    }
-
-    .dc-cat-header {
-        font-size: 15px;
-        font-weight: bold;
-        color: #33bbb0;
-        border-bottom: 1px solid #24463f;
-        padding: 14px 4px 4px 4px;
-        margin: 4px 2px;
-    }
-
-    .dc-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 10px;
-        margin: 10px 2px 6px 2px;
-    }
-
-    .dc-empty {
-        color: grey;
-        padding: 20px;
-    }
-</style>
-
-<h3>@Loc["ExplorerTitle"]</h3>
-<MudText Typo="Typo.body2" Style="color:grey; margin-bottom:14px;">
-    @Loc["ExplorerSubtitle"]
-</MudText>
-
-<MudStack Row="true" Wrap="Wrap.Wrap" Style="gap:10px; margin-bottom:10px;">
-    <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" Color="@Color.Primary">@Loc["NewCreatureBtn"]</MudButton>
-    <MudButton OnClick="@(() => ExportAllCreatures())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Upload" Color="@Color.Primary">@Loc["ExportCreaturesBtn"]</MudButton>
-    <MudButton OnClick="@(() => ImportCreatures())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Download" Color="@Color.Primary">@Loc["ImportCreaturesBtn"]</MudButton>
-    <MudButton OnClick="@(() => PlayerGroupsModalRef?.Show())" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Groups2" Color="@Color.Primary">@Loc["PlayerGroupsBtn"]</MudButton>
-</MudStack>
-
-<div style="max-width:420px; margin-bottom:6px;">
-    <MudTextField T="string" Immediate="true" Value="@_search" ValueChanged="@((string v) => _search = v)"
-                  Label="@Loc["SearchCreature"]" Variant="Variant.Outlined" Clearable="true"
-                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+<div class="dc-irow dc-irow-wrap" style="gap:10px; margin-bottom:10px;">
+    <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Navigation.NavigateTo("/newcreature"))">
+        <DcIcon Name="add" />
+        @Loc["NewCreatureBtn"]
+    </button>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => ExportAllCreatures())" title="@Loc["ExportCreaturesBtnTitle"]">
+        <DcIcon Name="upload" />
+        @Loc["ExportCreaturesBtn"]
+    </button>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => ImportCreatures())" title="@Loc["ImportCreaturesBtnTitle"]">
+        <DcIcon Name="download" />
+        @Loc["ImportCreaturesBtn"]
+    </button>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => PlayerGroupsModalRef?.Show())">
+        <DcIcon Name="groups" />
+        @Loc["PlayerGroupsBtn"]
+    </button>
 </div>
 
-@RenderCreatureSection(false, Loc["CreaturesTitle"], Loc["NoCreatures"], Icons.Material.Filled.Pets)
-@RenderCreatureSection(true, Loc["PlayersTitle"], Loc["NoPlayers"], Icons.Material.Filled.Person)
+@* The search box draws its own trailing affordance: the magnifier while it is
+   empty, a clear button once there is something to clear. *@
+<div class="dc-field" style="max-width:420px; margin-bottom:6px;">
+    <label class="dc-flabel" for="creature-search">@Loc["SearchCreature"]</label>
+    <span style="position:relative;display:block;">
+        <input class="dc-inp" id="creature-search" type="text" spellcheck="false" style="padding-right:34px;"
+               value="@_search" @oninput="@(e => _search = e.Value?.ToString() ?? string.Empty)" />
+        @if (!string.IsNullOrEmpty(_search))
+        {
+            <button type="button" class="dc-ib" title="@Loc["CancelBtn"]"
+                    style="position:absolute;right:2px;top:50%;transform:translateY(-50%);width:28px;height:28px;"
+                    @onclick="@(() => _search = string.Empty)">
+                <DcIcon Name="close" Size="14" />
+            </button>
+        }
+        else
+        {
+            <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;">
+                <DcIcon Name="search" />
+            </span>
+        }
+    </span>
+</div>
+
+@* How many of each kind are listed below. *@
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:16px 2px 4px 2px;">
+    <span style="font-size:13px; color:var(--t2);">@CountLabel()</span>
+</div>
+
+@RenderCreatureSection(false, Loc["CreaturesTitle"], Loc["NoCreatures"], "pets")
+@RenderCreatureSection(true, Loc["PlayersTitle"], Loc["NoPlayers"], "person")
 
 <GenericModal TContent="PlayerGroupsEditor" @ref="PlayerGroupsModalRef" OnClose="OnPlayerGroupsModalClose">
     <PlayerGroupsEditor />
 </GenericModal>
 
+<DcConfirm @ref="_confirm" Destructive="true" />
+
 @code {
     private GenericModal<PlayerGroupsEditor>? PlayerGroupsModalRef;
 
+    private DcConfirm? _confirm;
+
     private string _search = string.Empty;
+
+    /// Counted separately, because "41 creatures" while four of them are
+    /// players contradicts the two sections right below it.
+    private string CountLabel()
+    {
+        var shown = CombatService.GetCreatureList().Where(Matches).ToList();
+        int players = shown.Count(c => c.IsPlayer);
+        int creatures = shown.Count - players;
+
+        var parts = new List<string> { $"{creatures} {Loc["CreaturesCountLabel"]}" };
+        if (players > 0)
+        {
+            parts.Add($"{players} {Loc["PlayersMeta"]}");
+        }
+
+        return string.Join(" \u00b7 ", parts);
+    }
 
     /// Case-insensitive substring match on the name, like the selector's search.
     private bool Matches(DCCreature creature) =>
@@ -127,12 +107,13 @@
     private void OnPlayerGroupsModalClose(bool result) => StateHasChanged();
 
     /// Both sections (monsters/NPCs and player characters) share the exact same
-    /// card anatomy; only the filter, heading and icon differ.
+    /// card anatomy; only the filter, heading and icon differ. `icon` is a
+    /// DcIcon name.
     private RenderFragment RenderCreatureSection(bool isPlayer, string title, string emptyText, string icon) => __builder =>
     {
         var creatures = CombatService.GetCreatureList().Where(x => x.IsPlayer == isPlayer && Matches(x)).ToList();
 
-        <div class="dc-cat-header" style="font-size:28px;">@title</div>
+        <h2 class="dc-h2" style="margin-top:22px;">@title</h2>
 
         if (creatures.Count == 0)
         {
@@ -143,29 +124,53 @@
             .GroupBy(c => InitialOf(c.Name))
             .OrderBy(g => g.Key, StringComparer.CurrentCulture))
         {
-            <div class="dc-cat-header">@group.Key</div>
-            <div class="dc-grid">
+            <div class="dc-alpha">@group.Key</div>
+            <div class="dc-grid-3">
                 @foreach (var creature in group.OrderBy(c => c.Name, StringComparer.CurrentCulture))
                 {
-                    var c = creature;
-                    <div class="dc-card dc-card-clickable" @onclick="() => Edit(c)">
-                        <div class="dc-icon">
-                            <MudIcon Icon="@icon" />
-                        </div>
-                        <div class="dc-body">
-                            <div class="dc-name">@c.Name</div>
-                            <div class="dc-meta">@MetaOf(c)</div>
-                        </div>
-                        <div @onclick:stopPropagation="true">
-                            <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["EditCreatureBtn"]" />
-                            <MudIconButton OnClick="() => ExportCreature(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["ExportCreatureBtn"]" />
-                            <MudIconButton OnClick="() => DeleteCreature(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["DeleteCreatureBtn"]" />
-                        </div>
-                    </div>
+                    @RenderCreatureStrip(creature, isPlayer, icon)
                 }
             </div>
         }
     };
+
+    /// One strip per creature, laid out three-up by .dc-grid-3. Not a
+    /// full-width row - the grid is what makes a long library readable.
+    private RenderFragment RenderCreatureStrip(DCCreature creature, bool isPlayer, string icon) => __builder =>
+    {
+        var c = creature;
+
+        <div class="dc-strip dc-clickable @KindClass(isPlayer)" @onclick="() => Edit(c)">
+            <div class="dc-tile">
+                <DcIcon Name="@icon" Size="24" />
+            </div>
+            <div class="dc-strip-body">
+                <div class="dc-strip-name">@c.Name</div>
+                <div class="dc-meta">@MetaOf(c)</div>
+            </div>
+            <div style="display:flex; gap:2px;" @onclick:stopPropagation="true">
+                @RenderCreatureActions(c)
+            </div>
+        </div>
+    };
+
+    /// Edit / export / delete.
+    private RenderFragment RenderCreatureActions(DCCreature creature) => __builder =>
+    {
+        var c = creature;
+
+        <button type="button" class="dc-ib" @onclick="() => Edit(c)" title="@Loc["EditCreatureBtn"]">
+            <DcIcon Name="edit" />
+        </button>
+        <button type="button" class="dc-ib" @onclick="() => ExportCreature(c)" title="@Loc["ExportCreatureBtn"]">
+            <DcIcon Name="upload" />
+        </button>
+        <button type="button" class="dc-ib dc-danger" @onclick="() => DeleteCreature(c)" title="@Loc["DeleteCreatureBtn"]">
+            <DcIcon Name="delete" Class="dc-i-danger" />
+        </button>
+    };
+
+    private static string KindClass(bool isPlayer) => isPlayer ? "dc-k-pc" : "dc-k-npc";
 
     /// Grouping key: the first letter, or "#" for names starting with anything else
     /// (digits, punctuation). The old 'a'..'z' loop silently hid those entries.
@@ -193,11 +198,13 @@
 
     private async Task DeleteCreature(DCCreature creature)
     {
-        bool? confirm = await DialogService.ShowMessageBoxAsync(
+        if (_confirm == null) return;
+
+        bool confirm = await _confirm.AskAsync(
             Loc["DeleteCreatureTitle"],
             string.Format(Loc["DeleteCreatureQuestion"], creature.Name),
-            yesText: Loc["DeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);
-        if (confirm != true) return;
+            Loc["DeleteConfirmBtn"], Loc["CancelBtn"]);
+        if (!confirm) return;
 
         CombatService.DeleteCreature(creature);
         CombatService.SaveCreatures();

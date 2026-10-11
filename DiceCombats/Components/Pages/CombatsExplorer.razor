@@ -12,112 +12,70 @@
 @inject DiceCombatsService CombatService
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
-@inject IDialogService DialogService
 @inject IStringLocalizer<Resources.Localization.CombatsExplorer> Loc
 
-<style>
-    /* Card list with the same anatomy as the DiceAudio scenes catalogue, teal/green theme. */
-    .dc-card {
-        border-radius: 12px;
-        background: #12201d;
-        border: 1px solid #24463f;
-        padding: 16px 18px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        cursor: pointer;
-        transition: box-shadow 0.2s, border-color 0.2s;
-    }
+<h1 class="dc-h1">@Loc["CombatsTitle"]</h1>
+<p class="dc-sub" style="margin-bottom:18px;">@Loc["CombatsSubtitle"]</p>
 
-        .dc-card:hover {
-            box-shadow: 0 4px 16px rgba(255,255,255,0.08);
-            border-color: #3c7a6c;
-        }
-
-    .dc-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 10px;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(-45deg, rgba(85,197,109,0.35), rgba(50,200,126,0.45), rgba(0,170,170,0.55), rgba(35,170,128,0.65));
-    }
-
-    .dc-body {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .dc-name {
-        font-weight: bold;
-        font-size: 15px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .dc-meta {
-        font-size: 12px;
-        color: grey;
-    }
-
-    .dc-cat-header {
-        font-size: 15px;
-        font-weight: bold;
-        color: #23aba0;
-        border-bottom: 1px solid #24463f;
-        padding: 14px 4px 4px 4px;
-        margin: 4px 2px;
-    }
-
-    .dc-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 10px;
-        margin: 10px 2px 6px 2px;
-    }
-
-    .dc-empty {
-        color: grey;
-        padding: 20px;
-    }
-</style>
-
-<h3>@Loc["CombatsTitle"]</h3>
-<MudText Typo="Typo.body2" Style="color:grey; margin-bottom:14px;">
-    @Loc["CombatsSubtitle"]
-</MudText>
-
-<MudStack Row="true" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center" Style="gap:10px; margin-bottom:10px;">
-    <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
-               Variant="Variant.Filled"
-               StartIcon="@Icons.Material.Filled.Add"
-               Color="@Color.Primary">
+<div class="dc-irow dc-irow-wrap" style="gap:10px; margin-bottom:10px;">
+    <button type="button" class="dc-btn dc-btn-fill" @onclick="@(() => Navigation.NavigateTo("/combatmanager/new"))">
+        <DcIcon Name="add" />
         @Loc["NewCombatBtn"]
-    </MudButton>
-    <MudButton OnClick="@(() => ExportAllCombats())"
-               Variant="Variant.Outlined"
-               StartIcon="@Icons.Material.Filled.Upload"
-               Color="@Color.Primary"
-               title="@Loc["ExportAllCombatsBtnTitle"]">
+    </button>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => ExportAllCombats())" title="@Loc["ExportAllCombatsBtnTitle"]">
+        <DcIcon Name="upload" />
         @Loc["ExportAllCombatsBtn"]
-    </MudButton>
-    <MudButton OnClick="@(() => ImportCombats())"
-               Variant="Variant.Outlined"
-               StartIcon="@Icons.Material.Filled.Download"
-               Color="@Color.Primary"
-               title="@Loc["ImportCombatsBtnTitle"]">
+    </button>
+    <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => ImportCombats())" title="@Loc["ImportCombatsBtnTitle"]">
+        <DcIcon Name="download" />
         @Loc["ImportCombatsBtn"]
-    </MudButton>
-    <MudSwitch @bind-Value="_showEditionButtons" Label="@Loc["ShowEditonBtnsToggle"]" Color="Color.Primary" />
-</MudStack>
+    </button>
+    @* The old MudSwitch, as the house toggle chip: it lights up while the
+       per-combat edition buttons are showing. *@
+    <button type="button" class="dc-tog @(_showEditionButtons ? "dc-on" : "")"
+            aria-pressed="@(_showEditionButtons ? "true" : "false")"
+            @onclick="@(() => _showEditionButtons = !_showEditionButtons)">
+        <DcIcon Name="tune" Size="14" />
+        @Loc["ShowEditonBtnsToggle"]
+    </button>
+</div>
 
-<div style="max-width:420px; margin-bottom:6px;">
-    <MudTextField T="string" Immediate="true" Value="@_search" ValueChanged="@((string v) => _search = v)"
-                  Label="@Loc["SearchCombat"]" Variant="Variant.Outlined" Clearable="true"
-                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
+@* The search box draws its own trailing affordance: the magnifier while it is
+   empty, a clear button once there is something to clear. *@
+<div class="dc-field" style="max-width:420px; margin-bottom:6px;">
+    <label class="dc-flabel" for="combat-search">@Loc["SearchCombat"]</label>
+    <span style="position:relative;display:block;">
+        <input class="dc-inp" id="combat-search" type="text" spellcheck="false" style="padding-right:34px;"
+               value="@_search" @oninput="@(e => _search = e.Value?.ToString() ?? string.Empty)" />
+        @if (!string.IsNullOrEmpty(_search))
+        {
+            <button type="button" class="dc-ib" title="@Loc["CancelBtn"]"
+                    style="position:absolute;right:2px;top:50%;transform:translateY(-50%);width:28px;height:28px;"
+                    @onclick="@(() => _search = string.Empty)">
+                <DcIcon Name="close" Size="14" />
+            </button>
+        }
+        else
+        {
+            <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;">
+                <DcIcon Name="search" />
+            </span>
+        }
+    </span>
+</div>
+
+@* Where you are in the campaign tree. *@
+<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:16px 2px 4px 2px;">
+    @if (_openCampaign == null)
+    {
+        <span style="font-size:13px; color:var(--t2);">@Loc["RootCrumb"]</span>
+    }
+    else
+    {
+        <span class="dc-crumb" @onclick="CloseCampaign">@Loc["RootCrumb"]</span>
+        <span style="color:var(--t4); font-size:13px;">/</span>
+        <span style="font-size:13px; color:var(--t2);">@_openCampaign</span>
+    }
 </div>
 
 @if (_openCampaign == null && !string.IsNullOrWhiteSpace(_search))
@@ -126,7 +84,7 @@
        are listed themselves, grouped under the campaign they belong to. *@
     var results = SearchResults();
 
-    <div class="dc-cat-header" style="font-size:28px;">@Loc["SearchResultsTitle"]</div>
+    <h2 class="dc-h2" style="margin-top:22px;">@Loc["SearchResultsTitle"]</h2>
 
     if (results.Count == 0)
     {
@@ -138,7 +96,7 @@
         .OrderBy(g => g.Key, StringComparer.CurrentCulture))
     {
         var campaign = group.Key;
-        <div class="dc-cat-header">
+        <h2 class="dc-h2" style="margin-top:18px;">
             @if (campaign.Length == 0)
             {
                 @Loc["NoCampaignTitle"]
@@ -146,11 +104,11 @@
             else
             {
                 <span style="cursor:pointer;" @onclick="() => OpenCampaign(campaign)">
-                    <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Style="font-size:16px; vertical-align:text-bottom;" />
+                    <DcIcon Name="folder-open" />
                     @campaign
                 </span>
             }
-        </div>
+        </h2>
         @RenderCombatGrid(group.OrderBy(c => c.Name, StringComparer.CurrentCulture).ToList())
     }
 }
@@ -160,61 +118,73 @@ else if (_openCampaign == null)
     var campaigns = CombatService.GetCampaigns();
     if (campaigns.Count > 0)
     {
-        <div class="dc-cat-header" style="font-size:28px;">@Loc["CampaignsTitle"]</div>
-        <div class="dc-grid">
+        <h2 class="dc-h2" style="margin-top:22px;">@Loc["CampaignsTitle"]</h2>
+        <div class="dc-grid-3">
             @foreach (string campaign in campaigns)
             {
                 var name = campaign;
                 var count = CombatService.GetCombatsOfCampaign(name).Count;
-                <div class="dc-card" @onclick="() => OpenCampaign(name)">
+                @* A campaign keeps the full brand gradient on its tile, so it
+                   never reads as a combat whatever the view. *@
+                <div class="dc-strip dc-clickable" @onclick="() => OpenCampaign(name)">
                     <div class="dc-icon">
-                        <MudIcon Icon="@Icons.Material.Filled.FolderOpen" />
+                        <DcIcon Name="folder-open" Size="24" />
                     </div>
-                    <div class="dc-body">
-                        <div class="dc-name">@name</div>
+                    <div class="dc-strip-body">
+                        <div class="dc-strip-name">@name</div>
                         <div class="dc-meta">@count @Loc["CombatsMeta"]</div>
                     </div>
-                    <MudIcon Icon="@Icons.Material.Filled.ChevronRight" Style="color:grey;" />
+                    <DcIcon Name="chevron-right" Size="20" Class="dc-i-muted" />
                 </div>
             }
         </div>
     }
 
-    <div class="dc-cat-header" style="font-size:28px;">@Loc["LooseCombatsTitle"]</div>
+    <h2 class="dc-h2" style="margin-top:22px;">@Loc["LooseCombatsTitle"]</h2>
     @RenderCombats(CombatService.GetCombatList().FindAll(x => string.IsNullOrWhiteSpace(x.Campaign)), Loc["NoCombats"])
 }
 else
 {
     @* Inside a campaign: only its combats, plus the way out and a rename. *@
-    <MudStack Row="true" AlignItems="AlignItems.Center" Style="gap:10px; margin:10px 0 0 0;">
-        <MudButton OnClick="CloseCampaign" Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.ArrowBack" Color="@Color.Primary">
+    <div class="dc-irow dc-irow-wrap" style="gap:10px; margin:10px 0 0 0; align-items:flex-end;">
+        <button type="button" class="dc-btn dc-btn-out" @onclick="CloseCampaign">
+            <DcIcon Name="arrow-back" />
             @Loc["BackBtn"]
-        </MudButton>
-        <MudIcon Icon="@Icons.Material.Filled.FolderOpen" Color="@Color.Primary" />
+        </button>
+        <DcIcon Name="folder-open" Size="20" Class="dc-i-accent" />
         @if (_renamingCampaign)
         {
-            @* Sized wrapper: the MudTextField root is width:100%, so as a bare flex
-               item it would eat the row and shove the confirm/cancel to the far right. *@
-            <div style="width:320px;">
-                <MudTextField T="string" @bind-Value="_campaignRename" Label="@Loc["CampaignName"]"
-                              Variant="Variant.Outlined" Immediate="true" />
+            @* Sized wrapper: .dc-inp is width:100%, so as a bare flex item it
+               would eat the row and shove the confirm/cancel to the far right. *@
+            <div class="dc-field" style="width:320px;">
+                <label class="dc-flabel" for="campaign-rename">@Loc["CampaignName"]</label>
+                <input class="dc-inp" id="campaign-rename" type="text" spellcheck="false"
+                       @bind="_campaignRename" @bind:event="oninput" />
             </div>
-            <MudIconButton Icon="@Icons.Material.Filled.Check" Color="@Color.Success"
-                           OnClick="ConfirmRenameCampaign" title="@Loc["RenameCampaignBtn"]" />
-            <MudIconButton Icon="@Icons.Material.Filled.Close"
-                           OnClick="@(() => _renamingCampaign = false)" title="@Loc["CancelBtn"]" />
+            <button type="button" class="dc-ib" @onclick="ConfirmRenameCampaign" title="@Loc["RenameCampaignBtn"]">
+                <DcIcon Name="check" Class="dc-i-accent" />
+            </button>
+            <button type="button" class="dc-ib" @onclick="@(() => _renamingCampaign = false)" title="@Loc["CancelBtn"]">
+                <DcIcon Name="close" />
+            </button>
         }
         else
         {
-            <MudText Typo="Typo.h6">@_openCampaign</MudText>
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" OnClick="StartRenameCampaign" title="@Loc["RenameCampaignBtn"]" />
+            <span style="font-size:17px;font-weight:700;color:var(--t1);">@_openCampaign</span>
+            <button type="button" class="dc-ib" @onclick="StartRenameCampaign" title="@Loc["RenameCampaignBtn"]">
+                <DcIcon Name="edit" />
+            </button>
         }
-    </MudStack>
+    </div>
 
     @RenderCombats(VisibleCombats(_openCampaign), Loc["NoCombatsInCampaign"])
 }
 
+<DcConfirm @ref="_confirm" Destructive="true" />
+
 @code {
+    private DcConfirm? _confirm;
+
     private bool _showEditionButtons;
 
     private string _search = string.Empty;
@@ -295,7 +265,7 @@ else
             .GroupBy(c => InitialOf(c.Name))
             .OrderBy(g => g.Key, StringComparer.CurrentCulture))
         {
-            <div class="dc-cat-header">@group.Key</div>
+            <div class="dc-alpha">@group.Key</div>
             @RenderCombatGrid(group.OrderBy(c => c.Name, StringComparer.CurrentCulture).ToList())
         }
     };
@@ -303,43 +273,91 @@ else
     /// The cards themselves, without any grouping of their own.
     private RenderFragment RenderCombatGrid(List<DCCombat> combats) => __builder =>
     {
-        <div class="dc-grid">
+        <div class="dc-grid-3">
             @foreach (DCCombat combat in combats)
             {
-                var c = combat;
-                var isFavorite = CombatService.IsCombatFavorite(c.Id.ToString());
-                <div class="dc-card" @onclick="@(() => Navigation.NavigateTo($"/combatmanager/{c.Id}"))">
-                    <div class="dc-icon">
-                        <MudIcon Icon="@Icons.Material.Filled.Shield" />
-                    </div>
-                    <div class="dc-body">
-                        <div class="dc-name">@c.Name</div>
-                        <div class="dc-meta">@MetaOf(c)</div>
-                    </div>
-                    <div @onclick:stopPropagation="true">
-                        <MudIconButton OnClick="() => ToggleFavorite(c)"
-                                       Icon="@(isFavorite ? Icons.Material.Filled.Star : Icons.Material.Filled.StarBorder)"
-                                       Color="@(isFavorite ? Color.Warning : Color.Default)"
-                                       title="@Loc["FavoriteBtn"]" />
-                        @if (_showEditionButtons)
-                        {
-                            <MudIconButton OnClick="() => Edit(c)" Icon="@Icons.Material.Filled.Edit" title="@Loc["CombatEditBtn"]" />
-                            <MudIconButton OnClick="() => ExportCombat(c)" Icon="@Icons.Material.Filled.Upload" title="@Loc["CombatExportBtn"]" />
-                            <MudIconButton OnClick="() => DeleteCombat(c)" Icon="@Icons.Material.Filled.Delete" Color="@Color.Error" title="@Loc["CombatDeleteBtn"]" />
-                        }
-                    </div>
-                </div>
+                @RenderCombatStrip(combat)
             }
         </div>
     };
 
+    /// One strip per combat, laid out three-up by .dc-grid-3.
+    ///
+    /// Third row: the opposition. Two combats that both say "7 creature(s)"
+    /// are told apart by what is in them, not by the count, so the roster is
+    /// on the entry rather than behind a click. It stays on one line and
+    /// scrolls sideways when it does not fit, so every strip in the grid keeps
+    /// the same height.
+    private RenderFragment RenderCombatStrip(DCCombat combat) => __builder =>
+    {
+        var c = combat;
+        var roster = DCCombatRoster.Of(c);
+        var players = DCCombatRoster.PlayerCount(c);
+
+        <div class="dc-strip dc-clickable dc-k-npc"
+             @onclick="@(() => Navigation.NavigateTo($"/combatmanager/{c.Id}"))">
+            <div class="dc-tile">
+                <DcIcon Name="shield" Size="24" />
+            </div>
+            <div class="dc-strip-body">
+                <div class="dc-strip-name">@c.Name</div>
+                <div class="dc-meta">@MetaOf(c, players)</div>
+                @if (roster.Count > 0)
+                {
+                    <div class="dc-roster">
+                        <div class="dc-roster-track">
+                            @foreach (var entry in roster)
+                            {
+                                <span class="dc-mini">
+                                    <span class="dc-dot"></span>
+                                    @entry.Name
+                                    <b>&times;@entry.Count</b>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            <div style="display:flex; gap:2px;" @onclick:stopPropagation="true">
+                @RenderCombatActions(c)
+            </div>
+        </div>
+    };
+
+    /// Pin, and the edition buttons when the toolbar switch is on.
+    private RenderFragment RenderCombatActions(DCCombat combat) => __builder =>
+    {
+        var c = combat;
+        var isPinned = CombatService.IsCombatPinned(c.Id.ToString());
+
+        @* One mark instead of two icons: solid and accented while the combat
+           is pinned, hollow and quiet while it is not. *@
+        <button type="button" class="dc-ib" @onclick="() => TogglePinned(c)" title="@Loc["PinnedBtn"]">
+            <DcIcon Name="pin" Filled="@isPinned" Class="@(isPinned ? "dc-i-accent" : null)" />
+        </button>
+        @if (_showEditionButtons)
+        {
+            <button type="button" class="dc-ib" @onclick="() => Edit(c)" title="@Loc["CombatEditBtn"]">
+                <DcIcon Name="edit" />
+            </button>
+            <button type="button" class="dc-ib" @onclick="() => ExportCombat(c)" title="@Loc["CombatExportBtn"]">
+                <DcIcon Name="upload" />
+            </button>
+            <button type="button" class="dc-ib dc-danger" @onclick="() => DeleteCombat(c)" title="@Loc["CombatDeleteBtn"]">
+                <DcIcon Name="delete" Class="dc-i-danger" />
+            </button>
+        }
+    };
+
     private async Task DeleteCombat(DCCombat combat)
     {
-        bool? confirm = await DialogService.ShowMessageBoxAsync(
+        if (_confirm == null) return;
+
+        bool confirm = await _confirm.AskAsync(
             Loc["DeleteCombatTitle"],
             string.Format(Loc["DeleteCombatQuestion"], combat.Name),
-            yesText: Loc["DeleteConfirmBtn"], cancelText: Loc["CancelBtn"]);
-        if (confirm != true) return;
+            Loc["DeleteConfirmBtn"], Loc["CancelBtn"]);
+        if (!confirm) return;
 
         CombatService.DeleteCombat(combat);
         CombatService.SaveCombats();
@@ -362,12 +380,19 @@ else
         return char.IsLetter(first) ? first.ToString() : "#";
     }
 
-    private string MetaOf(DCCombat combat)
+    /// The party is counted rather than listed: every combat has roughly the
+    /// same party, so listing it would drown out the opposition.
+    private string MetaOf(DCCombat combat, int players)
     {
         var parts = new List<string>
         {
-            $"{combat.CreaturesList.Count} {Loc["CreaturesMeta"]}"
+            $"{DCCombatRoster.CreatureCount(combat)} {Loc["CreaturesMeta"]}"
         };
+
+        if (players > 0)
+        {
+            parts.Add($"{players} {Loc["PlayersMeta"]}");
+        }
 
         if (combat.DurationCount > 0)
         {
@@ -377,16 +402,16 @@ else
         return string.Join(" · ", parts);
     }
 
-    private void ToggleFavorite(DCCombat combat)
+    private void TogglePinned(DCCombat combat)
     {
         var guid = combat.Id.ToString();
-        if (CombatService.IsCombatFavorite(guid))
+        if (CombatService.IsCombatPinned(guid))
         {
-            CombatService.RemoveCombatToFavoriteByGUID(guid);
+            CombatService.RemoveCombatFromPinnedByGUID(guid);
         }
         else
         {
-            CombatService.AddCombatToFavoriteByGUID(guid);
+            CombatService.AddCombatToPinnedByGUID(guid);
         }
         StateHasChanged();
     }

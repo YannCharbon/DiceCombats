@@ -2,8 +2,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background-color: #202020;
-    color: white;
+    background-color: var(--s0);
+    color: var(--t2);
 }
 
 main {

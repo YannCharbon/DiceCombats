@@ -1,4 +1,4 @@
-using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
+﻿using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
 using System.Diagnostics;
 using System.Globalization;
 using Application = Microsoft.Maui.Controls.Application;
@@ -22,7 +22,11 @@ namespace DiceCombats
         // through the window now.
         protected override Microsoft.Maui.Controls.Window CreateWindow(IActivationState? activationState)
         {
-            return new Microsoft.Maui.Controls.Window(new MainPage());
+            // The caption is hidden because the web page draws the title bar,
+            // but Windows still reads the window Title for the taskbar tooltip,
+            // Alt+Tab and the window list. Without it the app showed its icon
+            // there with no name beside it.
+            return new Microsoft.Maui.Controls.Window(new MainPage()) { Title = "DiceCombats" };
         }
 
         public void SetCultureAndReload(string cultureCode)

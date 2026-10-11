@@ -20,7 +20,7 @@
     right: 0;
     z-index: 10050;
     height: 150px;
-    background-color:#0D0D0D;
+    background-color:var(--s0);
     box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
     color: white;
     padding:10px;
@@ -47,13 +47,23 @@
     .popup-message {
     font-size: 18px;
     }
+
+    /* The icon used to carry MudBlazor's Color.Error / Color.Success. It is a
+       stroked line now, so the colour comes from the wrapper it sits in. */
+    .popup-ico {
+    display: inline-flex;
+    vertical-align: -0.18em;
+    }
+
+    .popup-ico-bad { color: var(--danger); }
+    .popup-ico-good { color: var(--a1); }
 </style>
 
 <div class="popup-frame popup-frame-width" style="@(_showModal ? "display:block;" : "display:none;")">
     @if (Type == PopupNotificationService.Type.FAILURE) {
-        <div class="popup-title"><MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" Title="Favorite" />&nbsp;@Title</div>
+        <div class="popup-title"><span class="popup-ico popup-ico-bad"><DcIcon Name="error" Size="26" /></span>&nbsp;@Title</div>
     } else {
-        <div class="popup-title"><MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Title="Favorite" />&nbsp;@Title</div>
+        <div class="popup-title"><span class="popup-ico popup-ico-good"><DcIcon Name="check-circle" Size="26" /></span>&nbsp;@Title</div>
     }
     <div class="popup-message">@Message</div>
 </div>

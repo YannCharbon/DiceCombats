@@ -28,8 +28,8 @@
         margin-bottom: 15px;
         padding:10px;
         border-radius:10px;
-        background-color:#0F0F0F;
-        box-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+        background-color:var(--s0);
+        border: 1px solid var(--b1);
         max-height: 250px;
         overflow-y: auto;
     }
@@ -65,18 +65,18 @@
 <div class="welcome-body">
     @if (UpdateAvailable)
     {
-        <h5>DiceCombats <b>@UpdateInfos?.tag_name</b> @Loc["IsAvailable"].</h5>
+        <p class="dc-strip-name" style="margin:0 0 6px;">DiceCombats <b>@UpdateInfos?.tag_name</b> @Loc["IsAvailable"].</p>
         <br />
         @if (CombatService.IsCurrentCulture("fr")) {
-            <h5>Se rendre sur <a style="color:darkcyan;" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> pour télécharger la mise à jour. Si vous souhaitez le faire plus tard, veuillez vous rendre dans les paramètres.</h5>
+            <p class="dc-meta" style="margin:0;">Se rendre sur <a class="dc-crumb" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> pour télécharger la mise à jour. Si vous souhaitez le faire plus tard, veuillez vous rendre dans les paramètres.</p>
         } else {
-            <h5>Visit <a style="color:darkcyan;" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> to download the update or go to app settings if you want to do it later.</h5>
+            <p class="dc-meta" style="margin:0;">Visit <a class="dc-crumb" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> to download the update or go to app settings if you want to do it later.</p>
         }
     } else
     {
         @if (!NewVersion)
         {
-            <h3>@Loc["KeyFeatures"]</h3>
+            <h3 class="dc-h2">@Loc["KeyFeatures"]</h3>
             <p>@Loc["KeyFeaturesDescription"]</p>
             <ul>
                 <li>@((MarkupString)Loc["KeyFeature1"].Value)</li>
@@ -91,11 +91,11 @@
                 @((MarkupString)_releaseNotes)
             </div>
         }
-        <h3>@Loc["License"]</h3>
-        <p>@((MarkupString)Loc["LicenseDescription"].Value) <a href="https://github.com/YannCharbon/DiceCombats" style="color:white;" target="_blank"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Title="GitHub" />&nbsp;GitHub</a>.</p>
-        <h3>@Loc["SupportProject"]</h3>
+        <h3 class="dc-h2">@Loc["License"]</h3>
+        <p>@((MarkupString)Loc["LicenseDescription"].Value) <a href="https://github.com/YannCharbon/DiceCombats" class="dc-crumb" target="_blank"><DcIcon Name="github" title="GitHub" />&nbsp;GitHub</a>.</p>
+        <h3 class="dc-h2">@Loc["SupportProject"]</h3>
         <p>
-            @Loc["SupportProjectDescription1"] <a href="https://github.com/YannCharbon/DiceCombats" style="color:white;" target="_blank"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Title="GitHub" />&nbsp;GitHub</a>.
+            @Loc["SupportProjectDescription1"] <a href="https://github.com/YannCharbon/DiceCombats" class="dc-crumb" target="_blank"><DcIcon Name="github" title="GitHub" />&nbsp;GitHub</a>.
             @Loc["SupportProjectDescription2"]
         </p>
         <p>@Loc["DonationDescription"]</p>

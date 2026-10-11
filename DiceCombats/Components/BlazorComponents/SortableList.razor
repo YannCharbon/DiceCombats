@@ -13,7 +13,7 @@
 
 @typeparam T
 
-<div id="@Id">
+<div id="@Id" class="@Class">
     @foreach (var item in Items)
     {
         @if (SortableItemTemplate is not null)
@@ -24,6 +24,13 @@
 </div>
 
 @code {
+
+    /// Classes for the container the items are dropped into. Without this the
+    /// caller cannot lay the items out at all: the sortable div sits between the
+    /// caller's wrapper and the items, so a flex/grid wrapper outside it has no
+    /// effect on them.
+    [Parameter]
+    public string? Class { get; set; }
 
     [Parameter]
     public RenderFragment<T>? SortableItemTemplate { get; set; }

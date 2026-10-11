@@ -145,7 +145,7 @@
     <value />
   </data>
   <data name="ShowEditonBtnsToggle" xml:space="preserve">
-    <value>Show edition buttons</value>
+    <value>Show edit buttons</value>
   </data>
   <data name="CombatsTitle" xml:space="preserve">
     <value>Combats</value>
@@ -162,8 +162,8 @@
   <data name="RoundsMeta" xml:space="preserve">
     <value>round(s)</value>
   </data>
-  <data name="FavoriteBtn" xml:space="preserve">
-    <value>Favorite</value>
+  <data name="PinnedBtn" xml:space="preserve">
+    <value>Pin</value>
   </data>
   <data name="SearchCombat" xml:space="preserve">
     <value>Search a combat</value>
@@ -187,7 +187,7 @@
     <value>Campaigns</value>
   </data>
   <data name="LooseCombatsTitle" xml:space="preserve">
-    <value>Combats</value>
+    <value>Combats with no campaign</value>
   </data>
   <data name="CombatsMeta" xml:space="preserve">
     <value>combat(s)</value>
@@ -209,5 +209,11 @@
   </data>
   <data name="NoCampaignTitle" xml:space="preserve">
     <value>No campaign</value>
+  </data>
+  <data name="RootCrumb" xml:space="preserve">
+    <value>Root</value>
+  </data>
+  <data name="PlayersMeta" xml:space="preserve">
+    <value>player(s)</value>
   </data>
 </root>

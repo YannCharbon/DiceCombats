@@ -24,7 +24,7 @@ namespace DiceCombats
     {
         private List<DCCreature> _CreatureList = new List<DCCreature>();
         private List<DCCombat> _CombatsList = new List<DCCombat>();
-        private List<string> _favoriteCombats = new List<string>();
+        private List<string> _pinnedCombats = new List<string>();
         private List<DCCreatureCustomField> _userCreatureCustomFields = new List<DCCreatureCustomField>();
         private List<DCPlayerGroup> _playerGroups = new List<DCPlayerGroup>();
         private List<DCCombatLogSession> _combatLogs = new List<DCCombatLogSession>();
@@ -33,7 +33,7 @@ namespace DiceCombats
         {
             _ = LoadCreatureListAsync();
             _ = LoadCombatsListAsync();
-            _ = LoadFavoriteCombatsListAsync();
+            _ = LoadPinnedCombatsListAsync();
             _ = LoadUserCreatureCustomFieldsListAsync();
             _ = LoadPlayerGroupsListAsync();
             _ = LoadCombatLogsListAsync();
@@ -206,60 +206,83 @@ namespace DiceCombats
             SaveCombats();
         }
 
-        public void AddCombatToFavoriteByGUID(string guid)
+        public void AddCombatToPinnedByGUID(string guid)
         {
-            if (_favoriteCombats.Contains(guid) == false)
+            if (_pinnedCombats.Contains(guid) == false)
             {
-                _favoriteCombats.Add(guid);
-                _ = SaveFavoriteCombatsListAsync();
+                _pinnedCombats.Add(guid);
+                _ = SavePinnedCombatsListAsync();
             }
         }
 
-        public void RemoveCombatToFavoriteByGUID(string guid)
+        public void RemoveCombatFromPinnedByGUID(string guid)
         {
-            if (_favoriteCombats.Contains(guid) == true)
+            if (_pinnedCombats.Contains(guid) == true)
             {
-                _favoriteCombats.Remove(guid);
-                _ = SaveFavoriteCombatsListAsync();
+                _pinnedCombats.Remove(guid);
+                _ = SavePinnedCombatsListAsync();
             }
         }
 
-        public bool IsCombatFavorite(string guid)
+        public bool IsCombatPinned(string guid)
         {
-            return _favoriteCombats.Contains(guid);
+            return _pinnedCombats.Contains(guid);
         }
 
-        public List<string> GetFavoriteCombatsGuids()
+        public List<string> GetPinnedCombatsGuids()
         {
-            foreach (var guid in _favoriteCombats.ToArray())
+            foreach (var guid in _pinnedCombats.ToArray())
             if (GetCombatFromGUID(guid) == null)
             {
                 // Update the list if anything has changed
-                RemoveCombatToFavoriteByGUID(guid);
+                RemoveCombatFromPinnedByGUID(guid);
             }
-            return _favoriteCombats;
+            return _pinnedCombats;
         }
 
-        private static string favoriteCombatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "favoritesCombats.json");
+        private static string pinnedCombatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "pinnedCombats.json");
 
-        public async Task SaveFavoriteCombatsListAsync()
+        // Pinned combats used to be called "favorites" and were stored under this
+        // name. It is only ever read, once, by LoadPinnedCombatsListAsync when the
+        // new file is missing, so that users who pinned combats before the rename
+        // keep them. The legacy file is deliberately left on disk: if the user ever
+        // downgrades, it is their only copy of the list.
+        private static string legacyFavoriteCombatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "favoritesCombats.json");
+
+        public async Task SavePinnedCombatsListAsync()
         {
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
             };
-            string json = JsonSerializer.Serialize(_favoriteCombats, options);
-            await File.WriteAllTextAsync(favoriteCombatsFilePath, json);
-            Debug.WriteLine($"Write file to {favoriteCombatsFilePath}");
+            string json = JsonSerializer.Serialize(_pinnedCombats, options);
+            await File.WriteAllTextAsync(pinnedCombatsFilePath, json);
+            Debug.WriteLine($"Write file to {pinnedCombatsFilePath}");
         }
 
-        public async Task LoadFavoriteCombatsListAsync()
+        public async Task LoadPinnedCombatsListAsync()
         {
-            if (File.Exists(favoriteCombatsFilePath))
+            bool fromLegacyFile = false;
+            string? path = null;
+
+            if (File.Exists(pinnedCombatsFilePath))
             {
                 Debug.WriteLine("File exists");
-                string json = await File.ReadAllTextAsync(favoriteCombatsFilePath);
+                path = pinnedCombatsFilePath;
+            }
+            else if (File.Exists(legacyFavoriteCombatsFilePath))
+            {
+                // Migration: the list was saved before pinned combats were called
+                // pinned. Read it from the old name and write it to the new one.
+                Debug.WriteLine($"Legacy file exists, migrating {legacyFavoriteCombatsFilePath} to {pinnedCombatsFilePath}");
+                path = legacyFavoriteCombatsFilePath;
+                fromLegacyFile = true;
+            }
+
+            if (path != null)
+            {
+                string json = await File.ReadAllTextAsync(path);
                 var options = new JsonSerializerOptions
                 {
                     DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
@@ -267,7 +290,15 @@ namespace DiceCombats
                 var temp = JsonSerializer.Deserialize<List<string>>(json, options);
                 if (temp != null)
                 {
-                    _favoriteCombats = temp;
+                    _pinnedCombats = temp;
+                }
+
+                if (fromLegacyFile)
+                {
+                    // Write straight away so the new path becomes the source of
+                    // truth even if the app is killed before the next save. The
+                    // legacy file is left untouched on purpose.
+                    await SavePinnedCombatsListAsync();
                 }
             }
         }

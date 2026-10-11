@@ -14,9 +14,9 @@
 
 <style>
     .CombatEditorCreatureBox {
-        background-color: #2A2A2A;
+        background-color: var(--s3);
         box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
-        border: 1px solid #505050;
+        border: 1px solid var(--b1);
         border-radius: 10px;
         /* Column flex so the creature list below the search/quick-add controls
            takes exactly the leftover height instead of a hardcoded one, which
@@ -52,133 +52,169 @@
     }
 </style>
 
-@* AlignItems.Center: without it the row stretches the buttons to the height of
+@* align-items:center: without it the row stretches the buttons to the height of
    the tallest field, which made them look bulky next to the campaign picker. *@
-<MudStack Row="true" Style="padding-bottom:20px;" Wrap="Wrap.Wrap" AlignItems="AlignItems.Center">
-    <MudTextField Label="Combat name" Variant="Variant.Outlined" T="string" @bind-Value="Combat.Name"></MudTextField>
-    @* Free text: picking an existing campaign or typing a brand new one both
-       just set the combat's Campaign, and clearing it takes the combat back out. *@
-    <MudAutocomplete T="string" Label="@Loc["Campaign"]" Variant="Variant.Outlined"
-                     Value="@Combat.Campaign" ValueChanged="@((string v) => SetCampaign(v))"
-                     SearchFunc="@SearchCampaigns" CoerceValue="true" Clearable="true"
-                     Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.FolderOpen"
-                     Placeholder="@Loc["CampaignHelper"]" />
-    <MudButton OnClick="SyncCreatures" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Sync" IconColor="Color.Primary" title="@Loc["UpdateCreaturesBtnTitle"]" Size="Size.Large">@Loc["UpdateCreatureBtn"]</MudButton>
-    <MudButton OnClick="DeleteCombat" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" IconColor="Color.Secondary" Size="Size.Large">@Loc["DeleteCombatBtn"]</MudButton>
-</MudStack>
+<div class="dc-irow dc-irow-wrap" style="padding-bottom:20px;align-items:flex-end;">
+    <div class="dc-field" style="min-width:200px;">
+        <label class="dc-flabel" for="combat-name">@Loc["CombatNameLabel"]</label>
+        <input class="dc-inp" id="combat-name" type="text" spellcheck="false" @bind="Combat.Name" />
+    </div>
 
-<MudGrid>
-    <MudItem sm="7">
-        <div class="CombatEditorCreatureBox">
-            <h2>@Loc["Title"]</h2>
-            <div style="padding-bottom:10px;">
-                <MudTextField Immediate="true" T="string" ValueChanged="@UpdateCreatureSearchList" Label="@Loc["SearchCreature"]" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" />
-            </div>
-            @* Quick add: drop a whole party in at once instead of ticking players one by one. *@
-            @if (CombatService.GetPlayerGroups().Count > 0)
+    @* Free text with suggestions: picking an existing campaign or typing a brand
+       new one both just set the combat's Campaign, and clearing it takes the
+       combat back out. A datalist gives the suggestions without MudAutocomplete. *@
+    <div class="dc-field" style="min-width:220px;position:relative;">
+        <label class="dc-flabel" for="combat-campaign">@Loc["Campaign"]</label>
+        <input class="dc-inp" id="combat-campaign" type="text" list="dc-campaigns" spellcheck="false"
+               placeholder="@Loc["CampaignHelper"]" value="@Combat.Campaign"
+               @onchange="@(e => SetCampaign(e.Value?.ToString() ?? string.Empty))" />
+        <datalist id="dc-campaigns">
+            @foreach (var c in CombatService.GetCampaigns())
             {
-                <div style="padding-bottom:10px;">
-                    <MudMenu Label="@Loc["QuickAddGroupBtn"]" Variant="Variant.Filled" Color="@Color.Primary"
-                             StartIcon="@Icons.Material.Filled.GroupAdd" Dense="true">
-                        @foreach (DCPlayerGroup group in CombatService.GetPlayerGroups())
+                <option value="@c"></option>
+            }
+        </datalist>
+    </div>
+
+    <button type="button" class="dc-btn dc-btn-out" @onclick="SyncCreatures" title="@Loc["UpdateCreaturesBtnTitle"]">
+        <DcIcon Name="sync" /> @Loc["UpdateCreatureBtn"]
+    </button>
+    <button type="button" class="dc-btn dc-btn-danger" @onclick="DeleteCombat">
+        <DcIcon Name="delete" /> @Loc["DeleteCombatBtn"]
+    </button>
+</div>
+
+<div class="dc-selgrid">
+    <div class="CombatEditorCreatureBox">
+        <h2 class="dc-h2">@Loc["Title"]</h2>
+
+        <div class="dc-field" style="padding-bottom:10px;">
+            <label class="dc-flabel" for="creature-search">@Loc["SearchCreature"]</label>
+            <span style="position:relative;display:block;">
+                <input class="dc-inp" id="creature-search" type="text" spellcheck="false"
+                       style="padding-right:32px;"
+                       @oninput="@(e => UpdateCreatureSearchList(e.Value?.ToString() ?? string.Empty))" />
+                <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);color:var(--t3);pointer-events:none;">
+                    <DcIcon Name="search" />
+                </span>
+            </span>
+        </div>
+
+        @* Quick add: drop a whole party in at once instead of ticking players one by one.
+           Up to three parties read as chips, which is one click each. Past that the
+           chips would wrap into several rows and eat the creature list below them, so
+           they collapse into a picker whose height never changes however many groups
+           exist — and a native select brings its own scrolling and typeahead. *@
+        @{
+            var playerGroups = CombatService.GetPlayerGroups();
+        }
+        @if (playerGroups.Count > 0)
+        {
+            <div class="dc-irow dc-irow-wrap" style="padding-bottom:10px;">
+                <span class="dc-flabel"><DcIcon Name="group-add" /> @Loc["QuickAddGroupBtn"]</span>
+                @if (playerGroups.Count <= 3)
+                {
+                    @foreach (DCPlayerGroup group in playerGroups)
+                    {
+                        var g = group;
+                        var members = CombatService.GetPlayerGroupMembers(g);
+                        <button type="button" class="dc-tog" @onclick="() => AddPlayerGroup(g)">
+                            @(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name) (@members.Count)
+                        </button>
+                    }
+                }
+                else
+                {
+                    <select class="dc-inp" style="width:auto;flex:1 1 150px;min-width:0;max-width:240px;"
+                            aria-label="@Loc["QuickAddGroupBtn"]" @bind="_quickGroupId">
+                        <option value="">&#8212;</option>
+                        @foreach (DCPlayerGroup group in playerGroups)
                         {
                             var g = group;
                             var members = CombatService.GetPlayerGroupMembers(g);
-                            <MudMenuItem OnClick="() => AddPlayerGroup(g)">
-                                @(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name) (@members.Count)
-                            </MudMenuItem>
+                            <option value="@g.Id">@(string.IsNullOrWhiteSpace(g.Name) ? Loc["UnnamedPlayerGroup"] : g.Name) (@members.Count)</option>
                         }
-                    </MudMenu>
-                </div>
-            }
-            <div class="CombatEditorCreatureList">
-                @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.Name))
-                {
-                    @if (creature.IsPlayer)
-                    {
-                        <MudGrid>
-                            <MudItem sm="4">
-                                <MudIcon Icon="@Icons.Material.Filled.Person" Title="@Loc["Player"]" />&nbsp;<span>@creature.Name</span>
-                            </MudItem>
-
-                            @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
-                            {
-                                <MudItem sm="3">
-                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">@Loc["Add"]</MudButton>
-                                </MudItem>
-                            }
-                            else
-                            {
-                                <MudItem sm="3">
-                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">@Loc["Remove"]</MudButton>
-                                </MudItem>
-                                <MudItem sm="4">
-                                    <span>@Loc["Added"] <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
-                                </MudItem>
-                            }
-
-                        </MudGrid>
-                        <MudDivider />
-                    }
-                }
-                @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.Name))
-                {
-                    @if (!creature.IsPlayer)
-                    {
-                        <MudGrid>
-                            <MudItem sm="4">
-                                <span>@creature.Name</span>
-                            </MudItem>
-
-                            @if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
-                            {
-                                <MudItem sm="3">
-                                    <MudButton OnClick="() => AddCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add" IconColor="Color.Primary" Size="Size.Large">@Loc["Add"]</MudButton>
-                                </MudItem>
-                            }
-                            else
-                            {
-                                <MudItem sm="3">
-                                    <MudButton OnClick="() => RemoveCreature(creature)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Remove" IconColor="Color.Secondary" Size="Size.Large">@Loc["Remove"]</MudButton>
-                                </MudItem>
-                                <MudItem sm="4">
-                                    <span>@Loc["Added"] <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" /></span>
-                                </MudItem>
-                            }
-
-                        </MudGrid>
-                        <MudDivider />
-                    }
+                    </select>
+                    <button type="button" class="dc-btn dc-btn-fill" style="min-height:32px;padding:0 12px;"
+                            disabled="@(_quickGroupId.Length == 0)" @onclick="AddSelectedPlayerGroup">
+                        <DcIcon Name="add" /> @Loc["Add"]
+                    </button>
                 }
             </div>
+        }
+
+        <div class="CombatEditorCreatureList">
+            @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.IsPlayer ? 0 : 1).ThenBy(x => x.Name))
+            {
+                var c = creature;
+                var inCombat = Combat.CreaturesList.Find(x => x.Name == c.Name) != null;
+                <div class="dc-selrow">
+                    <span class="dc-selname">
+                        @if (c.IsPlayer)
+                        {
+                            <span title="@Loc["Player"]" style="color:var(--a2);display:inline-flex;"><DcIcon Name="person" /></span>
+                        }
+                        @c.Name
+                    </span>
+
+                    @if (!inCombat)
+                    {
+                        <button type="button" class="dc-btn dc-btn-fill" @onclick="() => AddCreature(c)">
+                            <DcIcon Name="add" /> @Loc["Add"]
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="dc-tag" style="color:var(--a1);border-color:var(--a1);">
+                            <DcIcon Name="check-circle" /> @Loc["Added"]
+                        </span>
+                        <button type="button" class="dc-btn dc-btn-danger" @onclick="() => RemoveCreature(c)">
+                            <DcIcon Name="remove" /> @Loc["Remove"]
+                        </button>
+                    }
+                </div>
+            }
         </div>
-    </MudItem>
-    <MudItem sm="4">
-        <div class="CombatEditorCreatureBox" style="overflow-y: scroll; overflow-x: hidden;">
-            <SortableList Id="creaturesSortable" Items="Combat.CreaturesList" OnUpdate="@SortCreaturesList" Context="creature">
-                 <SortableItemTemplate>
-                    <div style="display:flex; justify-content: space-between; user-select: none; background-color:#2A2A2A; cursor: move;">
-                        <div>
-                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleUp" title="@Loc["MoveUp"]" OnClick="() => Combat.MoveCreature(creature, true)"></MudIconButton>
-                            <MudIconButton Style="margin:-5px;padding:-5px;" Icon="@Icons.Material.Filled.ArrowCircleDown" title="@Loc["MoveDown"]" OnClick="() => Combat.MoveCreature(creature, false)"></MudIconButton>
-                        </div>
-                        <div>
-                            <span>@creature.Name</span>
-                        </div>
-                        <div style="width: 100px;">
-                            <MudNumericField T="uint" Min="1" Value="creature.InCombatInstanceCount" ValueChanged="(args) => Combat.UpdateInstanceCount(args, creature)" Label="@Loc["Instances"]" Variant="Variant.Outlined"></MudNumericField>
-                        </div>
-                    </div>
-                 </SortableItemTemplate>
-             </SortableList>
-        </div>
-    </MudItem>
-</MudGrid>
+    </div>
+
+    <div class="CombatEditorCreatureBox" style="overflow-y:auto; overflow-x:hidden;">
+        @* The whole row is the drag handle here, so the arrows stay: they are the
+           click and keyboard path to the same reorder. *@
+        <SortableList Id="creaturesSortable" Items="Combat.CreaturesList" OnUpdate="@SortCreaturesList" Context="creature">
+            <SortableItemTemplate>
+                <div class="dc-selorder">
+                    <span class="dc-irow" style="gap:2px;">
+                        <button type="button" class="dc-ib" title="@Loc["MoveUp"]" aria-label="@Loc["MoveUp"]"
+                                @onclick="() => Combat.MoveCreature(creature, true)"><DcIcon Name="circle-up" /></button>
+                        <button type="button" class="dc-ib" title="@Loc["MoveDown"]" aria-label="@Loc["MoveDown"]"
+                                @onclick="() => Combat.MoveCreature(creature, false)"><DcIcon Name="circle-down" /></button>
+                    </span>
+
+                    <span class="dc-selname">@creature.Name</span>
+
+                    <span class="dc-step" title="@Loc["Instances"]">
+                        <button type="button" aria-label="@Loc["Instances"]"
+                                @onclick="() => Combat.UpdateInstanceCount(creature.InCombatInstanceCount > 1 ? creature.InCombatInstanceCount - 1 : 1, creature)">&minus;</button>
+                        <input class="dc-num" type="number" min="1" value="@creature.InCombatInstanceCount"
+                               aria-label="@Loc["Instances"]"
+                               @onchange="@(e => Combat.UpdateInstanceCount(ParseCount(e.Value), creature))" />
+                        <button type="button" aria-label="@Loc["Instances"]"
+                                @onclick="() => Combat.UpdateInstanceCount(creature.InCombatInstanceCount + 1, creature)">+</button>
+                    </span>
+                </div>
+            </SortableItemTemplate>
+        </SortableList>
+    </div>
+</div>
 
 @code {
     [Parameter] public DCCombat Combat { get; set; } = default!;
 
     private List<DCCreature> creatureSearchList = new List<DCCreature>();
+
+    /// The group picked in the collapsed quick-add row, held as the raw option
+    /// value so the empty placeholder is representable.
+    private string _quickGroupId = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -221,14 +257,26 @@
         Combat.Campaign = (campaign ?? string.Empty).Trim();
     }
 
-    private Task<IEnumerable<string>> SearchCampaigns(string value, CancellationToken token)
+    /// The instance box hands back raw text; a blank or a zero lands on 1,
+    /// which is what MudNumericField Min="1" used to enforce.
+    private static uint ParseCount(object? value)
     {
-        var campaigns = CombatService.GetCampaigns();
-        if (!string.IsNullOrWhiteSpace(value))
+        return uint.TryParse(value?.ToString(), out uint parsed) && parsed >= 1 ? parsed : 1u;
+    }
+    /// Resolves the picked option back to its group, then clears the box: the
+    /// party is in the list below now, so a selection left standing would read
+    /// like something is still pending.
+    private void AddSelectedPlayerGroup()
+    {
+        if (!Guid.TryParse(_quickGroupId, out Guid id)) return;
+
+        DCPlayerGroup? group = CombatService.GetPlayerGroups().Find(x => x.Id == id);
+        if (group != null)
         {
-            campaigns = campaigns.FindAll(x => x.Contains(value, StringComparison.CurrentCultureIgnoreCase));
+            AddPlayerGroup(group);
         }
-        return Task.FromResult<IEnumerable<string>>(campaigns);
+
+        _quickGroupId = string.Empty;
     }
 
     private void AddPlayerGroup(DCPlayerGroup group)

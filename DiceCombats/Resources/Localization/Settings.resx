@@ -124,12 +124,15 @@
     <value>About</value>
   </data>
   <data name="TitleLanguages" xml:space="preserve">
-    <value>Languages</value>
+    <value>Language</value>
   </data>
   <data name="TitleSettings" xml:space="preserve">
     <value>Settings</value>
   </data>
   <data name="TitleUpdates" xml:space="preserve">
     <value>Updates</value>
+  </data>
+  <data name="SettingsSubtitle" xml:space="preserve">
+    <value>Language, updates, and what changed in this build.</value>
   </data>
 </root>

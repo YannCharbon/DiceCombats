@@ -12,79 +12,75 @@
 @inject DiceCombatsService CombatService
 @inject IStringLocalizer<Resources.Localization.Home> Loc
 
-<style>
-    .favorite-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-</style>
-
 <GenericModal TContent="WelcomeMessage" OnClose="HandleWelcomeMessageModalClose" @ref="WelcomeMessageModalRef">
     <WelcomeMessage NewVersion="_newVersion" UpdateAvailable="_updateAvailable" UpdateInfos="_updateInfos" />
 </GenericModal>
 
-<div style="justify-content:center;text-align:center;padding-top:50px">
-    <h3>@Loc["Title"]</h3>
-    
-    <p>@Loc["Description"]</p>
-</div>
+<div class="dc-home">
 
-<div style="justify-content:center;text-align:center;padding-top:50px">
-    <h3>@Loc["FavoriteCombatsTitle"]</h3>
+    <div style="text-align:center;">
+        <h1 class="dc-h1" style="font-size:34px;">@Loc["Title"]</h1>
+        <p class="dc-sub" style="font-size:15px;max-width:560px;margin:8px auto 0 auto;">@Loc["Description"]</p>
+    </div>
 
-    @if (CombatService.GetCreatureList().Count == 0)
-    {
-        <p>
-            @Loc["FavoriteCombatsNoCreatures"]</p>
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/newcreature"))"
-                    Variant="Variant.Filled"
-                    StartIcon="@Icons.Material.Filled.Add"
-                    Color="@Color.Primary"
-                    Size="Size.Large">
-            @Loc["FavoriteCombatsCreateFirstCreature"]
-        </MudButton>
-    }
-    else if (CombatService.GetCombatList().Count == 0)
-    {
-        <p>@Loc["FavoriteCombatsNoCombats"]</p>
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/combatmanager/new"))"
-                    Variant="Variant.Filled"
-                    StartIcon="@Icons.Material.Filled.Add"
-                    Color="@Color.Primary"
-                    Size="Size.Large">
-            @Loc["FavoriteCombatsCreateFirstCombat"]
-        </MudButton>
-    }
-    else if (CombatService.GetFavoriteCombatsGuids().Count == 0)
-    {
-        <p>
-            @Loc["FavoriteCombatsNoFavorite"]</p>
-        <MudButton OnClick="@(() => Navigation.NavigateTo("/combatsexplorer"))"
-                   Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.Add"
-                   Color="@Color.Primary"
-                   Size="Size.Large">
-            @Loc["FavoriteCombatsSelect"]
-        </MudButton>
-    } else
-    {
-        <div class="row favorite-container">
-            @foreach (string guid in CombatService.GetFavoriteCombatsGuids())
+    <section>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <h2 class="dc-h2" style="border:0;padding-bottom:0;">@Loc["PinnedCombatsTitle"]</h2>
+            @if (CombatService.GetPinnedCombatsGuids().Count > 0)
             {
-                <div style="border-radius:10px;background-color:#1E867F;padding:5px;margin:5px;width:18rem;">
-                    <h4><a href="/combatmanager/@guid">@CombatService.GetCombatFromGUID(guid)?.Name</a></h4>
-                </div>
+                <a class="dc-crumb" @onclick="@(() => Navigation.NavigateTo("/combatsexplorer"))">@Loc["AllCombatsLink"] &rarr;</a>
             }
         </div>
-    }
 
-    <MudDivider Style="margin-top:50px;margin-bottom:30px;"></MudDivider>
+        @if (CombatService.GetCreatureList().Count == 0)
+        {
+            @RenderEmptyState(Loc["PinnedCombatsNoCreatures"], Loc["PinnedCombatsCreateFirstCreature"], "/newcreature")
+        }
+        else if (CombatService.GetCombatList().Count == 0)
+        {
+            @RenderEmptyState(Loc["PinnedCombatsNoCombats"], Loc["PinnedCombatsCreateFirstCombat"], "/combatmanager/new")
+        }
+        else if (CombatService.GetPinnedCombatsGuids().Count == 0)
+        {
+            @RenderEmptyState(Loc["PinnedCombatsNoPinned"], Loc["PinnedCombatsSelect"], "/combatsexplorer")
+        }
+        else
+        {
+            <div class="dc-grid-3">
+                @foreach (string guid in CombatService.GetPinnedCombatsGuids())
+                {
+                    var combat = CombatService.GetCombatFromGUID(guid);
+                    if (combat == null) continue;
+                    @RenderPinnedCard(combat)
+                }
+            </div>
+        }
+    </section>
 
-    <a href="https://github.com/YannCharbon/DiceCombats" target="_blank" style="color:white;margin:10px;"><MudIcon Icon="@Icons.Custom.Brands.GitHub" Size="@Size.Large" Title="GitHub" /></a>
-    <MudIcon Icon="@Icons.Material.Filled.Settings" Size="@Size.Large" style="color:white;margin:10px;cursor:pointer;" Title="@Loc["SettingsTitle"]" @onclick="@(() => Navigation.NavigateTo("/settings"))" />
-    <MudIcon Icon="@Icons.Material.Filled.AutoMode" Size="@Size.Large" style="color:white;margin:10px;cursor:pointer;" Title="@Loc["AutomationTitle"]" @onclick="@(() => Navigation.NavigateTo("/automations"))" />
+    <section>
+        <h2 class="dc-h2" style="border:0;padding-bottom:0;">@Loc["StartSomethingTitle"]</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">
+            <button type="button" class="dc-btn dc-btn-fill"
+                    @onclick="@(() => Navigation.NavigateTo("/combatmanager/new"))">
+                <DcIcon Name="add" />
+                @Loc["NewCombatBtn"]
+            </button>
+            <button type="button" class="dc-btn dc-btn-out"
+                    @onclick="@(() => Navigation.NavigateTo("/newcreature"))">
+                <DcIcon Name="add" />
+                @Loc["NewCreatureBtn"]
+            </button>
+            <button type="button" class="dc-btn dc-btn-out"
+                    @onclick="@(() => Navigation.NavigateTo("/automations"))">
+                <DcIcon Name="auto-mode" />
+                @Loc["AutomationTitle"]
+            </button>
+        </div>
+    </section>
 
+    <div style="border-top:1px solid var(--b1);padding-top:22px;text-align:center;">
+        <span class="dc-meta">DiceCombats @CombatService.GetVersion() &middot; &copy; Yann Charbon &middot; GPL-3.0-or-later</span>
+    </div>
 
 </div>
 
@@ -133,5 +129,76 @@
         {
             Preferences.Set("LastShowedNewVersion", _updateInfos.tag_name);
         }
+    }
+
+    /// A pinned combat, shown as the same strip the combats explorer uses:
+    /// a combat should not look like two different things depending on which
+    /// page you are on. Third row is the opposition, on one scrolling line.
+    private RenderFragment RenderPinnedCard(DCCombat combat) => __builder =>
+    {
+        var c = combat;
+        var roster = DCCombatRoster.Of(c);
+        var players = DCCombatRoster.PlayerCount(c);
+
+        <div class="dc-strip dc-clickable dc-k-npc"
+             @onclick="@(() => Navigation.NavigateTo($"/combatmanager/{c.Id}"))">
+            <div class="dc-tile">
+                <DcIcon Name="shield" Size="24" />
+            </div>
+            <div class="dc-strip-body">
+                <div class="dc-strip-name">@c.Name</div>
+                <div class="dc-meta">@MetaOf(c, players)</div>
+                @if (roster.Count > 0)
+                {
+                    <div class="dc-roster">
+                        <div class="dc-roster-track">
+                            @foreach (var entry in roster)
+                            {
+                                <span class="dc-mini">
+                                    <span class="dc-dot"></span>
+                                    @entry.Name
+                                    <b>&times;@entry.Count</b>
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    };
+
+    /// The three "nothing here yet" states share one shape.
+    private RenderFragment RenderEmptyState(string text, string actionLabel, string route) => __builder =>
+    {
+        <div class="dc-panel" style="text-align:center;padding:28px 16px;">
+            <p class="dc-meta" style="margin:0 0 16px 0;">@text</p>
+            @* The one call to action on an otherwise empty section, so it keeps
+               the larger size the MudButton had. *@
+            <button type="button" class="dc-btn dc-btn-fill" style="min-height:42px;padding:0 20px;font-size:14px;"
+                    @onclick="@(() => Navigation.NavigateTo(route))">
+                <DcIcon Name="add" Size="18" />
+                @actionLabel
+            </button>
+        </div>
+    };
+
+    private string MetaOf(DCCombat combat, int players)
+    {
+        var parts = new List<string>
+        {
+            $"{DCCombatRoster.CreatureCount(combat)} {Loc["CreaturesMeta"]}"
+        };
+
+        if (players > 0)
+        {
+            parts.Add($"{players} {Loc["PlayersMeta"]}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(combat.Campaign))
+        {
+            parts.Add(combat.Campaign);
+        }
+
+        return string.Join(" · ", parts);
     }
 }

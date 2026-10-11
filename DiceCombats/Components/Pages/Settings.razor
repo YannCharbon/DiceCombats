@@ -77,31 +77,35 @@
            (--s4 on the panel's --s3) rather than as two stray headings. The
            strings stay the hardcoded per-culture pairs they already were. *@
         <div class="dc-note" style="margin-top:14px;">
-            @if (_updateAvailable)
+            @* Three outcomes, not two. The page used to render "up to date" for
+               anything that was not a confirmed update, so a refused request -
+               which is what GitHub sends once the hourly limit for the IP is
+               used up - looked exactly like good news. *@
+            @if (_update is { State: DCUpdateCheckState.UpdateAvailable, Release: not null })
             {
                 <div class="dc-irow" style="gap:9px;">
                     <DcIcon Name="download" Size="18" Class="dc-i-info" />
                     @if (CombatService.IsCurrentCulture("fr"))
                     {
-                        <span>DiceCombats <b>@_updateInfos?.tag_name</b> est disponible</span>
+                        <span>DiceCombats <b>@_update.Release.tag_name</b> est disponible</span>
                     }
                     else
                     {
-                        <span>DiceCombats <b>@_updateInfos?.tag_name</b> is available.</span>
+                        <span>DiceCombats <b>@_update.Release.tag_name</b> is available.</span>
                     }
                 </div>
                 <div class="dc-meta" style="margin-top:7px;">
                     @if (CombatService.IsCurrentCulture("fr"))
                     {
-                        <text>Se rendre sur <a href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> pour télécharger la mise à jour.</text>
+                        <text>Se rendre sur <a href="@_update.Release.html_url">@_update.Release.html_url</a> pour télécharger la mise à jour.</text>
                     }
                     else
                     {
-                        <text>Visit <a href="@_updateInfos?.html_url">@_updateInfos?.html_url</a> to download the update.</text>
+                        <text>Visit <a href="@_update.Release.html_url">@_update.Release.html_url</a> to download the update.</text>
                     }
                 </div>
             }
-            else
+            else if (_update?.State == DCUpdateCheckState.UpToDate)
             {
                 <div class="dc-irow" style="gap:9px;">
                     <DcIcon Name="check-circle" Size="18" Class="dc-i-accent" />
@@ -115,6 +119,56 @@
                     }
                 </div>
             }
+            else if (_update?.State == DCUpdateCheckState.CheckFailed)
+            {
+                <div class="dc-irow" style="gap:9px;">
+                    <DcIcon Name="error" Size="18" Class="dc-i-warn" />
+                    @if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        <span>Impossible de joindre GitHub pour vérifier les mises à jour.</span>
+                    }
+                    else
+                    {
+                        <span>Could not reach GitHub to check for updates.</span>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="dc-irow" style="gap:9px;">
+                    <DcIcon Name="access-time" Size="18" Class="dc-i-muted" />
+                    @if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        <span>Recherche de mises à jour…</span>
+                    }
+                    else
+                    {
+                        <span>Checking for updates…</span>
+                    }
+                </div>
+            }
+
+            <div class="dc-irow dc-irow-wrap" style="gap:12px;margin-top:10px;">
+                <button type="button" class="dc-btn dc-btn-out dc-btn-sm"
+                        disabled="@_updateChecking" @onclick="CheckUpdateNow">
+                    <DcIcon Name="sync" Size="16" />
+                    @if (CombatService.IsCurrentCulture("fr"))
+                    {
+                        <text>@(_updateChecking ? "Vérification…" : "Vérifier maintenant")</text>
+                    }
+                    else
+                    {
+                        <text>@(_updateChecking ? "Checking…" : "Check now")</text>
+                    }
+                </button>
+                @if (_update?.CheckedUtc is DateTime updateCheckedAt)
+                {
+                    <span class="dc-meta">
+                        @(CombatService.IsCurrentCulture("fr") ? "Dernière vérification " : "Last checked ")
+                        @updateCheckedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                    </span>
+                }
+            </div>
         </div>
     </div>
 
@@ -150,22 +204,29 @@
 </div>
 
 @code {
-    private bool _updateAvailable = false;
-    private GitHubRelease? _updateInfos = null;
+    private DCUpdateStatus? _update;
+    private bool _updateChecking;
 
+    /// An explicit request always goes to the network; the automatic check
+    /// honours the service's interval.
+    async Task CheckUpdateNow()
+    {
+        if (_updateChecking) return;
+        _updateChecking = true;
+        StateHasChanged();
+        try { _update = await CombatService.CheckUpdateAsync(force: true); }
+        finally { _updateChecking = false; }
+    }
+
+    // firstRender matters: this ends in StateHasChanged, so without the guard
+    // the render it causes runs this again - an endless loop that spent the
+    // hourly GitHub quota for the IP in seconds, after which every reply is 403
+    // and the update it had just found read as "up to date".
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
+        if (!firstRender) return;
 
-        }
-
-        _updateInfos = await CombatService.CheckUpdate();
-        if (_updateInfos != null)
-        {
-            _updateAvailable = (CombatService.GetVersion() != _updateInfos?.tag_name);
-        }
-
+        _update = await CombatService.CheckUpdateAsync();
         StateHasChanged();
     }
 }

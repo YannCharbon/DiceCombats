@@ -1118,6 +1118,11 @@ input[type="number"].dc-inp::-webkit-inner-spin-button,
 
 .dc-fgrp-grow > .dc-flabel { padding-top: 9px; }
 
+/* A text grid cell: the column decides the width, the content the height.
+   The cells were <input type="text"> after the reskin, which cannot show a
+   second line however long the note is. */
+textarea.dc-gcell { width: 100%; min-width: 100px; }
+
 textarea.dc-gta {
     height: 32px;
     min-height: 32px;

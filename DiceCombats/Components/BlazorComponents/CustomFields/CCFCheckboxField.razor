@@ -74,10 +74,11 @@ else
                     </label>
                     @if (Field.ShowTextFields == true)
                     {
-                        <input class="dc-inp" type="text" spellcheck="false" style="width:110px;flex:0 1 110px;"
-                               placeholder="@Field.TextFieldsLabels[index]" title="@Field.TextFieldsLabels[index]"
-                               value="@Field.TextFields[index]"
-                               @onchange="@(e => OnTextChanged(index, e.Value?.ToString() ?? string.Empty))" />
+                        <textarea class="dc-inp dc-gta" rows="1" data-dc-grow="height" spellcheck="false"
+                                  style="width:110px;flex:0 1 110px;"
+                                  placeholder="@Field.TextFieldsLabels[index]" title="@Field.TextFieldsLabels[index]"
+                                  value="@Field.TextFields[index]"
+                                  @onchange="@(e => OnTextChanged(index, e.Value?.ToString() ?? string.Empty))"></textarea>
                     }
                 </div>
             }
@@ -90,10 +91,11 @@ else
                 </label>
                 @if (Field.ShowTextFields == true)
                 {
-                    <input class="dc-inp" type="text" spellcheck="false" style="width:110px;flex:0 1 110px;"
-                           placeholder="@Field.TextFieldsLabels[index]" title="@Field.TextFieldsLabels[index]"
-                           value="@Field.TextFields[index]"
-                           @onchange="@(e => OnTextChanged(index, e.Value?.ToString() ?? string.Empty))" />
+                    <textarea class="dc-inp dc-gta" rows="1" data-dc-grow="height" spellcheck="false"
+                              style="width:110px;flex:0 1 110px;"
+                              placeholder="@Field.TextFieldsLabels[index]" title="@Field.TextFieldsLabels[index]"
+                              value="@Field.TextFields[index]"
+                              @onchange="@(e => OnTextChanged(index, e.Value?.ToString() ?? string.Empty))"></textarea>
                 }
             }
         }

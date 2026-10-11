@@ -82,8 +82,8 @@
                                     }
                                     <div class="dc-field">
                                         <span class="dc-flabel">@Field.TextLabels[i][j]</span>
-                                        <input class="dc-inp" type="text" style="min-width:100px;"
-                                               @bind="Field.TextValues[i][j]" @bind:event="oninput" />
+                                        <textarea class="dc-inp dc-gta dc-gcell" rows="1" data-dc-grow="height"
+                                                  @bind="Field.TextValues[i][j]" @bind:event="oninput"></textarea>
                                     </div>
                                 </div>
                             </td>
@@ -128,16 +128,16 @@ else
                             {
                                 <div class="dc-field">
                                     <span class="dc-flabel">@Field.TextLabels[rowIndex][columnIndex]</span>
-                                    <input class="dc-inp" type="text" spellcheck="false" style="min-width:100px;"
-                                           value="@Field.TextValues[rowIndex][columnIndex]"
-                                           @oninput="@(e => OnTextValueChanged(rowIndex, columnIndex, e.Value?.ToString() ?? string.Empty))" />
+                                    <textarea class="dc-inp dc-gta dc-gcell" rows="1" data-dc-grow="height" spellcheck="false"
+                                              value="@Field.TextValues[rowIndex][columnIndex]"
+                                              @oninput="@(e => OnTextValueChanged(rowIndex, columnIndex, e.Value?.ToString() ?? string.Empty))"></textarea>
                                 </div>
                             }
                             else
                             {
-                                <input class="dc-inp" type="text" spellcheck="false" style="min-width:100px;"
-                                       value="@Field.TextValues[rowIndex][columnIndex]"
-                                       @oninput="@(e => OnTextValueChanged(rowIndex, columnIndex, e.Value?.ToString() ?? string.Empty))" />
+                                <textarea class="dc-inp dc-gta dc-gcell" rows="1" data-dc-grow="height" spellcheck="false"
+                                          value="@Field.TextValues[rowIndex][columnIndex]"
+                                          @oninput="@(e => OnTextValueChanged(rowIndex, columnIndex, e.Value?.ToString() ?? string.Empty))"></textarea>
                             }
                         </td>
                     }

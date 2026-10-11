@@ -7,8 +7,9 @@
     <div class="dc-fbody">
         <div class="dc-field" style="flex:1 1 auto;">
             <span class="dc-flabel">@Field.Title</span>
-            <input class="dc-inp" type="text" spellcheck="false" value="@Field.Text"
-                   @onchange="@(e => OnTextChanged(e.Value?.ToString() ?? string.Empty))" />
+            <textarea class="dc-inp dc-gta" rows="1" data-dc-grow="height" spellcheck="false"
+                      value="@Field.Text"
+                      @onchange="@(e => OnTextChanged(e.Value?.ToString() ?? string.Empty))"></textarea>
         </div>
     </div>
 }

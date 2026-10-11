@@ -43,7 +43,17 @@
         return sizer;
     }
 
+    // A text grid cell takes its width from its column, so it only wants the
+    // height half of this: data-dc-grow="height" asks for that and nothing else.
+    function fitHeight(ta) {
+        // scrollHeight excludes the border and the box is border-box, hence +2.
+        ta.style.height = 'auto';
+        ta.style.height = Math.max(32, ta.scrollHeight + 2) + 'px';
+    }
+
     function fit(ta) {
+        if (ta.getAttribute('data-dc-grow') === 'height') { fitHeight(ta); return; }
+
         var group = ta.closest('.dc-fgrp-grow');
         if (!group) return;
 
@@ -66,9 +76,7 @@
         var want = widest + PAD + GAP + (label ? label.offsetWidth : 0);
         group.style.setProperty('--dc-grow-w', Math.max(MIN_W, want) + 'px');
 
-        // scrollHeight excludes the border and the box is border-box, hence +2.
-        ta.style.height = 'auto';
-        ta.style.height = Math.max(32, ta.scrollHeight + 2) + 'px';
+        fitHeight(ta);
     }
 
     function fitAll() {

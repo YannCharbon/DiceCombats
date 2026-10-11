@@ -1,62 +1,73 @@
 # Release notes
 
+The application has been redrawn. Every MudBlazor control is gone, replaced by one the application draws
+itself, which means the creature manager, the explorers, the combat board and the automations page
+finally agree with each other instead of each looking slightly like a different program. DiceAudio has
+been given the same treatment, in its own colours, so the two halves of the suite now read as one.
+
 ### New
 
-- **Damage kinds on the hit points field**
-  A hit points field now carries its own list of damage kinds, each with a colour and an icon, and the reduction rules that apply to the creature. Resistance, immunity and vulnerability are covered, attack attributes such as magical decide whether a rule applies, and temporary hit points, maximum hit points reduction and negative hit points are supported. Creatures that only have current and maximum hit points keep working as before.
+- **Pinned combats**
+  What used to be called favourites is now pinning, with a pin where the star was. Existing favourites
+  are carried over on first start.
 
-- **Damage calculator**
-  A popup lets you stage several damage lines of different kinds before applying them, shows the whole calculation with the rule used for each line, and applies everything in one step that a single undo takes back. The quick buttons in the card still apply a single hit directly, and open the popup only when the creature has rules to resolve.
+- **Custom fields reorder by dragging**
+  A field is moved by picking it up, so the move backward and move forward buttons that each field
+  carried are gone.
 
-- **Combat log**
-  Starting a combat opens a recording session that follows the rounds and stores every hit, heal and turn. The log window shows the damage dealt by each creature with the best hit, the average and the split by damage kind, the damage taken by each target, and the round by round timeline. Sessions are kept per combat and can be exported as JSON, statistics included.
+- **Three ways to show a detailed popup**
+  A detailed popup field can present its entries as a list, as a grid or as tabs. Existing fields keep
+  the layout they had.
 
-- **Combat events for damage and healing**
-  Damage and healing now raise their own automation events. An attack raises one event describing the whole hit and one event per damage kind, all carrying the attacker, the target, the amounts before and after reduction, the damage kind, the attack attributes and an intensity that says how hard the hit landed. Starting and ending a combat raise events as well.
+- **A checkbox option can light up when it is ticked**
+  Optional, per field. The whole cell takes the accent, so a ticked option is visible across a strip
+  rather than only at the box itself.
 
-- **Sheet links in the app**
-  Links of a creature sheet imported from aidedd.org, such as the spells a creature can cast, open in a window of the app instead of the system browser. The creature editor carries the option, on by default, and it can be turned off per creature.
+- **Checking for updates on demand**
+  The settings page carries a "Check now" button and says when it last looked.
 
 ### Improvements
 
-- **Damage source attribution**
-  The damage popup lets you pick who is dealing the hit from the creatures of the combat, players first and marked as such. It follows the creature holding the initiative, so the usual case takes no click, and the combat log reports separately what was attributed automatically.
+- **One visual language**
+  Buttons, inputs, tick boxes, steppers, selects, menus, modals and confirmations are the application's
+  own and answer to one set of tokens: one card colour, one border, one radius, one set of accents.
 
-- **Automation triggers for damage**
-  The new triggers can be filtered by attacker and by damage kind, so an automation can be written as "when this player deals slashing damage" without hand written conditions.
+- **The automations page**
+  Five levels of nesting used to land on the same colour, because MudBlazor paints every panel from a
+  single surface. Each level now takes its own step, and an automation's fields sit several to a row
+  instead of one short control per full-width line. An open automation stays in its column.
 
-- **Variables listed in the automation editor**
-  The trigger block now lists the variables the selected trigger delivers. Clicking one copies it, ready to be pasted into a body, a URL, a header or a condition.
+- **Readable controls**
+  The edge of anything you can operate now clears the contrast ratio the standard asks for, and the ink
+  on a damage kind chip is computed against the colour you chose for it rather than assumed.
 
-- **Starting a combat**
-  Sorting the initiative now asks whether the combat starts, which begins the timer and the log recording in one step. Stopping the combat or closing the app closes the session and saves it.
+- **The creature whose turn it is**
+  Its frame carries a travelling gradient again, in the colours the application actually uses.
 
-- **Amount fields validate while typing**
-  The value fields of the damage popup no longer need to lose the focus to be taken into account.
+- **The initiative window**
+  Rebuilt as a table, with the "next creature" button given the weight it deserves.
 
-### Bug fixes
+- **The taskbar shows the application's name**
+  The window had no title, so Windows had only the icon to go on.
 
-- **Creatures joined a combat at zero hit points**
-  A creature added to a combat or synchronised now starts at its maximum hit points.
+### Fixed
 
-- **The damage popup kept its previous content**
-  Reopening the popup after closing it, whichever way it was closed, no longer shows the damage lines of the previous attack.
+- **An update that disappeared**
+  The settings page asked GitHub on every render and ended by asking for another render, so it looped
+  and spent the hourly limit for your address within seconds. The refusals that followed were reported
+  as "up to date", which is how an update found a moment earlier vanished. The check now runs once,
+  is cached for six hours, and a failure says so while keeping what it last knew.
 
-- **Placeholders in automation requests**
-  Decimal values are now written with a dot and booleans as true and false whatever the language of the application is, so a request body stays valid JSON in French.
+- **The version was always 0.0.0**
+  Shown in the settings, and compared against the latest release to decide whether an update exists.
 
-- **Build and warnings**
-  The project builds again after the package update, and all build warnings have been cleared.
+- **Text boxes that had lost their lines**
+  The text grid cells, the per-option note on a checkbox field and the default value of a text field
+  could only show one line however much was written in them.
 
-- **PDF pages rebuilt every second**
-  A PDF inside a detailed popup was torn down and rendered again on every render of the
-  page holding it - about once a second while a combat timer runs - which made it flash,
-  jump and lose the zoom level. Each page now keeps a stable identity so it is rendered
-  once, and the zoom-to-fit no longer re-triggers itself.
+- **Imported sheets turning the GitHub button red**
+  A creature sheet saved from aidedd.org carries the site's own stylesheet, which was recolouring parts
+  of the application around it.
 
-- **Detailed popup jumping off the screen**
-  Opening a detailed popup no longer makes the creature cards slide and the modal shoot off
-  the right edge of the screen before snapping back. Relayouts of the masonry grids are now
-  instantaneous instead of animated: the animation put a temporary transform on the creature
-  card, which made the card - rather than the window - the reference for the popup placed
-  inside it.
+- **The settings icon**
+  It was a circle with eight radiating spokes, which reads as a sun rather than a cog.

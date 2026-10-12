@@ -31,6 +31,12 @@
         cursor: pointer;
         background: var(--s6);
         border-color: var(--ctl);
+        /* A placeholder can be longer than a phone is wide. Breaking it is
+           scoped to this chip rather than to .kbd: `anywhere` counts towards
+           min-content, so on .kbd it would also re-measure the placeholder
+           table's columns on a desktop window. */
+        max-width: 100%;
+        overflow-wrap: anywhere;
     }
 
         .trigger-variable:hover {
@@ -66,7 +72,7 @@
        because the whole point of it is to be opened. */
     .trigger-fields {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
         gap: 12px;
         align-items: end;
     }

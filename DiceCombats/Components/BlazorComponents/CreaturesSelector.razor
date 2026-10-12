@@ -27,7 +27,11 @@
         white-space: normal;
         padding: 10px;
         margin: 10px;
-        width: 100%;
+        /* No width:100% - the box is a grid item and already stretches to its
+           track. Asking for the FULL track and then adding a margin put it
+           10px past the track on each side, so the dialog carried a horizontal
+           scrollbar at every window size. width:auto stretches to the track
+           minus the margins, which is what the margins were for. */
         height: 500px;
         min-width: 350px;
         box-sizing: border-box;

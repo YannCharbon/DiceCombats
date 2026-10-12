@@ -237,7 +237,7 @@ a:hover, .btn-link:hover {
 /* The explorers' grid: 3 across on a desktop window, fewer as it narrows. */
 .dc-grid-3 {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
     gap: 12px;
     margin: 10px 2px 6px 2px;
 }
@@ -490,7 +490,7 @@ a:hover, .btn-link:hover {
 
 .assist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
     gap: 12px;
 }
 
@@ -857,6 +857,12 @@ input[type="number"].dc-inp::-webkit-inner-spin-button,
     grid-template-columns: auto 18px;
     grid-template-rows: 1fr 1fr;
     height: 32px;
+    /* A number box has a floor: below about 64px the value and its two
+       chevrons have nowhere to go. It is also the only item in a field row
+       with slack, so the shrink algorithm picks it first - which is how the
+       hit-point stepper ended up a 1.5px hairline on a phone. Where there is
+       room this changes nothing; where there is not, something else gives. */
+    flex: none;
     border: 1px solid var(--ctl);
     border-radius: var(--r-btn);
     overflow: hidden;
@@ -1094,7 +1100,12 @@ input[type="number"].dc-inp::-webkit-inner-spin-button,
 }
 
 .dc-fgrp > .dc-flabel { flex: none; }
-.dc-fgrp-hp { flex: 1 1 auto; }
+
+/* Six controls - name, bar, stepper, damage, heal, apply - which is one more
+   than a narrow window holds. Wrapping drops the apply button onto its own
+   line; without it the row simply ran past the card's right edge and the
+   button was cut in half. A window with room still lays it out on one line. */
+.dc-fgrp-hp { flex: 1 1 auto; flex-wrap: wrap; }
 .dc-fgrp-col { flex-direction: column; align-items: flex-start; gap: 6px; }
 
 .dc-flabel {
@@ -1336,7 +1347,12 @@ textarea.dc-gta {
    Each kind declares the width it actually needs, so a Colour field never
    takes a full row to say one thing. */
 
-.dc-fgrid { display: flex; flex-wrap: wrap; gap: 11px; align-items: flex-start; }
+/* min-width:0 is what lets the wall shrink. In edition mode SortableList
+   renders a second .dc-fgrid INSIDE this one, and a flex item defaults to
+   min-width:auto - so the inner wall was pinned to its cards' intrinsic
+   width (~400px) and everything past the viewport was clipped: delete
+   buttons, and the right-hand column of every option grid. */
+.dc-fgrid { display: flex; flex-wrap: wrap; gap: 11px; align-items: flex-start; min-width: 0; }
 
 .dc-fcard {
     flex: 1 1 var(--dc-fb, 420px);
@@ -1396,7 +1412,7 @@ textarea.dc-gta {
 }
 
 .dc-opt .dc-inp { height: 28px; font-size: 12.5px; }
-.dc-opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 6px; }
+.dc-opt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(176px, 100%), 1fr)); gap: 6px; }
 
 .dc-note {
     background: var(--s4);
@@ -1433,8 +1449,8 @@ textarea.dc-gta {
 }
 
 .dc-msec-help { margin: 0 0 10px; font-size: 12.5px; color: var(--t3); line-height: 1.5; }
-.dc-mgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(430px, 1fr)); gap: 12px; align-items: start; }
-.dc-mgrid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; align-items: start; }
+.dc-mgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(430px, 100%), 1fr)); gap: 12px; align-items: start; }
+.dc-mgrid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; align-items: start; }
 .dc-mgrid3 .dc-msec-head { flex-direction: column; align-items: flex-start; gap: 9px; }
 
 .dc-mrow {
@@ -1480,7 +1496,7 @@ textarea.dc-gta {
 /* ═══ the detailed popup: tabs, list or grid ═══════════════════════════════ */
 
 .dc-dstack > .dc-msec { margin-bottom: 11px; }
-.dc-dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 11px; align-items: start; }
+.dc-dgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 11px; align-items: start; }
 
 /* ═══ the combat board keeps the masonry it already has ═════════════════
    .masonry-layout / .masonry-item stay exactly as they are, in CombatManager's

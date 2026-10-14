@@ -134,6 +134,11 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>NewCreature.resx</DependentUpon>
       </Compile>
+      <Compile Update="Resources\Localization\Portability.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Portability.resx</DependentUpon>
+      </Compile>
       <Compile Update="Resources\Localization\Settings.Designer.cs">
         <DesignTime>True</DesignTime>
         <AutoGen>True</AutoGen>
@@ -193,6 +198,10 @@
       <EmbeddedResource Update="Resources\Localization\NewCreature.resx">
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>NewCreature.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+      <EmbeddedResource Update="Resources\Localization\Portability.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Portability.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Update="Resources\Localization\Settings.resx">
         <Generator>ResXFileCodeGenerator</Generator>

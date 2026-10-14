@@ -1,14 +1,19 @@
 ﻿using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
 using System.Diagnostics;
 using System.Globalization;
+using DiceCombats.Storage;
 using Application = Microsoft.Maui.Controls.Application;
 
 namespace DiceCombats
 {
     public partial class App : Application
     {
-        public App()
+        private readonly ILocalPreferences _localPreferences;
+
+        public App(ILocalPreferences localPreferences)
         {
+            _localPreferences = localPreferences;
+
             InitializeComponent();
 
             var currentApp = Application.Current;
@@ -35,7 +40,7 @@ namespace DiceCombats
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            Preferences.Set("Language", cultureCode);
+            _localPreferences.Set("Language", cultureCode);
 
             // Reload the Blazor-based UI on the single window this app has.
             if (Windows.Count > 0)

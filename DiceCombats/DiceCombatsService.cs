@@ -17,11 +17,40 @@ using static MudBlazor.FilterOperator;
 using System.Reflection;
 using System.Net.Http.Headers;
 using System.Globalization;
+using DiceCombats.Storage;
 
 namespace DiceCombats
 {
     public class DiceCombatsService
     {
+        // The data files, by name: SafeFileStore turns them into paths inside
+        // the data folder that DataLocation points at.
+        public const string CreaturesFileName = "creatures.json";
+        public const string CombatsFileName = "combats.json";
+        public const string PinnedCombatsFileName = "pinnedCombats.json";
+        public const string UserCreatureCustomFieldsFileName = "userCreatureCustomFields.json";
+        public const string PlayerGroupsFileName = "playerGroups.json";
+        public const string CombatLogsFileName = "combatLogs.json";
+
+        // Pinned combats used to be called "favorites" and were stored under this
+        // name. It is only ever read, once, by LoadPinnedCombatsListAsync when the
+        // new file is missing, so that users who pinned combats before the rename
+        // keep them. The legacy file is deliberately left on disk: if the user ever
+        // downgrades, it is their only copy of the list.
+        public const string LegacyFavoriteCombatsFileName = "favoritesCombats.json";
+
+        // The same options the files have always been written with, so that a
+        // file nobody changed is recognised as unchanged and left alone.
+        private static readonly JsonSerializerOptions ReadOptions = new JsonSerializerOptions();
+        private static readonly JsonSerializerOptions WriteOptions = new JsonSerializerOptions { WriteIndented = true };
+
+        // Every save passes overwriteExternalChange: true. A file changed on
+        // another computer is overwritten, as it always has been, until the app
+        // can ask the user whether to reload or overwrite it.
+
+        private readonly SafeFileStore _store;
+        private readonly ILocalPreferences _localPreferences;
+
         private List<DCCreature> _CreatureList = new List<DCCreature>();
         private List<DCCombat> _CombatsList = new List<DCCombat>();
         private List<string> _pinnedCombats = new List<string>();
@@ -29,14 +58,61 @@ namespace DiceCombats
         private List<DCPlayerGroup> _playerGroups = new List<DCPlayerGroup>();
         private List<DCCombatLogSession> _combatLogs = new List<DCCombatLogSession>();
 
-        public DiceCombatsService()
+        public DiceCombatsService(SafeFileStore store, ILocalPreferences localPreferences)
         {
-            _ = LoadCreatureListAsync();
-            _ = LoadCombatsListAsync();
-            _ = LoadPinnedCombatsListAsync();
-            _ = LoadUserCreatureCustomFieldsListAsync();
-            _ = LoadPlayerGroupsListAsync();
-            _ = LoadCombatLogsListAsync();
+            _store = store;
+            _localPreferences = localPreferences;
+        }
+
+        /// <summary>
+        /// Loads every data file, each on its own: a file that cannot be read
+        /// leaves its list empty, is never saved over, and does not stop the
+        /// others from loading. Called once at startup, before any page.
+        /// </summary>
+        public async Task InitializeAsync()
+        {
+            await LoadGuardedAsync(CreaturesFileName, LoadCreatureListAsync);
+            await LoadGuardedAsync(CombatsFileName, LoadCombatsListAsync);
+            await LoadGuardedAsync(PinnedCombatsFileName, LoadPinnedCombatsListAsync);
+            await LoadGuardedAsync(UserCreatureCustomFieldsFileName, LoadUserCreatureCustomFieldsListAsync);
+            await LoadGuardedAsync(PlayerGroupsFileName, LoadPlayerGroupsListAsync);
+            await LoadGuardedAsync(CombatLogsFileName, LoadCombatLogsListAsync);
+        }
+
+        // Anything that goes wrong while one file is taken in blocks that file
+        // and lets the next one load.
+        private async Task LoadGuardedAsync(string fileName, Func<Task> load)
+        {
+            try
+            {
+                await load();
+            }
+            catch (Exception ex)
+            {
+                _store.Block(fileName, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Starts a save of every file. Each is written only if it changed; the
+        /// returned task completes when all of them are on disk.
+        /// </summary>
+        public Task SaveAllAsync()
+        {
+            return Task.WhenAll(
+                SaveCreaturesAsync(),
+                SaveCombatsAsync(),
+                SavePinnedCombatsListAsync(),
+                SaveUserCreatureCustomFieldsListAsync(),
+                SavePlayerGroupsListAsync(),
+                SaveCombatLogsAsync());
+        }
+
+        private async Task<List<T>?> LoadListAsync<T>(string fileName)
+        {
+            var result = await _store.LoadJsonAsync<List<T>>(fileName, ReadOptions);
+            Debug.WriteLine($"Load {fileName}: {result.Outcome} {result.Error}");
+            return result.Outcome == LoadOutcome.Loaded ? result.Value : null;
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -46,11 +122,10 @@ namespace DiceCombats
 
         public List<DCCreature> GetCreatureList() { return _CreatureList; }
 
+        /// <summary>Adds to the list in memory; the caller saves with <see cref="SaveCreatures"/>.</summary>
         public void AddCreature(DCCreature creature)
         {
             _CreatureList.Add(creature);
-            string json = JsonSerializer.Serialize(_CreatureList);
-            Debug.WriteLine(json);
         }
 
         public void DeleteCreature(DCCreature creature)
@@ -58,48 +133,23 @@ namespace DiceCombats
             _CreatureList.Remove(creature);
         }
 
+        /// <summary>Saves the creatures as they are now. The write itself finishes in the background.</summary>
         public void SaveCreatures()
         {
-            var options = new JsonSerializerOptions
-            {
-                /*Converters = { new DCCreatureCustomFieldConverter() },*/
-                WriteIndented = true // Optional: for better readability
-            };
-            string json = JsonSerializer.Serialize(_CreatureList, options);
-            Debug.WriteLine(json);
-
-            _ = SaveCreatureListAsync(_CreatureList);
+            _ = SaveCreaturesAsync();
         }
 
-        private static string creatureFilePath = Path.Combine(FileSystem.AppDataDirectory, "creatures.json");
-
-        public async Task SaveCreatureListAsync(List<DCCreature> creatureList)
+        public Task SaveCreaturesAsync()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            string json = JsonSerializer.Serialize(creatureList, options);
-            await File.WriteAllTextAsync(creatureFilePath, json);
-            Debug.WriteLine($"Write file to {creatureFilePath}");
+            return _store.SaveJsonAsync(CreaturesFileName, _CreatureList, WriteOptions, overwriteExternalChange: true);
         }
 
         public async Task LoadCreatureListAsync()
         {
-            if (File.Exists(creatureFilePath))
+            var temp = await LoadListAsync<DCCreature>(CreaturesFileName);
+            if (temp != null)
             {
-                Debug.WriteLine($"File {creatureFilePath} exists");
-                string json = await File.ReadAllTextAsync(creatureFilePath);
-                var options = new JsonSerializerOptions
-                {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-                var temp = JsonSerializer.Deserialize<List<DCCreature>>(json, options);
-                if (temp != null)
-                {
-                    _CreatureList = temp;
-                }
+                _CreatureList = temp;
             }
         }
 
@@ -113,6 +163,7 @@ namespace DiceCombats
 
         public List<DCCombat> GetCombatList() { return _CombatsList; }
 
+        /// <summary>Adds to the list in memory; the caller saves with <see cref="SaveCombats"/>.</summary>
         public void AddCombat(DCCombat combat)
         {
             _CombatsList.Add(combat);
@@ -122,49 +173,26 @@ namespace DiceCombats
         {
             _CombatsList.Remove(combat);
             DeleteCombatLogSessions(combat.Id);
+            RemoveCombatFromPinnedByGUID(combat.Id.ToString());
         }
 
+        /// <summary>Saves the combats as they are now. The write itself finishes in the background.</summary>
         public void SaveCombats()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true // Optional: for better readability
-            };
-            string json = JsonSerializer.Serialize(_CombatsList, options);
-            Debug.WriteLine(json);
-
-            _ = SaveCombatsListAsync(_CombatsList);
+            _ = SaveCombatsAsync();
         }
 
-        private static string combatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "combats.json");
-
-        public async Task SaveCombatsListAsync(List<DCCombat> combatsList)
+        public Task SaveCombatsAsync()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            string json = JsonSerializer.Serialize(combatsList, options);
-            await File.WriteAllTextAsync(combatsFilePath, json);
-            Debug.WriteLine($"Write file to {combatsFilePath}");
+            return _store.SaveJsonAsync(CombatsFileName, _CombatsList, WriteOptions, overwriteExternalChange: true);
         }
 
         public async Task LoadCombatsListAsync()
         {
-            if (File.Exists(combatsFilePath))
+            var temp = await LoadListAsync<DCCombat>(CombatsFileName);
+            if (temp != null)
             {
-                Debug.WriteLine($"File {combatsFilePath} exists");
-                string json = await File.ReadAllTextAsync(combatsFilePath);
-                var options = new JsonSerializerOptions
-                {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-                var temp = JsonSerializer.Deserialize<List<DCCombat>>(json, options);
-                if (temp != null)
-                {
-                    _CombatsList = temp;
-                }
+                _CombatsList = temp;
             }
         }
 
@@ -229,77 +257,53 @@ namespace DiceCombats
             return _pinnedCombats.Contains(guid);
         }
 
+        /// <summary>
+        /// The pinned combats that still exist. A getter never saves: a pin
+        /// whose combat is missing is only left out here, since the combats
+        /// may simply have failed to load. Deleting a combat unpins it.
+        /// </summary>
         public List<string> GetPinnedCombatsGuids()
         {
-            foreach (var guid in _pinnedCombats.ToArray())
-            if (GetCombatFromGUID(guid) == null)
-            {
-                // Update the list if anything has changed
-                RemoveCombatFromPinnedByGUID(guid);
-            }
-            return _pinnedCombats;
+            return _pinnedCombats.Where(guid => GetCombatFromGUID(guid) != null).ToList();
         }
 
-        private static string pinnedCombatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "pinnedCombats.json");
-
-        // Pinned combats used to be called "favorites" and were stored under this
-        // name. It is only ever read, once, by LoadPinnedCombatsListAsync when the
-        // new file is missing, so that users who pinned combats before the rename
-        // keep them. The legacy file is deliberately left on disk: if the user ever
-        // downgrades, it is their only copy of the list.
-        private static string legacyFavoriteCombatsFilePath = Path.Combine(FileSystem.AppDataDirectory, "favoritesCombats.json");
-
-        public async Task SavePinnedCombatsListAsync()
+        public Task SavePinnedCombatsListAsync()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            string json = JsonSerializer.Serialize(_pinnedCombats, options);
-            await File.WriteAllTextAsync(pinnedCombatsFilePath, json);
-            Debug.WriteLine($"Write file to {pinnedCombatsFilePath}");
+            return _store.SaveJsonAsync(PinnedCombatsFileName, _pinnedCombats, WriteOptions, overwriteExternalChange: true);
         }
 
         public async Task LoadPinnedCombatsListAsync()
         {
-            bool fromLegacyFile = false;
-            string? path = null;
+            var result = await _store.LoadJsonAsync<List<string>>(PinnedCombatsFileName, ReadOptions);
+            Debug.WriteLine($"Load {PinnedCombatsFileName}: {result.Outcome} {result.Error}");
 
-            if (File.Exists(pinnedCombatsFilePath))
-            {
-                Debug.WriteLine("File exists");
-                path = pinnedCombatsFilePath;
-            }
-            else if (File.Exists(legacyFavoriteCombatsFilePath))
+            if (result.Outcome == LoadOutcome.Missing)
             {
                 // Migration: the list was saved before pinned combats were called
                 // pinned. Read it from the old name and write it to the new one.
-                Debug.WriteLine($"Legacy file exists, migrating {legacyFavoriteCombatsFilePath} to {pinnedCombatsFilePath}");
-                path = legacyFavoriteCombatsFilePath;
-                fromLegacyFile = true;
-            }
-
-            if (path != null)
-            {
-                string json = await File.ReadAllTextAsync(path);
-                var options = new JsonSerializerOptions
+                // A pinned file that exists but cannot be read is not replaced.
+                var legacyResult = await _store.LoadJsonAsync<List<string>>(LegacyFavoriteCombatsFileName, ReadOptions);
+                var legacy = legacyResult.Outcome == LoadOutcome.Loaded ? legacyResult.Value : null;
+                if (legacyResult.Outcome == LoadOutcome.Failed)
                 {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-                var temp = JsonSerializer.Deserialize<List<string>>(json, options);
-                if (temp != null)
-                {
-                    _pinnedCombats = temp;
+                    // The pins exist but cannot be read: an empty pinned file
+                    // must not take their place.
+                    _store.Block(PinnedCombatsFileName, $"{LegacyFavoriteCombatsFileName} could not be read: {legacyResult.Error}");
                 }
-
-                if (fromLegacyFile)
+                else if (legacy != null)
                 {
-                    // Write straight away so the new path becomes the source of
+                    Debug.WriteLine($"Migrating {LegacyFavoriteCombatsFileName} to {PinnedCombatsFileName}");
+                    _pinnedCombats = legacy;
+
+                    // Write straight away so the new file becomes the source of
                     // truth even if the app is killed before the next save. The
                     // legacy file is left untouched on purpose.
                     await SavePinnedCombatsListAsync();
                 }
+            }
+            else if (result.Value != null)
+            {
+                _pinnedCombats = result.Value;
             }
         }
 
@@ -309,6 +313,7 @@ namespace DiceCombats
             if (field == null)
             {
                 _userCreatureCustomFields.Add(customField);
+                _ = SaveUserCreatureCustomFieldsListAsync();
                 return true;
             }
             return false;
@@ -320,6 +325,7 @@ namespace DiceCombats
             if (field != null)
             {
                 _userCreatureCustomFields.Remove(field);
+                _ = SaveUserCreatureCustomFieldsListAsync();
             }
         }
 
@@ -333,35 +339,17 @@ namespace DiceCombats
             return _userCreatureCustomFields.Find(x => x.Title == fieldName);
         }
 
-        private static string userCreatureCustomFieldsFilePath = Path.Combine(FileSystem.AppDataDirectory, "userCreatureCustomFields.json");
-
-        public async Task SaveUserCreatureCustomFieldsListAsync()
+        public Task SaveUserCreatureCustomFieldsListAsync()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            string json = JsonSerializer.Serialize(_userCreatureCustomFields, options);
-            await File.WriteAllTextAsync(userCreatureCustomFieldsFilePath, json);
-            Debug.WriteLine($"Write file to {userCreatureCustomFieldsFilePath}");
+            return _store.SaveJsonAsync(UserCreatureCustomFieldsFileName, _userCreatureCustomFields, WriteOptions, overwriteExternalChange: true);
         }
 
         public async Task LoadUserCreatureCustomFieldsListAsync()
         {
-            if (File.Exists(userCreatureCustomFieldsFilePath))
+            var temp = await LoadListAsync<DCCreatureCustomField>(UserCreatureCustomFieldsFileName);
+            if (temp != null)
             {
-                Debug.WriteLine("File exists");
-                string json = await File.ReadAllTextAsync(userCreatureCustomFieldsFilePath);
-                var options = new JsonSerializerOptions
-                {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-                var temp = JsonSerializer.Deserialize<List<DCCreatureCustomField>>(json, options);
-                if (temp != null)
-                {
-                    _userCreatureCustomFields = temp;
-                }
+                _userCreatureCustomFields = temp;
             }
         }
 
@@ -408,40 +396,27 @@ namespace DiceCombats
             }
         }
 
-        private static string combatLogsFilePath = Path.Combine(FileSystem.AppDataDirectory, "combatLogs.json");
-
         /// <summary>
-        /// Written synchronously: a session is stored when the fight ends, which
-        /// is often the moment the app is closing, and a background write would
-        /// not get the chance to finish.
+        /// A session is stored when the fight ends, which is often the moment
+        /// the app is closing: the close handlers wait for this write through
+        /// SafeFileStore.FlushAsync.
         /// </summary>
         public void SaveCombatLogs()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            string json = JsonSerializer.Serialize(_combatLogs, options);
-            File.WriteAllText(combatLogsFilePath, json);
-            Debug.WriteLine($"Write file to {combatLogsFilePath}");
+            _ = SaveCombatLogsAsync();
+        }
+
+        public Task SaveCombatLogsAsync()
+        {
+            return _store.SaveJsonAsync(CombatLogsFileName, _combatLogs, WriteOptions, overwriteExternalChange: true);
         }
 
         public async Task LoadCombatLogsListAsync()
         {
-            if (File.Exists(combatLogsFilePath))
+            var temp = await LoadListAsync<DCCombatLogSession>(CombatLogsFileName);
+            if (temp != null)
             {
-                Debug.WriteLine($"File {combatLogsFilePath} exists");
-                string json = await File.ReadAllTextAsync(combatLogsFilePath);
-                var options = new JsonSerializerOptions
-                {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-                var temp = JsonSerializer.Deserialize<List<DCCombatLogSession>>(json, options);
-                if (temp != null)
-                {
-                    _combatLogs = temp;
-                }
+                _combatLogs = temp;
             }
         }
 
@@ -479,35 +454,17 @@ namespace DiceCombats
                 .ToList();
         }
 
-        private static string playerGroupsFilePath = Path.Combine(FileSystem.AppDataDirectory, "playerGroups.json");
-
-        public async Task SavePlayerGroupsListAsync()
+        public Task SavePlayerGroupsListAsync()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-            string json = JsonSerializer.Serialize(_playerGroups, options);
-            await File.WriteAllTextAsync(playerGroupsFilePath, json);
-            Debug.WriteLine($"Write file to {playerGroupsFilePath}");
+            return _store.SaveJsonAsync(PlayerGroupsFileName, _playerGroups, WriteOptions, overwriteExternalChange: true);
         }
 
         public async Task LoadPlayerGroupsListAsync()
         {
-            if (File.Exists(playerGroupsFilePath))
+            var temp = await LoadListAsync<DCPlayerGroup>(PlayerGroupsFileName);
+            if (temp != null)
             {
-                Debug.WriteLine($"File {playerGroupsFilePath} exists");
-                string json = await File.ReadAllTextAsync(playerGroupsFilePath);
-                var options = new JsonSerializerOptions
-                {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-                var temp = JsonSerializer.Deserialize<List<DCPlayerGroup>>(json, options);
-                if (temp != null)
-                {
-                    _playerGroups = temp;
-                }
+                _playerGroups = temp;
             }
         }
 
@@ -610,9 +567,9 @@ namespace DiceCombats
                 return _updateStatus;
             }
 
-            Preferences.Set(PrefUpdateLatestTag, release.tag_name);
-            Preferences.Set(PrefUpdateLatestUrl, release.html_url ?? string.Empty);
-            Preferences.Set(PrefUpdateCheckedUtc, System.DateTime.UtcNow.Ticks);
+            _localPreferences.Set(PrefUpdateLatestTag, release.tag_name);
+            _localPreferences.Set(PrefUpdateLatestUrl, release.html_url ?? string.Empty);
+            _localPreferences.Set(PrefUpdateCheckedUtc, System.DateTime.UtcNow.Ticks);
 
             _updateStatus = new DCUpdateStatus(
                 IsNewerThanInstalled(release.tag_name)
@@ -628,8 +585,8 @@ namespace DiceCombats
         /// shows what was last true instead of claiming the app is up to date.
         private DCUpdateStatus LoadPersistedUpdateStatus()
         {
-            string tag = Preferences.Get(PrefUpdateLatestTag, string.Empty);
-            long ticks = Preferences.Get(PrefUpdateCheckedUtc, 0L);
+            string tag = _localPreferences.Get(PrefUpdateLatestTag, string.Empty);
+            long ticks = _localPreferences.Get(PrefUpdateCheckedUtc, 0L);
 
             if (string.IsNullOrWhiteSpace(tag) || ticks == 0)
             {
@@ -639,7 +596,7 @@ namespace DiceCombats
             var release = new GitHubRelease
             {
                 tag_name = tag,
-                html_url = Preferences.Get(PrefUpdateLatestUrl, string.Empty),
+                html_url = _localPreferences.Get(PrefUpdateLatestUrl, string.Empty),
             };
 
             return new DCUpdateStatus(

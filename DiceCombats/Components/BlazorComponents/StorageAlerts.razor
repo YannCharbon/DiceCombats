@@ -1,0 +1,68 @@
+@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@*
+    Tells the user when a data file could not be read or saved. Drawn like
+    DcConfirm, with a single button: there is nothing to decide, only
+    something to know.
+*@
+
+@implements IDisposable
+@inject StorageNotices Notices
+@inject IStringLocalizer<DiceCombats.Resources.Localization.Portability> Loc
+
+@if (_notices.Count > 0)
+{
+    <div class="dc-confirm-scrim" @onclick="Dismiss">
+        <div class="dc-confirm" role="alertdialog" aria-modal="true" @onclick:stopPropagation="true">
+            @foreach (var notice in _notices)
+            {
+                <p class="dc-confirm-msg">@Message(notice)</p>
+            }
+            <div class="dc-confirm-foot">
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="Dismiss">
+                    <DcIcon Name="check" />
+                    @Loc["AlertCloseBtn"]
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<StorageNotice> _notices = Array.Empty<StorageNotice>();
+
+    protected override void OnInitialized()
+    {
+        Notices.Changed += OnChanged;
+        _notices = Notices.Pending;
+    }
+
+    private string Message(StorageNotice notice) => notice.Kind == StorageNoticeKind.LoadFailed
+        ? string.Format(Loc["ErrorLoadFailed"], notice.FileName)
+        : string.Format(Loc["ErrorSaveFailed"], notice.FileName);
+
+    private void OnChanged()
+    {
+        InvokeAsync(() =>
+        {
+            _notices = Notices.Pending;
+            StateHasChanged();
+        });
+    }
+
+    private void Dismiss()
+    {
+        Notices.DismissAll();
+    }
+
+    public void Dispose()
+    {
+        Notices.Changed -= OnChanged;
+    }
+}

@@ -586,6 +586,10 @@ else
                     }
                 }
             }
+
+            // Written now rather than when the app closes, so that a crash
+            // cannot lose what was imported.
+            await SaveImportedAsync();
         }
         else
         {
@@ -598,6 +602,20 @@ else
             {
                 PopupNotificationService.Show("Combat import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
             }
+        }
+    }
+
+    private async Task SaveImportedAsync()
+    {
+        try
+        {
+            await CombatService.SaveCombatsAsync();
+            await CombatService.SaveCreaturesAsync();
+        }
+        catch (Exception ex)
+        {
+            // The user is told by StorageAlerts, through SafeFileStore.SaveFailed.
+            Debug.WriteLine($"Saving the import failed: {ex.Message}");
         }
     }
 }

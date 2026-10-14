@@ -17,6 +17,7 @@ using DiceCombats.Rendering.Contracts;        // <— ADD
 using DiceCombats.Rendering.Renderers;        // <— ADD
 using DiceCombats.Automations;
 using DiceCombats.Integrations;
+using DiceCombats.Storage;
 
 #if WINDOWS
 using Microsoft.UI;
@@ -85,19 +86,7 @@ namespace DiceCombats
                             WebTitleBar.Attach(window);
 
                             // Attach to the Closing event and use the service provider
-                            _appWindow.Closing += (s, e) =>
-                            {
-                                ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
-
-                                var diceService = ServiceProvider.GetRequiredService<DiceCombatsService>();
-                                if (diceService != null)
-                                {
-                                    diceService.SaveCreatures();
-                                    diceService.SaveCombats();
-                                    _ = diceService.SavePinnedCombatsListAsync();
-                                    _ = diceService.SaveUserCreatureCustomFieldsListAsync();
-                                }
-                            };
+                            _appWindow.Closing += (s, e) => SaveAndFlush(TimeSpan.FromSeconds(10));
                         });
                     });
 #endif
@@ -105,20 +94,12 @@ namespace DiceCombats
 #if ANDROID
                     events.AddAndroid(android =>
                     {
-                        android.OnPause(activity =>
-                        {
-                            ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
-
-                            // Use the root service provider
-                            var diceService = ServiceProvider.GetRequiredService<DiceCombatsService>();
-                            if (diceService != null)
-                            {
-                                diceService.SaveCreatures();
-                                diceService.SaveCombats();
-                                _ = diceService.SavePinnedCombatsListAsync();
-                                _ = diceService.SaveUserCreatureCustomFieldsListAsync();
-                            }
-                        });
+                        // Android may end the process at any time once the app is
+                        // in the background. OnPause comes first and must stay
+                        // quick, so it only starts the saves; OnStop then waits
+                        // for them, briefly.
+                        android.OnPause(activity => SaveAndFlush(TimeSpan.Zero));
+                        android.OnStop(activity => SaveAndFlush(TimeSpan.FromSeconds(2)));
                     });
 #endif
                 });
@@ -129,6 +110,37 @@ namespace DiceCombats
             builder.Services.AddBlazorWebViewDeveloperTools();
             builder.Logging.AddDebug();
 #endif
+
+            // Where the data is, and the store every data file goes through.
+            // Built first: the language below is read from the local
+            // preferences, and in a debug run on a sandbox (DICE_DATA_DIR)
+            // those are a file of the sandbox, never the real ones.
+#if DEBUG
+            string? debugOverride = Environment.GetEnvironmentVariable(DataLocation.DebugOverrideVariable);
+#else
+            string? debugOverride = null;
+#endif
+            if (string.IsNullOrWhiteSpace(debugOverride))
+            {
+                debugOverride = null;
+            }
+            var localPreferences = LocalPreferences.Create(debugOverride, () => new MauiLocalPreferences());
+            var dataLocation = new DataLocation("DiceCombats", debugOverride ?? FileSystem.AppDataDirectory,
+                                                localPreferences, GetMachineName(), debugOverride);
+            Debug.WriteLine($"Data folder: {dataLocation.Root} ({dataLocation.State}{(dataLocation.IsDebugOverride ? ", " + DataLocation.DebugOverrideVariable : "")})");
+#if DEBUG
+            // Until the startup screen exists, a folder that cannot be used
+            // stops a debug run here rather than showing an empty library.
+            if (dataLocation.State != DataLocationState.Ok)
+            {
+                throw new InvalidOperationException(
+                    $"The data folder {dataLocation.Root} cannot be used ({dataLocation.State}). Check {DataLocation.DebugOverrideVariable}.");
+            }
+#endif
+            builder.Services.AddSingleton<ILocalPreferences>(localPreferences);
+            builder.Services.AddSingleton(dataLocation);
+            builder.Services.AddSingleton(new SafeFileStore(dataLocation.GetPath));
+            builder.Services.AddSingleton<StorageNotices>();
 
             builder.Services.AddMudServices();
             builder.Services.AddSingleton<DiceCombatsService>();
@@ -162,7 +174,7 @@ namespace DiceCombats
             builder.Services.AddSingleton<RendererRegistry>();
             // ======================================================
 
-            string cultureCode = Preferences.Get("Language", CultureInfo.CurrentUICulture.Name);
+            string cultureCode = localPreferences.Get("Language", CultureInfo.CurrentUICulture.Name);
             var culture = new CultureInfo(cultureCode);
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
@@ -175,7 +187,66 @@ namespace DiceCombats
             // something else happened to ask for it.
             app.Services.GetRequiredService<CombatLogService>();
 
+            // Every data file is read before the first page can ask for it, or
+            // save over it. Until the startup screen exists, this waits here.
+            var diceService = app.Services.GetRequiredService<DiceCombatsService>();
+            var automationConfig = app.Services.GetRequiredService<AutomationConfigurationService>();
+            Task.Run(async () =>
+            {
+                await diceService.InitializeAsync();
+                await automationConfig.InitializeAsync();
+            }).GetAwaiter().GetResult();
+            app.Services.GetRequiredService<StorageNotices>().ReportLoadFailures();
+
             return app;
+        }
+
+        private static string GetMachineName()
+        {
+#if ANDROID
+            return DeviceInfo.Current.Name;
+#else
+            return Environment.MachineName;
+#endif
+        }
+
+        /// <summary>
+        /// Saves what is in memory, then waits at most <paramref name="wait"/>
+        /// until every write has reached the disk (no wait for TimeSpan.Zero).
+        /// Called when the window closes (Windows) and when the app goes to the
+        /// background (Android).
+        /// </summary>
+        private static void SaveAndFlush(TimeSpan wait)
+        {
+            try
+            {
+                ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
+                _ = ServiceProvider.GetRequiredService<DiceCombatsService>().SaveAllAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Saving on close failed: {ex}");
+            }
+            finally
+            {
+                // Whatever went wrong above, the saves already started are
+                // waited for.
+                if (wait > TimeSpan.Zero)
+                {
+                    try
+                    {
+                        var store = ServiceProvider.GetRequiredService<SafeFileStore>();
+                        if (!Task.Run(() => store.FlushAsync()).Wait(wait))
+                        {
+                            Debug.WriteLine($"Saving on close did not finish within {wait.TotalSeconds} seconds.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Saving on close failed: {ex}");
+                    }
+                }
+            }
         }
     }
 }

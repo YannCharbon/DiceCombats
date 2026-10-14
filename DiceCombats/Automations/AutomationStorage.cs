@@ -5,8 +5,16 @@ namespace DiceCombats.Automations;
 
 public interface IAutomationStorage
 {
-    Task<string?> ReadTextAsync(string fileName, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Reads and deserialises a file. Returns null when the file does not
+    /// exist. Throws when it exists but cannot be read or deserialised; the
+    /// storage then never writes over it during this session.
+    /// </summary>
+    Task<T?> ReadJsonAsync<T>(string fileName, JsonSerializerOptions options, CancellationToken cancellationToken = default) where T : class;
     Task WriteTextAsync(string fileName, string content, CancellationToken cancellationToken = default);
+
+    /// <summary>Refuses every later write of the file during this session.</summary>
+    void Block(string fileName, string reason);
 }
 
 public sealed class AutomationConfigurationService
@@ -24,6 +32,9 @@ public sealed class AutomationConfigurationService
         _jsonOptions = new JsonSerializerOptions { WriteIndented = true };
     }
 
+    /// <summary>Loads the configuration once, at startup.</summary>
+    public Task InitializeAsync(CancellationToken cancellationToken = default) => EnsureLoadedAsync(cancellationToken);
+
     public async Task<AutomationConfiguration> GetConfigurationAsync(CancellationToken cancellationToken = default)
     {
         await EnsureLoadedAsync(cancellationToken);
@@ -37,11 +48,14 @@ public sealed class AutomationConfigurationService
         try
         {
             if (_loaded) return;
-            var text = await _storage.ReadTextAsync(FileName, cancellationToken);
-            if (!string.IsNullOrWhiteSpace(text))
+            // A file that cannot be read leaves an empty configuration in
+            // memory, and the storage refuses to save it over the file.
+            try { _configuration = await _storage.ReadJsonAsync<AutomationConfiguration>(FileName, _jsonOptions, cancellationToken) ?? new(); }
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                try { _configuration = JsonSerializer.Deserialize<AutomationConfiguration>(text, _jsonOptions) ?? new(); }
-                catch (Exception ex) { Debug.WriteLine($"Invalid automations json: {ex}"); _configuration = new(); }
+                Debug.WriteLine($"Invalid automations json: {ex}");
+                _configuration = new();
+                _storage.Block(FileName, ex.Message);
             }
             _loaded = true;
         }

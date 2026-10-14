@@ -134,6 +134,29 @@ More screenshots on the [website](https://yanncharbon.github.io/DiceCombats/#scr
 
 ---
 
+## Your data
+
+- **Sharing.** A combat is exported with the creatures it uses, so whoever imports it gets the whole
+  encounter. In Settings, in the Data section, **Export the whole library…** saves your creatures,
+  combats, player groups, user custom fields and automations in one file, without the access tokens of
+  your automations. When you import a file and some items are already in your library, you choose for
+  each one whether to import it as a copy, replace the local one or keep yours. A backup is made first.
+- **Backups.** DiceCombats backs up your data the first time you open it each day, and before every
+  import, restore or copy of your data to another folder. The most recent backup is shown in Settings
+  with a **Restore** button, and **All backups…** lists the others.
+- **Using several computers (Windows).** With **Choose another folder…**, you can keep your data in a
+  folder that OneDrive, Dropbox or another service keeps in sync. If the folder already holds
+  DiceCombats data, you can use it, replace it with yours or merge both. Please open DiceCombats on one
+  computer at a time: it warns you when it is already open elsewhere, and offers to reload your data
+  when another computer has changed it. Please also set the folder to always keep its files on this
+  device.
+- **Android.** The data stays on the device. To take it to another device, export the whole library or
+  save a backup to a file, then import or restore it there.
+
+More details on the [website](https://yanncharbon.github.io/DiceCombats/#data).
+
+---
+
 ## The Dice ecosystem
 
 The Dice ecosystem currently includes two apps: DiceCombats and DiceAudio.
@@ -149,7 +172,8 @@ during combat.
 
 ## Installation
 
-There is no installer and no account to create. DiceCombats stores all of its data locally on your device.
+There is no installer and no account to create. DiceCombats stores all of its data locally on your device,
+in a folder you can choose on Windows.
 
 Get the latest build here: [![Latest Release](https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge)](https://github.com/YannCharbon/DiceCombats/releases/latest)
 

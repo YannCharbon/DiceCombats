@@ -2,7 +2,7 @@
 @using DiceCombats.Automations
 @using DiceCombats.Components.BlazorComponents.Automations
 @inject AutomationConfigurationService ConfigService
-@inject ILocalPreferences LocalPreferences
+@inject AppSettings Settings
 @inject IDiceEventPublisher EventPublisher
 @inject PopupNotificationService PopupNotificationService
 @inject IStringLocalizer<Resources.Localization.Automations> Loc
@@ -336,8 +336,8 @@
 
     private bool _assistanceExpanded
     {
-        get => LocalPreferences.Get("AssistanceAutomations", false);
-        set => LocalPreferences.Set("AssistanceAutomations", value);
+        get => Settings.Get("AssistanceAutomations", false);
+        set => Settings.Set("AssistanceAutomations", value);
     }
 
     protected override async Task OnInitializedAsync()

@@ -10,7 +10,7 @@
 @using System.Collections.Generic
 @using Microsoft.AspNetCore.Components
 @inject DiceCombatsService CombatService
-@inject ILocalPreferences LocalPreferences
+@inject AppSettings Settings
 @inject IStringLocalizer<Resources.Localization.CreatureCustomFieldsEditor> Loc
 
 @inject IJSRuntime JS
@@ -256,8 +256,8 @@
 
     private bool _fieldHelpExpanded
     {
-        get => LocalPreferences.Get("AssistanceField", true);
-        set => LocalPreferences.Set("AssistanceField", value);
+        get => Settings.Get("AssistanceField", true);
+        set => Settings.Set("AssistanceField", value);
     }
 
     // Each kind asks for the width it actually needs, so a Colour field never

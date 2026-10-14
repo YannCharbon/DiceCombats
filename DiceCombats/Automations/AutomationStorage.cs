@@ -58,8 +58,11 @@ public sealed class AutomationConfigurationService
         finally { _lock.Release(); }
     }
 
-    /// <summary>Loads the configuration once, at startup.</summary>
-    public Task InitializeAsync(CancellationToken cancellationToken = default) => EnsureLoadedAsync(cancellationToken);
+    /// <summary>
+    /// Reads the configuration at startup, once the data folder can be used.
+    /// Always reads, so that nothing asked before that moment sticks.
+    /// </summary>
+    public Task InitializeAsync(CancellationToken cancellationToken = default) => ReloadAsync(cancellationToken);
 
     public async Task<AutomationConfiguration> GetConfigurationAsync(CancellationToken cancellationToken = default)
     {
@@ -90,7 +93,8 @@ public sealed class AutomationConfigurationService
 
     public async Task SaveAsync(CancellationToken cancellationToken = default)
     {
-        await EnsureLoadedAsync(cancellationToken);
+        // Nothing to save before the configuration has been read.
+        if (!_loaded) return;
         var text = JsonSerializer.Serialize(_configuration, _jsonOptions);
         await _storage.WriteTextAsync(FileName, text, cancellationToken);
     }

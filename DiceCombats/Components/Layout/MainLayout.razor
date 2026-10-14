@@ -10,6 +10,8 @@
 
 @inject DiceCombatsService CombatsService
 @inject NavigationManager Navigation
+@inject DiceCombats.Storage.DataFolderService DataFolder
+@inject IStringLocalizer<DiceCombats.Resources.Localization.Portability> PLoc
 @implements IDisposable
 
 <PopupNotification></PopupNotification>
@@ -20,12 +22,20 @@
 
 <WebLinkModal />
 
-<DCNavMenu />
-
 <MudThemeProvider IsDarkMode="true" Theme="DCTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+
+@* Until the data has been read (the data folder could not be used at
+   startup), the startup screen stands in for the whole app. *@
+@if (!DataFolder.IsLoaded)
+{
+    <DataFolderGate />
+}
+else
+{
+<DCNavMenu />
 
 <div class="page">
     <!--<div class="sidebar">
@@ -34,6 +44,10 @@
 
     <main>
         <article class="content px-4" id="mainpagebody">
+            @if (DataFolder.Location.IsSessionFallback)
+            {
+                <div class="dc-note" style="margin:10px 0;">@PLoc["StartupUsingLocalBanner"]</div>
+            }
             @Body
         </article>
 
@@ -42,12 +56,16 @@
         </div>
     </main>
 </div>
+}
 
 @code {
     protected override void OnInitialized()
     {
         App.PagesReloadRequested += ReloadInPlace;
+        DataFolder.LoadedChanged += OnLoadedChanged;
     }
+
+    private void OnLoadedChanged() => InvokeAsync(StateHasChanged);
 
     // A full reload of the web page in the same web view: every component and
     // every scoped service starts again, as with a new page, but the native
@@ -60,6 +78,7 @@
     public void Dispose()
     {
         App.PagesReloadRequested -= ReloadInPlace;
+        DataFolder.LoadedChanged -= OnLoadedChanged;
     }
 
     // Every colour below is a stop of the brand gradient or a step of the

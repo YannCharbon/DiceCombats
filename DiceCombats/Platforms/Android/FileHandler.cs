@@ -79,6 +79,8 @@ namespace DiceCombats
             return await tcs.Task;
         }
 
+        public Task<string?> PickFolderAsync() => Task.FromResult<string?>(null);
+
         public async Task<byte[]> LoadFileAsync()
         {
             var intent = new Intent(Intent.ActionGetContent);

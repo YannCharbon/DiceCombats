@@ -51,6 +51,23 @@ namespace DiceCombats
             return true;
         }
 
+        public async Task<string?> PickFolderAsync()
+        {
+            var picker = new FolderPicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary
+            };
+            picker.FileTypeFilter.Add("*");
+
+            var winuiWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView as MauiWinUIWindow;
+            if (winuiWindow == null)
+                return null;
+
+            InitializeWithWindow.Initialize(picker, winuiWindow.WindowHandle);
+            var folder = await picker.PickSingleFolderAsync();
+            return folder?.Path;
+        }
+
         public async Task<byte[]> LoadFileAsync()
         {
             var picker = new FileOpenPicker

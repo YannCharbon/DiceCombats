@@ -459,4 +459,148 @@
   <data name="ImportRollbackFailed" xml:space="preserve">
     <value>L'importation n'a pas pu aboutir et vos données n'ont pas pu être rétablies automatiquement. Vos données d'avant l'importation se trouvent dans la sauvegarde {0}. Merci de la restaurer depuis les Réglages, dans la section Données.</value>
   </data>
+  <data name="DataFolderTitle" xml:space="preserve">
+    <value>Dossier de données</value>
+  </data>
+  <data name="DataFolderHelp" xml:space="preserve">
+    <value>C'est ici que DiceCombats conserve vos données. Vous pouvez choisir un autre dossier, par exemple un dossier synchronisé par OneDrive ou Dropbox, afin d'utiliser les mêmes données sur plusieurs ordinateurs. Merci de n'ouvrir DiceCombats que sur un ordinateur à la fois.</value>
+  </data>
+  <data name="DataFolderDefault" xml:space="preserve">
+    <value>Le dossier par défaut</value>
+  </data>
+  <data name="DataFolderChangeBtn" xml:space="preserve">
+    <value>Choisir un autre dossier…</value>
+  </data>
+  <data name="DataFolderOpenBtn" xml:space="preserve">
+    <value>Ouvrir le dossier</value>
+  </data>
+  <data name="DataFolderResetBtn" xml:space="preserve">
+    <value>Revenir au dossier par défaut</value>
+  </data>
+  <data name="DataFolderDebugSuffix" xml:space="preserve">
+    <value>(DICE_DATA_DIR)</value>
+  </data>
+  <data name="MoveConfirmTitle" xml:space="preserve">
+    <value>Déplacer vos données dans ce dossier ?</value>
+  </data>
+  <data name="MoveConfirmText" xml:space="preserve">
+    <value>DiceCombats copie vos données dans {0}, vérifie la copie, puis redémarre et utilise le nouveau dossier. Vos données actuelles restent à leur emplacement jusqu'à ce que vous les supprimiez depuis cette page.</value>
+  </data>
+  <data name="MoveConfirmBtn" xml:space="preserve">
+    <value>Déplacer mes données</value>
+  </data>
+  <data name="MoveCloudTip" xml:space="preserve">
+    <value>Si OneDrive ou un autre service synchronise ce dossier, réglez-le pour qu'il conserve toujours les fichiers sur cet appareil. Sinon, DiceCombats risque de devoir attendre leur téléchargement.</value>
+  </data>
+  <data name="MoveSubfolderNote" xml:space="preserve">
+    <value>Ce dossier contient déjà d'autres fichiers ; DiceCombats placera donc ses données dans le sous-dossier {0}.</value>
+  </data>
+  <data name="MoveInProgress" xml:space="preserve">
+    <value>Copie de vos données… {0} sur {1}</value>
+  </data>
+  <data name="MoveErrorNotWritable" xml:space="preserve">
+    <value>DiceCombats ne peut pas écrire dans ce dossier. Merci d'en choisir un autre.</value>
+  </data>
+  <data name="MoveErrorNoSpace" xml:space="preserve">
+    <value>L'espace libre est insuffisant sur ce disque : {0} nécessaires, {1} disponibles.</value>
+  </data>
+  <data name="MoveErrorInsideCurrent" xml:space="preserve">
+    <value>Ce dossier est le dossier de données actuel, ou se trouve à l'intérieur de celui-ci. Merci de choisir un dossier situé ailleurs.</value>
+  </data>
+  <data name="MoveErrorAppData" xml:space="preserve">
+    <value>Les dossiers situés dans AppData ne peuvent pas être utilisés. Merci de choisir un dossier ailleurs, par exemple dans vos Documents ou dans un dossier synchronisé.</value>
+  </data>
+  <data name="MoveErrorOtherApp" xml:space="preserve">
+    <value>Ce dossier contient des données de DiceAudio. Merci de choisir un dossier distinct pour DiceCombats.</value>
+  </data>
+  <data name="MoveFailed" xml:space="preserve">
+    <value>Vos données n'ont pas pu être copiées : {0}. Rien n'a été modifié et DiceCombats utilise toujours {1}.</value>
+  </data>
+  <data name="MoveRestartNotice" xml:space="preserve">
+    <value>DiceCombats va maintenant redémarrer pour utiliser le nouveau dossier.</value>
+  </data>
+  <data name="OldCopyNotice" xml:space="preserve">
+    <value>Vos anciennes données se trouvent toujours dans {0}. Une fois que vous aurez vérifié que tout se trouve dans le nouveau dossier, vous pourrez les supprimer.</value>
+  </data>
+  <data name="OldCopyDeleteBtn" xml:space="preserve">
+    <value>Supprimer l'ancienne copie</value>
+  </data>
+  <data name="OldCopyDeleteConfirm" xml:space="preserve">
+    <value>Cette action supprime vos anciennes données dans {0}. Elle est irréversible.</value>
+  </data>
+  <data name="ExistingFolderTitle" xml:space="preserve">
+    <value>Ce dossier contient déjà des données DiceCombats</value>
+  </data>
+  <data name="ExistingFolderText" xml:space="preserve">
+    <value>Le dossier contient {0}. Vos données actuelles contiennent {1}. Que souhaitez-vous faire ?</value>
+  </data>
+  <data name="ExistingUseFolderBtn" xml:space="preserve">
+    <value>Utiliser les données du dossier</value>
+  </data>
+  <data name="ExistingUseFolderHelp" xml:space="preserve">
+    <value>DiceCombats utilise le dossier tel quel. Vos données actuelles restent à leur emplacement.</value>
+  </data>
+  <data name="ExistingReplaceBtn" xml:space="preserve">
+    <value>Les remplacer par les miennes</value>
+  </data>
+  <data name="ExistingReplaceHelp" xml:space="preserve">
+    <value>Les données du dossier sont d'abord sauvegardées, puis remplacées par les vôtres.</value>
+  </data>
+  <data name="ExistingMergeBtn" xml:space="preserve">
+    <value>Fusionner</value>
+  </data>
+  <data name="ExistingMergeHelp" xml:space="preserve">
+    <value>Vos données sont ajoutées à celles du dossier, et vous choisissez ce qu'il convient de faire lorsqu'un élément existe des deux côtés.</value>
+  </data>
+  <data name="StartupMissingTitle" xml:space="preserve">
+    <value>Le dossier de données est inaccessible</value>
+  </data>
+  <data name="StartupInvalidTitle" xml:space="preserve">
+    <value>Le dossier de données ne peut pas être utilisé</value>
+  </data>
+  <data name="StartupMissingText" xml:space="preserve">
+    <value>DiceCombats conserve vos données dans {0}, mais ce dossier est inaccessible pour le moment. S'il se trouve sur un disque externe ou sur le réseau, connectez-le puis réessayez. DiceCombats ne créera pas de bibliothèque vide à cet endroit.</value>
+  </data>
+  <data name="StartupInvalidText" xml:space="preserve">
+    <value>Le dossier {0} ne peut pas être utilisé : il ne contient pas de données DiceCombats, DiceCombats ne peut pas y écrire, ou il a été préparé par une version plus récente de DiceCombats.</value>
+  </data>
+  <data name="StartupTryAgainBtn" xml:space="preserve">
+    <value>Réessayer</value>
+  </data>
+  <data name="StartupChooseFolderBtn" xml:space="preserve">
+    <value>Choisir un autre dossier…</value>
+  </data>
+  <data name="StartupUseLocalBtn" xml:space="preserve">
+    <value>Ouvrir le dossier par défaut à la place</value>
+  </data>
+  <data name="StartupUseLocalHelp" xml:space="preserve">
+    <value>Ouvre à la place les données du dossier par défaut de DiceCombats, pour cette session uniquement. Ces données peuvent être plus anciennes que celles du dossier choisi, voire absentes. Les modifications faites pendant cette session restent dans le dossier par défaut. À la prochaine ouverture, DiceCombats cherchera de nouveau le dossier choisi.</value>
+  </data>
+  <data name="StartupUsingLocalBanner" xml:space="preserve">
+    <value>Votre dossier de données est inaccessible : DiceCombats affiche les données de son dossier par défaut. Les modifications faites maintenant y sont enregistrées, et non dans votre dossier de données.</value>
+  </data>
+  <data name="StartupQuitBtn" xml:space="preserve">
+    <value>Quitter</value>
+  </data>
+  <data name="MergeNothingNewText" xml:space="preserve">
+    <value>Ce dossier ne contient rien de plus que vos données. Voulez-vous utiliser ce dossier avec vos données ?</value>
+  </data>
+  <data name="MergeNothingNewBtn" xml:space="preserve">
+    <value>Utiliser ce dossier</value>
+  </data>
+  <data name="ReplaceConfirmText" xml:space="preserve">
+    <value>Les données de {0} seront remplacées par les vôtres. Celles qui s'y trouvaient sont d'abord sauvegardées dans {0}\Backups.</value>
+  </data>
+  <data name="MoveRestartBtn" xml:space="preserve">
+    <value>Redémarrer maintenant</value>
+  </data>
+  <data name="StartupTryAgainHelp" xml:space="preserve">
+    <value>Vérifie de nouveau le dossier, par exemple une fois le disque ou le réseau connecté.</value>
+  </data>
+  <data name="StartupChooseFolderHelp" xml:space="preserve">
+    <value>Ouvre un dossier contenant vos données DiceCombats, s'il se trouve désormais ailleurs.</value>
+  </data>
+  <data name="StartupQuitHelp" xml:space="preserve">
+    <value>Ferme DiceCombats sans rien modifier.</value>
+  </data>
 </root>

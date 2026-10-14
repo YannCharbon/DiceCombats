@@ -459,4 +459,148 @@
   <data name="ImportRollbackFailed" xml:space="preserve">
     <value>The import could not be completed, and your data could not be put back automatically. Your data from just before the import is in the backup {0}. Please restore it from Settings, in the Data section.</value>
   </data>
+  <data name="DataFolderTitle" xml:space="preserve">
+    <value>Data folder</value>
+  </data>
+  <data name="DataFolderHelp" xml:space="preserve">
+    <value>This is where DiceCombats keeps your data. You can choose another folder, for example one that OneDrive or Dropbox keeps in sync, to use the same data on several computers. Please open DiceCombats on one computer at a time.</value>
+  </data>
+  <data name="DataFolderDefault" xml:space="preserve">
+    <value>The default folder</value>
+  </data>
+  <data name="DataFolderChangeBtn" xml:space="preserve">
+    <value>Choose another folder…</value>
+  </data>
+  <data name="DataFolderOpenBtn" xml:space="preserve">
+    <value>Open the folder</value>
+  </data>
+  <data name="DataFolderResetBtn" xml:space="preserve">
+    <value>Back to the default folder</value>
+  </data>
+  <data name="DataFolderDebugSuffix" xml:space="preserve">
+    <value>(DICE_DATA_DIR)</value>
+  </data>
+  <data name="MoveConfirmTitle" xml:space="preserve">
+    <value>Move your data to this folder?</value>
+  </data>
+  <data name="MoveConfirmText" xml:space="preserve">
+    <value>DiceCombats copies your data to {0}, checks the copy, then restarts and uses the new folder. Your current data stays where it is until you delete it from this page.</value>
+  </data>
+  <data name="MoveConfirmBtn" xml:space="preserve">
+    <value>Move my data</value>
+  </data>
+  <data name="MoveCloudTip" xml:space="preserve">
+    <value>If OneDrive or another service keeps this folder in sync, please set it to always keep the files on this device. Otherwise DiceCombats may have to wait for files to download.</value>
+  </data>
+  <data name="MoveSubfolderNote" xml:space="preserve">
+    <value>This folder already contains other files, so DiceCombats will keep its data in the subfolder {0}.</value>
+  </data>
+  <data name="MoveInProgress" xml:space="preserve">
+    <value>Copying your data… {0} of {1}</value>
+  </data>
+  <data name="MoveErrorNotWritable" xml:space="preserve">
+    <value>DiceCombats cannot write in this folder. Please choose another one.</value>
+  </data>
+  <data name="MoveErrorNoSpace" xml:space="preserve">
+    <value>There is not enough free space on this drive: {0} needed, {1} available.</value>
+  </data>
+  <data name="MoveErrorInsideCurrent" xml:space="preserve">
+    <value>This folder is the current data folder, or is inside it. Please choose a folder elsewhere.</value>
+  </data>
+  <data name="MoveErrorAppData" xml:space="preserve">
+    <value>Folders inside AppData cannot be used. Please choose a folder elsewhere, for example in your Documents or in a synchronised folder.</value>
+  </data>
+  <data name="MoveErrorOtherApp" xml:space="preserve">
+    <value>This folder holds DiceAudio data. Please choose a separate folder for DiceCombats.</value>
+  </data>
+  <data name="MoveFailed" xml:space="preserve">
+    <value>Your data could not be copied: {0}. Nothing has been changed, and DiceCombats still uses {1}.</value>
+  </data>
+  <data name="MoveRestartNotice" xml:space="preserve">
+    <value>DiceCombats will now restart to use the new folder.</value>
+  </data>
+  <data name="OldCopyNotice" xml:space="preserve">
+    <value>Your previous data is still in {0}. Once you have checked that everything is in the new folder, you can delete it.</value>
+  </data>
+  <data name="OldCopyDeleteBtn" xml:space="preserve">
+    <value>Delete the old copy</value>
+  </data>
+  <data name="OldCopyDeleteConfirm" xml:space="preserve">
+    <value>This deletes your previous data in {0}. It cannot be undone.</value>
+  </data>
+  <data name="ExistingFolderTitle" xml:space="preserve">
+    <value>This folder already contains DiceCombats data</value>
+  </data>
+  <data name="ExistingFolderText" xml:space="preserve">
+    <value>The folder contains {0}. Your current data contains {1}. What would you like to do?</value>
+  </data>
+  <data name="ExistingUseFolderBtn" xml:space="preserve">
+    <value>Use the folder's data</value>
+  </data>
+  <data name="ExistingUseFolderHelp" xml:space="preserve">
+    <value>DiceCombats switches to the folder as it is. Your current data stays where it is.</value>
+  </data>
+  <data name="ExistingReplaceBtn" xml:space="preserve">
+    <value>Replace it with mine</value>
+  </data>
+  <data name="ExistingReplaceHelp" xml:space="preserve">
+    <value>The folder's data is backed up first, then replaced by yours.</value>
+  </data>
+  <data name="ExistingMergeBtn" xml:space="preserve">
+    <value>Merge</value>
+  </data>
+  <data name="ExistingMergeHelp" xml:space="preserve">
+    <value>Your data is added to the folder's data, and you choose what to do when an item exists on both sides.</value>
+  </data>
+  <data name="StartupMissingTitle" xml:space="preserve">
+    <value>The data folder cannot be reached</value>
+  </data>
+  <data name="StartupInvalidTitle" xml:space="preserve">
+    <value>The data folder cannot be used</value>
+  </data>
+  <data name="StartupMissingText" xml:space="preserve">
+    <value>DiceCombats keeps your data in {0}, but this folder cannot be reached at the moment. If it is on an external drive or on the network, please connect it and try again. DiceCombats will not create an empty library there.</value>
+  </data>
+  <data name="StartupInvalidText" xml:space="preserve">
+    <value>The folder {0} cannot be used: it does not hold DiceCombats data, DiceCombats cannot write in it, or it was set up by a newer version of DiceCombats.</value>
+  </data>
+  <data name="StartupTryAgainBtn" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="StartupChooseFolderBtn" xml:space="preserve">
+    <value>Choose another folder…</value>
+  </data>
+  <data name="StartupUseLocalBtn" xml:space="preserve">
+    <value>Open the default folder instead</value>
+  </data>
+  <data name="StartupUseLocalHelp" xml:space="preserve">
+    <value>Opens the data in the default folder of DiceCombats instead, for this session only. This data may be older than the data in your chosen folder, or there may be none. Changes you make now stay in the default folder. Next time, DiceCombats will look for your chosen folder again.</value>
+  </data>
+  <data name="StartupUsingLocalBanner" xml:space="preserve">
+    <value>Your data folder could not be reached, so DiceCombats is showing the data in its default folder. Changes you make now are saved there, not in your data folder.</value>
+  </data>
+  <data name="StartupQuitBtn" xml:space="preserve">
+    <value>Quit</value>
+  </data>
+  <data name="MergeNothingNewText" xml:space="preserve">
+    <value>There is nothing to add from this folder. Do you want to use this folder with your data?</value>
+  </data>
+  <data name="MergeNothingNewBtn" xml:space="preserve">
+    <value>Use this folder</value>
+  </data>
+  <data name="ReplaceConfirmText" xml:space="preserve">
+    <value>This replaces the data in {0} with yours. The data that was there is backed up first in {0}\Backups.</value>
+  </data>
+  <data name="MoveRestartBtn" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
+  <data name="StartupTryAgainHelp" xml:space="preserve">
+    <value>Checks the folder again, for example once the drive or the network is connected.</value>
+  </data>
+  <data name="StartupChooseFolderHelp" xml:space="preserve">
+    <value>Opens a folder that holds your DiceCombats data, if it is now somewhere else.</value>
+  </data>
+  <data name="StartupQuitHelp" xml:space="preserve">
+    <value>Closes DiceCombats without changing anything.</value>
+  </data>
 </root>

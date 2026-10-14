@@ -20,6 +20,7 @@ public sealed class DCImportFlow
     private readonly DCBundleService _bundles;
     private readonly IFileHandler _fileHandler;
     private TaskCompletionSource? _done;
+    private ImportReport? _applied;
 
     public DCImportFlow(DCBundleService bundles, IFileHandler fileHandler)
     {
@@ -49,9 +50,11 @@ public sealed class DCImportFlow
         await StartAsync(data);
     }
 
-    public async Task StartAsync(byte[] data)
+    /// <summary>Opens the import of a file. Returns the report when the user applied it, null otherwise.</summary>
+    public async Task<ImportReport?> StartAsync(byte[] data)
     {
-        if (Stage != DCImportStage.Idle) return;
+        if (Stage != DCImportStage.Idle) return null;
+        _applied = null;
         _done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         FileSizeBytes = data.LongLength;
         try
@@ -66,6 +69,7 @@ public sealed class DCImportFlow
         }
         Changed?.Invoke();
         await _done.Task;
+        return _applied;
     }
 
     public async Task ConfirmAsync()
@@ -86,6 +90,7 @@ public sealed class DCImportFlow
         try
         {
             Report = await _bundles.ApplyAsync(Session);
+            _applied = Report;
             Stage = DCImportStage.Report;
         }
         catch (Exception ex)

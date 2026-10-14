@@ -128,19 +128,25 @@ namespace DiceCombats
             var dataLocation = new DataLocation("DiceCombats", debugOverride ?? FileSystem.AppDataDirectory,
                                                 localPreferences, GetMachineName(), debugOverride);
             Debug.WriteLine($"Data folder: {dataLocation.Root} ({dataLocation.State}{(dataLocation.IsDebugOverride ? ", " + DataLocation.DebugOverrideVariable : "")})");
-#if DEBUG
-            // Until the startup screen exists, a folder that cannot be used
-            // stops a debug run here rather than showing an empty library.
-            if (dataLocation.State != DataLocationState.Ok)
+            var store = new SafeFileStore(dataLocation.GetPath);
+            var settings = new AppSettings(store, "DiceCombats");
+
+            // The language is a setting of the data folder; when that folder
+            // cannot be used (the startup screen then shows), the copy kept on
+            // this computer speaks for it.
+            string cultureCode = localPreferences.Get("Language", CultureInfo.CurrentUICulture.Name);
+            if (dataLocation.State == DataLocationState.Ok)
             {
-                throw new InvalidOperationException(
-                    $"The data folder {dataLocation.Root} cannot be used ({dataLocation.State}). Check {DataLocation.DebugOverrideVariable}.");
+                Task.Run(() => settings.InitializeAsync(localPreferences, DataFolderService.MovedPreferenceKeys)).GetAwaiter().GetResult();
+                cultureCode = settings.Get("Language", cultureCode);
             }
-#endif
+
             builder.Services.AddSingleton<ILocalPreferences>(localPreferences);
             builder.Services.AddSingleton(dataLocation);
-            builder.Services.AddSingleton(new SafeFileStore(dataLocation.GetPath));
+            builder.Services.AddSingleton(store);
+            builder.Services.AddSingleton(settings);
             builder.Services.AddSingleton<StorageNotices>();
+            builder.Services.AddSingleton<DataFolderService>();
 
             builder.Services.AddMudServices();
             builder.Services.AddSingleton<DiceCombatsService>();
@@ -177,7 +183,6 @@ namespace DiceCombats
             builder.Services.AddSingleton<RendererRegistry>();
             // ======================================================
 
-            string cultureCode = localPreferences.Get("Language", CultureInfo.CurrentUICulture.Name);
             var culture = new CultureInfo(cultureCode);
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
@@ -191,37 +196,13 @@ namespace DiceCombats
             app.Services.GetRequiredService<CombatLogService>();
 
             // Every data file is read before the first page can ask for it, or
-            // save over it. Until the startup screen exists, this waits here.
-            var diceService = app.Services.GetRequiredService<DiceCombatsService>();
-            var automationConfig = app.Services.GetRequiredService<AutomationConfigurationService>();
-            Task.Run(async () =>
+            // save over it. When the data folder cannot be used, nothing is
+            // read: the startup screen (DataFolderGate) asks what to do, and
+            // loads once a usable folder is chosen.
+            if (dataLocation.State == DataLocationState.Ok)
             {
-                await diceService.InitializeAsync();
-                await automationConfig.InitializeAsync();
-            }).GetAwaiter().GetResult();
-            app.Services.GetRequiredService<StorageNotices>().ReportLoadFailures();
-
-            // The first start of the day on this machine makes a backup, in the
-            // background. Not after a file failed to load: the backups kept
-            // would slowly be replaced by copies of the broken state.
-            if (app.Services.GetRequiredService<SafeFileStore>().BlockedFiles.Count == 0)
-            {
-                var backups = app.Services.GetRequiredService<BackupService>();
-                var store = app.Services.GetRequiredService<SafeFileStore>();
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        // After the saves the load itself started (the pinned
-                        // list migration) are on disk.
-                        await store.FlushAsync();
-                        await backups.AutoBackupIfDueAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Automatic backup failed: {ex}");
-                    }
-                });
+                var dataFolder = app.Services.GetRequiredService<DataFolderService>();
+                Task.Run(dataFolder.LoadAsync).GetAwaiter().GetResult();
             }
 
             return app;
@@ -248,6 +229,11 @@ namespace DiceCombats
             {
                 ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
                 _ = ServiceProvider.GetRequiredService<DiceCombatsService>().SaveAllAsync();
+                var dataFolder = ServiceProvider.GetRequiredService<DataFolderService>();
+                if (dataFolder.IsLoaded)
+                {
+                    _ = dataFolder.WriteMarkerAsync();
+                }
             }
             catch (Exception ex)
             {

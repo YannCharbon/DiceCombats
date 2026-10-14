@@ -9,10 +9,14 @@ namespace DiceCombats
     public partial class App : Application
     {
         private readonly ILocalPreferences _localPreferences;
+        private readonly AppSettings _settings;
+        private readonly DataLocation _location;
 
-        public App(ILocalPreferences localPreferences)
+        public App(ILocalPreferences localPreferences, AppSettings settings, DataLocation location)
         {
             _localPreferences = localPreferences;
+            _settings = settings;
+            _location = location;
 
             InitializeComponent();
 
@@ -40,9 +44,33 @@ namespace DiceCombats
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
+            // The language travels in settings.json; a copy stays on this
+            // computer, so that the startup screen speaks it when the data
+            // folder cannot be reached.
+            if (_settings.IsInitialized)
+            {
+                _settings.Set("Language", cultureCode);
+            }
             _localPreferences.Set("Language", cultureCode);
 
             ReloadPages();
+        }
+
+        /// <summary>
+        /// Starts the app again, after the data folder changed. In a debug run on
+        /// a sandbox (DICE_DATA_DIR) it only quits: a restarted process might not
+        /// get that variable, and would then open the real data.
+        /// </summary>
+        public void Restart()
+        {
+#if WINDOWS
+            if (!_location.IsDebugOverride)
+            {
+                var failure = Microsoft.Windows.AppLifecycle.AppInstance.Restart(string.Empty);
+                Debug.WriteLine($"Restart failed: {failure}");
+            }
+#endif
+            Quit();
         }
 
         /// <summary>

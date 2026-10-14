@@ -69,6 +69,12 @@ namespace DiceCombats
         /// leaves its list empty, is never saved over, and does not stop the
         /// others from loading. Called once at startup, before any page.
         /// </summary>
+        /// <summary>
+        /// False until the data has been read. Until then nothing is saved: the
+        /// lists are empty, and the data folder may not even be reachable yet.
+        /// </summary>
+        public bool IsInitialized { get; private set; }
+
         public async Task InitializeAsync()
         {
             await LoadGuardedAsync(CreaturesFileName, LoadCreatureListAsync);
@@ -77,6 +83,7 @@ namespace DiceCombats
             await LoadGuardedAsync(UserCreatureCustomFieldsFileName, LoadUserCreatureCustomFieldsListAsync);
             await LoadGuardedAsync(PlayerGroupsFileName, LoadPlayerGroupsListAsync);
             await LoadGuardedAsync(CombatLogsFileName, LoadCombatLogsListAsync);
+            IsInitialized = true;
         }
 
         // Anything that goes wrong while one file is taken in blocks that file
@@ -158,6 +165,7 @@ namespace DiceCombats
 
         public Task<SaveOutcome> SaveCreaturesAsync()
         {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
             return _store.SaveJsonAsync(CreaturesFileName, _CreatureList, WriteOptions, overwriteExternalChange: true);
         }
 
@@ -201,6 +209,7 @@ namespace DiceCombats
 
         public Task<SaveOutcome> SaveCombatsAsync()
         {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
             return _store.SaveJsonAsync(CombatsFileName, _CombatsList, WriteOptions, overwriteExternalChange: true);
         }
 
@@ -286,6 +295,7 @@ namespace DiceCombats
 
         public Task<SaveOutcome> SavePinnedCombatsListAsync()
         {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
             return _store.SaveJsonAsync(PinnedCombatsFileName, _pinnedCombats, WriteOptions, overwriteExternalChange: true);
         }
 
@@ -314,8 +324,10 @@ namespace DiceCombats
 
                     // Write straight away so the new file becomes the source of
                     // truth even if the app is killed before the next save. The
-                    // legacy file is left untouched on purpose.
-                    await SavePinnedCombatsListAsync();
+                    // legacy file is left untouched on purpose. Written through
+                    // the store directly: the service saves nothing while it is
+                    // still loading.
+                    await _store.SaveJsonAsync(PinnedCombatsFileName, _pinnedCombats, WriteOptions, overwriteExternalChange: true);
                 }
                 else
                 {
@@ -362,6 +374,7 @@ namespace DiceCombats
 
         public Task<SaveOutcome> SaveUserCreatureCustomFieldsListAsync()
         {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
             return _store.SaveJsonAsync(UserCreatureCustomFieldsFileName, _userCreatureCustomFields, WriteOptions, overwriteExternalChange: true);
         }
 
@@ -429,6 +442,7 @@ namespace DiceCombats
 
         public Task<SaveOutcome> SaveCombatLogsAsync()
         {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
             return _store.SaveJsonAsync(CombatLogsFileName, _combatLogs, WriteOptions, overwriteExternalChange: true);
         }
 
@@ -439,6 +453,35 @@ namespace DiceCombats
             {
                 _combatLogs = temp;
             }
+        }
+
+        /// <summary>
+        /// Adds the combat logs and pinned combats of another library, when two
+        /// data folders are merged: sessions by id, with the usual limit per
+        /// combat; pins of combats that exist, with the stale ones dropped.
+        /// </summary>
+        public async Task MergeLogsAndPinsAsync(IEnumerable<DCCombatLogSession> sessions, IEnumerable<string> pins)
+        {
+            foreach (var session in sessions)
+            {
+                if (!_combatLogs.Exists(x => x.Id == session.Id)) _combatLogs.Add(session);
+            }
+            foreach (var group in _combatLogs.GroupBy(x => x.CombatId).ToList())
+            {
+                foreach (var old in group.OrderByDescending(x => x.StartedAt).Skip(MaxLogSessionsPerCombat))
+                {
+                    _combatLogs.Remove(old);
+                }
+            }
+
+            foreach (string pin in pins)
+            {
+                if (!_pinnedCombats.Contains(pin)) _pinnedCombats.Add(pin);
+            }
+            _pinnedCombats.RemoveAll(guid => GetCombatFromGUID(guid) == null);
+
+            await SaveCombatLogsAsync();
+            await SavePinnedCombatsListAsync();
         }
 
         // Player groups
@@ -477,6 +520,7 @@ namespace DiceCombats
 
         public Task<SaveOutcome> SavePlayerGroupsListAsync()
         {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
             return _store.SaveJsonAsync(PlayerGroupsFileName, _playerGroups, WriteOptions, overwriteExternalChange: true);
         }
 

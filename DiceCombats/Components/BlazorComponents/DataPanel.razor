@@ -16,8 +16,10 @@
 
 @using DiceCombats.Storage
 @inject BackupService Backups
+@inject DiceCombatsService CombatService
 @inject DiceCombats.Portability.DCBundleService Bundles
 @inject DiceCombats.Portability.DCImportFlow ImportFlow
+@inject DataFolderService DataFolder
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
 @inject StorageNotices Notices
@@ -88,7 +90,95 @@
             <DcIcon Name="download" /> @Loc["ImportFromFileBtn"]
         </button>
     </div>
+
+    @* Windows only (workplan §1.3): on Android the data stays on the device,
+       and export or a backup saved to a file take it elsewhere. *@
+    @if (OperatingSystem.IsWindows())
+    {
+        <div class="dc-strip-name" style="margin-top:18px;">@Loc["DataFolderTitle"]</div>
+        <p class="dc-meta" style="margin:6px 0 0;">@Loc["DataFolderHelp"]</p>
+        <div class="dc-note" style="margin-top:10px;">
+            @if (Location.IsDefault && !Location.IsDebugOverride)
+            {
+                <b>@Loc["DataFolderDefault"]</b><br />
+            }
+            <span style="overflow-wrap:anywhere;">@Location.Root</span>
+            @if (Location.IsDebugOverride && Location.IsDefault)
+            {
+                @(" ")<span>@Loc["DataFolderDebugSuffix"]</span>
+            }
+        </div>
+        @if (_moveProgress != null)
+        {
+            <p class="dc-meta" style="margin:8px 0 0;">@_moveProgress</p>
+        }
+        <div class="dc-irow dc-irow-wrap" style="gap:10px;margin-top:12px;">
+            <button type="button" class="dc-btn dc-btn-out" disabled="@_busy" @onclick="() => ChangeFolder(null)">
+                <DcIcon Name="folder-open" /> @Loc["DataFolderChangeBtn"]
+            </button>
+            <button type="button" class="dc-btn dc-btn-out" @onclick="() => OpenFolder(Location.Root)">
+                <DcIcon Name="launch" /> @Loc["DataFolderOpenBtn"]
+            </button>
+            @if (!Location.IsDefault)
+            {
+                <button type="button" class="dc-btn dc-btn-out" disabled="@_busy" @onclick="() => ChangeFolder(Location.DefaultRoot)">
+                    <DcIcon Name="restore" /> @Loc["DataFolderResetBtn"]
+                </button>
+            }
+        </div>
+        @if (DataFolder.PreviousRoot is string previous && Directory.Exists(previous))
+        {
+            <div class="dc-note" style="margin-top:12px;">
+                @string.Format(Loc["OldCopyNotice"], previous)
+                <div style="margin-top:8px;">
+                    <button type="button" class="dc-btn dc-btn-danger dc-btn-sm" disabled="@_busy" @onclick="() => DeleteOldCopy(previous)">
+                        <DcIcon Name="delete" Size="16" /> @Loc["OldCopyDeleteBtn"]
+                    </button>
+                </div>
+            </div>
+        }
+    }
 </div>
+
+@if (_restartPending)
+{
+    <div class="dc-confirm-scrim">
+        <div class="dc-confirm" role="alertdialog" aria-modal="true">
+            <h3 class="dc-confirm-title">@Loc["DataFolderTitle"]</h3>
+            <p class="dc-confirm-msg">@Loc["MoveRestartNotice"]</p>
+            <div class="dc-confirm-foot">
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="RestartNow"><DcIcon Name="sync" /> @Loc["MoveRestartBtn"]</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_existing != null)
+{
+    <div class="dc-confirm-scrim">
+        <div class="dc-confirm" role="dialog" aria-modal="true" style="width:min(620px,100%);">
+            <h3 class="dc-confirm-title">@Loc["ExistingFolderTitle"]</h3>
+            <p class="dc-confirm-msg">@string.Format(Loc["ExistingFolderText"], _existingTheirs, _existingMine)</p>
+            <div class="dc-stack" style="gap:10px;margin-bottom:14px;">
+                <div>
+                    <button type="button" class="dc-btn dc-btn-fill" @onclick="UseExisting"><DcIcon Name="check" /> @Loc["ExistingUseFolderBtn"]</button>
+                    <div class="dc-meta" style="margin-top:4px;">@Loc["ExistingUseFolderHelp"]</div>
+                </div>
+                <div>
+                    <button type="button" class="dc-btn dc-btn-out" @onclick="ReplaceExisting"><DcIcon Name="upload" /> @Loc["ExistingReplaceBtn"]</button>
+                    <div class="dc-meta" style="margin-top:4px;">@Loc["ExistingReplaceHelp"]</div>
+                </div>
+                <div>
+                    <button type="button" class="dc-btn dc-btn-out" @onclick="MergeExisting"><DcIcon Name="sync" /> @Loc["ExistingMergeBtn"]</button>
+                    <div class="dc-meta" style="margin-top:4px;">@Loc["ExistingMergeHelp"]</div>
+                </div>
+            </div>
+            <div class="dc-confirm-foot">
+                <button type="button" class="dc-btn" @onclick="() => _existing = null">@Loc["WizardCancelBtn"]</button>
+            </div>
+        </div>
+    </div>
+}
 
 @if (_showAll && _backups != null)
 {
@@ -114,6 +204,13 @@
 <DcConfirm @ref="_confirm" />
 
 @code {
+    private DataLocation Location => DataFolder.Location;
+    private string? _moveProgress;
+    private bool _restartPending;
+    private string? _existing;
+    private string _existingTheirs = "";
+    private string _existingMine = "";
+
     private IReadOnlyList<BackupInfo>? _backups;
     private bool _busy;
     private bool _showAll;
@@ -355,6 +452,191 @@
             _ => Loc["RestoreDamaged"],
         };
         PopupNotificationService.Show(Loc["BackupsTitle"], message, PopupNotificationService.Type.FAILURE, 6000);
+    }
+
+    // ── data folder (Windows) ──────────────────────────────────────────
+
+    /// The chosen folder (or the default one, for "Back to the default
+    /// folder") is checked, then the data is moved there, or the folder's
+    /// own data is offered.
+    private async Task ChangeFolder(string? target)
+    {
+        if (_busy) return;
+        string? folder = target ?? await FileHandler.PickFolderAsync();
+        if (folder == null) return;
+
+        var check = DataFolder.CheckTarget(folder);
+        string? refusal = check.Check switch
+        {
+            MoveTargetCheck.NotWritable => Loc["MoveErrorNotWritable"],
+            MoveTargetCheck.NoSpace => string.Format(Loc["MoveErrorNoSpace"], Size(check.NeededBytes), Size(check.FreeBytes)),
+            MoveTargetCheck.InsideCurrent => Loc["MoveErrorInsideCurrent"],
+            MoveTargetCheck.AppData => Loc["MoveErrorAppData"],
+            MoveTargetCheck.OtherApp => Loc["MoveErrorOtherApp"],
+            MoveTargetCheck.Invalid => string.Format(Loc["StartupInvalidText"], check.Folder),
+            _ => null,
+        };
+        if (refusal != null)
+        {
+            PopupNotificationService.Show(Loc["DataFolderTitle"], refusal, PopupNotificationService.Type.FAILURE, 8000);
+            return;
+        }
+
+        if (check.Check == MoveTargetCheck.ExistingLibrary)
+        {
+            _existingTheirs = Contents(BackupService.SummarizeFolder(check.Folder));
+            _existingMine = Contents(BackupService.SummarizeFolder(Location.Root));
+            _existing = check.Folder;
+            return;
+        }
+
+        if (_confirm == null) return;
+        string text = string.Format(Loc["MoveConfirmText"], check.Folder);
+        if (check.Check == MoveTargetCheck.UseSubfolder) text += " " + string.Format(Loc["MoveSubfolderNote"], check.Folder);
+        text += " " + Loc["MoveCloudTip"];
+        if (!await _confirm.AskAsync(Loc["MoveConfirmTitle"], text, Loc["MoveConfirmBtn"], Loc["WizardCancelBtn"]))
+        {
+            DataFolderService.DiscardTarget(check);
+            return;
+        }
+
+        await RunMoveAsync(progress => DataFolder.MoveAsync(check.Folder, progress));
+    }
+
+    private async Task UseExisting()
+    {
+        string folder = _existing!;
+        _existing = null;
+        await RunMoveAsync(_ => DataFolder.UseExistingAsync(folder));
+    }
+
+    private async Task ReplaceExisting()
+    {
+        string folder = _existing!;
+        _existing = null;
+        if (_confirm == null) return;
+        if (!await _confirm.AskAsync(Loc["ExistingReplaceBtn"], string.Format(Loc["ReplaceConfirmText"], folder),
+                                     Loc["ExistingReplaceBtn"], Loc["WizardCancelBtn"])) return;
+        await RunMoveAsync(progress => DataFolder.ReplaceExistingAsync(folder, progress));
+    }
+
+    // The folder's library is imported into this computer's data with the
+    // import wizard (choices for every conflict); once the import is applied,
+    // the result replaces the folder's data, which is backed up first.
+    private async Task MergeExisting()
+    {
+        string folder = _existing!;
+        _existing = null;
+        byte[] bundle;
+        try
+        {
+            bundle = DataFolderService.ReadFolderAsBundle(folder, CombatService.GetVersion());
+        }
+        catch (Exception ex)
+        {
+            PopupNotificationService.Show(Loc["DataFolderTitle"], string.Format(Loc["MoveFailed"], ex.Message, Location.Root), PopupNotificationService.Type.FAILURE, 8000);
+            return;
+        }
+        bool somethingToAdd;
+        try
+        {
+            var session = await Bundles.AnalyseAsync(bundle);
+            somethingToAdd = session.Plan.AllItems.Any(i => i.Inserts);
+        }
+        catch (Exception ex)
+        {
+            PopupNotificationService.Show(Loc["DataFolderTitle"], string.Format(Loc["MoveFailed"], ex.Message, Location.Root), PopupNotificationService.Type.FAILURE, 8000);
+            return;
+        }
+
+        if (somethingToAdd)
+        {
+            if (await ImportFlow.StartAsync(bundle) == null) return;   // cancelled: nothing changes
+        }
+        else
+        {
+            // The import would have nothing to do: ask whether to go on.
+            if (_confirm == null) return;
+            if (!await _confirm.AskAsync(Loc["ExistingMergeBtn"], Loc["MergeNothingNewText"],
+                                         Loc["MergeNothingNewBtn"], Loc["WizardCancelBtn"])) return;
+        }
+
+        await RunMoveAsync(async progress =>
+        {
+            await DataFolder.MergeLogsAndPinsFromAsync(folder);
+            await DataFolder.ReplaceExistingAsync(folder, progress);
+        });
+    }
+
+    // Moves, then restarts. A failure leaves everything as it was: the data
+    // stays where it is, and the app keeps using it.
+    private async Task RunMoveAsync(Func<IProgress<(int Done, int Total)>, Task> move)
+    {
+        _busy = true;
+        var progress = new Progress<(int Done, int Total)>(p =>
+        {
+            _moveProgress = string.Format(Loc["MoveInProgress"], p.Done, p.Total);
+            InvokeAsync(StateHasChanged);
+        });
+        try
+        {
+            _moveProgress = string.Format(Loc["MoveInProgress"], 0, "…");
+            StateHasChanged();
+            var started = DateTime.UtcNow;
+            await move(progress);
+
+            // A short copy still shows its progress for a moment; the last
+            // line stays under the notice.
+            var shown = DateTime.UtcNow - started;
+            if (shown < TimeSpan.FromSeconds(1.5)) await Task.Delay(TimeSpan.FromSeconds(1.5) - shown);
+            _restartPending = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Moving the data failed: {ex}");
+            _moveProgress = null;
+            PopupNotificationService.Show(Loc["DataFolderTitle"], string.Format(Loc["MoveFailed"], ex.Message, Location.Root), PopupNotificationService.Type.FAILURE, 10000);
+            _busy = false;
+        }
+    }
+
+    private void RestartNow()
+    {
+        (Application.Current as App)?.Restart();
+    }
+
+    private async Task DeleteOldCopy(string previous)
+    {
+        if (_confirm == null) return;
+        if (!await _confirm.AskAsync(Loc["OldCopyDeleteBtn"], string.Format(Loc["OldCopyDeleteConfirm"], previous),
+                                     Loc["OldCopyDeleteBtn"], Loc["WizardCancelBtn"])) return;
+        try
+        {
+            DataFolder.DeleteOldCopy();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            PopupNotificationService.Show(Loc["DataFolderTitle"], ex.Message, PopupNotificationService.Type.FAILURE, 8000);
+        }
+    }
+
+    private string Contents(IReadOnlyDictionary<string, int> summary) => SummaryText(summary);
+
+    private static string Size(long bytes) => bytes >= 1024 * 1024 * 1024
+        ? (bytes / (1024d * 1024 * 1024)).ToString("0.0", CultureInfo.CurrentCulture) + " GB"
+        : (bytes / (1024d * 1024)).ToString("0.0", CultureInfo.CurrentCulture) + " MB";
+
+    private static void OpenFolder(string folder)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Opening the folder failed: {ex.Message}");
+        }
     }
 
     private void OpenBackupsFolder()

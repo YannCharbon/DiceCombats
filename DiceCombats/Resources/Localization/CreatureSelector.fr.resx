@@ -168,4 +168,13 @@
   <data name="CombatNameLabel" xml:space="preserve">
     <value>Nom du combat</value>
   </data>
+  <data name="SyncDoneTitle" xml:space="preserve">
+    <value>Créatures mises à jour</value>
+  </data>
+  <data name="SyncDoneText" xml:space="preserve">
+    <value>Les créatures de ce combat ont été mises à jour à partir de votre bibliothèque.</value>
+  </data>
+  <data name="SyncDoneNotFoundText" xml:space="preserve">
+    <value>Les créatures de ce combat ont été mises à jour à partir de votre bibliothèque, sauf : {0}. Chacune d'elles ne figure plus dans votre bibliothèque ou y porte le même nom que plusieurs autres créatures ; elle est donc restée inchangée.</value>
+  </data>
 </root>

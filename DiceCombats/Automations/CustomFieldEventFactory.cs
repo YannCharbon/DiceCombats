@@ -136,7 +136,9 @@ public static class CustomFieldEventFactory
             ["combatId"] = combat.Id,
             ["combatName"] = combat.Name,
             // creatureName is what the existing creature filter matches on, and
-            // for a hit that is the creature being hit.
+            // for a hit that is the creature being hit. creatureId tells two
+            // creatures with the same name apart.
+            ["creatureId"] = creature.Id,
             ["creatureName"] = creature.Name,
             ["targetName"] = creature.Name,
             ["targetIsPlayer"] = creature.IsPlayer,

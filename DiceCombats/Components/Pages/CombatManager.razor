@@ -206,7 +206,7 @@
 <DcConfirm @ref="_confirm" />
 
 <GenericModal TContent="CreaturesSelector" OnClose="HandleCreaturesSelectorModalClose" @ref="CreaturesSelectorModalRef">
-    <CreaturesSelector Combat="_combat" />
+    <CreaturesSelector Combat="_combat" OnEntriesReplaced="RememberReplacedIds" />
 </GenericModal>
 
 <div class="CombatEditorFloatingInitiativeWindow">
@@ -239,7 +239,7 @@
             @foreach (DCCreature creature in _initiativeWindowCreatureListCopy)
             {
                 var c = creature;
-                <tr class="@(creature.Name == _currentInitiativeCreature.Name ? "current-initiative-creature" : "")">
+                <tr class="@(IsActing(creature) ? "current-initiative-creature" : "")">
                     <td style="width:240px;">@creature.Name</td>
                     <td style="width:86px;">
                         <span class="dc-step">
@@ -318,7 +318,7 @@
                acting, dc-acting swaps the border for the travelling Dice gradient
                (app.css) — it replaced the scoped .current-initiative-creature-border
                so that the rule survives any later move of this markup. *@
-            <div class="dc-ccard @(creature.Name == _currentInitiativeCreature.Name ? "dc-acting" : "")">
+            <div class="dc-ccard @(IsActing(creature) ? "dc-acting" : "")">
                 <div>
                     <div id="@creature.Id.ToString()" class="dc-sheet">
                         @if (creature.ImageSheetBas64 != string.Empty)
@@ -450,7 +450,22 @@
 
     private System.Timers.Timer _timer = new System.Timers.Timer(1000);
 
-    private DCCreature _currentInitiativeCreature = new DCCreature("Default");
+    /// The creature whose turn it is, or null before the first turn.
+    private DCCreature? _currentInitiativeCreature;
+
+    /// Entries the selector gave a new GUID while it was open, old to new.
+    private readonly Dictionary<Guid, Guid> _replacedIds = new();
+
+    private void RememberReplacedIds(IReadOnlyDictionary<Guid, Guid> replaced)
+    {
+        foreach (var (oldId, newId) in replaced)
+        {
+            _replacedIds[oldId] = newId;
+        }
+    }
+
+    /// By GUID: two creatures of a fight may share a name.
+    private bool IsActing(DCCreature creature) => _currentInitiativeCreature != null && creature.Id == _currentInitiativeCreature.Id;
 
     protected override void OnInitialized()
     {
@@ -553,32 +568,32 @@
 
     private async Task MoveToNextCreatureInInitiative()
     {
-        var previous = _currentInitiativeCreature;
-        int idx = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
-        if (idx >= 0)
+        if (_initiativeWindowCreatureListCopy.Count == 0)
         {
-            if (idx < _initiativeWindowCreatureListCopy.Count - 1)
-            {
-                _currentInitiativeCreature = _initiativeWindowCreatureListCopy[idx + 1];
-            }
-            else
-            {
-                _currentInitiativeCreature = _initiativeWindowCreatureListCopy[0];
-            }
+            return;
         }
-        await JSRuntime.InvokeVoidAsync("scrollToElementById", _currentInitiativeCreature.Id.ToString());
 
-        var previousIndex = _initiativeWindowCreatureListCopy.IndexOf(previous);
-        var currentIndex = _initiativeWindowCreatureListCopy.IndexOf(_currentInitiativeCreature);
+        // With no creature acting yet, the turn starts at the top of the order.
+        var previous = _currentInitiativeCreature;
+        int idx = previous == null ? -1 : _initiativeWindowCreatureListCopy.IndexOf(previous);
+        var current = idx >= 0 && idx < _initiativeWindowCreatureListCopy.Count - 1
+            ? _initiativeWindowCreatureListCopy[idx + 1]
+            : _initiativeWindowCreatureListCopy[0];
+        _currentInitiativeCreature = current;
 
-        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["previousCreatureId"] = previous.Id, ["previousCreatureName"] = previous.Name, ["previousInitiativeIndex"] = previousIndex, ["currentCreatureId"] = _currentInitiativeCreature.Id, ["currentCreatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = currentIndex } });
+        await JSRuntime.InvokeVoidAsync("scrollToElementById", current.Id.ToString());
 
-        if (previous.Id != Guid.Empty)
+        var previousIndex = previous == null ? -1 : _initiativeWindowCreatureListCopy.IndexOf(previous);
+        var currentIndex = _initiativeWindowCreatureListCopy.IndexOf(current);
+
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.InitiativeNext, Category = "Initiative", DisplayName = "Next creature", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["previousCreatureId"] = previous?.Id, ["previousCreatureName"] = previous?.Name, ["previousInitiativeIndex"] = previousIndex, ["currentCreatureId"] = current.Id, ["currentCreatureName"] = current.Name, ["initiativeIndex"] = currentIndex } });
+
+        if (previous != null)
         {
             await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureLostInitiative, Category = "Creatures", DisplayName = "Creature lost initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = previous.Id, ["creatureName"] = previous.Name, ["initiativeIndex"] = previousIndex } });
         }
 
-        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureGotInitiative, Category = "Creatures", DisplayName = "Creature got initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = _currentInitiativeCreature.Id, ["creatureName"] = _currentInitiativeCreature.Name, ["initiativeIndex"] = currentIndex } });
+        await EventPublisher.PublishAsync(new DiceCombats.Automations.DiceEvent { Type = DiceCombats.Automations.DiceEventTypes.CreatureGotInitiative, Category = "Creatures", DisplayName = "Creature got initiative", Data = new() { ["combatId"] = _combat.Id, ["combatName"] = _combat.Name, ["creatureId"] = current.Id, ["creatureName"] = current.Name, ["initiativeIndex"] = currentIndex } });
     }
 
     private void OpenCreaturesSelectorModal()
@@ -614,6 +629,21 @@
     {
         _initiativeWindowCreatureListCopy = _combat.CreaturesList.ToList();
 
+        // The selector may have replaced the entries (update from the library,
+        // which can change a GUID) or removed the one acting: look it up again
+        // in the new list, following its new GUID if it got one.
+        if (_currentInitiativeCreature != null)
+        {
+            Guid actingId = _currentInitiativeCreature.Id;
+            // Bounded by the map size, so that a cycle can never hang the page.
+            for (int i = 0; i < _replacedIds.Count && _replacedIds.TryGetValue(actingId, out Guid newId); i++)
+            {
+                actingId = newId;
+            }
+            _currentInitiativeCreature = _initiativeWindowCreatureListCopy.Find(x => x.Id == actingId);
+        }
+        _replacedIds.Clear();
+
         SaveCombat();
     }
 
@@ -648,7 +678,7 @@
     {
         // Before the initiative has been sorted there is no current creature, so
         // the top of the list stands in for it.
-        string suggested = _combat.CreaturesList.Exists(x => x.Name == _currentInitiativeCreature.Name)
+        string suggested = _currentInitiativeCreature != null && _combat.CreaturesList.Exists(x => x.Id == _currentInitiativeCreature.Id)
             ? _currentInitiativeCreature.Name
             : _initiativeWindowCreatureListCopy.FirstOrDefault()?.Name ?? string.Empty;
 

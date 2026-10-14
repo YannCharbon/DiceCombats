@@ -151,7 +151,7 @@
             @foreach (DCCreature creature in creatureSearchList.OrderBy(x => x.IsPlayer ? 0 : 1).ThenBy(x => x.Name))
             {
                 var c = creature;
-                var inCombat = Combat.CreaturesList.Find(x => x.Name == c.Name) != null;
+                var inCombat = Combat.FindEntryFor(c, CombatService.GetCreatureList()) != null;
                 <div class="dc-selrow">
                     <span class="dc-selname">
                         @if (c.IsPlayer)
@@ -213,6 +213,10 @@
 
 @code {
     [Parameter] public DCCombat Combat { get; set; } = default!;
+
+    /// Told, after an update from the library, which entries took a new GUID
+    /// (old GUID to new GUID), so that the page can follow the acting creature.
+    [Parameter] public Action<IReadOnlyDictionary<Guid, Guid>>? OnEntriesReplaced { get; set; }
 
     private List<DCCreature> creatureSearchList = new List<DCCreature>();
 
@@ -293,9 +297,9 @@
 
     private void AddCreature(DCCreature creature)
     {
-        // Matched by name like the rest of the selector: the combat holds clones,
-        // so a reference check would let the same creature in twice.
-        if (Combat.CreaturesList.Find(x => x.Name == creature.Name) == null)
+        // The combat holds copies, which keep the GUID of their library
+        // creature: two creatures with the same name are still two creatures.
+        if (Combat.FindEntryFor(creature, CombatService.GetCreatureList()) == null)
         {
             Combat.AddCreature((DCCreature)creature.Clone());
         }
@@ -303,7 +307,11 @@
 
     private void RemoveCreature(DCCreature creature)
     {
-        Combat.RemoveCreature(creature);
+        DCCreature? entry = Combat.FindEntryFor(creature, CombatService.GetCreatureList());
+        if (entry != null)
+        {
+            Combat.RemoveCreature(entry);
+        }
     }
 
     private void SortCreaturesList((int oldIndex, int newIndex) indices)
@@ -320,23 +328,19 @@
 
     private void SyncCreatures()
     {
-        foreach (DCCreature creature in Combat.CreaturesList.ToList())
+        // In place, by GUID: the order of the fight is kept, the library is not
+        // touched, and a creature that is no longer in the library stays as it is.
+        var replacedIds = new Dictionary<Guid, Guid>();
+        var notFound = Combat.SyncWithLibrary(CombatService.GetCreatureList(), replacedIds);
+        if (replacedIds.Count > 0)
         {
-            uint backupInstanceCount = creature.InCombatInstanceCount;
-            RemoveCreature(creature);
-            DCCreature? tempCreature = CombatService.GetCreatureList().Find(x => x.Name == creature.Name);
-            if (tempCreature != null)
-            {
-                tempCreature.InCombatInstanceCount = backupInstanceCount;
-                AddCreature((DCCreature)tempCreature.Clone());
-            }
+            OnEntriesReplaced?.Invoke(replacedIds);
         }
 
-        if (CombatService.IsCurrentCulture("fr")) {
-            PopupNotificationService.Show("Créatures synchronisées", "Les modifications les plus récentes ont été appliquées sur toutes les créatures", PopupNotificationService.Type.SUCCESS, 4000);
-        } else {
-            PopupNotificationService.Show("Creatures synchronized", "Succesfully updated all creatures from creature tab to newest modifications", PopupNotificationService.Type.SUCCESS, 4000);
-        }
+        string message = notFound.Count == 0
+            ? Loc["SyncDoneText"]
+            : string.Format(Loc["SyncDoneNotFoundText"], string.Join(", ", notFound.Select(x => x.Name)));
+        PopupNotificationService.Show(Loc["SyncDoneTitle"], message, PopupNotificationService.Type.SUCCESS, notFound.Count == 0 ? 4000 : 8000);
     }
 
     private void UpdateCreatureSearchList(string arg)

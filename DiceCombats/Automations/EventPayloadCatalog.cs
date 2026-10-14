@@ -86,7 +86,7 @@ public static class EventPayloadCatalog
     {
         return
         [
-            "creatureName", "targetName", "targetIsPlayer",
+            "creatureId", "creatureName", "targetName", "targetIsPlayer",
             "sourceName", "sourceIsPlayer", "sourceInferred",
             "rawAmount", "appliedAmount", "intensity", "severity",
             "tags", "attackId", "fieldTitle", "resultHitPoints", "maximumHitPoints"

@@ -167,5 +167,32 @@ namespace DiceCombats.Resources.Localization {
                 return ResourceManager.GetString("UpdateCreaturesBtnTitle", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Creatures updated.
+        /// </summary>
+        internal static string SyncDoneTitle {
+            get {
+                return ResourceManager.GetString("SyncDoneTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The creatures of this combat have been updated from your library..
+        /// </summary>
+        internal static string SyncDoneText {
+            get {
+                return ResourceManager.GetString("SyncDoneText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The creatures of this combat have been updated from your library, except: {0}. Each of these is either no longer in your library or shares its name with several creatures there, so it was left as it is..
+        /// </summary>
+        internal static string SyncDoneNotFoundText {
+            get {
+                return ResourceManager.GetString("SyncDoneNotFoundText", resourceCulture);
+            }
+        }
     }
 }

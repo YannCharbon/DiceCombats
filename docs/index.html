@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="logo.svg" type="image/svg+xml" />
 
+    <meta name="google-site-verification" content="_48weFEogx-29jpGcYPBlgfw3vu8xmv0ZpCxvn52Kq0" />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content="DiceCombats - Open-source TTRPG combat manager" />
     <meta property="og:description" content="DiceCombats is a system-agnostic tabletop RPG combat manager with custom creature sheets, live initiative tracking, damage types and resistances, combat logs, and automations." />
@@ -36,21 +37,27 @@
 </head>
 <body>
 
-    <div class="topbar">
+    <header class="topbar">
         <div class="topbar-inner">
-            <a class="brand" href=""><img src="logo.svg" alt="DiceCombats logo" />DiceCombats</a>
-            <nav>
-            <a class="hide-small" href="#features">Features</a>
-            <a class="hide-small" href="#fields">Fields</a>
-            <a class="hide-small" href="#screenshots">Screenshots</a>
-            <a class="hide-small" href="#ecosystem">Ecosystem</a>
-            <a class="hide-small" href="#install">Install</a>
-                <a href="https://github.com/YannCharbon/DiceCombats/"><img src="github-mark-white.svg" alt="" />GitHub repo</a>
-                <a href="fr/"><img src="language-svgrepo-com.svg" alt="" />FR</a>
-                <a class="cta" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">Download</a>
+            <div class="crumb">
+                <a class="crumb-family" href="https://yanncharbon.github.io/DiceAtrium/" title="The Dice Atrium family" aria-label="The Dice Atrium family"><img src="atrium-logo.svg" alt="" /></a>
+                <span class="crumb-sep" aria-hidden="true">/</span>
+                <a class="brand" href=""><img src="logo.svg" alt="" />DiceCombats</a>
+            </div>
+            <nav class="nav-sections" aria-label="Page sections">
+                <a href="#features">Features</a>
+                <a href="#fields">Fields</a>
+                <a href="#screenshots">Screenshots</a>
+                <a href="#ecosystem">Ecosystem</a>
+                <a href="#install">Install</a>
             </nav>
+            <div class="nav-util">
+                <a class="nav-key" href="https://github.com/YannCharbon/DiceCombats/" title="GitHub" aria-label="GitHub"><img src="github-mark-white.svg" alt="" /></a>
+                <a class="nav-key nav-lang" href="fr/" hreflang="fr" title="Version française" aria-label="Version française">FR</a>
+                <a class="btn primary nav-cta" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">Download</a>
+            </div>
         </div>
-    </div>
+    </header>
 
     <header class="hero">
         <div class="hero-inner">
@@ -59,7 +66,7 @@
             <p class="tagline">DiceCombats helps you manage combat during your tabletop RPG sessions, regardless of the game system you use. Build creatures with the fields you need, track initiative and hit points during combat, and let the app handle the rest: damage resistances, combat logs, and automations with other applications.</p>
 
             <div class="badges">
-                <a href="https://github.com/YannCharbon/DiceCombats/releases/latest"><img src="https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge&color=1aa3a3" alt="Latest release" /></a>
+                <a href="https://github.com/YannCharbon/DiceCombats/releases/latest"><img src="https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge&color=32C87E" alt="Latest release" /></a>
                 <img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=for-the-badge" alt="License GPL-3.0" />
                 <img src="https://img.shields.io/badge/Windows%20%7C%20Android-informational?style=for-the-badge" alt="Windows and Android" />
             </div>
@@ -69,7 +76,7 @@
                     <img src="download-minimalistic-svgrepo-com.svg" alt="" />Download
                 </a>
                 <a class="btn" href="https://github.com/YannCharbon/DiceCombats/">
-                    <img src="github-mark-white.svg" alt="" />GitHub repo
+                    <img src="github-mark-white.svg" alt="" />GitHub
                 </a>
             </div>
 
@@ -96,7 +103,7 @@
                 </div>
                 <div class="card">
                     <h3>Live combat</h3>
-                    <p>During combat, roll initiative, sort the turn order, and jump directly to any creature in the list. A timer keeps track of the fight, you can keep general notes, and each instance of a creature maintains its own values.</p>
+                    <p>During combat, roll initiative, sort the turn order, and jump directly to any creature in the list. A timer keeps track of the fight, you can keep general notes, and each instance of a creature keeps its own values.</p>
                 </div>
                 <div class="card">
                     <h3>Damage types and resistances</h3>
@@ -108,7 +115,7 @@
                 </div>
                 <div class="card">
                     <h3>Automations</h3>
-                    <p>Combat events can be sent to any external application through HTTP requests. Choose a trigger, apply filters if needed, and build a sequence of requests with optional delays.</p>
+                    <p>Combat events can trigger HTTP requests to any external application. Choose a trigger, apply filters if needed, and build a sequence of requests with optional delays.</p>
                 </div>
                 <div class="card">
                     <h3>Import, export and languages</h3>
@@ -329,13 +336,13 @@
     <section id="screenshots">
         <div class="wrap">
             <h2>A look at the app</h2>
-            <p class="lead">Here are a few examples of what DiceCombats looks like in use.</p>
+            <p class="lead">A few screenshots of DiceCombats in use.</p>
             <div class="shots">
                 <article class="shot">
                     <div class="shot-media"><img src="img/combat-manager.jpg" alt="The combat view" loading="lazy" /></div>
                     <div class="shot-text">
                         <h3>The combat view</h3>
-                        <p>This is where you spend most of the session. Creature sheets and their custom fields remain visible, while the initiative window floats above them. Start the timer, jump to the creature whose turn it is, and keep your notes in view.</p>
+                        <p>This is where you spend most of the session. Creature sheets and their custom fields remain visible, while the initiative window floats above them. Start the timer, jump to the creature whose turn it is, and keep your notes at hand.</p>
                     </div>
                 </article>
                 <article class="shot">
@@ -380,20 +387,21 @@
     <section id="ecosystem">
         <div class="wrap">
             <h2>The Dice ecosystem</h2>
-            <p class="lead">The Dice ecosystem currently includes two apps: DiceCombats and DiceAudio. DiceAudio complements DiceCombats by handling the audio side of your game table.</p>
-            <div class="eco">
-                <div class="eco-card self">
-                    <img src="logo.svg" alt="DiceCombats logo" />
-                    <div>
-                        <h3>DiceCombats <span style="color:var(--text-dim);font-weight:400;font-size:0.9rem;">This app</span></h3>
-                        <p>Creatures, combat, initiative, damage, and combat logs. DiceCombats can also send HTTP requests to other applications when events occur during combat.</p>
-                    </div>
+            <p class="lead">DiceCombats is part of Dice, a family of free, open-source apps I write for my own game table and share with other game masters. Each app covers a different part of running a tabletop RPG, and they all follow the same principles: no installer, no account, your data stays on your machine, and they talk to other programs over HTTP.</p>
+            <div class="atrium-banner">
+                <img src="atrium-logo.svg" alt="Dice Atrium logo" />
+                <div>
+                    <h3>Dice Atrium</h3>
+                    <p>All the Dice apps are gathered in the Atrium.</p>
+                    <a class="btn primary" href="https://yanncharbon.github.io/DiceAtrium/">Visit the Dice Atrium</a>
                 </div>
-                <div class="eco-card">
+            </div>
+            <div class="eco-grid">
+                <div class="eco-app">
                     <img src="sibling-logo.svg" alt="DiceAudio logo" />
                     <div>
                         <h3>DiceAudio</h3>
-                        <p>DiceAudio handles the audio for your table: a library of music, ambience tracks and sound effects; layered scenes that can fade smoothly from one context to another; and scenarios for an entire session. It exposes a local API, allowing DiceCombats automations to start a scene or move it to the next step.</p>
+                        <p>Manages the sound at your table: a library of music, ambiences and sound effects, layered scenes that crossfade from one context to another, and scenarios covering a whole session. Its local API can receive requests from DiceCombats automations, for instance to play a sting on a critical hit. You set up the link yourself, in the settings of both apps.</p>
                         <a href="https://yanncharbon.github.io/DiceAudio/">Visit the DiceAudio page</a>
                     </div>
                 </div>
@@ -404,7 +412,7 @@
     <section id="install">
         <div class="wrap">
             <h2>Install</h2>
-            <p class="lead">There is no installer and no account to create. DiceCombats stores all of its data locally on your device.</p>
+            <p class="lead">No installer and no account are needed. DiceCombats stores all its data locally on your device.</p>
             <ul class="plain">
                 <li><strong>Windows</strong>: Download the ZIP from the latest release, extract it anywhere, and run <span class="code-style">DiceCombats.exe</span>. You can pin it to the Start menu for easier access.</li>
                 <li><strong>Android</strong>: Download and install the APK. The Android build is experimental, and some views may not yet display perfectly.</li>
@@ -452,7 +460,7 @@ dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-windows10.0.19041.0 -c 
     <footer>
         <div class="wrap">
             <span>DiceCombats, GPL-3.0-or-later. Built with .NET MAUI and Blazor.</span>
-            <span><a href="https://github.com/YannCharbon/DiceCombats/">GitHub</a> &middot; <a href="https://yanncharbon.github.io/DiceAudio/">DiceAudio</a></span>
+            <span><a href="https://github.com/YannCharbon/DiceCombats/">GitHub</a> &middot; <a href="https://yanncharbon.github.io/DiceAtrium/">Dice Atrium</a> &middot; <a href="https://yanncharbon.github.io/DiceAudio/">DiceAudio</a></span>
         </div>
     </footer>
 

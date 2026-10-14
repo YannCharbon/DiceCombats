@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../style.css" />
     <link rel="icon" href="../logo.svg" type="image/svg+xml" />
 
+    <meta name="google-site-verification" content="_48weFEogx-29jpGcYPBlgfw3vu8xmv0ZpCxvn52Kq0" />
     <meta name="robots" content="index, follow" />
     <meta property="og:title" content="DiceCombats - Gestionnaire de combats pour JDR open source" />
     <meta property="og:description" content="DiceCombats est un gestionnaire de combats pour JDR indépendant du système de jeu : fiches de créatures personnalisables, suivi de l'initiative, gestion des dégâts et résistances, journal de combat et automatisations." />
@@ -36,21 +37,27 @@
 </head>
 <body>
 
-    <div class="topbar">
+    <header class="topbar">
         <div class="topbar-inner">
-            <a class="brand" href="../"><img src="../logo.svg" alt="Logo DiceCombats" />DiceCombats</a>
-            <nav>
-            <a class="hide-small" href="#features">Fonctionnalités</a>
-            <a class="hide-small" href="#fields">Champs personnalisés</a>
-            <a class="hide-small" href="#screenshots">Aperçu</a>
-            <a class="hide-small" href="#ecosystem">Écosystème</a>
-            <a class="hide-small" href="#install">Installation</a>
-                <a href="https://github.com/YannCharbon/DiceCombats/"><img src="../github-mark-white.svg" alt="" />GitHub</a>
-                <a href="../"><img src="../language-svgrepo-com.svg" alt="" />EN</a>
-                <a class="cta" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">Télécharger</a>
+            <div class="crumb">
+                <a class="crumb-family" href="https://yanncharbon.github.io/DiceAtrium/fr/" title="Famille Dice Atrium" aria-label="Famille Dice Atrium"><img src="../atrium-logo.svg" alt="" /></a>
+                <span class="crumb-sep" aria-hidden="true">/</span>
+                <a class="brand" href="../"><img src="../logo.svg" alt="" />DiceCombats</a>
+            </div>
+            <nav class="nav-sections" aria-label="Sections de la page">
+                <a href="#features">Fonctionnalités</a>
+                <a href="#fields">Champs personnalisés</a>
+                <a href="#screenshots">Aperçu</a>
+                <a href="#ecosystem">Écosystème</a>
+                <a href="#install">Installation</a>
             </nav>
+            <div class="nav-util">
+                <a class="nav-key" href="https://github.com/YannCharbon/DiceCombats/" title="GitHub" aria-label="GitHub"><img src="../github-mark-white.svg" alt="" /></a>
+                <a class="nav-key nav-lang" href="../" hreflang="en" title="English version" aria-label="English version">EN</a>
+                <a class="btn primary nav-cta" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">Télécharger</a>
+            </div>
         </div>
-    </div>
+    </header>
 
     <header class="hero">
         <div class="hero-inner">
@@ -59,7 +66,7 @@
             <p class="tagline">DiceCombats est un gestionnaire de combats pour JDR conçu pour fonctionner quel que soit le système utilisé. Vous créez les fiches de vos créatures avec les champs dont vous avez besoin, puis vous suivez l'initiative et les points de vie pendant le combat. L'application gère ensuite les résistances aux dégâts, conserve un journal du combat et peut déclencher des actions dans d'autres applications.</p>
 
             <div class="badges">
-                <a href="https://github.com/YannCharbon/DiceCombats/releases/latest"><img src="https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge&color=1aa3a3" alt="Dernière version" /></a>
+                <a href="https://github.com/YannCharbon/DiceCombats/releases/latest"><img src="https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge&color=32C87E" alt="Dernière version" /></a>
                 <img src="https://img.shields.io/badge/license-GPL--3.0-blue?style=for-the-badge" alt="Licence GPL-3.0" />
                 <img src="https://img.shields.io/badge/Windows%20%7C%20Android-informational?style=for-the-badge" alt="Windows et Android" />
             </div>
@@ -92,7 +99,7 @@
                 </div>
                 <div class="card">
                     <h3>Import depuis aidedd.org</h3>
-                    <p>Si vous jouez à D&amp;D, il suffit de coller l'URL d'un monstre d'aidedd.org pour importer directement sa fiche, aussi bien pour les blocs de statistiques 2014 que 2024. Les liens vers les sorts s'ouvrent directement dans DiceCombats, sans devoir quitter l'application pendant le combat.</p>
+                    <p>Si vous jouez à D&amp;D, il suffit de coller l'URL d'un monstre d'aidedd.org pour importer directement sa fiche, qu'il s'agisse d'un bloc de statistiques au format 2014 ou 2024. Les liens vers les sorts s'ouvrent directement dans DiceCombats, sans devoir quitter l'application pendant le combat.</p>
                 </div>
                 <div class="card">
                     <h3>Gestion du combat</h3>
@@ -133,7 +140,7 @@
                         <li>Si vous souhaitez réutiliser un champ, enregistrez-le comme champ personnalisé. Il apparaîtra
                         alors dans la même liste et pourra être ajouté à n'importe quelle autre créature. Les champs
                         définis comme partagés sont inclus lors des exports.</li>
-                        <li>En combat, chaque champ utilise son affichage prévu pour le jeu et chaque exemplaire d'une
+                        <li>En combat, chaque champ adopte son affichage de jeu et chaque exemplaire d'une
                         même créature conserve ses propres valeurs.</li>
                     </ol>
                 </div>
@@ -216,7 +223,7 @@
                 </article>
                 <article class="ftype">
                     <h3>Grille de cases à cocher</h3>
-                    <p>Le même principe, organisé en lignes et en colonnes. Elle peut par exemple servir à suivre les emplacements de sorts par niveau ou les munitions de plusieurs armes.</p>
+                    <p>Le même principe, organisé en lignes et en colonnes. Cette grille peut par exemple servir à suivre les emplacements de sorts par niveau ou les munitions de plusieurs armes.</p>
                     <figure>
                         <img src="../img/cfs/cf_checkboxgrid_edit.jpg" alt="Grille de cases à cocher, configuration" loading="lazy" />
                         <figcaption>Configuration</figcaption>
@@ -301,7 +308,7 @@
                     </div>
                     <figure>
                         <img src="../img/cfs/cf_color_render.jpg" alt="Couleur, deux instances, deux couleurs" loading="lazy" />
-                        <figcaption>Deux instances, deux couleurs</figcaption>
+                        <figcaption>Deux exemplaires, deux couleurs</figcaption>
                     </figure>
                 </article>
                 <article class="ftype">
@@ -329,13 +336,13 @@
     <section id="screenshots">
         <div class="wrap">
             <h2>Aperçu de l'application</h2>
-            <p class="lead">Quelques captures d'écran pour montrer à quoi ressemble DiceCombats en utilisation.</p>
+            <p class="lead">Quelques captures d'écran de DiceCombats en cours d'utilisation.</p>
             <div class="shots">
                 <article class="shot">
                     <div class="shot-media"><img src="../img/combat-manager.jpg" alt="La vue de combat" loading="lazy" /></div>
                     <div class="shot-text">
                         <h3>Vue de combat</h3>
-                        <p>C'est l'écran principal pendant une partie. Les fiches des créatures et leurs champs personnalisés y sont affichés, tandis que la fenêtre d'initiative reste accessible au-dessus. Vous pouvez lancer le chronomètre, afficher directement le combattant dont c'est le tour et garder vos notes à portée de vue.</p>
+                        <p>C'est l'écran principal pendant une partie. Les fiches des créatures et leurs champs personnalisés y sont affichés, tandis que la fenêtre d'initiative reste accessible au-dessus. Vous pouvez lancer le chronomètre, afficher directement le combattant dont c'est le tour et garder vos notes sous les yeux.</p>
                     </div>
                 </article>
                 <article class="shot">
@@ -380,21 +387,22 @@
     <section id="ecosystem">
         <div class="wrap">
             <h2>Écosystème Dice</h2>
-            <p class="lead">L'écosystème Dice comprend actuellement deux applications : DiceCombats et DiceAudio. DiceAudio complète DiceCombats pour la gestion sonore d'une partie.</p>
-            <div class="eco">
-                <div class="eco-card self">
-                    <img src="../logo.svg" alt="Logo DiceCombats" />
-                    <div>
-                        <h3>DiceCombats <span style="color:var(--text-dim);font-weight:400;font-size:0.9rem;">Cette application</span></h3>
-                        <p>Gestion des créatures, des combats, de l'initiative, des dégâts et du journal de combat. Les événements d'un combat peuvent également être transmis à d'autres applications par requêtes HTTP.</p>
-                    </div>
+            <p class="lead">DiceCombats fait partie d'un écosystème d'applications nommé Dice, une famille d'outils gratuits et open source que j'écris pour ma propre table de jeu et que je partage avec d'autres maîtres de jeu. Chaque application est dédiée à une thématique et à des tâches différentes dans le monde du JDR, et suit les mêmes principes : pas d'installateur, pas de compte, vos données restent sur votre machine, et la même philosophie de communication par interface HTTP.</p>
+            <div class="atrium-banner">
+                <img src="../atrium-logo.svg" alt="Logo Dice Atrium" />
+                <div>
+                    <h3>Dice Atrium</h3>
+                    <p>Toutes les applications Dice sont regroupées dans l'Atrium.</p>
+                    <a class="btn primary" href="https://yanncharbon.github.io/DiceAtrium/fr/">Voir le Dice Atrium</a>
                 </div>
-                <div class="eco-card">
+            </div>
+            <div class="eco-grid">
+                <div class="eco-app">
                     <img src="../sibling-logo.svg" alt="Logo DiceAudio" />
                     <div>
                         <h3>DiceAudio</h3>
-                        <p>DiceAudio gère l'audio de vos parties : bibliothèque de musiques, ambiances et effets sonores, scènes composées de plusieurs couches avec transitions progressives, et scénarios audio pour préparer une séance complète. Son API locale permet à une automatisation de DiceCombats de lancer une scène ou de la faire évoluer.</p>
-                        <a href="https://yanncharbon.github.io/DiceAudio/">Découvrir DiceAudio</a>
+                        <p>Gère l'ambiance sonore de votre table : une bibliothèque de musiques, d'ambiances et d'effets sonores, des scènes en plusieurs couches avec des fondus enchaînés entre leurs contextes, et des scénarios couvrant toute une séance. Son API locale peut recevoir les requêtes des automatisations de DiceCombats, par exemple pour jouer un jingle lors d'un coup critique. La liaison entre les deux applications se configure manuellement dans leurs réglages respectifs.</p>
+                        <a href="https://yanncharbon.github.io/DiceAudio/fr/">Voir la page DiceAudio</a>
                     </div>
                 </div>
             </div>
@@ -410,7 +418,7 @@
                 <li><strong>Android</strong> : téléchargez l'APK puis installez-le. La version Android est encore expérimentale et certaines vues peuvent ne pas s'afficher parfaitement.</li>
             </ul>
 
-            <h2 style="margin-top:34px;">Compiler le projet</h2>
+            <h2 style="margin-top:34px;">Compiler depuis les sources</h2>
             <p class="lead">Le SDK .NET 10 et les workloads MAUI doivent être installés. Les autres dépendances sont récupérées automatiquement depuis NuGet.</p>
 <pre><code>git clone https://github.com/YannCharbon/DiceCombats.git
 dotnet workload install maui-windows maui-android
@@ -423,7 +431,7 @@ dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-windows10.0.19041.0 -c 
             <h2>Contribuer</h2>
             <div class="cards">
                 <div class="card">
-                    <h3>Bugs et suggestions</h3>
+                    <h3>Bugs et idées</h3>
                     <p>Si vous rencontrez un bug ou souhaitez proposer une fonctionnalité, vous pouvez ouvrir une issue sur le dépôt GitHub.</p>
                 </div>
                 <div class="card">
@@ -452,7 +460,7 @@ dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-windows10.0.19041.0 -c 
     <footer>
         <div class="wrap">
             <span>DiceCombats, GPL-3.0-or-later. Développé avec .NET MAUI et Blazor.</span>
-            <span><a href="https://github.com/YannCharbon/DiceCombats/">GitHub</a> &middot; <a href="https://yanncharbon.github.io/DiceAudio/">DiceAudio</a></span>
+            <span><a href="https://github.com/YannCharbon/DiceCombats/">GitHub</a> &middot; <a href="https://yanncharbon.github.io/DiceAtrium/fr/">Dice Atrium</a> &middot; <a href="https://yanncharbon.github.io/DiceAudio/fr/">DiceAudio</a></span>
         </div>
     </footer>
 

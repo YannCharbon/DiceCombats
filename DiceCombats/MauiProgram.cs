@@ -225,10 +225,11 @@ namespace DiceCombats
         /// </summary>
         private static void SaveAndFlush(TimeSpan wait)
         {
+            Task saving = Task.CompletedTask;
             try
             {
                 ServiceProvider.GetRequiredService<CombatLogService>().EndSession();
-                _ = ServiceProvider.GetRequiredService<DiceCombatsService>().SaveAllAsync();
+                saving = ServiceProvider.GetRequiredService<DiceCombatsService>().SaveAllAsync();
                 var dataFolder = ServiceProvider.GetRequiredService<DataFolderService>();
                 if (dataFolder.IsLoaded)
                 {
@@ -248,10 +249,16 @@ namespace DiceCombats
                     try
                     {
                         var store = ServiceProvider.GetRequiredService<SafeFileStore>();
-                        if (!Task.Run(() => store.FlushAsync()).Wait(wait))
+                        if (!Task.Run(async () => { await saving; await store.FlushAsync(); }).Wait(wait))
                         {
                             Debug.WriteLine($"Saving on close did not finish within {wait.TotalSeconds} seconds.");
                         }
+                        // Changes that another computer's version stopped from
+                        // being saved are kept next to the file, never dropped.
+                        var dataFolder = ServiceProvider.GetRequiredService<DataFolderService>();
+                        if (OperatingSystem.IsWindows()) dataFolder.KeepUnsavedChanges();
+                        // The app is closing: other computers may open the folder without a warning.
+                        dataFolder.ReleaseFolder();
                     }
                     catch (Exception ex)
                     {

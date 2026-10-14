@@ -158,7 +158,11 @@
     <div class="dc-confirm-scrim">
         <div class="dc-confirm" role="dialog" aria-modal="true" style="width:min(620px,100%);">
             <h3 class="dc-confirm-title">@Loc["ExistingFolderTitle"]</h3>
-            <p class="dc-confirm-msg">@string.Format(Loc["ExistingFolderText"], _existingTheirs, _existingMine)</p>
+            <p class="dc-confirm-msg" style="margin-bottom:6px;">
+                @string.Format(Loc["ExistingThisComputer"], _existingMine)<br />
+                @string.Format(Loc["ExistingThisFolder"], _existingTheirs)
+            </p>
+            <p class="dc-confirm-msg">@Loc["ExistingFolderText"]</p>
             <div class="dc-stack" style="gap:10px;margin-bottom:14px;">
                 <div>
                     <button type="button" class="dc-btn dc-btn-fill" @onclick="UseExisting"><DcIcon Name="check" /> @Loc["ExistingUseFolderBtn"]</button>
@@ -603,6 +607,7 @@
 
     private void RestartNow()
     {
+        DataFolder.ReleaseFolder();
         (Application.Current as App)?.Restart();
     }
 

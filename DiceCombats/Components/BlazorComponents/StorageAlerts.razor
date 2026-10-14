@@ -11,13 +11,40 @@
     restore ended (the pages are rebuilt after it). Drawn like
     DcConfirm, with a single button: there is nothing to decide, only
     something to know.
+    A file changed on another computer is the exception (spec §3.4): the save
+    wrote nothing, and the user chooses between reloading the data and
+    overwriting the file with what is here.
 *@
 
+@using DiceCombats.Storage
 @implements IDisposable
 @inject StorageNotices Notices
+@inject DataFolderService DataFolder
 @inject IStringLocalizer<DiceCombats.Resources.Localization.Portability> Loc
 
-@if (_notices.Count > 0)
+@if (_changed.Count > 0)
+{
+    <div class="dc-confirm-scrim">
+        <div class="dc-confirm" role="alertdialog" aria-modal="true">
+            <h3 class="dc-confirm-title">@Loc["ChangedOnDiskTitle"]</h3>
+            @foreach (var notice in _changed)
+            {
+                <p class="dc-confirm-msg">@string.Format(Loc["ChangedOnDiskText"], notice.Detail)</p>
+            }
+            <div class="dc-confirm-foot">
+                <button type="button" class="dc-btn dc-btn-out" disabled="@_busy" @onclick="Overwrite">
+                    <DcIcon Name="save" />
+                    @Loc["ChangedOverwriteBtn"]
+                </button>
+                <button type="button" class="dc-btn dc-btn-fill" disabled="@_busy" @onclick="Reload">
+                    <DcIcon Name="sync" />
+                    @Loc["ChangedReloadBtn"]
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else if (_notices.Count > 0)
 {
     <div class="dc-confirm-scrim" @onclick="Dismiss">
         <div class="dc-confirm" role="alertdialog" aria-modal="true" @onclick:stopPropagation="true">
@@ -37,11 +64,19 @@
 
 @code {
     private IReadOnlyList<StorageNotice> _notices = Array.Empty<StorageNotice>();
+    private IReadOnlyList<StorageNotice> _changed = Array.Empty<StorageNotice>();
+    private bool _busy;
 
     protected override void OnInitialized()
     {
         Notices.Changed += OnChanged;
-        _notices = Notices.Pending;
+        Split(Notices.Pending);
+    }
+
+    private void Split(IReadOnlyList<StorageNotice> pending)
+    {
+        _changed = pending.Where(n => n.Kind == StorageNoticeKind.ChangedOnDisk).ToList();
+        _notices = pending.Where(n => n.Kind != StorageNoticeKind.ChangedOnDisk).ToList();
     }
 
     private string Message(StorageNotice notice) => notice.Kind switch
@@ -50,6 +85,10 @@
         StorageNoticeKind.SaveFailed => string.Format(Loc["ErrorSaveFailed"], notice.Detail),
         StorageNoticeKind.RestoreDone => Loc["RestoreDone"],
         StorageNoticeKind.RestoreRollbackFailed => string.Format(Loc["RestoreRollbackFailed"], notice.Detail),
+        StorageNoticeKind.ConflictCopies => string.Format(Loc["CloudConflictCopies"], notice.Detail),
+        StorageNoticeKind.CloudOnly => string.Format(Loc["CloudOnlyWarning"], notice.Detail),
+        StorageNoticeKind.UnsavedCopies => string.Format(Loc["UnsavedCopiesImport"], notice.Detail),
+        StorageNoticeKind.UnsavedCopiesManual => string.Format(Loc["UnsavedCopiesManual"], notice.Detail),
         _ => string.Format(Loc["RestoreFailed"], notice.Detail),
     };
 
@@ -57,14 +96,49 @@
     {
         InvokeAsync(() =>
         {
-            _notices = Notices.Pending;
+            Split(Notices.Pending);
             StateHasChanged();
         });
     }
 
+    // Only the notices shown in this dialog: one about a changed file waits for its choice.
     private void Dismiss()
     {
-        Notices.DismissAll();
+        foreach (var notice in _notices) Notices.Dismiss(notice);
+    }
+
+    // Every data file is read again, then the pages are rebuilt.
+    private async Task Reload()
+    {
+        _busy = true;
+        try
+        {
+            foreach (var notice in _changed) Notices.Dismiss(notice);
+            await DataFolder.ReloadAllAsync();
+        }
+        finally
+        {
+            _busy = false;
+        }
+        (Application.Current as App)?.ReloadPages();
+    }
+
+    // Each changed file is written again with what is here.
+    private async Task Overwrite()
+    {
+        _busy = true;
+        try
+        {
+            foreach (var notice in _changed)
+            {
+                Notices.Dismiss(notice);
+                await DataFolder.OverwriteAsync(notice.Detail);
+            }
+        }
+        finally
+        {
+            _busy = false;
+        }
     }
 
     public void Dispose()

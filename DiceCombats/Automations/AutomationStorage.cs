@@ -11,7 +11,8 @@ public interface IAutomationStorage
     /// storage then never writes over it during this session.
     /// </summary>
     Task<T?> ReadJsonAsync<T>(string fileName, JsonSerializerOptions options, CancellationToken cancellationToken = default) where T : class;
-    Task WriteTextAsync(string fileName, string content, CancellationToken cancellationToken = default);
+    /// <summary>Writes a file; it is not written over a change made elsewhere unless <paramref name="overwriteExternalChange"/>.</summary>
+    Task WriteTextAsync(string fileName, string content, CancellationToken cancellationToken = default, bool overwriteExternalChange = false);
 
     /// <summary>Refuses every later write of the file during this session.</summary>
     void Block(string fileName, string reason);
@@ -91,11 +92,11 @@ public sealed class AutomationConfigurationService
         finally { _lock.Release(); }
     }
 
-    public async Task SaveAsync(CancellationToken cancellationToken = default)
+    public async Task SaveAsync(CancellationToken cancellationToken = default, bool overwriteExternalChange = false)
     {
         // Nothing to save before the configuration has been read.
         if (!_loaded) return;
         var text = JsonSerializer.Serialize(_configuration, _jsonOptions);
-        await _storage.WriteTextAsync(FileName, text, cancellationToken);
+        await _storage.WriteTextAsync(FileName, text, cancellationToken, overwriteExternalChange);
     }
 }

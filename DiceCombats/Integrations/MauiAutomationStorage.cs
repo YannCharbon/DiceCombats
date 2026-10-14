@@ -8,10 +8,12 @@ namespace DiceCombats.Integrations;
 public sealed class MauiAutomationStorage : IAutomationStorage
 {
     private readonly SafeFileStore _store;
+    private readonly StorageNotices? _notices;
 
-    public MauiAutomationStorage(SafeFileStore store)
+    public MauiAutomationStorage(SafeFileStore store, StorageNotices? notices = null)
     {
         _store = store;
+        _notices = notices;
     }
 
     public async Task<T?> ReadJsonAsync<T>(string fileName, JsonSerializerOptions options, CancellationToken cancellationToken = default) where T : class
@@ -25,11 +27,15 @@ public sealed class MauiAutomationStorage : IAutomationStorage
         };
     }
 
-    public async Task WriteTextAsync(string fileName, string content, CancellationToken cancellationToken = default)
+    // A file changed on another computer is not written over: the user is
+    // asked whether to reload it or overwrite it.
+    public async Task WriteTextAsync(string fileName, string content, CancellationToken cancellationToken = default, bool overwriteExternalChange = false)
     {
-        // A change made on another computer is overwritten until DiceCombats
-        // can ask what to do about it.
-        await _store.SaveTextAsync(fileName, content, overwriteExternalChange: true, ct: cancellationToken);
+        var outcome = await _store.SaveTextAsync(fileName, content, overwriteExternalChange, cancellationToken);
+        if (outcome == SaveOutcome.ChangedOnDisk)
+        {
+            _notices?.ReportChangedOnDisk(fileName);
+        }
     }
 
     public void Block(string fileName, string reason) => _store.Block(fileName, reason);

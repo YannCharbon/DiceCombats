@@ -140,5 +140,140 @@ namespace DiceCombats.Resources.Localization {
                 return ResourceManager.GetString("StartupQuitHelp", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DiceCombats is already open on another computer.
+        /// </summary>
+        internal static string LockTitle {
+            get {
+                return ResourceManager.GetString("LockTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The data folder has been in use on {0} since {1}. If you also open it here, changes made on one computer may overwrite those made on the other..
+        /// </summary>
+        internal static string LockText {
+            get {
+                return ResourceManager.GetString("LockText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DiceCombats already seems to be open on this computer, since {0}. If you open it a second time, the two windows may overwrite each other's changes..
+        /// </summary>
+        internal static string LockSameComputerText {
+            get {
+                return ResourceManager.GetString("LockSameComputerText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Open anyway.
+        /// </summary>
+        internal static string LockOpenAnywayBtn {
+            get {
+                return ResourceManager.GetString("LockOpenAnywayBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This data was changed on another computer.
+        /// </summary>
+        internal static string ChangedOnDiskTitle {
+            get {
+                return ResourceManager.GetString("ChangedOnDiskTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The file {0} was changed in the data folder after DiceCombats read it. Reload it to get those changes, or overwrite it with what you have here..
+        /// </summary>
+        internal static string ChangedOnDiskText {
+            get {
+                return ResourceManager.GetString("ChangedOnDiskText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reload.
+        /// </summary>
+        internal static string ChangedReloadBtn {
+            get {
+                return ResourceManager.GetString("ChangedReloadBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Overwrite.
+        /// </summary>
+        internal static string ChangedOverwriteBtn {
+            get {
+                return ResourceManager.GetString("ChangedOverwriteBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Your data was changed on another computer. Reload it when you are ready..
+        /// </summary>
+        internal static string ChangedBanner {
+            get {
+                return ResourceManager.GetString("ChangedBanner", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Your synchronisation service has made copies of some files, because two computers changed them at the same time: {0}. DiceCombats uses the original files. Please compare them and delete the copies you do not need..
+        /// </summary>
+        internal static string CloudConflictCopies {
+            get {
+                return ResourceManager.GetString("CloudConflictCopies", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Some files of the data folder are only in the cloud: {0}. Please set the folder to always keep its files on this device..
+        /// </summary>
+        internal static string CloudOnlyWarning {
+            get {
+                return ResourceManager.GetString("CloudOnlyWarning", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This computer: {0}.
+        /// </summary>
+        internal static string ExistingThisComputer {
+            get {
+                return ResourceManager.GetString("ExistingThisComputer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This folder: {0}.
+        /// </summary>
+        internal static string ExistingThisFolder {
+            get {
+                return ResourceManager.GetString("ExistingThisFolder", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Some changes could not be saved because the same data was changed on another computer. They are kept in the data folder: {0}. You can import them with Import from a file….
+        /// </summary>
+        internal static string UnsavedCopiesImport {
+            get {
+                return ResourceManager.GetString("UnsavedCopiesImport", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Some changes could not be saved because the same data was changed on another computer. They are kept in the data folder: {0}. These files cannot be imported. To use one of them, please make a backup first and close DiceCombats. Then give the file the name of the data file it belongs to, for example playerGroups.json, in place of that file..
+        /// </summary>
+        internal static string UnsavedCopiesManual {
+            get {
+                return ResourceManager.GetString("UnsavedCopiesManual", resourceCulture);
+            }
+        }
     }
 }

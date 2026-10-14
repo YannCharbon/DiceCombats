@@ -133,7 +133,7 @@
     <value>Backups</value>
   </data>
   <data name="BackupsHelp" xml:space="preserve">
-    <value>DiceCombats backs up your data the first time you open it each day, and before every import, restore or change of data folder. A backup contains your creatures, combats, player groups, user custom fields, automations, combat logs and settings.</value>
+    <value>DiceCombats backs up your data the first time you open it each day, and before every import, every restore, and before your data is copied to another folder. A backup contains your creatures, combats, player groups, user custom fields, automations, combat logs and settings.</value>
   </data>
   <data name="BackupNowBtn" xml:space="preserve">
     <value>Back up now</value>
@@ -532,7 +532,7 @@
     <value>This folder already contains DiceCombats data</value>
   </data>
   <data name="ExistingFolderText" xml:space="preserve">
-    <value>The folder contains {0}. Your current data contains {1}. What would you like to do?</value>
+    <value>What would you like to do?</value>
   </data>
   <data name="ExistingUseFolderBtn" xml:space="preserve">
     <value>Use the folder's data</value>
@@ -602,5 +602,50 @@
   </data>
   <data name="StartupQuitHelp" xml:space="preserve">
     <value>Closes DiceCombats without changing anything.</value>
+  </data>
+  <data name="LockTitle" xml:space="preserve">
+    <value>DiceCombats is already open on another computer</value>
+  </data>
+  <data name="LockText" xml:space="preserve">
+    <value>The data folder has been in use on {0} since {1}. If you also open it here, changes made on one computer may overwrite those made on the other.</value>
+  </data>
+  <data name="LockSameComputerText" xml:space="preserve">
+    <value>DiceCombats already seems to be open on this computer, since {0}. If you open it a second time, the two windows may overwrite each other's changes.</value>
+  </data>
+  <data name="LockOpenAnywayBtn" xml:space="preserve">
+    <value>Open anyway</value>
+  </data>
+  <data name="ChangedOnDiskTitle" xml:space="preserve">
+    <value>This data was changed on another computer</value>
+  </data>
+  <data name="ChangedOnDiskText" xml:space="preserve">
+    <value>The file {0} was changed in the data folder after DiceCombats read it. Reload it to get those changes, or overwrite it with what you have here.</value>
+  </data>
+  <data name="ChangedReloadBtn" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="ChangedOverwriteBtn" xml:space="preserve">
+    <value>Overwrite</value>
+  </data>
+  <data name="ChangedBanner" xml:space="preserve">
+    <value>Your data was changed on another computer. Reload it when you are ready.</value>
+  </data>
+  <data name="CloudConflictCopies" xml:space="preserve">
+    <value>Your synchronisation service has made copies of some files, because two computers changed them at the same time: {0}. DiceCombats uses the original files. Please compare them and delete the copies you do not need.</value>
+  </data>
+  <data name="CloudOnlyWarning" xml:space="preserve">
+    <value>Some files of the data folder are only in the cloud: {0}. Please set the folder to always keep its files on this device.</value>
+  </data>
+  <data name="ExistingThisComputer" xml:space="preserve">
+    <value>This computer: {0}</value>
+  </data>
+  <data name="ExistingThisFolder" xml:space="preserve">
+    <value>This folder: {0}</value>
+  </data>
+  <data name="UnsavedCopiesImport" xml:space="preserve">
+    <value>Some changes could not be saved because the same data was changed on another computer. They are kept in the data folder: {0}. You can import them with Import from a file…</value>
+  </data>
+  <data name="UnsavedCopiesManual" xml:space="preserve">
+    <value>Some changes could not be saved because the same data was changed on another computer. They are kept in the data folder: {0}. These files cannot be imported. To use one of them, please make a backup first and close DiceCombats. Then give the file the name of the data file it belongs to, for example playerGroups.json, in place of that file.</value>
   </data>
 </root>

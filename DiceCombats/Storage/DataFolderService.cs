@@ -39,11 +39,21 @@ public sealed class DataFolderService
     private readonly AppSettings _settings;
     private readonly ILocalPreferences _localPreferences;
     private readonly StorageNotices _notices;
+    private readonly DataFolderWatcher _watcher;
+    private readonly DataFolderLock _folderLock;
+
+    /// <summary>The data files watched for changes made on another computer (the legacy pinned list is never read, so not watched).</summary>
+    public static readonly IReadOnlyList<string> WatchedFiles =
+        BackupService.DataFileNames.Where(n => n != DiceCombatsService.LegacyFavoriteCombatsFileName).ToList();
 
     public DataFolderService(DataLocation location, SafeFileStore store, DiceCombatsService combats, AutomationConfigurationService automations,
                              CombatLogService combatLog, BackupService backups, AppSettings settings, ILocalPreferences localPreferences,
-                             StorageNotices notices)
+                             StorageNotices notices, DataFolderWatcher? watcher = null)
     {
+        _watcher = watcher ?? new DataFolderWatcher(store, WatchedFiles);
+        _folderLock = new DataFolderLock(store, () => location.Root, location.AppName, location.MachineName, combats.GetVersion());
+        _watcher.ChangedElsewhere += _ => ChangedElsewhere?.Invoke();
+        combats.ChangedOnDisk += notices.ReportChangedOnDisk;
         _location = location;
         _store = store;
         _combats = combats;
@@ -71,6 +81,15 @@ public sealed class DataFolderService
     public async Task LoadAsync()
     {
         if (IsLoaded) return;
+
+        // Before anything is read: what a synchronisation service left behind
+        // (spec §5.7). Reading a file only in the cloud would download it.
+        _notices.ReportCloudFiles(CloudFiles.FindConflictCopies(_location.Root, BackupService.DataFileNames),
+                                  CloudFiles.FindCloudOnly(_location.Root, BackupService.DataFileNames));
+        var unsaved = UnsavedCopies.Find(_location.Root, BackupService.DataFileNames);
+        _notices.ReportUnsavedCopies(unsaved.Where(IsImportableUnsavedCopy).ToList(),
+                                     unsaved.Where(n => !IsImportableUnsavedCopy(n)).ToList());
+
         if (!_settings.IsInitialized)
         {
             await _settings.InitializeAsync(_localPreferences, MovedPreferenceKeys);
@@ -79,6 +98,15 @@ public sealed class DataFolderService
         await _automations.InitializeAsync();
         _notices.ReportLoadFailures();
         await WriteMarkerAsync();
+
+        // Windows only (spec §5.5): the lock says this computer has the folder
+        // open, and the watcher notices what another computer changes in it.
+        if (OperatingSystem.IsWindows())
+        {
+            await _folderLock.AcquireAsync();
+            _watcher.Start(_location.Root);
+        }
+
         IsLoaded = true;
         LoadedChanged?.Invoke();
 
@@ -115,6 +143,77 @@ public sealed class DataFolderService
         {
             Debug.WriteLine($"The marker could not be written: {ex.Message}");
         }
+    }
+
+    // ── several computers ──────────────────────────────────────────────
+
+    /// <summary>Raised when a data file was changed elsewhere (the banner shows); see <see cref="ChangedFiles"/>.</summary>
+    public event Action? ChangedElsewhere;
+
+    /// <summary>The data files changed on another computer since they were read here.</summary>
+    public IReadOnlyList<string> ChangedFiles => _watcher.Changed;
+
+    public DataFolderWatcher Watcher => _watcher;
+
+    /// <summary>
+    /// "Reload": reads every data file again, dropping what is in memory. Only
+    /// when the user asks: the app never reloads by itself, in a combat or not.
+    /// The caller rebuilds the pages.
+    /// </summary>
+    public async Task ReloadAllAsync()
+    {
+        using (_watcher.Pause())
+        {
+            await _combats.ReloadAsync();
+            await _automations.ReloadAsync();
+            await _settings.ReloadAsync();
+        }
+        _watcher.Clear();
+        _notices.ReportLoadFailures();
+        ChangedElsewhere?.Invoke();
+    }
+
+    /// <summary>"Overwrite": saves one file over what another computer wrote in it.</summary>
+    public async Task OverwriteAsync(string fileName)
+    {
+        if (fileName == AutomationConfigurationService.AutomationsFileName)
+        {
+            await _automations.SaveAsync(overwriteExternalChange: true);
+        }
+        else
+        {
+            await _combats.OverwriteAsync(fileName);
+        }
+        _watcher.Clear(new[] { fileName });
+        ChangedElsewhere?.Invoke();
+    }
+
+    // ── changes that could not be saved ────────────────────────────────
+
+    /// <summary>A kept list of creatures or combats: Import from a file reads it as an older export.</summary>
+    public static bool IsImportableUnsavedCopy(string name) =>
+        name.StartsWith(Path.GetFileNameWithoutExtension(DiceCombatsService.CreaturesFileName) + ".", StringComparison.OrdinalIgnoreCase)
+        || name.StartsWith(Path.GetFileNameWithoutExtension(DiceCombatsService.CombatsFileName) + ".", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// When the app closes: each file whose last save was refused because
+    /// another computer had changed it (a "Reload or Overwrite" choice still
+    /// open, or a refused save on close) gets the app's version written next
+    /// to it by SafeFileStore (UnsavedCopies), so that nothing is lost. The
+    /// data file itself is left as the other computer wrote it.
+    /// Synchronous: called while the window closes.
+    /// </summary>
+    public IReadOnlyList<string> KeepUnsavedChanges() =>
+        IsLoaded ? _store.WriteUnsavedCopies(_location.MachineName, DateTime.Now) : Array.Empty<string>();
+
+    /// <summary>
+    /// At a clean exit, or before a restart: stops the heartbeat and deletes
+    /// this session's lock. Synchronous: called while the window closes.
+    /// </summary>
+    public void ReleaseFolder()
+    {
+        _watcher.Stop();
+        _folderLock.Release();
     }
 
     // ── moving ──────────────────────────────────────────────────────────
@@ -173,7 +272,7 @@ public sealed class DataFolderService
         }
         catch
         {
-            Unblock(blocked);
+            await UnblockAsync(blocked);
             throw;
         }
         _location.SetPointer(IsDefault(target) ? null : target);
@@ -207,7 +306,7 @@ public sealed class DataFolderService
         }
         catch
         {
-            Unblock(blocked);
+            await UnblockAsync(blocked);
             throw;
         }
         string oldRoot = _location.Root;
@@ -293,6 +392,8 @@ public sealed class DataFolderService
     // Everything in memory goes to disk first, and the combat recording ends.
     private async Task StopAndFlushAsync()
     {
+        // The app's own writes from here on are not changes made elsewhere.
+        _watcher.Stop();
         _combatLog.EndSession();
         await _combats.SaveAllAsync();
         await _automations.SaveAsync();
@@ -315,12 +416,16 @@ public sealed class DataFolderService
         return blocked;
     }
 
-    private void Unblock(IEnumerable<string> names)
+    // Each file is read again rather than forgotten: it then holds what was
+    // just saved, and the next save is not taken for a change made elsewhere.
+    private async Task UnblockAsync(IEnumerable<string> names)
     {
         foreach (string name in names)
         {
-            _store.ForgetFile(name);
+            var result = await _store.LoadTextAsync(name);
+            if (result.Outcome == LoadOutcome.Failed) _store.ForgetFile(name);
         }
+        if (IsLoaded && OperatingSystem.IsWindows()) _watcher.Start(_location.Root);
     }
 
     private void WriteMarkerTo(string target)

@@ -133,7 +133,7 @@
     <value>Sauvegardes</value>
   </data>
   <data name="BackupsHelp" xml:space="preserve">
-    <value>DiceCombats sauvegarde vos données à la première ouverture de chaque journée, ainsi qu'avant chaque importation, restauration ou changement de dossier de données. Une sauvegarde contient vos créatures, combats, groupes de joueurs, champs personnalisés utilisateur, automatisations, journaux de combat et réglages.</value>
+    <value>DiceCombats sauvegarde vos données à la première ouverture de chaque journée, ainsi qu'avant chaque importation, chaque restauration et chaque copie de vos données vers un autre dossier. Une sauvegarde contient vos créatures, combats, groupes de joueurs, champs personnalisés, automatisations, journaux de combat et réglages.</value>
   </data>
   <data name="BackupNowBtn" xml:space="preserve">
     <value>Sauvegarder maintenant</value>
@@ -235,7 +235,7 @@
     <value>Groupes de joueurs : {0}</value>
   </data>
   <data name="SummaryFieldTemplates" xml:space="preserve">
-    <value>Champs personnalisés utilisateur : {0}</value>
+    <value>Champs personnalisés : {0}</value>
   </data>
   <data name="SummaryAutomations" xml:space="preserve">
     <value>Automatisations : {0}</value>
@@ -265,7 +265,7 @@
     <value>Exporter toute la bibliothèque…</value>
   </data>
   <data name="ExportLibraryHelp" xml:space="preserve">
-    <value>Enregistre vos créatures, combats, groupes de joueurs, champs personnalisés utilisateur et automatisations dans un seul fichier. Les jetons d'accès de vos automatisations n'y figurent pas.</value>
+    <value>Enregistre vos créatures, combats, groupes de joueurs, champs personnalisés et automatisations dans un seul fichier. Les jetons d'accès de vos automatisations n'y figurent pas.</value>
   </data>
   <data name="WizardTitle" xml:space="preserve">
     <value>Importation</value>
@@ -433,7 +433,7 @@
     <value>Groupes de joueurs</value>
   </data>
   <data name="KindFieldTemplate" xml:space="preserve">
-    <value>Champs personnalisés utilisateur</value>
+    <value>Champs personnalisés</value>
   </data>
   <data name="KindExternalApp" xml:space="preserve">
     <value>Applications externes</value>
@@ -532,7 +532,7 @@
     <value>Ce dossier contient déjà des données DiceCombats</value>
   </data>
   <data name="ExistingFolderText" xml:space="preserve">
-    <value>Le dossier contient {0}. Vos données actuelles contiennent {1}. Que souhaitez-vous faire ?</value>
+    <value>Que souhaitez-vous faire ?</value>
   </data>
   <data name="ExistingUseFolderBtn" xml:space="preserve">
     <value>Utiliser les données du dossier</value>
@@ -602,5 +602,50 @@
   </data>
   <data name="StartupQuitHelp" xml:space="preserve">
     <value>Ferme DiceCombats sans rien modifier.</value>
+  </data>
+  <data name="LockTitle" xml:space="preserve">
+    <value>DiceCombats est déjà ouvert sur un autre ordinateur</value>
+  </data>
+  <data name="LockText" xml:space="preserve">
+    <value>Le dossier de données est utilisé sur {0} depuis {1}. Si vous l'ouvrez aussi ici, les modifications faites sur un ordinateur risquent d'écraser celles faites sur l'autre.</value>
+  </data>
+  <data name="LockSameComputerText" xml:space="preserve">
+    <value>DiceCombats semble déjà ouvert sur cet ordinateur depuis {0}. Si vous l'ouvrez une seconde fois, les deux fenêtres risquent d'écraser mutuellement leurs modifications.</value>
+  </data>
+  <data name="LockOpenAnywayBtn" xml:space="preserve">
+    <value>Ouvrir quand même</value>
+  </data>
+  <data name="ChangedOnDiskTitle" xml:space="preserve">
+    <value>Ces données ont été modifiées sur un autre ordinateur</value>
+  </data>
+  <data name="ChangedOnDiskText" xml:space="preserve">
+    <value>Le fichier {0} a été modifié dans le dossier de données après sa lecture par DiceCombats. Rechargez-le pour obtenir ces modifications, ou remplacez-le par ce que vous avez ici.</value>
+  </data>
+  <data name="ChangedReloadBtn" xml:space="preserve">
+    <value>Recharger</value>
+  </data>
+  <data name="ChangedOverwriteBtn" xml:space="preserve">
+    <value>Remplacer</value>
+  </data>
+  <data name="ChangedBanner" xml:space="preserve">
+    <value>Vos données ont été modifiées sur un autre ordinateur. Rechargez-les lorsque vous le souhaitez.</value>
+  </data>
+  <data name="CloudConflictCopies" xml:space="preserve">
+    <value>Votre service de synchronisation a créé des copies de certains fichiers, car deux ordinateurs les ont modifiés en même temps : {0}. DiceCombats utilise les fichiers d'origine. Merci de les comparer et de supprimer les copies inutiles.</value>
+  </data>
+  <data name="CloudOnlyWarning" xml:space="preserve">
+    <value>Certains fichiers du dossier de données se trouvent uniquement dans le cloud : {0}. Merci de régler le dossier pour qu'il conserve toujours ses fichiers sur cet appareil.</value>
+  </data>
+  <data name="ExistingThisComputer" xml:space="preserve">
+    <value>Cet ordinateur : {0}</value>
+  </data>
+  <data name="ExistingThisFolder" xml:space="preserve">
+    <value>Ce dossier : {0}</value>
+  </data>
+  <data name="UnsavedCopiesImport" xml:space="preserve">
+    <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Vous pouvez les récupérer avec Importer depuis un fichier…</value>
+  </data>
+  <data name="UnsavedCopiesManual" xml:space="preserve">
+    <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Ces fichiers ne peuvent pas être importés. Pour utiliser l'un d'eux, effectuez d'abord une sauvegarde et fermez DiceCombats. Renommez ensuite le fichier avec le nom du fichier de données auquel il correspond, par exemple playerGroups.json, en remplacement de celui-ci.</value>
   </data>
 </root>

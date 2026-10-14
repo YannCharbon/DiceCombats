@@ -44,9 +44,10 @@ namespace DiceCombats
         private static readonly JsonSerializerOptions ReadOptions = new JsonSerializerOptions();
         private static readonly JsonSerializerOptions WriteOptions = new JsonSerializerOptions { WriteIndented = true };
 
-        // Every save passes overwriteExternalChange: true. A file changed on
-        // another computer is overwritten, as it always has been, until the app
-        // can ask the user whether to reload or overwrite it.
+        // A save never writes over a file changed elsewhere since it was read
+        // (another computer, through a synchronised folder): it returns
+        // ChangedOnDisk instead, and ChangedOnDisk is raised so that the user
+        // chooses between reloading and overwriting.
 
         private readonly SafeFileStore _store;
         private readonly ILocalPreferences _localPreferences;
@@ -98,6 +99,37 @@ namespace DiceCombats
             {
                 _store.Block(fileName, ex.Message);
             }
+        }
+
+        /// <summary>Raised, from any thread, when a save found its file changed elsewhere and wrote nothing.</summary>
+        public event Action<string>? ChangedOnDisk;
+
+        // The event is raised before the save's task completes: whoever waits
+        // for the save (the window closing) also sees the notice it caused.
+        private async Task<SaveOutcome> SaveListAsync<T>(string fileName, List<T> list, bool overwriteExternalChange = false)
+        {
+            var outcome = await _store.SaveJsonAsync(fileName, list, WriteOptions, overwriteExternalChange).ConfigureAwait(false);
+            if (outcome == SaveOutcome.ChangedOnDisk)
+            {
+                ChangedOnDisk?.Invoke(fileName);
+            }
+            return outcome;
+        }
+
+        /// <summary>"Overwrite": saves one file over what another computer wrote in it.</summary>
+        public Task<SaveOutcome> OverwriteAsync(string fileName)
+        {
+            if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
+            return fileName switch
+            {
+                CreaturesFileName => SaveListAsync(fileName, _CreatureList, overwriteExternalChange: true),
+                CombatsFileName => SaveListAsync(fileName, _CombatsList, overwriteExternalChange: true),
+                PinnedCombatsFileName => SaveListAsync(fileName, _pinnedCombats, overwriteExternalChange: true),
+                UserCreatureCustomFieldsFileName => SaveListAsync(fileName, _userCreatureCustomFields, overwriteExternalChange: true),
+                CombatLogsFileName => SaveListAsync(fileName, _combatLogs, overwriteExternalChange: true),
+                PlayerGroupsFileName => SaveListAsync(fileName, _playerGroups, overwriteExternalChange: true),
+                _ => Task.FromResult(SaveOutcome.Unchanged),
+            };
         }
 
         /// <summary>
@@ -166,7 +198,7 @@ namespace DiceCombats
         public Task<SaveOutcome> SaveCreaturesAsync()
         {
             if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
-            return _store.SaveJsonAsync(CreaturesFileName, _CreatureList, WriteOptions, overwriteExternalChange: true);
+            return SaveListAsync(CreaturesFileName, _CreatureList);
         }
 
         public async Task LoadCreatureListAsync()
@@ -210,7 +242,7 @@ namespace DiceCombats
         public Task<SaveOutcome> SaveCombatsAsync()
         {
             if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
-            return _store.SaveJsonAsync(CombatsFileName, _CombatsList, WriteOptions, overwriteExternalChange: true);
+            return SaveListAsync(CombatsFileName, _CombatsList);
         }
 
         public async Task LoadCombatsListAsync()
@@ -296,7 +328,7 @@ namespace DiceCombats
         public Task<SaveOutcome> SavePinnedCombatsListAsync()
         {
             if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
-            return _store.SaveJsonAsync(PinnedCombatsFileName, _pinnedCombats, WriteOptions, overwriteExternalChange: true);
+            return SaveListAsync(PinnedCombatsFileName, _pinnedCombats);
         }
 
         public async Task LoadPinnedCombatsListAsync()
@@ -375,7 +407,7 @@ namespace DiceCombats
         public Task<SaveOutcome> SaveUserCreatureCustomFieldsListAsync()
         {
             if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
-            return _store.SaveJsonAsync(UserCreatureCustomFieldsFileName, _userCreatureCustomFields, WriteOptions, overwriteExternalChange: true);
+            return SaveListAsync(UserCreatureCustomFieldsFileName, _userCreatureCustomFields);
         }
 
         public async Task LoadUserCreatureCustomFieldsListAsync()
@@ -443,7 +475,7 @@ namespace DiceCombats
         public Task<SaveOutcome> SaveCombatLogsAsync()
         {
             if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
-            return _store.SaveJsonAsync(CombatLogsFileName, _combatLogs, WriteOptions, overwriteExternalChange: true);
+            return SaveListAsync(CombatLogsFileName, _combatLogs);
         }
 
         public async Task LoadCombatLogsListAsync()
@@ -521,7 +553,7 @@ namespace DiceCombats
         public Task<SaveOutcome> SavePlayerGroupsListAsync()
         {
             if (!IsInitialized) return Task.FromResult(SaveOutcome.Blocked);
-            return _store.SaveJsonAsync(PlayerGroupsFileName, _playerGroups, WriteOptions, overwriteExternalChange: true);
+            return SaveListAsync(PlayerGroupsFileName, _playerGroups);
         }
 
         public async Task LoadPlayerGroupsListAsync()

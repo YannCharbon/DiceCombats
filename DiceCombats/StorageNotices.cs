@@ -10,7 +10,7 @@ using DiceCombats.Storage;
 
 namespace DiceCombats
 {
-    public enum StorageNoticeKind { LoadFailed, SaveFailed, RestoreDone, RestoreFailed, RestoreRollbackFailed }
+    public enum StorageNoticeKind { LoadFailed, SaveFailed, RestoreDone, RestoreFailed, RestoreRollbackFailed, ChangedOnDisk, ConflictCopies, CloudOnly, UnsavedCopies, UnsavedCopiesManual }
 
     /// <param name="Detail">The file name for a load or save failure, the reason for a failed restore,
     /// the safety backup's file name when putting the data back failed.</param>
@@ -65,6 +65,40 @@ namespace DiceCombats
         public void ReportRestore(bool succeeded, string detail = "")
         {
             Add(new StorageNotice(succeeded ? StorageNoticeKind.RestoreDone : StorageNoticeKind.RestoreFailed, detail));
+        }
+
+        /// <summary>A save found its file changed on another computer: the user chooses to reload or overwrite.</summary>
+        public void ReportChangedOnDisk(string fileName)
+        {
+            Add(new StorageNotice(StorageNoticeKind.ChangedOnDisk, fileName));
+        }
+
+        /// <summary>At startup: conflict copies left by a synchronisation service, or files only in the cloud (names, comma-separated).</summary>
+        public void ReportCloudFiles(IReadOnlyList<string> conflictCopies, IReadOnlyList<string> cloudOnly)
+        {
+            if (conflictCopies.Count > 0) Add(new StorageNotice(StorageNoticeKind.ConflictCopies, string.Join(", ", conflictCopies)));
+            if (cloudOnly.Count > 0) Add(new StorageNotice(StorageNoticeKind.CloudOnly, string.Join(", ", cloudOnly)));
+        }
+
+        /// <summary>
+        /// At startup: changes kept at the last close because the file had been
+        /// changed on another computer. Those that Import from a file... reads
+        /// (creature and combat lists), and those to put back by hand.
+        /// </summary>
+        public void ReportUnsavedCopies(IReadOnlyList<string> importable, IReadOnlyList<string> manual)
+        {
+            if (importable.Count > 0) Add(new StorageNotice(StorageNoticeKind.UnsavedCopies, string.Join(", ", importable)));
+            if (manual.Count > 0) Add(new StorageNotice(StorageNoticeKind.UnsavedCopiesManual, string.Join(", ", manual)));
+        }
+
+        /// <summary>Removes one notice (a choice was made for it).</summary>
+        public void Dismiss(StorageNotice notice)
+        {
+            lock (_gate)
+            {
+                _pending.Remove(notice);
+            }
+            Changed?.Invoke();
         }
 
         /// <summary>A restore failed and the data could not be put back: the user restores this backup by hand.</summary>

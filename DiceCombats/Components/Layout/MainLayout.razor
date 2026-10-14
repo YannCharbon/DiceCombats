@@ -48,6 +48,17 @@ else
             {
                 <div class="dc-note" style="margin:10px 0;">@PLoc["StartupUsingLocalBanner"]</div>
             }
+            @* Another computer changed the data (spec §3.4): the user reloads
+               when ready. Never automatic, even in the middle of a combat. *@
+            @if (DataFolder.ChangedFiles.Count > 0)
+            {
+                <div class="dc-note" style="margin:10px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span style="flex:1 1 240px;">@PLoc["ChangedBanner"]</span>
+                    <button type="button" class="dc-btn dc-btn-fill" disabled="@_reloading" @onclick="ReloadChangedData">
+                        <DcIcon Name="sync" /> @PLoc["ChangedReloadBtn"]
+                    </button>
+                </div>
+            }
             @Body
         </article>
 
@@ -63,9 +74,26 @@ else
     {
         App.PagesReloadRequested += ReloadInPlace;
         DataFolder.LoadedChanged += OnLoadedChanged;
+        DataFolder.ChangedElsewhere += OnLoadedChanged;
     }
 
     private void OnLoadedChanged() => InvokeAsync(StateHasChanged);
+
+    private bool _reloading;
+
+    private async Task ReloadChangedData()
+    {
+        _reloading = true;
+        try
+        {
+            await DataFolder.ReloadAllAsync();
+        }
+        finally
+        {
+            _reloading = false;
+        }
+        (Application.Current as App)?.ReloadPages();
+    }
 
     // A full reload of the web page in the same web view: every component and
     // every scoped service starts again, as with a new page, but the native
@@ -79,6 +107,7 @@ else
     {
         App.PagesReloadRequested -= ReloadInPlace;
         DataFolder.LoadedChanged -= OnLoadedChanged;
+        DataFolder.ChangedElsewhere -= OnLoadedChanged;
     }
 
     // Every colour below is a stop of the brand gradient or a step of the

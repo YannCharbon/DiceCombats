@@ -37,7 +37,36 @@ namespace DiceCombats
 
             Preferences.Set("Language", cultureCode);
 
-            // Reload the Blazor-based UI on the single window this app has.
+            ReloadPages();
+        }
+
+        /// <summary>
+        /// Raised when the pages must be built again. The main layout answers by
+        /// reloading the web page in place.
+        /// </summary>
+        public static event Action? PagesReloadRequested;
+
+        /// <summary>
+        /// Builds every page again, so that they pick up a new language or data
+        /// that was replaced.
+        ///
+        /// On Windows the web page is reloaded inside the same BlazorWebView:
+        /// replacing the MAUI page creates a new WebView2 under a new navigation
+        /// view, and WebTitleBar only lifts the first one into the title-bar
+        /// strip, so the new one sat 32 px lower, under a dark band. Replacing
+        /// the page is kept for the other platforms, and for the case where no
+        /// layout is there to answer.
+        /// </summary>
+        public void ReloadPages()
+        {
+            var reloadInPlace = PagesReloadRequested;
+#if WINDOWS
+            if (reloadInPlace != null)
+            {
+                reloadInPlace();
+                return;
+            }
+#endif
             if (Windows.Count > 0)
             {
                 Windows[0].Page = new MainPage();

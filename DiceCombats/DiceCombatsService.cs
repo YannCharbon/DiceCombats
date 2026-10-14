@@ -156,7 +156,7 @@ namespace DiceCombats
             _ = SaveCreaturesAsync();
         }
 
-        public Task SaveCreaturesAsync()
+        public Task<SaveOutcome> SaveCreaturesAsync()
         {
             return _store.SaveJsonAsync(CreaturesFileName, _CreatureList, WriteOptions, overwriteExternalChange: true);
         }
@@ -199,7 +199,7 @@ namespace DiceCombats
             _ = SaveCombatsAsync();
         }
 
-        public Task SaveCombatsAsync()
+        public Task<SaveOutcome> SaveCombatsAsync()
         {
             return _store.SaveJsonAsync(CombatsFileName, _CombatsList, WriteOptions, overwriteExternalChange: true);
         }
@@ -284,7 +284,7 @@ namespace DiceCombats
             return _pinnedCombats.Where(guid => GetCombatFromGUID(guid) != null).ToList();
         }
 
-        public Task SavePinnedCombatsListAsync()
+        public Task<SaveOutcome> SavePinnedCombatsListAsync()
         {
             return _store.SaveJsonAsync(PinnedCombatsFileName, _pinnedCombats, WriteOptions, overwriteExternalChange: true);
         }
@@ -360,7 +360,7 @@ namespace DiceCombats
             return _userCreatureCustomFields.Find(x => x.Title == fieldName);
         }
 
-        public Task SaveUserCreatureCustomFieldsListAsync()
+        public Task<SaveOutcome> SaveUserCreatureCustomFieldsListAsync()
         {
             return _store.SaveJsonAsync(UserCreatureCustomFieldsFileName, _userCreatureCustomFields, WriteOptions, overwriteExternalChange: true);
         }
@@ -427,7 +427,7 @@ namespace DiceCombats
             _ = SaveCombatLogsAsync();
         }
 
-        public Task SaveCombatLogsAsync()
+        public Task<SaveOutcome> SaveCombatLogsAsync()
         {
             return _store.SaveJsonAsync(CombatLogsFileName, _combatLogs, WriteOptions, overwriteExternalChange: true);
         }
@@ -475,7 +475,7 @@ namespace DiceCombats
                 .ToList();
         }
 
-        public Task SavePlayerGroupsListAsync()
+        public Task<SaveOutcome> SavePlayerGroupsListAsync()
         {
             return _store.SaveJsonAsync(PlayerGroupsFileName, _playerGroups, WriteOptions, overwriteExternalChange: true);
         }

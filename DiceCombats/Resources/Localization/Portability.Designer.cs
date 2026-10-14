@@ -581,5 +581,509 @@ namespace DiceCombats.Resources.Localization {
                 return ResourceManager.GetString("ErrorFileTooLarge", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à New.
+        /// </summary>
+        internal static string StatusNew {
+            get {
+                return ResourceManager.GetString("StatusNew", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Up to date.
+        /// </summary>
+        internal static string StatusUpToDate {
+            get {
+                return ResourceManager.GetString("StatusUpToDate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Differs.
+        /// </summary>
+        internal static string StatusDiffers {
+            get {
+                return ResourceManager.GetString("StatusDiffers", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name already used.
+        /// </summary>
+        internal static string StatusNameUsed {
+            get {
+                return ResourceManager.GetString("StatusNameUsed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Nothing to do.
+        /// </summary>
+        internal static string ChoiceNothing {
+            get {
+                return ResourceManager.GetString("ChoiceNothing", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import.
+        /// </summary>
+        internal static string ChoiceImport {
+            get {
+                return ResourceManager.GetString("ChoiceImport", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Skip.
+        /// </summary>
+        internal static string ChoiceSkip {
+            get {
+                return ResourceManager.GetString("ChoiceSkip", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import as a copy.
+        /// </summary>
+        internal static string ChoiceImportAsCopy {
+            get {
+                return ResourceManager.GetString("ChoiceImportAsCopy", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Replace the local one.
+        /// </summary>
+        internal static string ChoiceReplaceLocal {
+            get {
+                return ResourceManager.GetString("ChoiceReplaceLocal", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Keep the local one.
+        /// </summary>
+        internal static string ChoiceKeepLocal {
+            get {
+                return ResourceManager.GetString("ChoiceKeepLocal", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Merge.
+        /// </summary>
+        internal static string ChoiceMerge {
+            get {
+                return ResourceManager.GetString("ChoiceMerge", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import with a new name.
+        /// </summary>
+        internal static string ChoiceImportWithNewName {
+            get {
+                return ResourceManager.GetString("ChoiceImportWithNewName", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Keep both with the same name.
+        /// </summary>
+        internal static string ChoiceKeepBothSameName {
+            get {
+                return ResourceManager.GetString("ChoiceKeepBothSameName", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Use the local one instead.
+        /// </summary>
+        internal static string ChoiceUseLocal {
+            get {
+                return ResourceManager.GetString("ChoiceUseLocal", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Apply to all of this kind.
+        /// </summary>
+        internal static string ChoiceApplyToAll {
+            get {
+                return ResourceManager.GetString("ChoiceApplyToAll", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Adds it to your library..
+        /// </summary>
+        internal static string ChoiceImportHelp {
+            get {
+                return ResourceManager.GetString("ChoiceImportHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Leaves it out of the import..
+        /// </summary>
+        internal static string ChoiceSkipHelp {
+            get {
+                return ResourceManager.GetString("ChoiceSkipHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Adds the imported version next to yours, under the name below. Yours is not changed..
+        /// </summary>
+        internal static string ChoiceImportAsCopyHelp {
+            get {
+                return ResourceManager.GetString("ChoiceImportAsCopyHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Your version is overwritten by the imported one, and everything that uses it then uses the imported version..
+        /// </summary>
+        internal static string ChoiceReplaceLocalHelp {
+            get {
+                return ResourceManager.GetString("ChoiceReplaceLocalHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The imported version is left out. Anything imported that uses it will use yours..
+        /// </summary>
+        internal static string ChoiceKeepLocalHelp {
+            get {
+                return ResourceManager.GetString("ChoiceKeepLocalHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Keeps yours and adds what the imported one contains. Each part is then checked on its own..
+        /// </summary>
+        internal static string ChoiceMergeHelp {
+            get {
+                return ResourceManager.GetString("ChoiceMergeHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Imports it under the name below, so that you can tell the two apart..
+        /// </summary>
+        internal static string ChoiceImportWithNewNameHelp {
+            get {
+                return ResourceManager.GetString("ChoiceImportWithNewNameHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Imports it with the same name. You will then have two with this name..
+        /// </summary>
+        internal static string ChoiceKeepBothSameNameHelp {
+            get {
+                return ResourceManager.GetString("ChoiceKeepBothSameNameHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The imported one is left out, and anything imported that uses it will use yours instead..
+        /// </summary>
+        internal static string ChoiceUseLocalHelp {
+            get {
+                return ResourceManager.GetString("ChoiceUseLocalHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Part of the content of this file already exists in your library. Please choose what to do in each case; the suggested choice is already selected..
+        /// </summary>
+        internal static string WizardIntro {
+            get {
+                return ResourceManager.GetString("WizardIntro", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à In the file.
+        /// </summary>
+        internal static string WizardInFile {
+            get {
+                return ResourceManager.GetString("WizardInFile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à In your library.
+        /// </summary>
+        internal static string WizardInLibrary {
+            get {
+                return ResourceManager.GetString("WizardInLibrary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à New name.
+        /// </summary>
+        internal static string WizardNewName {
+            get {
+                return ResourceManager.GetString("WizardNewName", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Please enter a name..
+        /// </summary>
+        internal static string WizardNameEmpty {
+            get {
+                return ResourceManager.GetString("WizardNameEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This name is already used. Please choose another one..
+        /// </summary>
+        internal static string WizardNameTaken {
+            get {
+                return ResourceManager.GetString("WizardNameTaken", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Other content uses this one.
+        /// </summary>
+        internal static string WizardSkipWarningTitle {
+            get {
+                return ResourceManager.GetString("WizardSkipWarningTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à If you do not import "{0}", the following will be imported without it: {1}.
+        /// </summary>
+        internal static string WizardSkipWarning {
+            get {
+                return ResourceManager.GetString("WizardSkipWarning", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import.
+        /// </summary>
+        internal static string WizardConfirmBtn {
+            get {
+                return ResourceManager.GetString("WizardConfirmBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Ready to import.
+        /// </summary>
+        internal static string ImportSummaryTitle {
+            get {
+                return ResourceManager.GetString("ImportSummaryTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Nothing in this file conflicts with your library. The following will be added:.
+        /// </summary>
+        internal static string ImportSummaryText {
+            get {
+                return ResourceManager.GetString("ImportSummaryText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Everything in this file is already in your library, so there is nothing to import..
+        /// </summary>
+        internal static string ImportNothingToDo {
+            get {
+                return ResourceManager.GetString("ImportNothingToDo", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A backup of your current data is made before anything is changed..
+        /// </summary>
+        internal static string ImportBackupNote {
+            get {
+                return ResourceManager.GetString("ImportBackupNote", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Replaced: {0}.
+        /// </summary>
+        internal static string ReportReplaced {
+            get {
+                return ResourceManager.GetString("ReportReplaced", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Merged: {0}.
+        /// </summary>
+        internal static string ReportMerged {
+            get {
+                return ResourceManager.GetString("ReportMerged", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Not imported: {0}.
+        /// </summary>
+        internal static string ReportSkipped {
+            get {
+                return ResourceManager.GetString("ReportSkipped", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Already up to date: {0}.
+        /// </summary>
+        internal static string ReportUpToDate {
+            get {
+                return ResourceManager.GetString("ReportUpToDate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The import could not be completed, so your data has been put back as it was before. Details: {0}.
+        /// </summary>
+        internal static string ImportFailed {
+            get {
+                return ResourceManager.GetString("ImportFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import from a file….
+        /// </summary>
+        internal static string ImportFromFileBtn {
+            get {
+                return ResourceManager.GetString("ImportFromFileBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Some of the content of this file refers to things that are not in it ({0} references). It is imported without them..
+        /// </summary>
+        internal static string WarningBrokenReferences {
+            get {
+                return ResourceManager.GetString("WarningBrokenReferences", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Creatures.
+        /// </summary>
+        internal static string KindCreature {
+            get {
+                return ResourceManager.GetString("KindCreature", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Combats.
+        /// </summary>
+        internal static string KindCombat {
+            get {
+                return ResourceManager.GetString("KindCombat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Player groups.
+        /// </summary>
+        internal static string KindPlayerGroup {
+            get {
+                return ResourceManager.GetString("KindPlayerGroup", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User custom fields.
+        /// </summary>
+        internal static string KindFieldTemplate {
+            get {
+                return ResourceManager.GetString("KindFieldTemplate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à External apps.
+        /// </summary>
+        internal static string KindExternalApp {
+            get {
+                return ResourceManager.GetString("KindExternalApp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Automations.
+        /// </summary>
+        internal static string KindAutomation {
+            get {
+                return ResourceManager.GetString("KindAutomation", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The creature "{0}" of this combat is no longer in your library, so only its copy in the combat is exported..
+        /// </summary>
+        internal static string WarningCreatureNotInLibrary {
+            get {
+                return ResourceManager.GetString("WarningCreatureNotInLibrary", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The access token of "{0}" was left out. Please enter it again after importing..
+        /// </summary>
+        internal static string WarningTokenRemoved {
+            get {
+                return ResourceManager.GetString("WarningTokenRemoved", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This file was made by an older version of DiceCombats. It is converted as it is imported..
+        /// </summary>
+        internal static string WarningLegacyFormat {
+            get {
+                return ResourceManager.GetString("WarningLegacyFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The request sent by "{0}" may contain an access token, and it was exported as it is. Please check it after importing..
+        /// </summary>
+        internal static string WarningBodyKeptAsIs {
+            get {
+                return ResourceManager.GetString("WarningBodyKeptAsIs", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Importing your data….
+        /// </summary>
+        internal static string ImportInProgress {
+            get {
+                return ResourceManager.GetString("ImportInProgress", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The import could not be completed, and your data could not be put back automatically. Your data from just before the import is in the backup {0}. Please restore it from Settings, in the Data section..
+        /// </summary>
+        internal static string ImportRollbackFailed {
+            get {
+                return ResourceManager.GetString("ImportRollbackFailed", resourceCulture);
+            }
+        }
     }
 }

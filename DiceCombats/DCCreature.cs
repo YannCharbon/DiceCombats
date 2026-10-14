@@ -49,6 +49,12 @@ namespace DiceCombats
             Id = Guid.NewGuid();
         }
 
+        /// <summary>Gives the creature another name, for example when it is imported next to one with the same name.</summary>
+        public void Rename(string name)
+        {
+            Name = name;
+        }
+
         public void SetImageSheetBase64(string imageSheetBase64)
         {
             ImageSheetBas64 = imageSheetBase64;

@@ -291,4 +291,172 @@
   <data name="ErrorFileTooLarge" xml:space="preserve">
     <value>This file is too large: {0} MB, while DiceCombats accepts up to {1} MB.</value>
   </data>
+  <data name="StatusNew" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="StatusUpToDate" xml:space="preserve">
+    <value>Up to date</value>
+  </data>
+  <data name="StatusDiffers" xml:space="preserve">
+    <value>Differs</value>
+  </data>
+  <data name="StatusNameUsed" xml:space="preserve">
+    <value>Name already used</value>
+  </data>
+  <data name="ChoiceNothing" xml:space="preserve">
+    <value>Nothing to do</value>
+  </data>
+  <data name="ChoiceImport" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ChoiceSkip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="ChoiceImportAsCopy" xml:space="preserve">
+    <value>Import as a copy</value>
+  </data>
+  <data name="ChoiceReplaceLocal" xml:space="preserve">
+    <value>Replace the local one</value>
+  </data>
+  <data name="ChoiceKeepLocal" xml:space="preserve">
+    <value>Keep the local one</value>
+  </data>
+  <data name="ChoiceMerge" xml:space="preserve">
+    <value>Merge</value>
+  </data>
+  <data name="ChoiceImportWithNewName" xml:space="preserve">
+    <value>Import with a new name</value>
+  </data>
+  <data name="ChoiceKeepBothSameName" xml:space="preserve">
+    <value>Keep both with the same name</value>
+  </data>
+  <data name="ChoiceUseLocal" xml:space="preserve">
+    <value>Use the local one instead</value>
+  </data>
+  <data name="ChoiceApplyToAll" xml:space="preserve">
+    <value>Apply to all of this kind</value>
+  </data>
+  <data name="ChoiceImportHelp" xml:space="preserve">
+    <value>Adds it to your library.</value>
+  </data>
+  <data name="ChoiceSkipHelp" xml:space="preserve">
+    <value>Leaves it out of the import.</value>
+  </data>
+  <data name="ChoiceImportAsCopyHelp" xml:space="preserve">
+    <value>Adds the imported version next to yours, under the name below. Yours is not changed.</value>
+  </data>
+  <data name="ChoiceReplaceLocalHelp" xml:space="preserve">
+    <value>Your version is overwritten by the imported one, and everything that uses it then uses the imported version.</value>
+  </data>
+  <data name="ChoiceKeepLocalHelp" xml:space="preserve">
+    <value>The imported version is left out. Anything imported that uses it will use yours.</value>
+  </data>
+  <data name="ChoiceMergeHelp" xml:space="preserve">
+    <value>Keeps yours and adds what the imported one contains. Each part is then checked on its own.</value>
+  </data>
+  <data name="ChoiceImportWithNewNameHelp" xml:space="preserve">
+    <value>Imports it under the name below, so that you can tell the two apart.</value>
+  </data>
+  <data name="ChoiceKeepBothSameNameHelp" xml:space="preserve">
+    <value>Imports it with the same name. You will then have two with this name.</value>
+  </data>
+  <data name="ChoiceUseLocalHelp" xml:space="preserve">
+    <value>The imported one is left out, and anything imported that uses it will use yours instead.</value>
+  </data>
+  <data name="WizardIntro" xml:space="preserve">
+    <value>Part of the content of this file already exists in your library. Please choose what to do in each case; the suggested choice is already selected.</value>
+  </data>
+  <data name="WizardInFile" xml:space="preserve">
+    <value>In the file</value>
+  </data>
+  <data name="WizardInLibrary" xml:space="preserve">
+    <value>In your library</value>
+  </data>
+  <data name="WizardNewName" xml:space="preserve">
+    <value>New name</value>
+  </data>
+  <data name="WizardNameEmpty" xml:space="preserve">
+    <value>Please enter a name.</value>
+  </data>
+  <data name="WizardNameTaken" xml:space="preserve">
+    <value>This name is already used. Please choose another one.</value>
+  </data>
+  <data name="WizardSkipWarningTitle" xml:space="preserve">
+    <value>Other content uses this one</value>
+  </data>
+  <data name="WizardSkipWarning" xml:space="preserve">
+    <value>If you do not import "{0}", the following will be imported without it: {1}</value>
+  </data>
+  <data name="WizardConfirmBtn" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ImportSummaryTitle" xml:space="preserve">
+    <value>Ready to import</value>
+  </data>
+  <data name="ImportSummaryText" xml:space="preserve">
+    <value>Nothing in this file conflicts with your library. The following will be added:</value>
+  </data>
+  <data name="ImportNothingToDo" xml:space="preserve">
+    <value>Everything in this file is already in your library, so there is nothing to import.</value>
+  </data>
+  <data name="ImportBackupNote" xml:space="preserve">
+    <value>A backup of your current data is made before anything is changed.</value>
+  </data>
+  <data name="ReportReplaced" xml:space="preserve">
+    <value>Replaced: {0}</value>
+  </data>
+  <data name="ReportMerged" xml:space="preserve">
+    <value>Merged: {0}</value>
+  </data>
+  <data name="ReportSkipped" xml:space="preserve">
+    <value>Not imported: {0}</value>
+  </data>
+  <data name="ReportUpToDate" xml:space="preserve">
+    <value>Already up to date: {0}</value>
+  </data>
+  <data name="ImportFailed" xml:space="preserve">
+    <value>The import could not be completed, so your data has been put back as it was before. Details: {0}</value>
+  </data>
+  <data name="ImportFromFileBtn" xml:space="preserve">
+    <value>Import from a file…</value>
+  </data>
+  <data name="WarningBrokenReferences" xml:space="preserve">
+    <value>Some of the content of this file refers to things that are not in it ({0} references). It is imported without them.</value>
+  </data>
+  <data name="KindCreature" xml:space="preserve">
+    <value>Creatures</value>
+  </data>
+  <data name="KindCombat" xml:space="preserve">
+    <value>Combats</value>
+  </data>
+  <data name="KindPlayerGroup" xml:space="preserve">
+    <value>Player groups</value>
+  </data>
+  <data name="KindFieldTemplate" xml:space="preserve">
+    <value>User custom fields</value>
+  </data>
+  <data name="KindExternalApp" xml:space="preserve">
+    <value>External apps</value>
+  </data>
+  <data name="KindAutomation" xml:space="preserve">
+    <value>Automations</value>
+  </data>
+  <data name="WarningCreatureNotInLibrary" xml:space="preserve">
+    <value>The creature "{0}" of this combat is no longer in your library, so only its copy in the combat is exported.</value>
+  </data>
+  <data name="WarningTokenRemoved" xml:space="preserve">
+    <value>The access token of "{0}" was left out. Please enter it again after importing.</value>
+  </data>
+  <data name="WarningLegacyFormat" xml:space="preserve">
+    <value>This file was made by an older version of DiceCombats. It is converted as it is imported.</value>
+  </data>
+  <data name="WarningBodyKeptAsIs" xml:space="preserve">
+    <value>The request sent by "{0}" may contain an access token, and it was exported as it is. Please check it after importing.</value>
+  </data>
+  <data name="ImportInProgress" xml:space="preserve">
+    <value>Importing your data…</value>
+  </data>
+  <data name="ImportRollbackFailed" xml:space="preserve">
+    <value>The import could not be completed, and your data could not be put back automatically. Your data from just before the import is in the backup {0}. Please restore it from Settings, in the Data section.</value>
+  </data>
 </root>

@@ -23,11 +23,4 @@ public static class DCBundleMessages
             (DCBundle.MaxSizeBytes / (1024 * 1024)).ToString(CultureInfo.CurrentCulture)),
         _ => loc["ErrorUnreadableFile"],
     };
-
-    public static string ImportResult(IStringLocalizer loc, DCSimpleImportResult result)
-    {
-        var parts = new List<string> { string.Format(loc["ReportAdded"], result.Added) };
-        if (result.KeptLocal > 0) parts.Add(string.Format(loc["ReportKeptLocal"], result.KeptLocal));
-        return string.Join(" · ", parts);
-    }
 }

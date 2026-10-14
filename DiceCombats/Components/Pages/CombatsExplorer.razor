@@ -13,6 +13,7 @@
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
 @inject DiceCombats.Portability.DCBundleService Bundles
+@inject DiceCombats.Portability.DCImportFlow ImportFlow
 @inject IStringLocalizer<Resources.Localization.Portability> PLoc
 @inject IStringLocalizer<Resources.Localization.CombatsExplorer> Loc
 
@@ -30,7 +31,7 @@
     </button>
     <button type="button" class="dc-btn dc-btn-out" @onclick="@(() => ImportCombats())" title="@Loc["ImportCombatsBtnTitle"]">
         <DcIcon Name="download" />
-        @Loc["ImportCombatsBtn"]
+        @PLoc["ImportFromFileBtn"]
     </button>
     @* The old MudSwitch, as the house toggle chip: it lights up while the
        per-combat edition buttons are showing. *@
@@ -450,29 +451,11 @@ else
         }
     }
 
+    // Any DiceCombats file, through the import wizard; the list is drawn
+    // again once the wizard is closed.
     private async Task ImportFromFileAsync()
     {
-        var data = await FileHandler.LoadFileAsync();
-        if (data == null || data.Length == 0)
-        {
-            return;
-        }
-
-        try
-        {
-            var result = await Bundles.ImportSimpleAsync(data);
-            PopupNotificationService.Show(PLoc["ImportReportTitle"], DiceCombats.Portability.DCBundleMessages.ImportResult(PLoc, result), PopupNotificationService.Type.SUCCESS, 4000);
-        }
-        catch (DiceCombats.Portability.DCBundleReadException ex)
-        {
-            Debug.WriteLine($"Import refused: {ex.Error} {ex.Message}");
-            PopupNotificationService.Show(PLoc["WizardTitle"], DiceCombats.Portability.DCBundleMessages.ReadError(PLoc, ex, data.LongLength), PopupNotificationService.Type.FAILURE, 6000);
-        }
-        catch (Exception ex)
-        {
-            // A save that failed is told by StorageAlerts.
-            Debug.WriteLine($"Import failed: {ex}");
-        }
+        await ImportFlow.ImportFromFileAsync();
         StateHasChanged();
     }
 }

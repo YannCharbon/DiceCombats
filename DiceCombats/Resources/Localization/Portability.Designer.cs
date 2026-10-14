@@ -473,5 +473,113 @@ namespace DiceCombats.Resources.Localization {
                 return ResourceManager.GetString("BackupAllTitle", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Sharing.
+        /// </summary>
+        internal static string SharingTitle {
+            get {
+                return ResourceManager.GetString("SharingTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Export.
+        /// </summary>
+        internal static string ExportTitle {
+            get {
+                return ResourceManager.GetString("ExportTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Export the whole library….
+        /// </summary>
+        internal static string ExportLibraryBtn {
+            get {
+                return ResourceManager.GetString("ExportLibraryBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Saves your creatures, combats, player groups, user custom fields and automations in a single file. The access tokens of your automations are left out..
+        /// </summary>
+        internal static string ExportLibraryHelp {
+            get {
+                return ResourceManager.GetString("ExportLibraryHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import.
+        /// </summary>
+        internal static string WizardTitle {
+            get {
+                return ResourceManager.GetString("WizardTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Import finished.
+        /// </summary>
+        internal static string ImportReportTitle {
+            get {
+                return ResourceManager.GetString("ImportReportTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Added: {0}.
+        /// </summary>
+        internal static string ReportAdded {
+            get {
+                return ResourceManager.GetString("ReportAdded", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Kept your version: {0}.
+        /// </summary>
+        internal static string ReportKeptLocal {
+            get {
+                return ResourceManager.GetString("ReportKeptLocal", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This file could not be read. It may be damaged, or it may not be a DiceCombats file..
+        /// </summary>
+        internal static string ErrorUnreadableFile {
+            get {
+                return ResourceManager.GetString("ErrorUnreadableFile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This file comes from DiceAudio. Please open it in DiceAudio..
+        /// </summary>
+        internal static string ErrorOtherAppFile {
+            get {
+                return ResourceManager.GetString("ErrorOtherAppFile", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This file was made with a newer version of DiceCombats. Please update DiceCombats to open it..
+        /// </summary>
+        internal static string ErrorNewerFormat {
+            get {
+                return ResourceManager.GetString("ErrorNewerFormat", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This file is too large: {0} MB, while DiceCombats accepts up to {1} MB..
+        /// </summary>
+        internal static string ErrorFileTooLarge {
+            get {
+                return ResourceManager.GetString("ErrorFileTooLarge", resourceCulture);
+            }
+        }
     }
 }

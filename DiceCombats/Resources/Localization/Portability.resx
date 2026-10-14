@@ -255,4 +255,40 @@
   <data name="BackupAllTitle" xml:space="preserve">
     <value>All backups</value>
   </data>
+  <data name="SharingTitle" xml:space="preserve">
+    <value>Sharing</value>
+  </data>
+  <data name="ExportTitle" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="ExportLibraryBtn" xml:space="preserve">
+    <value>Export the whole library…</value>
+  </data>
+  <data name="ExportLibraryHelp" xml:space="preserve">
+    <value>Saves your creatures, combats, player groups, user custom fields and automations in a single file. The access tokens of your automations are left out.</value>
+  </data>
+  <data name="WizardTitle" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="ImportReportTitle" xml:space="preserve">
+    <value>Import finished</value>
+  </data>
+  <data name="ReportAdded" xml:space="preserve">
+    <value>Added: {0}</value>
+  </data>
+  <data name="ReportKeptLocal" xml:space="preserve">
+    <value>Kept your version: {0}</value>
+  </data>
+  <data name="ErrorUnreadableFile" xml:space="preserve">
+    <value>This file could not be read. It may be damaged, or it may not be a DiceCombats file.</value>
+  </data>
+  <data name="ErrorOtherAppFile" xml:space="preserve">
+    <value>This file comes from DiceAudio. Please open it in DiceAudio.</value>
+  </data>
+  <data name="ErrorNewerFormat" xml:space="preserve">
+    <value>This file was made with a newer version of DiceCombats. Please update DiceCombats to open it.</value>
+  </data>
+  <data name="ErrorFileTooLarge" xml:space="preserve">
+    <value>This file is too large: {0} MB, while DiceCombats accepts up to {1} MB.</value>
+  </data>
 </root>

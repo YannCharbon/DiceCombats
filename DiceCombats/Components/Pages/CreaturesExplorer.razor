@@ -13,6 +13,8 @@
 @inject NavigationManager Navigation
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
+@inject DiceCombats.Portability.DCBundleService Bundles
+@inject IStringLocalizer<Resources.Localization.Portability> PLoc
 @inject IStringLocalizer<Resources.Localization.CreaturesExplorer> Loc
 
 <h1 class="dc-h1">@Loc["ExplorerTitle"]</h1>
@@ -211,180 +213,56 @@
         StateHasChanged();
     }
 
-    private async Task ExportCreature(DCCreature creature)
-    {
-        var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-        string json = JsonSerializer.Serialize(creature, options);
+    private Task ExportCreature(DCCreature creature) =>
+        ExportAsync(() => Bundles.ExportCreaturesAsync(new[] { creature }, $"DC_creature_{creature.Name}.json"));
 
-        var fileName = $"DC_creature_{creature.Name}.json";
-        var data = System.Text.Encoding.UTF8.GetBytes(json);
+    private Task ExportAllCreatures() =>
+        ExportAsync(() => Bundles.ExportCreaturesAsync(CombatService.GetCreatureList(), "DC_all_creatures.json"));
 
-        await FileHandler.SaveFileAsync(fileName, data);
+    private Task ImportCreatures() => ImportFromFileAsync();
 
-        if (CombatService.IsCurrentCulture("fr"))
-        {
-            PopupNotificationService.Show("Exportation", $"Créature '{creature.Name}' exportée avec succès", PopupNotificationService.Type.SUCCESS, 3000);
-        } else {
-            PopupNotificationService.Show("Creature export", $"Successfully exported '{creature.Name}'", PopupNotificationService.Type.SUCCESS, 3000);
-        }
-    }
-
-    private async Task ExportAllCreatures()
-    {
-        var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-            };
-        string json = JsonSerializer.Serialize(CombatService.GetCreatureList(), options);
-
-        var fileName = $"DC_all_creatures.json";
-        var data = System.Text.Encoding.UTF8.GetBytes(json);
-
-        await FileHandler.SaveFileAsync(fileName, data);
-
-        if (CombatService.IsCurrentCulture("fr"))
-        {
-            PopupNotificationService.Show("Exportation", $"Toutes les créatures exportées avec succès", PopupNotificationService.Type.SUCCESS, 3000);
-        } else
-        {
-            PopupNotificationService.Show("Creature export", "Successfully exported all creatures", PopupNotificationService.Type.SUCCESS, 3000);
-        }
-    }
-
-    private async Task ImportCreatures()
-    {
-        var fileData = await FileHandler.LoadFileAsync();
-        if (fileData != null)
-        {
-            string json = System.Text.Encoding.UTF8.GetString(fileData);
-            var options = new JsonSerializerOptions
-                {
-                    DefaultBufferSize = 15 * 1024 * 1024 // 15MiB
-                };
-            try
-            {
-                var newCreature = JsonSerializer.Deserialize<DCCreature>(json, options);
-                if (newCreature != null)
-                {
-                    if (newCreature.JsonMitigatorId != DCJsonMitigatorId.CREATURE)
-                    {
-                        if (CombatService.IsCurrentCulture("fr"))
-                        {
-                            PopupNotificationService.Show("Importation", "Ce fichier ne contient pas de créature", PopupNotificationService.Type.FAILURE, 4000);
-                        }
-                        else
-                        {
-                            PopupNotificationService.Show("Combat import", "This file does not contain creatures", PopupNotificationService.Type.FAILURE, 4000);
-                        }
-                        throw new InvalidDataException("JSON does not contain a creature");
-                    }
-                    if (CombatService.GetCreatureFromGUID(newCreature.Id.ToString()) == null)
-                    {
-                        CombatService.AddCreature(newCreature);
-                        Debug.WriteLine($"Added new creature '{newCreature.Name}'");
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"The creature '{newCreature.Name}' already exists.");
-                    }
-
-                    if (CombatService.IsCurrentCulture("fr"))
-                    {
-                        PopupNotificationService.Show("Importation", $"Créature '{newCreature.Name}' importée avec succès", PopupNotificationService.Type.SUCCESS, 3000);
-                    }
-                    else {
-                        PopupNotificationService.Show("Creature import", $"Successfully imported {newCreature.Name}", PopupNotificationService.Type.SUCCESS, 3000);
-                    }
-                }
-            }
-            catch
-            {
-                try
-                {
-                    Debug.WriteLine("File does not contain a single creature. Trying a Creature list.");
-
-                    var newCreatureList = JsonSerializer.Deserialize<List<DCCreature>>(json, options);
-
-                    if (newCreatureList != null)
-                    {
-                        if (newCreatureList.Count > 0 && newCreatureList[0].JsonMitigatorId != DCJsonMitigatorId.CREATURE)
-                        {
-                            if (CombatService.IsCurrentCulture("fr"))
-                            {
-                                PopupNotificationService.Show("Importation", "Ce fichier ne contient pas de créature", PopupNotificationService.Type.FAILURE, 4000);
-                            }
-                            else
-                            {
-                                PopupNotificationService.Show("Combat import", "This file does not contain creatures", PopupNotificationService.Type.FAILURE, 4000);
-                            }
-                            throw new InvalidDataException("JSON does not contain creatues");
-                        }
-                        foreach (DCCreature creature in newCreatureList)
-                        {
-                            if (CombatService.GetCreatureFromGUID(creature.Id.ToString()) == null)
-                            {
-                                CombatService.AddCreature(creature);
-                                Debug.WriteLine($"Added new creature '{creature.Name}'");
-                            }
-                            else
-                            {
-                                Debug.WriteLine($"The creature '{creature.Name}' already exists.");
-                            }
-                        }
-                        if (CombatService.IsCurrentCulture("fr"))
-                        {
-                            PopupNotificationService.Show("Importation", $"Créature(s) importée(s) avec succès", PopupNotificationService.Type.SUCCESS, 3000);
-                        } else
-                        {
-                            PopupNotificationService.Show("Creature import", "Successfully imported multiple creatures", PopupNotificationService.Type.SUCCESS, 3000);
-                        }
-                    }
-                }
-                catch
-                {
-                    Debug.WriteLine("File does not contain any valid creature.");
-                    if (CombatService.IsCurrentCulture("fr"))
-                    {
-                        PopupNotificationService.Show("Importation", $"Le fichier ne contient aucune créature valide", PopupNotificationService.Type.FAILURE, 4000);
-                    }
-                    else {
-                        PopupNotificationService.Show("Creature import", "File does not contain any valid creature", PopupNotificationService.Type.FAILURE, 4000);
-                    }
-                }
-            }
-
-            // Written now rather than when the app closes, so that a crash
-            // cannot lose what was imported.
-            await SaveImportedAsync();
-        }
-        else
-        {
-            Debug.WriteLine("File does not contain any data.");
-            if (CombatService.IsCurrentCulture("fr"))
-            {
-                PopupNotificationService.Show("Importation", $"Le fichier ne contient aucune donnée", PopupNotificationService.Type.FAILURE, 4000);
-            }
-            else {
-                PopupNotificationService.Show("Creature import", "File does not contain any data", PopupNotificationService.Type.FAILURE, 4000);
-            }
-        }
-    }
-
-    private async Task SaveImportedAsync()
+    // Export and import go through the bundle format (spec §2.2): a bundle or
+    // any older DiceCombats export reads back. A cancelled file dialog says
+    // nothing.
+    private async Task ExportAsync(Func<Task<bool>> export)
     {
         try
         {
-            await CombatService.SaveCreaturesAsync();
+            if (await export())
+            {
+                PopupNotificationService.Show(PLoc["ExportTitle"], PLoc["ExportDone"], PopupNotificationService.Type.SUCCESS, 3000);
+            }
         }
         catch (Exception ex)
         {
-            // The user is told by StorageAlerts, through SafeFileStore.SaveFailed.
-            Debug.WriteLine($"Saving the import failed: {ex.Message}");
+            Debug.WriteLine($"Export failed: {ex}");
+            PopupNotificationService.Show(PLoc["ExportTitle"], string.Format(PLoc["ExportFailed"], ex.Message), PopupNotificationService.Type.FAILURE, 6000);
         }
+    }
+
+    private async Task ImportFromFileAsync()
+    {
+        var data = await FileHandler.LoadFileAsync();
+        if (data == null || data.Length == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            var result = await Bundles.ImportSimpleAsync(data);
+            PopupNotificationService.Show(PLoc["ImportReportTitle"], DiceCombats.Portability.DCBundleMessages.ImportResult(PLoc, result), PopupNotificationService.Type.SUCCESS, 4000);
+        }
+        catch (DiceCombats.Portability.DCBundleReadException ex)
+        {
+            Debug.WriteLine($"Import refused: {ex.Error} {ex.Message}");
+            PopupNotificationService.Show(PLoc["WizardTitle"], DiceCombats.Portability.DCBundleMessages.ReadError(PLoc, ex, data.LongLength), PopupNotificationService.Type.FAILURE, 6000);
+        }
+        catch (Exception ex)
+        {
+            // A save that failed is told by StorageAlerts.
+            Debug.WriteLine($"Import failed: {ex}");
+        }
+        StateHasChanged();
     }
 }

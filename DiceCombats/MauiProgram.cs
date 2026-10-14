@@ -155,6 +155,7 @@ namespace DiceCombats
             builder.Services.AddSingleton<IDiceEventPublisher>(sp => sp.GetRequiredService<DiceEventDispatcher>());
             builder.Services.AddSingleton<CombatLogService>();
             builder.Services.AddSingleton<BackupService>();
+            builder.Services.AddSingleton<DiceCombats.Portability.DCBundleService>();
 
 #if ANDROID
             builder.Services.AddSingleton<IFileHandler, FileHandler>();

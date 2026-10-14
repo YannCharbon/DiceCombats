@@ -7,8 +7,8 @@
 *@
 
 @*
-    Settings → Data. Only the backups section exists so far; sharing and the
-    data folder come with their own work (spec §7.1).
+    Settings → Data: backups, then sharing. The data folder section comes
+    with its own work (spec §7.1).
 
     A backup row is a strip, not a table: four columns do not fit a phone.
     The column names stay as hover titles on what they label.
@@ -16,6 +16,7 @@
 
 @using DiceCombats.Storage
 @inject BackupService Backups
+@inject DiceCombats.Portability.DCBundleService Bundles
 @inject IFileHandler FileHandler
 @inject PopupNotificationService PopupNotificationService
 @inject StorageNotices Notices
@@ -74,6 +75,14 @@
                 </div>
             }
         }
+    </div>
+
+    <div class="dc-strip-name" style="margin-top:18px;">@Loc["SharingTitle"]</div>
+    <p class="dc-meta" style="margin:6px 0 0;">@Loc["ExportLibraryHelp"]</p>
+    <div class="dc-irow dc-irow-wrap" style="gap:10px;margin-top:12px;">
+        <button type="button" class="dc-btn dc-btn-out" disabled="@_busy" @onclick="ExportLibrary">
+            <DcIcon Name="upload" /> @Loc["ExportLibraryBtn"]
+        </button>
     </div>
 </div>
 
@@ -215,6 +224,28 @@
         {
             Debug.WriteLine($"Saving a backup to a file failed: {ex}");
             PopupNotificationService.Show(Loc["BackupsTitle"], string.Format(Loc["ExportFailed"], ex.Message), PopupNotificationService.Type.FAILURE, 6000);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task ExportLibrary()
+    {
+        if (_busy) return;
+        _busy = true;
+        try
+        {
+            if (await Bundles.ExportLibraryAsync("DC_library.json"))
+            {
+                PopupNotificationService.Show(Loc["ExportTitle"], Loc["ExportDone"], PopupNotificationService.Type.SUCCESS, 3000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Library export failed: {ex}");
+            PopupNotificationService.Show(Loc["ExportTitle"], string.Format(Loc["ExportFailed"], ex.Message), PopupNotificationService.Type.FAILURE, 6000);
         }
         finally
         {

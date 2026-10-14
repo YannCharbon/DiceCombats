@@ -9,6 +9,8 @@
 @inherits LayoutComponentBase
 
 @inject DiceCombatsService CombatsService
+@inject NavigationManager Navigation
+@implements IDisposable
 
 <PopupNotification></PopupNotification>
 
@@ -42,6 +44,24 @@
 </div>
 
 @code {
+    protected override void OnInitialized()
+    {
+        App.PagesReloadRequested += ReloadInPlace;
+    }
+
+    // A full reload of the web page in the same web view: every component and
+    // every scoped service starts again, as with a new page, but the native
+    // window around it is left alone (see App.ReloadPages).
+    private void ReloadInPlace()
+    {
+        _ = InvokeAsync(() => Navigation.NavigateTo(Navigation.Uri, forceLoad: true));
+    }
+
+    public void Dispose()
+    {
+        App.PagesReloadRequested -= ReloadInPlace;
+    }
+
     // Every colour below is a stop of the brand gradient or a step of the
     // surface ramp defined in wwwroot/css/app.css, so MudBlazor's components
     // sit in the same colour world as the app's own. The previous

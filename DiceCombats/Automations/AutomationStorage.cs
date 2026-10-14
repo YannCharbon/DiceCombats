@@ -19,7 +19,8 @@ public interface IAutomationStorage
 
 public sealed class AutomationConfigurationService
 {
-    private const string FileName = "automations.json";
+    public const string AutomationsFileName = "automations.json";
+    private const string FileName = AutomationsFileName;
     private readonly IAutomationStorage _storage;
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly SemaphoreSlim _lock = new(1, 1);
@@ -30,6 +31,31 @@ public sealed class AutomationConfigurationService
     {
         _storage = storage;
         _jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+    }
+
+    /// <summary>
+    /// Reads the file again, after a restore. The configuration in memory is
+    /// replaced only once the file has been read (a missing file gives an empty
+    /// one); a file that cannot be read keeps it as it was, and stays blocked.
+    /// </summary>
+    public async Task ReloadAsync(CancellationToken cancellationToken = default)
+    {
+        await _lock.WaitAsync(cancellationToken);
+        try
+        {
+            try
+            {
+                var loaded = await _storage.ReadJsonAsync<AutomationConfiguration>(FileName, _jsonOptions, cancellationToken);
+                _configuration = loaded ?? new();
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                Debug.WriteLine($"Invalid automations json: {ex}");
+                _storage.Block(FileName, ex.Message);
+            }
+            _loaded = true;
+        }
+        finally { _lock.Release(); }
     }
 
     /// <summary>Loads the configuration once, at startup.</summary>

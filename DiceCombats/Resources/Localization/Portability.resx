@@ -126,4 +126,133 @@
   <data name="ErrorSaveFailed" xml:space="preserve">
     <value>The file {0} could not be saved. Please check that the data folder can be reached and that the disk is not full, then try again.</value>
   </data>
+  <data name="DataPanelTitle" xml:space="preserve">
+    <value>Data</value>
+  </data>
+  <data name="BackupsTitle" xml:space="preserve">
+    <value>Backups</value>
+  </data>
+  <data name="BackupsHelp" xml:space="preserve">
+    <value>DiceCombats backs up your data the first time you open it each day, and before every import, restore or change of data folder. A backup contains your creatures, combats, player groups, user custom fields, automations, combat logs and settings.</value>
+  </data>
+  <data name="BackupNowBtn" xml:space="preserve">
+    <value>Back up now</value>
+  </data>
+  <data name="BackupRestoreBtn" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="BackupRestoreFromFileBtn" xml:space="preserve">
+    <value>Restore from a file…</value>
+  </data>
+  <data name="BackupSaveToFileBtn" xml:space="preserve">
+    <value>Save a backup to a file…</value>
+  </data>
+  <data name="BackupOpenFolderBtn" xml:space="preserve">
+    <value>Open the backups folder</value>
+  </data>
+  <data name="BackupListEmpty" xml:space="preserve">
+    <value>No backup yet.</value>
+  </data>
+  <data name="BackupColDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="BackupColComputer" xml:space="preserve">
+    <value>Computer</value>
+  </data>
+  <data name="BackupColReason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="BackupColContents" xml:space="preserve">
+    <value>Contents</value>
+  </data>
+  <data name="BackupReasonAuto" xml:space="preserve">
+    <value>Automatic</value>
+  </data>
+  <data name="BackupReasonManual" xml:space="preserve">
+    <value>Made by you</value>
+  </data>
+  <data name="BackupReasonBeforeImport" xml:space="preserve">
+    <value>Before an import</value>
+  </data>
+  <data name="BackupReasonBeforeRestore" xml:space="preserve">
+    <value>Before a restore</value>
+  </data>
+  <data name="BackupReasonBeforeMove" xml:space="preserve">
+    <value>Before a change of data folder</value>
+  </data>
+  <data name="BackupUnreadable" xml:space="preserve">
+    <value>This backup cannot be read.</value>
+  </data>
+  <data name="BackupFileType" xml:space="preserve">
+    <value>DiceCombats backup</value>
+  </data>
+  <data name="BackupDone" xml:space="preserve">
+    <value>The backup has been made.</value>
+  </data>
+  <data name="BackupFailed" xml:space="preserve">
+    <value>The backup could not be made: {0}. Your data has not been changed.</value>
+  </data>
+  <data name="RestoreConfirmTitle" xml:space="preserve">
+    <value>Restore this backup?</value>
+  </data>
+  <data name="RestoreConfirmText" xml:space="preserve">
+    <value>Your current data will be replaced by the data saved on {0}. A backup of your current data is made first, so that you can go back if needed.</value>
+  </data>
+  <data name="RestoreConfirmBtn" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="RestoreDone" xml:space="preserve">
+    <value>The backup has been restored.</value>
+  </data>
+  <data name="RestoreWrongApp" xml:space="preserve">
+    <value>This backup comes from DiceAudio and cannot be restored in DiceCombats.</value>
+  </data>
+  <data name="RestoreNewerVersion" xml:space="preserve">
+    <value>This backup was made with a newer version of DiceCombats. Please update DiceCombats to restore it.</value>
+  </data>
+  <data name="RestoreDamaged" xml:space="preserve">
+    <value>This backup is damaged and cannot be restored. Your data has not been changed.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>The restore could not be completed: {0}. Your data has been put back from the backup made just before.</value>
+  </data>
+  <data name="WizardCancelBtn" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ExportDone" xml:space="preserve">
+    <value>The file has been saved.</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>The file could not be saved: {0}</value>
+  </data>
+  <data name="SummaryCreatures" xml:space="preserve">
+    <value>Creatures: {0}</value>
+  </data>
+  <data name="SummaryCombats" xml:space="preserve">
+    <value>Combats: {0}</value>
+  </data>
+  <data name="SummaryPlayerGroups" xml:space="preserve">
+    <value>Player groups: {0}</value>
+  </data>
+  <data name="SummaryFieldTemplates" xml:space="preserve">
+    <value>User custom fields: {0}</value>
+  </data>
+  <data name="SummaryAutomations" xml:space="preserve">
+    <value>Automations: {0}</value>
+  </data>
+  <data name="SummaryCombatLogs" xml:space="preserve">
+    <value>Combat logs: {0}</value>
+  </data>
+  <data name="RestoreRollbackFailed" xml:space="preserve">
+    <value>The restore could not be completed, and your data could not be put back automatically. Your data from just before the restore is in the backup {0}. Please restore it from this page.</value>
+  </data>
+  <data name="BackupLatestLabel" xml:space="preserve">
+    <value>Most recent backup</value>
+  </data>
+  <data name="BackupAllBtn" xml:space="preserve">
+    <value>All backups…</value>
+  </data>
+  <data name="BackupAllTitle" xml:space="preserve">
+    <value>All backups</value>
+  </data>
 </root>

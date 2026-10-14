@@ -86,5 +86,392 @@ namespace DiceCombats.Resources.Localization {
                 return ResourceManager.GetString("ErrorSaveFailed", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Data.
+        /// </summary>
+        internal static string DataPanelTitle {
+            get {
+                return ResourceManager.GetString("DataPanelTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Backups.
+        /// </summary>
+        internal static string BackupsTitle {
+            get {
+                return ResourceManager.GetString("BackupsTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DiceCombats backs up your data the first time you open it each day, and before every import, restore or change of data folder. A backup contains your creatures, combats, player groups, user custom fields, automations, combat logs and settings..
+        /// </summary>
+        internal static string BackupsHelp {
+            get {
+                return ResourceManager.GetString("BackupsHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Back up now.
+        /// </summary>
+        internal static string BackupNowBtn {
+            get {
+                return ResourceManager.GetString("BackupNowBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Restore.
+        /// </summary>
+        internal static string BackupRestoreBtn {
+            get {
+                return ResourceManager.GetString("BackupRestoreBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Restore from a file….
+        /// </summary>
+        internal static string BackupRestoreFromFileBtn {
+            get {
+                return ResourceManager.GetString("BackupRestoreFromFileBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Save a backup to a file….
+        /// </summary>
+        internal static string BackupSaveToFileBtn {
+            get {
+                return ResourceManager.GetString("BackupSaveToFileBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Open the backups folder.
+        /// </summary>
+        internal static string BackupOpenFolderBtn {
+            get {
+                return ResourceManager.GetString("BackupOpenFolderBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à No backup yet..
+        /// </summary>
+        internal static string BackupListEmpty {
+            get {
+                return ResourceManager.GetString("BackupListEmpty", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Date.
+        /// </summary>
+        internal static string BackupColDate {
+            get {
+                return ResourceManager.GetString("BackupColDate", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Computer.
+        /// </summary>
+        internal static string BackupColComputer {
+            get {
+                return ResourceManager.GetString("BackupColComputer", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reason.
+        /// </summary>
+        internal static string BackupColReason {
+            get {
+                return ResourceManager.GetString("BackupColReason", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Contents.
+        /// </summary>
+        internal static string BackupColContents {
+            get {
+                return ResourceManager.GetString("BackupColContents", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Automatic.
+        /// </summary>
+        internal static string BackupReasonAuto {
+            get {
+                return ResourceManager.GetString("BackupReasonAuto", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Made by you.
+        /// </summary>
+        internal static string BackupReasonManual {
+            get {
+                return ResourceManager.GetString("BackupReasonManual", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Before an import.
+        /// </summary>
+        internal static string BackupReasonBeforeImport {
+            get {
+                return ResourceManager.GetString("BackupReasonBeforeImport", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Before a restore.
+        /// </summary>
+        internal static string BackupReasonBeforeRestore {
+            get {
+                return ResourceManager.GetString("BackupReasonBeforeRestore", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Before a change of data folder.
+        /// </summary>
+        internal static string BackupReasonBeforeMove {
+            get {
+                return ResourceManager.GetString("BackupReasonBeforeMove", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This backup cannot be read..
+        /// </summary>
+        internal static string BackupUnreadable {
+            get {
+                return ResourceManager.GetString("BackupUnreadable", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à DiceCombats backup.
+        /// </summary>
+        internal static string BackupFileType {
+            get {
+                return ResourceManager.GetString("BackupFileType", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The backup has been made..
+        /// </summary>
+        internal static string BackupDone {
+            get {
+                return ResourceManager.GetString("BackupDone", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The backup could not be made: {0}. Your data has not been changed..
+        /// </summary>
+        internal static string BackupFailed {
+            get {
+                return ResourceManager.GetString("BackupFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Restore this backup?.
+        /// </summary>
+        internal static string RestoreConfirmTitle {
+            get {
+                return ResourceManager.GetString("RestoreConfirmTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Your current data will be replaced by the data saved on {0}. A backup of your current data is made first, so that you can go back if needed..
+        /// </summary>
+        internal static string RestoreConfirmText {
+            get {
+                return ResourceManager.GetString("RestoreConfirmText", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Restore.
+        /// </summary>
+        internal static string RestoreConfirmBtn {
+            get {
+                return ResourceManager.GetString("RestoreConfirmBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The backup has been restored..
+        /// </summary>
+        internal static string RestoreDone {
+            get {
+                return ResourceManager.GetString("RestoreDone", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This backup comes from DiceAudio and cannot be restored in DiceCombats..
+        /// </summary>
+        internal static string RestoreWrongApp {
+            get {
+                return ResourceManager.GetString("RestoreWrongApp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This backup was made with a newer version of DiceCombats. Please update DiceCombats to restore it..
+        /// </summary>
+        internal static string RestoreNewerVersion {
+            get {
+                return ResourceManager.GetString("RestoreNewerVersion", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à This backup is damaged and cannot be restored. Your data has not been changed..
+        /// </summary>
+        internal static string RestoreDamaged {
+            get {
+                return ResourceManager.GetString("RestoreDamaged", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The restore could not be completed: {0}. Your data has been put back from the backup made just before..
+        /// </summary>
+        internal static string RestoreFailed {
+            get {
+                return ResourceManager.GetString("RestoreFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cancel.
+        /// </summary>
+        internal static string WizardCancelBtn {
+            get {
+                return ResourceManager.GetString("WizardCancelBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The file has been saved..
+        /// </summary>
+        internal static string ExportDone {
+            get {
+                return ResourceManager.GetString("ExportDone", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The file could not be saved: {0}.
+        /// </summary>
+        internal static string ExportFailed {
+            get {
+                return ResourceManager.GetString("ExportFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Creatures: {0}.
+        /// </summary>
+        internal static string SummaryCreatures {
+            get {
+                return ResourceManager.GetString("SummaryCreatures", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Combats: {0}.
+        /// </summary>
+        internal static string SummaryCombats {
+            get {
+                return ResourceManager.GetString("SummaryCombats", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Player groups: {0}.
+        /// </summary>
+        internal static string SummaryPlayerGroups {
+            get {
+                return ResourceManager.GetString("SummaryPlayerGroups", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User custom fields: {0}.
+        /// </summary>
+        internal static string SummaryFieldTemplates {
+            get {
+                return ResourceManager.GetString("SummaryFieldTemplates", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Automations: {0}.
+        /// </summary>
+        internal static string SummaryAutomations {
+            get {
+                return ResourceManager.GetString("SummaryAutomations", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Combat logs: {0}.
+        /// </summary>
+        internal static string SummaryCombatLogs {
+            get {
+                return ResourceManager.GetString("SummaryCombatLogs", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The restore could not be completed, and your data could not be put back automatically. Your data from just before the restore is in the backup {0}. Please restore it from this page..
+        /// </summary>
+        internal static string RestoreRollbackFailed {
+            get {
+                return ResourceManager.GetString("RestoreRollbackFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Most recent backup.
+        /// </summary>
+        internal static string BackupLatestLabel {
+            get {
+                return ResourceManager.GetString("BackupLatestLabel", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à All backups….
+        /// </summary>
+        internal static string BackupAllBtn {
+            get {
+                return ResourceManager.GetString("BackupAllBtn", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à All backups.
+        /// </summary>
+        internal static string BackupAllTitle {
+            get {
+                return ResourceManager.GetString("BackupAllTitle", resourceCulture);
+            }
+        }
     }
 }

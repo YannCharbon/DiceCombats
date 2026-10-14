@@ -10,14 +10,16 @@ using DiceCombats.Storage;
 
 namespace DiceCombats
 {
-    public enum StorageNoticeKind { LoadFailed, SaveFailed }
+    public enum StorageNoticeKind { LoadFailed, SaveFailed, RestoreDone, RestoreFailed, RestoreRollbackFailed }
 
-    public sealed record StorageNotice(StorageNoticeKind Kind, string FileName);
+    /// <param name="Detail">The file name for a load or save failure, the reason for a failed restore,
+    /// the safety backup's file name when putting the data back failed.</param>
+    public sealed record StorageNotice(StorageNoticeKind Kind, string Detail);
 
     /// <summary>
     /// What the user must be told about reading and writing the data files:
-    /// a file that could not be read (once per session) and a save that
-    /// failed. Kept outside the pages, so that a notice raised while no page
+    /// a file that could not be read (once per session), a save that failed,
+    /// and how a restore ended. Kept outside the pages, so that a notice raised while no page
     /// listens, or before the UI is rebuilt for a language change, still
     /// reaches the screen.
     /// </summary>
@@ -57,6 +59,18 @@ namespace DiceCombats
                     Add(new StorageNotice(StorageNoticeKind.LoadFailed, fileName));
                 }
             }
+        }
+
+        /// <summary>Told after the pages are rebuilt, so it is kept here rather than in a page.</summary>
+        public void ReportRestore(bool succeeded, string detail = "")
+        {
+            Add(new StorageNotice(succeeded ? StorageNoticeKind.RestoreDone : StorageNoticeKind.RestoreFailed, detail));
+        }
+
+        /// <summary>A restore failed and the data could not be put back: the user restores this backup by hand.</summary>
+        public void ReportRollbackFailed(string safetyBackupFileName)
+        {
+            Add(new StorageNotice(StorageNoticeKind.RestoreRollbackFailed, safetyBackupFileName));
         }
 
         public void DismissAll()

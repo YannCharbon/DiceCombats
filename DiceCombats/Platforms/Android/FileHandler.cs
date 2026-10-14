@@ -20,13 +20,26 @@ namespace DiceCombats
     {
         public async Task SaveFileAsync(string fileName, byte[] data)
         {
+            // As before: a JSON export that cannot be written is only logged.
+            try
+            {
+                await SaveFileAsync(fileName, data, ".json", "application/json", "JSON File");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving file: {ex}");
+            }
+        }
+
+        public async Task<bool> SaveFileAsync(string fileName, byte[] data, string extension, string mimeType, string typeLabel)
+        {
             var activity = MainActivity.Instance;
             if (activity == null)
                 throw new InvalidOperationException("Current activity is not available.");
 
             var intent = new Intent(Intent.ActionCreateDocument);
             intent.AddCategory(Intent.CategoryOpenable);
-            intent.SetType("application/json");
+            intent.SetType(mimeType);
             intent.PutExtra(Intent.ExtraTitle, fileName);
 
             var tcs = new TaskCompletionSource<bool>();
@@ -50,7 +63,7 @@ namespace DiceCombats
                         catch (Exception ex)
                         {
                             System.Diagnostics.Debug.WriteLine($"Error saving file: {ex}");
-                            tcs.SetResult(false);
+                            tcs.SetException(ex);
                         }
                     }
                     else
@@ -63,7 +76,7 @@ namespace DiceCombats
             MainActivity.ActivityResult += OnActivityResult;
             activity.StartActivityForResult(intent, 2000);
 
-            await tcs.Task;
+            return await tcs.Task;
         }
 
         public async Task<byte[]> LoadFileAsync()

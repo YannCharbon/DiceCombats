@@ -1,0 +1,330 @@
+@*
+ * DiceCombats - Copyright (C) 2025 Yann Charbon
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This file is part of DiceCombats, released under the GNU GPL v3.
+ * See the LICENSE file in the repository root for details.
+*@
+
+@*
+    Settings → Data. Only the backups section exists so far; sharing and the
+    data folder come with their own work (spec §7.1).
+
+    A backup row is a strip, not a table: four columns do not fit a phone.
+    The column names stay as hover titles on what they label.
+*@
+
+@using DiceCombats.Storage
+@inject BackupService Backups
+@inject IFileHandler FileHandler
+@inject PopupNotificationService PopupNotificationService
+@inject StorageNotices Notices
+@inject IStringLocalizer<Resources.Localization.Portability> Loc
+
+<div class="dc-panel">
+    <div style="display:flex;">
+        <div class="dc-pill">
+            <DcIcon Name="save" Size="26" />
+            <h3>@Loc["DataPanelTitle"]</h3>
+        </div>
+    </div>
+
+    <div class="dc-strip-name" style="margin-top:14px;">@Loc["BackupsTitle"]</div>
+    <p class="dc-meta" style="margin:6px 0 0;">@Loc["BackupsHelp"]</p>
+
+    <div class="dc-irow dc-irow-wrap" style="gap:10px;margin-top:12px;">
+        <button type="button" class="dc-btn dc-btn-fill" disabled="@_busy" @onclick="BackUpNow">
+            <DcIcon Name="save" /> @Loc["BackupNowBtn"]
+        </button>
+        <button type="button" class="dc-btn dc-btn-out" disabled="@_busy" @onclick="RestoreFromFile">
+            <DcIcon Name="upload-file" /> @Loc["BackupRestoreFromFileBtn"]
+        </button>
+        <button type="button" class="dc-btn dc-btn-out" disabled="@_busy" @onclick="SaveBackupToFile">
+            <DcIcon Name="download" /> @Loc["BackupSaveToFileBtn"]
+        </button>
+        @if (OperatingSystem.IsWindows())
+        {
+            <button type="button" class="dc-btn dc-btn-out" @onclick="OpenBackupsFolder">
+                <DcIcon Name="folder-open" /> @Loc["BackupOpenFolderBtn"]
+            </button>
+        }
+    </div>
+
+    @* Only the most recent backup shows here; the others are one click away
+       in "All backups…", so that the page stays short. *@
+    <div class="dc-stack" style="gap:8px;margin-top:12px;">
+        @if (_backups == null)
+        {
+            <span class="dc-meta">…</span>
+        }
+        else if (_backups.Count == 0)
+        {
+            <span class="dc-meta">@Loc["BackupListEmpty"]</span>
+        }
+        else
+        {
+            <span class="dc-meta">@Loc["BackupLatestLabel"]</span>
+            @BackupRow(_backups[0])
+            @if (_backups.Count > 1)
+            {
+                <div>
+                    <button type="button" class="dc-btn dc-btn-out dc-btn-sm" @onclick="() => _showAll = true">
+                        <DcIcon Name="list" Size="16" /> @Loc["BackupAllBtn"] (@_backups.Count)
+                    </button>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@if (_showAll && _backups != null)
+{
+    <div class="dc-confirm-scrim" @onclick="() => _showAll = false">
+        <div class="dc-confirm" role="dialog" aria-modal="true" style="width:min(720px,100%);max-height:85vh;display:flex;flex-direction:column;"
+             @onclick:stopPropagation="true">
+            <h3 class="dc-confirm-title">@Loc["BackupAllTitle"]</h3>
+            <div class="dc-stack" style="gap:8px;overflow-y:auto;min-height:0;margin-bottom:14px;">
+                @foreach (var backup in _backups)
+                {
+                    @BackupRow(backup)
+                }
+            </div>
+            <div class="dc-confirm-foot">
+                <button type="button" class="dc-btn dc-btn-fill" @onclick="() => _showAll = false">
+                    <DcIcon Name="check" /> @Loc["AlertCloseBtn"]
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<DcConfirm @ref="_confirm" />
+
+@code {
+    private IReadOnlyList<BackupInfo>? _backups;
+    private bool _busy;
+    private bool _showAll;
+
+    private RenderFragment BackupRow(BackupInfo backup) => __builder =>
+    {
+        var b = backup;
+        <div class="dc-strip">
+            <div class="dc-strip-body">
+                <div class="dc-strip-name" title="@Loc["BackupColDate"]">@b.CreatedAtUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture)</div>
+                <div class="dc-meta">
+                    <span title="@Loc["BackupColReason"]">@ReasonLabel(b.Reason)</span>
+                    &middot;
+                    <span title="@Loc["BackupColComputer"]">@b.Machine</span>
+                </div>
+                <div class="dc-meta" title="@Loc["BackupColContents"]">
+                    @(b.Readable ? SummaryText(b.Summary) : Loc["BackupUnreadable"])
+                </div>
+            </div>
+            <button type="button" class="dc-btn dc-btn-out dc-btn-sm" disabled="@(_busy || !b.Readable)" @onclick="() => RestoreFromList(b)">
+                <DcIcon Name="restore" Size="16" /> @Loc["BackupRestoreBtn"]
+            </button>
+        </div>
+    };
+    private DcConfirm? _confirm;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+    }
+
+    private async Task RefreshAsync()
+    {
+        try
+        {
+            _backups = await Backups.ListBackupsAsync();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Debug.WriteLine($"Listing backups failed: {ex.Message}");
+            _backups = Array.Empty<BackupInfo>();
+        }
+    }
+
+    private string ReasonLabel(string reason) => reason switch
+    {
+        BackupReason.Auto => Loc["BackupReasonAuto"],
+        BackupReason.Manual => Loc["BackupReasonManual"],
+        BackupReason.BeforeImport => Loc["BackupReasonBeforeImport"],
+        BackupReason.BeforeRestore => Loc["BackupReasonBeforeRestore"],
+        BackupReason.BeforeMove => Loc["BackupReasonBeforeMove"],
+        _ => reason,
+    };
+
+    private string SummaryText(IReadOnlyDictionary<string, int>? summary)
+    {
+        if (summary == null) return string.Empty;
+        var parts = new List<string>();
+        void Add(string key, string resource)
+        {
+            if (summary.TryGetValue(key, out int count)) parts.Add(string.Format(Loc[resource], count));
+        }
+        Add("creatures", "SummaryCreatures");
+        Add("combats", "SummaryCombats");
+        Add("playerGroups", "SummaryPlayerGroups");
+        Add("fieldTemplates", "SummaryFieldTemplates");
+        Add("automations", "SummaryAutomations");
+        Add("combatLogs", "SummaryCombatLogs");
+        return string.Join(" · ", parts);
+    }
+
+    private async Task BackUpNow()
+    {
+        if (_busy) return;
+        _busy = true;
+        try
+        {
+            await Backups.CreateBackupAsync(BackupReason.Manual);
+            PopupNotificationService.Show(Loc["BackupsTitle"], Loc["BackupDone"], PopupNotificationService.Type.SUCCESS, 3000);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Backup failed: {ex}");
+            PopupNotificationService.Show(Loc["BackupsTitle"], string.Format(Loc["BackupFailed"], ex.Message), PopupNotificationService.Type.FAILURE, 6000);
+        }
+        finally
+        {
+            _busy = false;
+            await RefreshAsync();
+        }
+    }
+
+    /// A fresh backup of the data as it is now, handed to the save picker: on
+    /// Android this is the way to take the data to another device.
+    private async Task SaveBackupToFile()
+    {
+        if (_busy) return;
+        _busy = true;
+        try
+        {
+            var backup = await Backups.CreateBackupAsync(BackupReason.Manual);
+            await RefreshAsync();
+            StateHasChanged();
+
+            byte[] bytes = await File.ReadAllBytesAsync(backup.Path);
+            if (await FileHandler.SaveFileAsync(backup.FileName, bytes, ".zip", "application/zip", Loc["BackupFileType"]))
+            {
+                PopupNotificationService.Show(Loc["BackupsTitle"], Loc["ExportDone"], PopupNotificationService.Type.SUCCESS, 3000);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Saving a backup to a file failed: {ex}");
+            PopupNotificationService.Show(Loc["BackupsTitle"], string.Format(Loc["ExportFailed"], ex.Message), PopupNotificationService.Type.FAILURE, 6000);
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private async Task RestoreFromList(BackupInfo backup)
+    {
+        _showAll = false;
+        byte[] bytes;
+        try
+        {
+            bytes = await File.ReadAllBytesAsync(backup.Path);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            PopupNotificationService.Show(Loc["BackupsTitle"], Loc["RestoreDamaged"], PopupNotificationService.Type.FAILURE, 6000);
+            Debug.WriteLine($"Reading the backup failed: {ex.Message}");
+            return;
+        }
+        await RestoreAsync(bytes);
+    }
+
+    private async Task RestoreFromFile()
+    {
+        if (_busy) return;
+        var (_, data) = await FileHandler.PickFileAsync();
+        if (data == null || data.Length == 0) return;
+        await RestoreAsync(data);
+    }
+
+    private async Task RestoreAsync(byte[] zip)
+    {
+        if (_busy || _confirm == null) return;
+        _busy = true;
+        try
+        {
+            var (check, manifest) = await Backups.CheckAsync(zip);
+            if (check != BackupCheck.Ok || manifest == null)
+            {
+                ShowRefusal(check);
+                return;
+            }
+
+            string date = manifest.CreatedAtUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture);
+            bool confirmed = await _confirm.AskAsync(Loc["RestoreConfirmTitle"], string.Format(Loc["RestoreConfirmText"], date),
+                                                     Loc["RestoreConfirmBtn"], Loc["WizardCancelBtn"]);
+            if (!confirmed) return;
+
+            try
+            {
+                await Backups.RestoreAsync(zip);
+                Notices.ReportRestore(true);
+            }
+            catch (BackupRefusedException refused)
+            {
+                ShowRefusal(refused.Check);
+                return;
+            }
+            catch (BackupSafetyFailedException safety)
+            {
+                PopupNotificationService.Show(Loc["BackupsTitle"], string.Format(Loc["BackupFailed"], safety.Message), PopupNotificationService.Type.FAILURE, 6000);
+                return;
+            }
+            catch (BackupRollbackFailedException rollback)
+            {
+                // The files stay blocked and nothing was read again, so the
+                // pages are left as they are; the safety backup is in the list.
+                Debug.WriteLine($"Restore and rollback failed: {rollback}");
+                Notices.ReportRollbackFailed(rollback.SafetyBackupFileName);
+                await RefreshAsync();
+                return;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Restore failed: {ex}");
+                Notices.ReportRestore(false, ex.Message);
+            }
+
+            // Every page held objects of the data that was just replaced.
+            (Application.Current as App)?.ReloadPages();
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    private void ShowRefusal(BackupCheck check)
+    {
+        string message = check switch
+        {
+            BackupCheck.WrongApp => Loc["RestoreWrongApp"],
+            BackupCheck.NewerVersion => Loc["RestoreNewerVersion"],
+            _ => Loc["RestoreDamaged"],
+        };
+        PopupNotificationService.Show(Loc["BackupsTitle"], message, PopupNotificationService.Type.FAILURE, 6000);
+    }
+
+    private void OpenBackupsFolder()
+    {
+        try
+        {
+            Directory.CreateDirectory(Backups.BackupsDir);
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{Backups.BackupsDir}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Opening the backups folder failed: {ex.Message}");
+        }
+    }
+}

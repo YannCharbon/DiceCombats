@@ -14,6 +14,10 @@ namespace DiceCombats
     public interface IFileHandler
     {
         Task SaveFileAsync(string fileName, byte[] data);
+
+        /// Saves through the save picker with the given file type. Returns false
+        /// when the user cancels; throws when the file cannot be written.
+        Task<bool> SaveFileAsync(string fileName, byte[] data, string extension, string mimeType, string typeLabel);
         Task<byte[]> LoadFileAsync();
 
         // New: used by DetailedPopup to let the user choose any file and read its bytes.

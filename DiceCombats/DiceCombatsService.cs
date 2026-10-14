@@ -94,6 +94,16 @@ namespace DiceCombats
         }
 
         /// <summary>
+        /// Reads the files again, after a restore. Each list is replaced only
+        /// once its file has been read (a missing file gives an empty list); a
+        /// file that cannot be read keeps the list as it was, and stays blocked.
+        /// </summary>
+        public Task ReloadAsync()
+        {
+            return InitializeAsync();
+        }
+
+        /// <summary>
         /// Starts a save of every file. Each is written only if it changed; the
         /// returned task completes when all of them are on disk.
         /// </summary>
@@ -108,11 +118,18 @@ namespace DiceCombats
                 SaveCombatLogsAsync());
         }
 
+        /// The list read from a file, an empty list when the file is missing,
+        /// or null when it cannot be read (the list in memory is then kept).
         private async Task<List<T>?> LoadListAsync<T>(string fileName)
         {
             var result = await _store.LoadJsonAsync<List<T>>(fileName, ReadOptions);
             Debug.WriteLine($"Load {fileName}: {result.Outcome} {result.Error}");
-            return result.Outcome == LoadOutcome.Loaded ? result.Value : null;
+            return result.Outcome switch
+            {
+                LoadOutcome.Loaded => result.Value,
+                LoadOutcome.Missing => new List<T>(),
+                _ => null,
+            };
         }
 
         public DCCreature? GetCreatureFromGUID(string guid)
@@ -299,6 +316,10 @@ namespace DiceCombats
                     // truth even if the app is killed before the next save. The
                     // legacy file is left untouched on purpose.
                     await SavePinnedCombatsListAsync();
+                }
+                else
+                {
+                    _pinnedCombats = new List<string>();
                 }
             }
             else if (result.Value != null)

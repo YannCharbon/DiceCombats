@@ -7,7 +7,8 @@
 *@
 
 @*
-    Tells the user when a data file could not be read or saved. Drawn like
+    Tells the user when a data file could not be read or saved, and how a
+    restore ended (the pages are rebuilt after it). Drawn like
     DcConfirm, with a single button: there is nothing to decide, only
     something to know.
 *@
@@ -43,9 +44,14 @@
         _notices = Notices.Pending;
     }
 
-    private string Message(StorageNotice notice) => notice.Kind == StorageNoticeKind.LoadFailed
-        ? string.Format(Loc["ErrorLoadFailed"], notice.FileName)
-        : string.Format(Loc["ErrorSaveFailed"], notice.FileName);
+    private string Message(StorageNotice notice) => notice.Kind switch
+    {
+        StorageNoticeKind.LoadFailed => string.Format(Loc["ErrorLoadFailed"], notice.Detail),
+        StorageNoticeKind.SaveFailed => string.Format(Loc["ErrorSaveFailed"], notice.Detail),
+        StorageNoticeKind.RestoreDone => Loc["RestoreDone"],
+        StorageNoticeKind.RestoreRollbackFailed => string.Format(Loc["RestoreRollbackFailed"], notice.Detail),
+        _ => string.Format(Loc["RestoreFailed"], notice.Detail),
+    };
 
     private void OnChanged()
     {

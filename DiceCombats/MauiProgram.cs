@@ -154,6 +154,7 @@ namespace DiceCombats
             builder.Services.AddSingleton<DiceEventDispatcher>();
             builder.Services.AddSingleton<IDiceEventPublisher>(sp => sp.GetRequiredService<DiceEventDispatcher>());
             builder.Services.AddSingleton<CombatLogService>();
+            builder.Services.AddSingleton<BackupService>();
 
 #if ANDROID
             builder.Services.AddSingleton<IFileHandler, FileHandler>();
@@ -197,6 +198,29 @@ namespace DiceCombats
                 await automationConfig.InitializeAsync();
             }).GetAwaiter().GetResult();
             app.Services.GetRequiredService<StorageNotices>().ReportLoadFailures();
+
+            // The first start of the day on this machine makes a backup, in the
+            // background. Not after a file failed to load: the backups kept
+            // would slowly be replaced by copies of the broken state.
+            if (app.Services.GetRequiredService<SafeFileStore>().BlockedFiles.Count == 0)
+            {
+                var backups = app.Services.GetRequiredService<BackupService>();
+                var store = app.Services.GetRequiredService<SafeFileStore>();
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        // After the saves the load itself started (the pinned
+                        // list migration) are on disk.
+                        await store.FlushAsync();
+                        await backups.AutoBackupIfDueAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Automatic backup failed: {ex}");
+                    }
+                });
+            }
 
             return app;
         }

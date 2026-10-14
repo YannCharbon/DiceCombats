@@ -42,7 +42,15 @@ namespace DiceCombats
 
             _localPreferences.Set("Language", cultureCode);
 
-            // Reload the Blazor-based UI on the single window this app has.
+            ReloadPages();
+        }
+
+        /// <summary>
+        /// Rebuilds the Blazor-based UI on the single window this app has, so
+        /// that no page keeps an object from before a language change or a restore.
+        /// </summary>
+        public void ReloadPages()
+        {
             if (Windows.Count > 0)
             {
                 Windows[0].Page = new MainPage();

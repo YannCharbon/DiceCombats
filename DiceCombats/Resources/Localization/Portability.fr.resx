@@ -126,4 +126,133 @@
   <data name="ErrorSaveFailed" xml:space="preserve">
     <value>Le fichier {0} n'a pas pu être enregistré. Vérifiez que le dossier de données est accessible et que le disque n'est pas plein, puis réessayez.</value>
   </data>
+  <data name="DataPanelTitle" xml:space="preserve">
+    <value>Données</value>
+  </data>
+  <data name="BackupsTitle" xml:space="preserve">
+    <value>Sauvegardes</value>
+  </data>
+  <data name="BackupsHelp" xml:space="preserve">
+    <value>DiceCombats sauvegarde vos données à la première ouverture de chaque journée, ainsi qu'avant chaque importation, restauration ou changement de dossier de données. Une sauvegarde contient vos créatures, combats, groupes de joueurs, champs personnalisés utilisateur, automatisations, journaux de combat et réglages.</value>
+  </data>
+  <data name="BackupNowBtn" xml:space="preserve">
+    <value>Sauvegarder maintenant</value>
+  </data>
+  <data name="BackupRestoreBtn" xml:space="preserve">
+    <value>Restaurer</value>
+  </data>
+  <data name="BackupRestoreFromFileBtn" xml:space="preserve">
+    <value>Restaurer depuis un fichier…</value>
+  </data>
+  <data name="BackupSaveToFileBtn" xml:space="preserve">
+    <value>Enregistrer une sauvegarde dans un fichier…</value>
+  </data>
+  <data name="BackupOpenFolderBtn" xml:space="preserve">
+    <value>Ouvrir le dossier des sauvegardes</value>
+  </data>
+  <data name="BackupListEmpty" xml:space="preserve">
+    <value>Aucune sauvegarde pour l'instant.</value>
+  </data>
+  <data name="BackupColDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="BackupColComputer" xml:space="preserve">
+    <value>Ordinateur</value>
+  </data>
+  <data name="BackupColReason" xml:space="preserve">
+    <value>Motif</value>
+  </data>
+  <data name="BackupColContents" xml:space="preserve">
+    <value>Contenu</value>
+  </data>
+  <data name="BackupReasonAuto" xml:space="preserve">
+    <value>Automatique</value>
+  </data>
+  <data name="BackupReasonManual" xml:space="preserve">
+    <value>Manuelle</value>
+  </data>
+  <data name="BackupReasonBeforeImport" xml:space="preserve">
+    <value>Avant une importation</value>
+  </data>
+  <data name="BackupReasonBeforeRestore" xml:space="preserve">
+    <value>Avant une restauration</value>
+  </data>
+  <data name="BackupReasonBeforeMove" xml:space="preserve">
+    <value>Avant un changement de dossier de données</value>
+  </data>
+  <data name="BackupUnreadable" xml:space="preserve">
+    <value>Cette sauvegarde ne peut pas être lue.</value>
+  </data>
+  <data name="BackupFileType" xml:space="preserve">
+    <value>Sauvegarde DiceCombats</value>
+  </data>
+  <data name="BackupDone" xml:space="preserve">
+    <value>La sauvegarde a été effectuée.</value>
+  </data>
+  <data name="BackupFailed" xml:space="preserve">
+    <value>La sauvegarde n'a pas pu être effectuée : {0}. Vos données n'ont pas été modifiées.</value>
+  </data>
+  <data name="RestoreConfirmTitle" xml:space="preserve">
+    <value>Restaurer cette sauvegarde ?</value>
+  </data>
+  <data name="RestoreConfirmText" xml:space="preserve">
+    <value>Vos données actuelles seront remplacées par celles sauvegardées le {0}. Une sauvegarde de vos données actuelles est effectuée au préalable, afin que vous puissiez revenir en arrière si nécessaire.</value>
+  </data>
+  <data name="RestoreConfirmBtn" xml:space="preserve">
+    <value>Restaurer</value>
+  </data>
+  <data name="RestoreDone" xml:space="preserve">
+    <value>La sauvegarde a été restaurée.</value>
+  </data>
+  <data name="RestoreWrongApp" xml:space="preserve">
+    <value>Cette sauvegarde provient de DiceAudio et ne peut pas être restaurée dans DiceCombats.</value>
+  </data>
+  <data name="RestoreNewerVersion" xml:space="preserve">
+    <value>Cette sauvegarde a été créée avec une version plus récente de DiceCombats. Merci de mettre DiceCombats à jour pour la restaurer.</value>
+  </data>
+  <data name="RestoreDamaged" xml:space="preserve">
+    <value>Cette sauvegarde est endommagée et ne peut pas être restaurée. Vos données n'ont pas été modifiées.</value>
+  </data>
+  <data name="RestoreFailed" xml:space="preserve">
+    <value>La restauration n'a pas pu aboutir : {0}. Vos données ont été rétablies à partir de la sauvegarde effectuée juste avant.</value>
+  </data>
+  <data name="WizardCancelBtn" xml:space="preserve">
+    <value>Annuler</value>
+  </data>
+  <data name="ExportDone" xml:space="preserve">
+    <value>Le fichier a été enregistré.</value>
+  </data>
+  <data name="ExportFailed" xml:space="preserve">
+    <value>Le fichier n'a pas pu être enregistré : {0}</value>
+  </data>
+  <data name="SummaryCreatures" xml:space="preserve">
+    <value>Créatures : {0}</value>
+  </data>
+  <data name="SummaryCombats" xml:space="preserve">
+    <value>Combats : {0}</value>
+  </data>
+  <data name="SummaryPlayerGroups" xml:space="preserve">
+    <value>Groupes de joueurs : {0}</value>
+  </data>
+  <data name="SummaryFieldTemplates" xml:space="preserve">
+    <value>Champs personnalisés utilisateur : {0}</value>
+  </data>
+  <data name="SummaryAutomations" xml:space="preserve">
+    <value>Automatisations : {0}</value>
+  </data>
+  <data name="SummaryCombatLogs" xml:space="preserve">
+    <value>Journaux de combat : {0}</value>
+  </data>
+  <data name="RestoreRollbackFailed" xml:space="preserve">
+    <value>La restauration n'a pas pu aboutir et vos données n'ont pas pu être rétablies automatiquement. Vos données d'avant la restauration se trouvent dans la sauvegarde {0}. Merci de la restaurer depuis cette page.</value>
+  </data>
+  <data name="BackupLatestLabel" xml:space="preserve">
+    <value>Sauvegarde la plus récente</value>
+  </data>
+  <data name="BackupAllBtn" xml:space="preserve">
+    <value>Toutes les sauvegardes…</value>
+  </data>
+  <data name="BackupAllTitle" xml:space="preserve">
+    <value>Toutes les sauvegardes</value>
+  </data>
 </root>

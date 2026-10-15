@@ -714,4 +714,13 @@
   <data name="DetailGroupMembers" xml:space="preserve">
     <value>Members: {0}</value>
   </data>
+  <data name="ImportSelectedCountOfOne" xml:space="preserve">
+    <value>{0} of {1} item selected</value>
+  </data>
+  <data name="ImportSelectedCountFew" xml:space="preserve">
+    <value>{0} of {1} items selected</value>
+  </data>
+  <data name="SelectNeedsHelp" xml:space="preserve">
+    <value>Ticks the items of this file that it uses and that are not ticked yet: {0}</value>
+  </data>
 </root>

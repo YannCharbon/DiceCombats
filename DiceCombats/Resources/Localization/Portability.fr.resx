@@ -190,10 +190,10 @@
     <value>La sauvegarde a été effectuée.</value>
   </data>
   <data name="BackupFailed" xml:space="preserve">
-    <value>La sauvegarde n'a pas pu être effectuée : {0}. Vos données n'ont pas été modifiées.</value>
+    <value>La sauvegarde n'a pas pu être effectuée : {0}. Vos données n'ont pas été modifiées.</value>
   </data>
   <data name="RestoreConfirmTitle" xml:space="preserve">
-    <value>Restaurer cette sauvegarde ?</value>
+    <value>Restaurer cette sauvegarde ?</value>
   </data>
   <data name="RestoreConfirmText" xml:space="preserve">
     <value>Vos données actuelles seront remplacées par celles sauvegardées le {0}. Une sauvegarde de vos données actuelles est effectuée au préalable, afin que vous puissiez revenir en arrière si nécessaire.</value>
@@ -214,7 +214,7 @@
     <value>Cette sauvegarde est endommagée et ne peut pas être restaurée. Vos données n'ont pas été modifiées.</value>
   </data>
   <data name="RestoreFailed" xml:space="preserve">
-    <value>La restauration n'a pas pu aboutir : {0}. Vos données ont été rétablies à partir de la sauvegarde effectuée juste avant.</value>
+    <value>La restauration n'a pas pu aboutir : {0}. Vos données ont été rétablies à partir de la sauvegarde effectuée juste avant.</value>
   </data>
   <data name="WizardCancelBtn" xml:space="preserve">
     <value>Annuler</value>
@@ -223,25 +223,25 @@
     <value>Le fichier a été enregistré.</value>
   </data>
   <data name="ExportFailed" xml:space="preserve">
-    <value>Le fichier n'a pas pu être enregistré : {0}</value>
+    <value>Le fichier n'a pas pu être enregistré : {0}</value>
   </data>
   <data name="SummaryCreatures" xml:space="preserve">
-    <value>Créatures : {0}</value>
+    <value>Créatures : {0}</value>
   </data>
   <data name="SummaryCombats" xml:space="preserve">
-    <value>Combats : {0}</value>
+    <value>Combats : {0}</value>
   </data>
   <data name="SummaryPlayerGroups" xml:space="preserve">
-    <value>Groupes de joueurs : {0}</value>
+    <value>Groupes de joueurs : {0}</value>
   </data>
   <data name="SummaryFieldTemplates" xml:space="preserve">
-    <value>Champs personnalisés : {0}</value>
+    <value>Champs personnalisés : {0}</value>
   </data>
   <data name="SummaryAutomations" xml:space="preserve">
-    <value>Automatisations : {0}</value>
+    <value>Automatisations : {0}</value>
   </data>
   <data name="SummaryCombatLogs" xml:space="preserve">
-    <value>Journaux de combat : {0}</value>
+    <value>Journaux de combat : {0}</value>
   </data>
   <data name="RestoreRollbackFailed" xml:space="preserve">
     <value>La restauration n'a pas pu aboutir et vos données n'ont pas pu être rétablies automatiquement. Vos données d'avant la restauration se trouvent dans la sauvegarde {0}. Merci de la restaurer depuis cette page.</value>
@@ -274,10 +274,10 @@
     <value>Importation terminée</value>
   </data>
   <data name="ReportAdded" xml:space="preserve">
-    <value>Ajouts : {0}</value>
+    <value>Ajouts : {0}</value>
   </data>
   <data name="ReportKeptLocal" xml:space="preserve">
-    <value>Versions locales conservées : {0}</value>
+    <value>Versions locales conservées : {0}</value>
   </data>
   <data name="ErrorUnreadableFile" xml:space="preserve">
     <value>Ce fichier n'a pas pu être lu. Il est peut-être endommagé, ou il ne s'agit pas d'un fichier DiceCombats.</value>
@@ -289,7 +289,7 @@
     <value>Ce fichier a été créé avec une version plus récente de DiceCombats. Merci de mettre DiceCombats à jour pour l'ouvrir.</value>
   </data>
   <data name="ErrorFileTooLarge" xml:space="preserve">
-    <value>Ce fichier est trop volumineux : {0} Mo, alors que DiceCombats accepte au plus {1} Mo.</value>
+    <value>Ce fichier est trop volumineux : {0} Mo, alors que DiceCombats accepte au plus {1} Mo.</value>
   </data>
   <data name="StatusNew" xml:space="preserve">
     <value>Nouveau</value>
@@ -382,7 +382,7 @@
     <value>Un autre contenu en dépend</value>
   </data>
   <data name="WizardSkipWarning" xml:space="preserve">
-    <value>Si vous n'importez pas « {0} », ce qui suit sera importé sans lui : {1}</value>
+    <value>Si vous n'importez pas « {0} », ce qui suit sera importé sans lui : {1}</value>
   </data>
   <data name="WizardConfirmBtn" xml:space="preserve">
     <value>Importer</value>
@@ -394,25 +394,25 @@
     <value>Aucun élément de ce fichier n'entre en conflit avec votre bibliothèque. Décochez ce que vous ne souhaitez pas importer.</value>
   </data>
   <data name="ImportNothingToDo" xml:space="preserve">
-    <value>Tout le contenu de ce fichier se trouve déjà dans votre bibliothèque ; il n'y a donc rien à importer.</value>
+    <value>Tout le contenu de ce fichier se trouve déjà dans votre bibliothèque ; il n'y a donc rien à importer.</value>
   </data>
   <data name="ImportBackupNote" xml:space="preserve">
     <value>Une sauvegarde de vos données actuelles est effectuée avant toute modification.</value>
   </data>
   <data name="ReportReplaced" xml:space="preserve">
-    <value>Remplacements : {0}</value>
+    <value>Remplacements : {0}</value>
   </data>
   <data name="ReportMerged" xml:space="preserve">
-    <value>Fusions : {0}</value>
+    <value>Fusions : {0}</value>
   </data>
   <data name="ReportSkipped" xml:space="preserve">
-    <value>Contenu non importé : {0}</value>
+    <value>Contenu non importé : {0}</value>
   </data>
   <data name="ReportUpToDate" xml:space="preserve">
-    <value>Déjà à jour : {0}</value>
+    <value>Déjà à jour : {0}</value>
   </data>
   <data name="ImportFailed" xml:space="preserve">
-    <value>L'importation n'a pas pu aboutir ; vos données ont donc été remises dans leur état précédent. Détails : {0}</value>
+    <value>L'importation n'a pas pu aboutir ; vos données ont donc été remises dans leur état précédent. Détails : {0}</value>
   </data>
   <data name="ImportFromFileBtn" xml:space="preserve">
     <value>Importer depuis un fichier…</value>
@@ -439,16 +439,16 @@
     <value>Automatisations</value>
   </data>
   <data name="WarningCreatureNotInLibrary" xml:space="preserve">
-    <value>La créature « {0} » de ce combat ne figure plus dans votre bibliothèque ; seule sa copie dans le combat est donc exportée.</value>
+    <value>La créature « {0} » de ce combat ne figure plus dans votre bibliothèque ; seule sa copie dans le combat est donc exportée.</value>
   </data>
   <data name="WarningTokenRemoved" xml:space="preserve">
-    <value>Le jeton d'accès de « {0} » n'a pas été inclus. Merci de le saisir de nouveau après l'importation.</value>
+    <value>Le jeton d'accès de « {0} » n'a pas été inclus. Merci de le saisir de nouveau après l'importation.</value>
   </data>
   <data name="WarningLegacyFormat" xml:space="preserve">
     <value>Ce fichier a été créé par une version plus ancienne de DiceCombats. Il est converti au moment de l'importation.</value>
   </data>
   <data name="WarningBodyKeptAsIs" xml:space="preserve">
-    <value>La requête envoyée par « {0} » contient peut-être un jeton d'accès ; elle a été exportée telle quelle. Merci de la vérifier après l'importation.</value>
+    <value>La requête envoyée par « {0} » contient peut-être un jeton d'accès ; elle a été exportée telle quelle. Merci de la vérifier après l'importation.</value>
   </data>
   <data name="ImportInProgress" xml:space="preserve">
     <value>Importation de vos données en cours…</value>
@@ -478,7 +478,7 @@
     <value>(DICE_DATA_DIR)</value>
   </data>
   <data name="MoveConfirmTitle" xml:space="preserve">
-    <value>Déplacer vos données dans ce dossier ?</value>
+    <value>Déplacer vos données dans ce dossier ?</value>
   </data>
   <data name="MoveConfirmText" xml:space="preserve">
     <value>DiceCombats copie vos données dans {0}, vérifie la copie, puis redémarre et utilise le nouveau dossier. Vos données actuelles restent à leur emplacement jusqu'à ce que vous les supprimiez depuis cette page.</value>
@@ -490,7 +490,7 @@
     <value>Si OneDrive ou un autre service synchronise ce dossier, réglez-le pour qu'il conserve toujours les fichiers sur cet appareil. Sinon, DiceCombats risque de devoir attendre leur téléchargement.</value>
   </data>
   <data name="MoveSubfolderNote" xml:space="preserve">
-    <value>Ce dossier contient déjà d'autres fichiers ; DiceCombats placera donc ses données dans le sous-dossier {0}.</value>
+    <value>Ce dossier contient déjà d'autres fichiers ; DiceCombats placera donc ses données dans le sous-dossier {0}.</value>
   </data>
   <data name="MoveInProgress" xml:space="preserve">
     <value>Copie de vos données… {0} sur {1}</value>
@@ -499,7 +499,7 @@
     <value>DiceCombats ne peut pas écrire dans ce dossier. Merci d'en choisir un autre.</value>
   </data>
   <data name="MoveErrorNoSpace" xml:space="preserve">
-    <value>L'espace libre est insuffisant sur ce disque : {0} nécessaires, {1} disponibles.</value>
+    <value>L'espace libre est insuffisant sur ce disque : {0} nécessaires, {1} disponibles.</value>
   </data>
   <data name="MoveErrorInsideCurrent" xml:space="preserve">
     <value>Ce dossier est le dossier de données actuel, ou se trouve à l'intérieur de celui-ci. Merci de choisir un dossier situé ailleurs.</value>
@@ -511,7 +511,7 @@
     <value>Ce dossier contient des données de DiceAudio. Merci de choisir un dossier distinct pour DiceCombats.</value>
   </data>
   <data name="MoveFailed" xml:space="preserve">
-    <value>Vos données n'ont pas pu être copiées : {0}. Rien n'a été modifié et DiceCombats utilise toujours {1}.</value>
+    <value>Vos données n'ont pas pu être copiées : {0}. Rien n'a été modifié et DiceCombats utilise toujours {1}.</value>
   </data>
   <data name="MoveRestartNotice" xml:space="preserve">
     <value>DiceCombats va maintenant redémarrer pour utiliser le nouveau dossier.</value>
@@ -529,7 +529,7 @@
     <value>Ce dossier contient déjà des données DiceCombats</value>
   </data>
   <data name="ExistingFolderText" xml:space="preserve">
-    <value>Que souhaitez-vous faire ?</value>
+    <value>Que souhaitez-vous faire ?</value>
   </data>
   <data name="ExistingUseFolderBtn" xml:space="preserve">
     <value>Utiliser les données du dossier</value>
@@ -559,7 +559,7 @@
     <value>DiceCombats conserve vos données dans {0}, mais ce dossier est inaccessible pour le moment. S'il se trouve sur un disque externe ou sur le réseau, connectez-le puis réessayez. DiceCombats ne créera pas de bibliothèque vide à cet endroit.</value>
   </data>
   <data name="StartupInvalidText" xml:space="preserve">
-    <value>Le dossier {0} ne peut pas être utilisé : il ne contient pas de données DiceCombats, DiceCombats ne peut pas y écrire, ou il a été préparé par une version plus récente de DiceCombats.</value>
+    <value>Le dossier {0} ne peut pas être utilisé : il ne contient pas de données DiceCombats, DiceCombats ne peut pas y écrire, ou il a été préparé par une version plus récente de DiceCombats.</value>
   </data>
   <data name="StartupTryAgainBtn" xml:space="preserve">
     <value>Réessayer</value>
@@ -574,13 +574,13 @@
     <value>Ouvre à la place les données du dossier par défaut de DiceCombats, pour cette session uniquement. Ces données peuvent être plus anciennes que celles du dossier choisi, voire absentes. Les modifications faites pendant cette session restent dans le dossier par défaut. À la prochaine ouverture, DiceCombats cherchera de nouveau le dossier choisi.</value>
   </data>
   <data name="StartupUsingLocalBanner" xml:space="preserve">
-    <value>Votre dossier de données est inaccessible : DiceCombats affiche les données de son dossier par défaut. Les modifications faites maintenant y sont enregistrées, et non dans votre dossier de données.</value>
+    <value>Votre dossier de données est inaccessible : DiceCombats affiche les données de son dossier par défaut. Les modifications faites maintenant y sont enregistrées, et non dans votre dossier de données.</value>
   </data>
   <data name="StartupQuitBtn" xml:space="preserve">
     <value>Quitter</value>
   </data>
   <data name="MergeNothingNewText" xml:space="preserve">
-    <value>Ce dossier ne contient rien de plus que vos données. Voulez-vous utiliser ce dossier avec vos données ?</value>
+    <value>Ce dossier ne contient rien de plus que vos données. Voulez-vous utiliser ce dossier avec vos données ?</value>
   </data>
   <data name="MergeNothingNewBtn" xml:space="preserve">
     <value>Utiliser ce dossier</value>
@@ -628,22 +628,22 @@
     <value>Vos données ont été modifiées sur un autre ordinateur. Rechargez-les lorsque vous le souhaitez.</value>
   </data>
   <data name="CloudConflictCopies" xml:space="preserve">
-    <value>Votre service de synchronisation a créé des copies de certains fichiers, car deux ordinateurs les ont modifiés en même temps : {0}. DiceCombats utilise les fichiers d'origine. Merci de les comparer et de supprimer les copies inutiles.</value>
+    <value>Votre service de synchronisation a créé des copies de certains fichiers, car deux ordinateurs les ont modifiés en même temps : {0}. DiceCombats utilise les fichiers d'origine. Merci de les comparer et de supprimer les copies inutiles.</value>
   </data>
   <data name="CloudOnlyWarning" xml:space="preserve">
-    <value>Certains fichiers du dossier de données se trouvent uniquement dans le cloud : {0}. Merci de régler le dossier pour qu'il conserve toujours ses fichiers sur cet appareil.</value>
+    <value>Certains fichiers du dossier de données se trouvent uniquement dans le cloud : {0}. Merci de régler le dossier pour qu'il conserve toujours ses fichiers sur cet appareil.</value>
   </data>
   <data name="ExistingThisComputer" xml:space="preserve">
-    <value>Cet ordinateur : {0}</value>
+    <value>Cet ordinateur : {0}</value>
   </data>
   <data name="ExistingThisFolder" xml:space="preserve">
-    <value>Ce dossier : {0}</value>
+    <value>Ce dossier : {0}</value>
   </data>
   <data name="UnsavedCopiesImport" xml:space="preserve">
-    <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Vous pouvez les récupérer avec Importer depuis un fichier…</value>
+    <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Vous pouvez les récupérer avec Importer depuis un fichier…</value>
   </data>
   <data name="UnsavedCopiesManual" xml:space="preserve">
-    <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Ces fichiers ne peuvent pas être importés. Pour utiliser l'un d'eux, effectuez d'abord une sauvegarde et fermez DiceCombats. Renommez ensuite le fichier avec le nom du fichier de données auquel il correspond, par exemple playerGroups.json, en remplacement de celui-ci.</value>
+    <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Ces fichiers ne peuvent pas être importés. Pour utiliser l'un d'eux, effectuez d'abord une sauvegarde et fermez DiceCombats. Renommez ensuite le fichier avec le nom du fichier de données auquel il correspond, par exemple playerGroups.json, en remplacement de celui-ci.</value>
   </data>
   <data name="LockOpenAnywayHelp" xml:space="preserve">
     <value>Ouvre également le dossier de données sur cet ordinateur. Si DiceCombats est encore ouvert sur l'autre ordinateur, merci de le fermer d'abord.</value>
@@ -713,5 +713,14 @@
   </data>
   <data name="DetailGroupMembers" xml:space="preserve">
     <value>Membres : {0}</value>
+  </data>
+  <data name="ImportSelectedCountOfOne" xml:space="preserve">
+    <value>{0} élément sélectionné sur {1}</value>
+  </data>
+  <data name="ImportSelectedCountFew" xml:space="preserve">
+    <value>{0} élément sélectionné sur {1}</value>
+  </data>
+  <data name="SelectNeedsHelp" xml:space="preserve">
+    <value>Coche les éléments nécessaires de ce fichier qui ne sont pas encore cochés : {0}</value>
   </data>
 </root>

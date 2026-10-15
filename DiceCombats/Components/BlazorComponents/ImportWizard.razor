@@ -115,7 +115,7 @@
         @if (!nothing)
         {
             <div class="dc-import-bar">
-                <span class="dc-meta" aria-live="polite">@string.Format(Loc["ImportSelectedCount"], selectable.Count(ConflictPlanner.IsSelected), selectable.Count)</span>
+                <span class="dc-meta" aria-live="polite">@SelectedCount(selectable.Count(ConflictPlanner.IsSelected), selectable.Count)</span>
             </div>
         }
         @if (Plan.AllItems.Any(i => i.NeedsNewName))
@@ -267,7 +267,8 @@
             @if (ConflictPlanner.MissingNeeds(Plan, i) is { Count: > 0 } needs)
             {
                 <div class="dc-import-row">
-                    <button type="button" class="dc-btn dc-btn-out dc-btn-sm" @onclick="() => Planner.SelectNeeds(Plan, i)">
+                    <button type="button" class="dc-btn dc-btn-out dc-btn-sm" @onclick="() => Planner.SelectNeeds(Plan, i)"
+                            title="@string.Format(Loc["SelectNeedsHelp"], string.Join(", ", needs.Select(n => n.IncomingName)))">
                         @string.Format(Loc["SelectNeeds"], needs.Count)
                     </button>
                 </div>
@@ -282,6 +283,13 @@
             }
         </div>
     };
+
+    // English counts the items in the file (1 of 1 item), French the ones
+    // selected (0 or 1 élément): one text for each case lets each language
+    // choose its own singular.
+    private string SelectedCount(int selected, int total) => string.Format(
+        total == 1 ? Loc["ImportSelectedCountOfOne"] : selected <= 1 ? Loc["ImportSelectedCountFew"] : Loc["ImportSelectedCount"],
+        selected, total);
 
     // A short detail under the name.
     private string? Detail(ImportItem<DCAssetKind> item) => item.Incoming switch

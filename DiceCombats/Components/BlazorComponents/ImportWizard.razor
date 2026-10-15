@@ -8,10 +8,10 @@
 
 @*
     The import of a DiceCombats file (spec §3.2, §7.1), whichever button
-    started it. A file with nothing in conflict gets a summary and a single
-    confirmation; otherwise every part of the file is listed with what will
-    happen to it, the suggested choice already selected. Lives in MainLayout
-    and follows DCImportFlow.
+    started it. Every part of the file is listed by section, in the order of
+    the import, with a tick box to leave it out; a part in conflict also has
+    its choice, the suggested one already selected. Lives in MainLayout and
+    follows DCImportFlow.
 *@
 
 @using DiceCombats.Portability
@@ -22,83 +22,20 @@
 @if (Flow.Stage != DCImportStage.Idle)
 {
     <div class="dc-confirm-scrim">
-        <div class="dc-confirm @(Flow.Stage == DCImportStage.Wizard ? "dc-import" : "")" role="dialog" aria-modal="true">
+        <div class="dc-confirm @(Flow.Stage is DCImportStage.Summary or DCImportStage.Wizard ? "dc-import" : "")" role="dialog" aria-modal="true" data-dc-dialog>
             @switch (Flow.Stage)
             {
                 case DCImportStage.Refused:
                     <h3 class="dc-confirm-title">@Loc["WizardTitle"]</h3>
                     <p class="dc-confirm-msg">@DCBundleMessages.ReadError(Loc, (DCBundleReadException)Flow.Error!, Flow.FileSizeBytes)</p>
                     <div class="dc-confirm-foot">
-                        <button type="button" class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
+                        <button type="button" data-dc-cancel class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
                     </div>
                     break;
 
                 case DCImportStage.Summary:
-                    @if (!Plan.AllItems.Any(i => i.Inserts))
-                    {
-                        @* Nothing is imported, so the export's warnings do not matter. *@
-                        <h3 class="dc-confirm-title">@Loc["ImportNothingTitle"]</h3>
-                        <p class="dc-confirm-msg">@Loc["ImportNothingToDo"]</p>
-                        <div class="dc-confirm-foot">
-                            <button type="button" class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
-                        </div>
-                    }
-                    else
-                    {
-                        <h3 class="dc-confirm-title">@Loc["ImportSummaryTitle"]</h3>
-                        <p class="dc-confirm-msg">@Loc["ImportSummaryText"]</p>
-                        <div class="dc-import-item dc-stack" style="gap:4px;margin-bottom:12px;">
-                            @foreach (var group in Plan.Items.Where(i => i.Inserts).GroupBy(i => i.Kind).OrderBy(g => g.Key))
-                            {
-                                <div class="dc-meta"><b>@KindLabel(group.Key)</b> &middot; @group.Count()</div>
-                            }
-                        </div>
-                        @Warnings()
-                        <p class="dc-meta" style="margin:10px 0 14px;">@Loc["ImportBackupNote"]</p>
-                        <div class="dc-confirm-foot">
-                            <button type="button" class="dc-btn" @onclick="Flow.Close">@Loc["WizardCancelBtn"]</button>
-                            <button type="button" class="dc-btn dc-btn-fill" @onclick="Flow.ConfirmAsync"><DcIcon Name="check" /> @Loc["WizardConfirmBtn"]</button>
-                        </div>
-                    }
-                    break;
-
                 case DCImportStage.Wizard:
-                    <h3 class="dc-confirm-title">@Loc["WizardTitle"]</h3>
-                    <p class="dc-confirm-msg">@Loc["WizardIntro"]</p>
-                    @if (Plan.AllItems.Any(i => i.NeedsNewName))
-                    {
-                        <div class="dc-import-item" style="margin-bottom:10px;">
-                            <div class="dc-import-affixes">
-                                <span class="dc-import-name" style="flex:0 0 auto;">@Loc["NameAffixLabel"]</span>
-                                <input class="dc-inp" value="@Planner.NamePrefix" aria-label="@Loc["NameAffixBefore"]" title="@Loc["NameAffixBefore"]"
-                                       @oninput="e => Planner.SetNameAffixes(Plan, e.Value?.ToString(), Planner.NameSuffix)" />
-                                <span class="dc-meta">@Loc["NameAffixName"]</span>
-                                <input class="dc-inp" value="@Planner.NameSuffix" aria-label="@Loc["NameAffixAfter"]" title="@Loc["NameAffixAfter"]"
-                                       @oninput="e => Planner.SetNameAffixes(Plan, Planner.NamePrefix, e.Value?.ToString())" />
-                            </div>
-                            <div class="dc-meta" style="margin-top:4px;">@Loc["NameAffixHelp"]</div>
-                        </div>
-                    }
-                    <div class="dc-import-body">
-                        @Warnings()
-                        @foreach (var group in Plan.Items.GroupBy(i => i.Kind).OrderBy(g => g.Key))
-                        {
-                            <div class="dc-strip-name" style="margin:14px 0 6px;">@KindLabel(group.Key)</div>
-                            <div class="dc-stack" style="gap:8px;">
-                                @foreach (var item in group.OrderBy(i => StatusOrder(i.Status)))
-                                {
-                                    @ItemRow(item)
-                                }
-                            </div>
-                        }
-                    </div>
-                    <p class="dc-meta" style="margin:12px 0 14px;">@Loc["ImportBackupNote"]</p>
-                    <div class="dc-confirm-foot">
-                        <button type="button" class="dc-btn" @onclick="Flow.Close">@Loc["WizardCancelBtn"]</button>
-                        <button type="button" class="dc-btn dc-btn-fill" disabled="@(!AllNamesValid)" @onclick="Flow.ConfirmAsync">
-                            <DcIcon Name="check" /> @Loc["WizardConfirmBtn"]
-                        </button>
-                    </div>
+                    @Contents()
                     break;
 
                 case DCImportStage.Applying:
@@ -116,7 +53,7 @@
                     </div>
                     @Warnings()
                     <div class="dc-confirm-foot" style="margin-top:14px;">
-                        <button type="button" class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
+                        <button type="button" data-dc-cancel class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
                     </div>
                     break;
 
@@ -124,7 +61,7 @@
                     <h3 class="dc-confirm-title">@Loc["WizardTitle"]</h3>
                     <p class="dc-confirm-msg">@FailureText(Flow.Error)</p>
                     <div class="dc-confirm-foot">
-                        <button type="button" class="dc-btn dc-btn-fill" @onclick="CloseAfterFailure"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
+                        <button type="button" data-dc-cancel class="dc-btn dc-btn-fill" @onclick="CloseAfterFailure"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
                     </div>
                     break;
             }
@@ -136,13 +73,18 @@
     .dc-import { width: min(880px, 100%); max-height: 90vh; display: flex; flex-direction: column; }
     .dc-import-body { overflow-y: auto; min-height: 0; padding-right: 4px; }
     .dc-import-item { background: var(--s4); border: 1px solid var(--b1); border-radius: var(--r-btn); padding: 10px 12px; }
+    .dc-import-item.is-muted { opacity: .6; }
     .dc-import-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .dc-import-head .dc-chk { flex: 0 0 auto; }
     .dc-import-name { font-weight: 700; color: var(--t1); flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
     .dc-import-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
     .dc-import-row .dc-inp { flex: 1 1 220px; min-width: 0; }
     .dc-import-affixes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .dc-import-affixes .dc-inp { flex: 0 1 160px; min-width: 80px; }
     .dc-import-bad { color: var(--danger); font-size: 12.5px; margin-top: 4px; }
+    .dc-import-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .dc-import-sec { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 14px 0 6px; }
+    .dc-import-sec > button:first-child { flex: 1 1 200px; justify-content: flex-start; padding-left: 4px; min-width: 0; }
 </style>
 
 @code {
@@ -161,26 +103,140 @@
         Flow.Changed -= OnChanged;
     }
 
+    // The file's contents, always listed, in the order of the import.
+    private RenderFragment Contents() => __builder =>
+    {
+        EnsureSections();
+        bool nothing = !Plan.AllItems.Any(ConflictPlanner.IsSelectable);
+        bool wizard = Flow.Stage == DCImportStage.Wizard;
+        var selectable = Plan.AllItems.Where(ConflictPlanner.IsSelectable).ToList();
+        <h3 class="dc-confirm-title">@(nothing ? Loc["ImportNothingTitle"] : wizard ? Loc["WizardTitle"] : Loc["ImportSummaryTitle"])</h3>
+        <p class="dc-confirm-msg" style="margin-bottom:10px;">@(nothing ? Loc["ImportNothingToDo"] : wizard ? Loc["WizardIntro"] : Loc["ImportSummaryText"])</p>
+        @if (!nothing)
+        {
+            <div class="dc-import-bar">
+                <span class="dc-meta" aria-live="polite">@string.Format(Loc["ImportSelectedCount"], selectable.Count(ConflictPlanner.IsSelected), selectable.Count)</span>
+            </div>
+        }
+        @if (Plan.AllItems.Any(i => i.NeedsNewName))
+        {
+            <div class="dc-import-item" style="margin-bottom:10px;">
+                <div class="dc-import-affixes">
+                    <span class="dc-import-name" style="flex:0 0 auto;">@Loc["NameAffixLabel"]</span>
+                    <input class="dc-inp" value="@Planner.NamePrefix" aria-label="@Loc["NameAffixBefore"]" title="@Loc["NameAffixBefore"]"
+                           @oninput="e => Planner.SetNameAffixes(Plan, e.Value?.ToString(), Planner.NameSuffix)" />
+                    <span class="dc-meta">@Loc["NameAffixName"]</span>
+                    <input class="dc-inp" value="@Planner.NameSuffix" aria-label="@Loc["NameAffixAfter"]" title="@Loc["NameAffixAfter"]"
+                           @oninput="e => Planner.SetNameAffixes(Plan, Planner.NamePrefix, e.Value?.ToString())" />
+                </div>
+                <div class="dc-meta" style="margin-top:4px;">@Loc["NameAffixHelp"]</div>
+            </div>
+        }
+        <div class="dc-import-body">
+            @if (!nothing)
+            {
+                @* When all is up to date nothing is imported, so the export's warnings do not matter. *@
+                @Warnings()
+            }
+            @foreach (var group in Plan.Items.GroupBy(i => i.Kind).OrderBy(g => g.Key))
+            {
+                var kind = group.Key;
+                var rows = group.ToList();
+                bool open = !_collapsed.Contains(kind);
+                <div class="dc-import-sec">
+                    <button type="button" class="dc-btn dc-btn-text dc-btn-sm" aria-expanded="@(open ? "true" : "false")" @onclick="() => Toggle(kind)">
+                        <DcIcon Name="@(open ? "chevron-down" : "chevron-right")" />
+                        <span class="dc-strip-name">@KindLabel(kind) (@rows.Count)</span>
+                    </button>
+                    @if (rows.Any(ConflictPlanner.IsSelectable))
+                    {
+                        <button type="button" class="dc-btn dc-btn-text dc-btn-sm" @onclick="() => Planner.SetSelected(Plan, rows, true)">@Loc["SelectAll"]</button>
+                        <button type="button" class="dc-btn dc-btn-text dc-btn-sm" @onclick="() => Planner.SetSelected(Plan, rows, false)">@Loc["SelectNone"]</button>
+                    }
+                </div>
+                @if (open)
+                {
+                    <div class="dc-stack" style="gap:8px;">
+                        @foreach (var item in rows.OrderBy(i => StatusOrder(i.Status)))
+                        {
+                            @ItemRow(item)
+                        }
+                    </div>
+                }
+            }
+        </div>
+        @if (!nothing)
+        {
+            <p class="dc-meta" style="margin:12px 0 14px;">@Loc["ImportBackupNote"]</p>
+        }
+        <div class="dc-confirm-foot" style="@(nothing ? "margin-top:14px;" : "")">
+            @if (nothing)
+            {
+                <button type="button" data-dc-cancel class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
+            }
+            else
+            {
+                <button type="button" data-dc-cancel class="dc-btn" @onclick="Flow.Close">@Loc["WizardCancelBtn"]</button>
+                <button type="button" class="dc-btn dc-btn-fill" disabled="@(!AllNamesValid || !Plan.AllItems.Any(i => i.Inserts))" @onclick="Flow.ConfirmAsync">
+                    <DcIcon Name="check" /> @Loc["WizardConfirmBtn"]
+                </button>
+            }
+        </div>
+    };
+
+    // Sections longer than this start collapsed.
+    private const int CollapseAbove = 20;
+    private readonly HashSet<DCAssetKind> _collapsed = new();
+    private DCImportSession? _sectionsOf;
+
+    private void EnsureSections()
+    {
+        if (ReferenceEquals(_sectionsOf, Flow.Session)) return;
+        _sectionsOf = Flow.Session;
+        _collapsed.Clear();
+        foreach (var group in Plan.Items.GroupBy(i => i.Kind).Where(g => g.Count() > CollapseAbove))
+        {
+            _collapsed.Add(group.Key);
+        }
+    }
+
+    private void Toggle(DCAssetKind kind)
+    {
+        if (!_collapsed.Remove(kind)) _collapsed.Add(kind);
+    }
+
     private RenderFragment ItemRow(ImportItem<DCAssetKind> item) => __builder =>
     {
         var i = item;
-        <div class="dc-import-item">
+        bool selectable = ConflictPlanner.IsSelectable(i);
+        <div class="dc-import-item @(selectable ? "" : "is-muted")">
             <div class="dc-import-head">
+                @if (selectable)
+                {
+                    <label class="dc-chk">
+                        <input type="checkbox" checked="@ConflictPlanner.IsSelected(i)" aria-label="@i.IncomingName"
+                               @onchange="e => Planner.SetSelected(Plan, i, e.Value is bool v && v)" />
+                    </label>
+                }
                 <span class="dc-import-name">@i.IncomingName</span>
                 <span class="dc-tag">@StatusLabel(i.Status)</span>
             </div>
+            @if (Detail(i) is string detail)
+            {
+                <div class="dc-meta" style="margin-top:2px;">@detail</div>
+            }
+            @if (i.Incoming is DCCombat combat && combat.CreaturesList.Count > 0)
+            {
+                <div class="dc-meta" style="margin-top:2px;">@CombatCreatures(combat)</div>
+            }
 
             @if (i.Status is ImportStatus.Differs or ImportStatus.NameUsed)
             {
                 <div class="dc-meta" style="margin-top:4px;">
                     <b>@Loc["WizardInFile"]</b> @i.IncomingName &middot; <b>@Loc["WizardInLibrary"]</b> @ConflictPlanner.NameOf(i.Local)
                 </div>
-            }
-
-            @if (i.AllowedChoices.Count > 1)
-            {
                 <div class="dc-import-row">
-                    <select class="dc-inp" style="flex:0 1 300px;" value="@i.Choice" @onchange="e => Choose(i, e.Value)">
+                    <select class="dc-inp" style="flex:0 1 300px;" value="@i.Choice" aria-label="@i.IncomingName" @onchange="e => Choose(i, e.Value)">
                         @foreach (var choice in i.AllowedChoices)
                         {
                             <option value="@choice">@ChoiceLabel(choice)</option>
@@ -200,12 +256,21 @@
             {
                 <div class="dc-import-row">
                     <label class="dc-meta">@Loc["WizardNewName"]</label>
-                    <input class="dc-inp" value="@i.NewName" @oninput="e => Planner.SetNewName(i, e.Value?.ToString())" />
+                    <input class="dc-inp" value="@i.NewName" aria-label="@Loc["WizardNewName"]" @oninput="e => Planner.SetNewName(i, e.Value?.ToString())" />
                 </div>
                 @if (NameProblem(i) is string problem)
                 {
                     <div class="dc-import-bad">@problem</div>
                 }
+            }
+
+            @if (ConflictPlanner.MissingNeeds(Plan, i) is { Count: > 0 } needs)
+            {
+                <div class="dc-import-row">
+                    <button type="button" class="dc-btn dc-btn-out dc-btn-sm" @onclick="() => Planner.SelectNeeds(Plan, i)">
+                        @string.Format(Loc["SelectNeeds"], needs.Count)
+                    </button>
+                </div>
             }
 
             @if (i.Choice == ImportChoice.Skip && Planner.DependentsOf(Plan, i) is { Count: > 0 } dependents)
@@ -217,6 +282,21 @@
             }
         </div>
     };
+
+    // A short detail under the name.
+    private string? Detail(ImportItem<DCAssetKind> item) => item.Incoming switch
+    {
+        DCCreature creature => creature.IsPlayer ? Loc["DetailPlayer"] : Loc["DetailNotPlayer"],
+        DCCombat combat => string.IsNullOrWhiteSpace(combat.Campaign)
+            ? string.Format(Loc["DetailCombatCreatures"], combat.CreaturesList.Count)
+            : string.Format(Loc["DetailCombatCampaign"], combat.Campaign, combat.CreaturesList.Count),
+        DCPlayerGroup group => string.Format(Loc["DetailGroupMembers"], group.PlayerIds.Count),
+        _ => null,
+    };
+
+    // The creatures of a combat, a name used several times shown once with its count.
+    private static string CombatCreatures(DCCombat combat) =>
+        string.Join(", ", combat.CreaturesList.GroupBy(c => c.Name).Select(g => g.Count() > 1 ? $"{g.Key} ×{g.Count()}" : g.Key));
 
     private RenderFragment Warnings() => __builder =>
     {

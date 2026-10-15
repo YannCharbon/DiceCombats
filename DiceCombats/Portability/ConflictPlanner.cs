@@ -238,6 +238,78 @@ public sealed class ConflictPlanner
                                                && (!_namedByHand.Contains(i) || i.NewName == null || !IsNameAvailable(plan, i, i.NewName))).ToList());
     }
 
+    // ── selection (the tick boxes of the wizard) ──────────────────────
+    // A ticked row is imported: its choice puts it into the library. An
+    // unticked one is left out: Skip, or for a conflict, the local one is
+    // kept. Ticking it again gives back the choice it had.
+
+    private readonly Dictionary<DCImportItem, ImportChoice> _choiceBeforeUntick = new(ReferenceEqualityComparer.Instance);
+
+    /// <summary>The choice that leaves an item out of the import, or null when it has none (up to date).</summary>
+    public static ImportChoice? LeaveOutChoice(DCImportItem item) =>
+        item.AllowedChoices.Contains(ImportChoice.Skip) ? ImportChoice.Skip
+        : item.AllowedChoices.Contains(ImportChoice.KeepLocal) ? ImportChoice.KeepLocal
+        : item.AllowedChoices.Contains(ImportChoice.UseLocal) ? ImportChoice.UseLocal
+        : null;
+
+    /// <summary>True when the row has a tick box: something to import, and a way to leave it out.</summary>
+    public static bool IsSelectable(DCImportItem item) => item.Status != ImportStatus.UpToDate && LeaveOutChoice(item) != null;
+
+    public static bool IsSelected(DCImportItem item) => item.Inserts;
+
+    /// <summary>Ticks (imports, with the choice it had before, else the suggested one) or unticks (leaves out) an item.</summary>
+    public void SetSelected(DCImportPlan plan, DCImportItem item, bool selected)
+    {
+        if (!IsSelectable(item) || IsSelected(item) == selected) return;
+        if (!selected)
+        {
+            _choiceBeforeUntick[item] = item.Choice;
+            SetChoice(plan, item, LeaveOutChoice(item)!.Value);
+            return;
+        }
+        var choice = _choiceBeforeUntick.TryGetValue(item, out var before) ? before : DefaultChoice(item.Kind, item.Status);
+        if (!item.AllowedChoices.Contains(choice) || choice == LeaveOutChoice(item))
+        {
+            choice = item.AllowedChoices.FirstOrDefault(c => c is not (ImportChoice.Skip or ImportChoice.KeepLocal or ImportChoice.UseLocal or ImportChoice.Nothing));
+        }
+        SetChoice(plan, item, choice);
+    }
+
+    /// <summary>Select all / Select none of a section.</summary>
+    public void SetSelected(DCImportPlan plan, IEnumerable<DCImportItem> items, bool selected)
+    {
+        foreach (var item in items.ToList()) SetSelected(plan, item, selected);
+    }
+
+    /// <summary>The items of the file that the given one uses: a combat's and a group's creatures, an automation's external apps.</summary>
+    public static IReadOnlyList<DCImportItem> UsedBy(DCImportPlan plan, DCImportItem item)
+    {
+        IEnumerable<Guid> ids = item.Incoming switch
+        {
+            DCCombat combat => combat.CreaturesList.Select(c => c.Id),
+            DCPlayerGroup group => group.PlayerIds,
+            EventActionBinding binding => binding.Actions.OfType<HttpRequestActionDefinition>().Where(a => a.ExternalAppId.HasValue).Select(a => a.ExternalAppId!.Value),
+            _ => Enumerable.Empty<Guid>(),
+        };
+        var wanted = ids.ToHashSet();
+        var kind = item.Incoming is EventActionBinding ? DCAssetKind.ExternalApp : DCAssetKind.Creature;
+        return plan.AllItems.Where(other => other.Kind == kind && other.IncomingId is Guid id && wanted.Contains(id)).ToList();
+    }
+
+    /// <summary>
+    /// What a ticked item uses and will not get: the items it uses that are
+    /// skipped. "Also import what it needs" ticks them. An item kept local is
+    /// not missing: the local one is used instead.
+    /// </summary>
+    public static IReadOnlyList<DCImportItem> MissingNeeds(DCImportPlan plan, DCImportItem item) =>
+        item.Inserts ? UsedBy(plan, item).Where(used => used.Choice == ImportChoice.Skip).ToList() : Array.Empty<DCImportItem>();
+
+    /// <summary>Ticks everything <see cref="MissingNeeds"/> lists.</summary>
+    public void SelectNeeds(DCImportPlan plan, DCImportItem item)
+    {
+        foreach (var used in MissingNeeds(plan, item)) SetSelected(plan, used, true);
+    }
+
     /// <summary>The items this import inserts that use the given one (to warn before it is skipped).</summary>
     public IReadOnlyList<DCImportItem> DependentsOf(DCImportPlan plan, DCImportItem item)
     {

@@ -361,7 +361,7 @@
     <value>The imported one is left out, and anything imported that uses it will use yours instead.</value>
   </data>
   <data name="WizardIntro" xml:space="preserve">
-    <value>Part of the content of this file already exists in your library. Please choose what to do in each case; the suggested choice is already selected.</value>
+    <value>Part of the content of this file already exists in your library. Please choose what to do in each case; the suggested choice is already selected. Untick what you do not want to import.</value>
   </data>
   <data name="WizardInFile" xml:space="preserve">
     <value>In the file</value>
@@ -391,7 +391,7 @@
     <value>Ready to import</value>
   </data>
   <data name="ImportSummaryText" xml:space="preserve">
-    <value>Nothing in this file conflicts with your library. The following will be added:</value>
+    <value>Nothing in this file conflicts with your library. Untick what you do not want to import.</value>
   </data>
   <data name="ImportNothingToDo" xml:space="preserve">
     <value>Everything in this file is already in your library, so there is nothing to import.</value>
@@ -686,5 +686,32 @@
   </data>
   <data name="ImportNothingTitle" xml:space="preserve">
     <value>Already in your library</value>
+  </data>
+  <data name="ImportSelectedCount" xml:space="preserve">
+    <value>{0} of {1} items selected</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="SelectNone" xml:space="preserve">
+    <value>Select none</value>
+  </data>
+  <data name="SelectNeeds" xml:space="preserve">
+    <value>Also import what it needs ({0})</value>
+  </data>
+  <data name="DetailPlayer" xml:space="preserve">
+    <value>Player character</value>
+  </data>
+  <data name="DetailNotPlayer" xml:space="preserve">
+    <value>Creature (not a player)</value>
+  </data>
+  <data name="DetailCombatCreatures" xml:space="preserve">
+    <value>Creatures: {0}</value>
+  </data>
+  <data name="DetailCombatCampaign" xml:space="preserve">
+    <value>Campaign: {0} · creatures: {1}</value>
+  </data>
+  <data name="DetailGroupMembers" xml:space="preserve">
+    <value>Members: {0}</value>
   </data>
 </root>

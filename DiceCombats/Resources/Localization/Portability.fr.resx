@@ -361,7 +361,7 @@
     <value>La version importée est laissée de côté, et ce qui l'utilise dans le fichier utilisera la vôtre à la place.</value>
   </data>
   <data name="WizardIntro" xml:space="preserve">
-    <value>Une partie du contenu de ce fichier existe déjà dans votre bibliothèque. Choisissez ce qu'il convient de faire dans chaque cas ; le choix proposé est déjà sélectionné.</value>
+    <value>Une partie du contenu de ce fichier existe déjà dans votre bibliothèque. Choisissez ce qu'il convient de faire dans chaque cas ; le choix proposé est déjà sélectionné. Décochez ce que vous ne souhaitez pas importer.</value>
   </data>
   <data name="WizardInFile" xml:space="preserve">
     <value>Dans le fichier</value>
@@ -391,7 +391,7 @@
     <value>Prêt pour l'importation</value>
   </data>
   <data name="ImportSummaryText" xml:space="preserve">
-    <value>Rien dans ce fichier n'entre en conflit avec votre bibliothèque. Voici ce qui sera ajouté :</value>
+    <value>Aucun élément de ce fichier n'entre en conflit avec votre bibliothèque. Décochez ce que vous ne souhaitez pas importer.</value>
   </data>
   <data name="ImportNothingToDo" xml:space="preserve">
     <value>Tout le contenu de ce fichier se trouve déjà dans votre bibliothèque ; il n'y a donc rien à importer.</value>
@@ -686,5 +686,32 @@
   </data>
   <data name="ImportNothingTitle" xml:space="preserve">
     <value>Déjà dans votre bibliothèque</value>
+  </data>
+  <data name="ImportSelectedCount" xml:space="preserve">
+    <value>{0} éléments sélectionnés sur {1}</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Tout sélectionner</value>
+  </data>
+  <data name="SelectNone" xml:space="preserve">
+    <value>Ne rien sélectionner</value>
+  </data>
+  <data name="SelectNeeds" xml:space="preserve">
+    <value>Importer aussi les éléments nécessaires ({0})</value>
+  </data>
+  <data name="DetailPlayer" xml:space="preserve">
+    <value>Personnage joueur</value>
+  </data>
+  <data name="DetailNotPlayer" xml:space="preserve">
+    <value>Créature (non joueur)</value>
+  </data>
+  <data name="DetailCombatCreatures" xml:space="preserve">
+    <value>Créatures : {0}</value>
+  </data>
+  <data name="DetailCombatCampaign" xml:space="preserve">
+    <value>Campagne : {0} · créatures : {1}</value>
+  </data>
+  <data name="DetailGroupMembers" xml:space="preserve">
+    <value>Membres : {0}</value>
   </data>
 </root>

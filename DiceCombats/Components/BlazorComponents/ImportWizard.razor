@@ -34,17 +34,18 @@
                     break;
 
                 case DCImportStage.Summary:
-                    <h3 class="dc-confirm-title">@Loc["ImportSummaryTitle"]</h3>
                     @if (!Plan.AllItems.Any(i => i.Inserts))
                     {
+                        @* Nothing is imported, so the export's warnings do not matter. *@
+                        <h3 class="dc-confirm-title">@Loc["ImportNothingTitle"]</h3>
                         <p class="dc-confirm-msg">@Loc["ImportNothingToDo"]</p>
-                        @Warnings()
                         <div class="dc-confirm-foot">
                             <button type="button" class="dc-btn dc-btn-fill" @onclick="Flow.Close"><DcIcon Name="check" /> @Loc["AlertCloseBtn"]</button>
                         </div>
                     }
                     else
                     {
+                        <h3 class="dc-confirm-title">@Loc["ImportSummaryTitle"]</h3>
                         <p class="dc-confirm-msg">@Loc["ImportSummaryText"]</p>
                         <div class="dc-import-item dc-stack" style="gap:4px;margin-bottom:12px;">
                             @foreach (var group in Plan.Items.Where(i => i.Inserts).GroupBy(i => i.Kind).OrderBy(g => g.Key))

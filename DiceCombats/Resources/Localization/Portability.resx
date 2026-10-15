@@ -133,7 +133,7 @@
     <value>Backups</value>
   </data>
   <data name="BackupsHelp" xml:space="preserve">
-    <value>DiceCombats backs up your data the first time you open it each day, and before every import, every restore, and before your data is copied to another folder. A backup contains your creatures, combats, player groups, user custom fields, automations, combat logs and settings.</value>
+    <value>DiceCombats backs up your data the first time you open it each day, and before every import, every restore and every copy of your data to another folder. A backup contains your creatures, combats, player groups, user custom fields, automations, combat logs and settings.</value>
   </data>
   <data name="BackupNowBtn" xml:space="preserve">
     <value>Back up now</value>
@@ -683,5 +683,8 @@
   </data>
   <data name="SameChoiceForAutomation" xml:space="preserve">
     <value>Same choice for all {0} automations marked “{1}”</value>
+  </data>
+  <data name="ImportNothingTitle" xml:space="preserve">
+    <value>Already in your library</value>
   </data>
 </root>

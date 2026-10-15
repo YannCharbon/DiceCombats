@@ -684,4 +684,7 @@
   <data name="SameChoiceForAutomation" xml:space="preserve">
     <value>Même choix pour les {0} automatisations marquées « {1} »</value>
   </data>
+  <data name="ImportNothingTitle" xml:space="preserve">
+    <value>Déjà dans votre bibliothèque</value>
+  </data>
 </root>

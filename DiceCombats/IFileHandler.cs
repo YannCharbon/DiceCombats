@@ -22,7 +22,9 @@ namespace DiceCombats
         /// The full path of a folder the user picks, or null when cancelled or
         /// not available (Android: the data folder cannot be moved there).
         Task<string?> PickFolderAsync();
-        Task<byte[]> LoadFileAsync();
+        /// Asks for a file to open. Returns its name (null when unknown) and
+        /// its content; empty content when cancelled.
+        Task<(string? name, byte[] data)> LoadFileAsync();
 
         // New: used by DetailedPopup to let the user choose any file and read its bytes.
         // Returns (a best-effort display path/name, and the file bytes). Empty values if cancelled.

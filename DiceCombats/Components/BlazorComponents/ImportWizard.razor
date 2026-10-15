@@ -22,7 +22,7 @@
 @if (Flow.Stage != DCImportStage.Idle)
 {
     <div class="dc-confirm-scrim">
-        <div class="dc-confirm dc-import" role="dialog" aria-modal="true">
+        <div class="dc-confirm @(Flow.Stage == DCImportStage.Wizard ? "dc-import" : "")" role="dialog" aria-modal="true">
             @switch (Flow.Stage)
             {
                 case DCImportStage.Refused:
@@ -46,7 +46,7 @@
                     else
                     {
                         <p class="dc-confirm-msg">@Loc["ImportSummaryText"]</p>
-                        <div class="dc-stack" style="gap:4px;margin-bottom:12px;">
+                        <div class="dc-import-item dc-stack" style="gap:4px;margin-bottom:12px;">
                             @foreach (var group in Plan.Items.Where(i => i.Inserts).GroupBy(i => i.Kind).OrderBy(g => g.Key))
                             {
                                 <div class="dc-meta"><b>@KindLabel(group.Key)</b> &middot; @group.Count()</div>
@@ -64,6 +64,20 @@
                 case DCImportStage.Wizard:
                     <h3 class="dc-confirm-title">@Loc["WizardTitle"]</h3>
                     <p class="dc-confirm-msg">@Loc["WizardIntro"]</p>
+                    @if (Plan.AllItems.Any(i => i.NeedsNewName))
+                    {
+                        <div class="dc-import-item" style="margin-bottom:10px;">
+                            <div class="dc-import-affixes">
+                                <span class="dc-import-name" style="flex:0 0 auto;">@Loc["NameAffixLabel"]</span>
+                                <input class="dc-inp" value="@Planner.NamePrefix" aria-label="@Loc["NameAffixBefore"]" title="@Loc["NameAffixBefore"]"
+                                       @oninput="e => Planner.SetNameAffixes(Plan, e.Value?.ToString(), Planner.NameSuffix)" />
+                                <span class="dc-meta">@Loc["NameAffixName"]</span>
+                                <input class="dc-inp" value="@Planner.NameSuffix" aria-label="@Loc["NameAffixAfter"]" title="@Loc["NameAffixAfter"]"
+                                       @oninput="e => Planner.SetNameAffixes(Plan, Planner.NamePrefix, e.Value?.ToString())" />
+                            </div>
+                            <div class="dc-meta" style="margin-top:4px;">@Loc["NameAffixHelp"]</div>
+                        </div>
+                    }
                     <div class="dc-import-body">
                         @Warnings()
                         @foreach (var group in Plan.Items.GroupBy(i => i.Kind).OrderBy(g => g.Key))
@@ -93,7 +107,7 @@
 
                 case DCImportStage.Report:
                     <h3 class="dc-confirm-title">@Loc["ImportReportTitle"]</h3>
-                    <div class="dc-stack" style="gap:4px;margin-bottom:12px;">
+                    <div class="dc-import-item dc-stack" style="gap:4px;margin-bottom:12px;">
                         @foreach (var line in ReportLines())
                         {
                             <div class="dc-meta">@line</div>
@@ -125,6 +139,8 @@
     .dc-import-name { font-weight: 700; color: var(--t1); flex: 1 1 200px; min-width: 0; overflow-wrap: anywhere; }
     .dc-import-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
     .dc-import-row .dc-inp { flex: 1 1 220px; min-width: 0; }
+    .dc-import-affixes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .dc-import-affixes .dc-inp { flex: 0 1 160px; min-width: 80px; }
     .dc-import-bad { color: var(--danger); font-size: 12.5px; margin-top: 4px; }
 </style>
 
@@ -169,10 +185,10 @@
                             <option value="@choice">@ChoiceLabel(choice)</option>
                         }
                     </select>
-                    @if (Plan.AllItems.Count(o => o.Kind == i.Kind && o.Status == i.Status) > 1)
+                    @if (ConflictPlanner.SameKindAndStatus(Plan, i).Count is var same && same > 1)
                     {
                         <button type="button" class="dc-btn dc-btn-out dc-btn-sm" @onclick="() => Planner.ApplyToAllOfKind(Plan, i.Kind, i.Status, i.Choice)">
-                            @Loc["ChoiceApplyToAll"]
+                            @string.Format(Loc["SameChoiceFor" + i.Kind], same, StatusLabel(i.Status))
                         </button>
                     }
                 </div>
@@ -183,7 +199,7 @@
             {
                 <div class="dc-import-row">
                     <label class="dc-meta">@Loc["WizardNewName"]</label>
-                    <input class="dc-inp" value="@i.NewName" @oninput="e => i.NewName = e.Value?.ToString()" />
+                    <input class="dc-inp" value="@i.NewName" @oninput="e => Planner.SetNewName(i, e.Value?.ToString())" />
                 </div>
                 @if (NameProblem(i) is string problem)
                 {
@@ -246,7 +262,7 @@
 
     private string? WarningText(BundleWarning warning) => warning.Code switch
     {
-        DCBundleWarningCodes.LegacyFormat => Loc["WarningLegacyFormat"],
+        DCBundleWarningCodes.LegacyFormat => Flow.FromUnsavedCopy ? Loc["WarningUnsavedCopy"] : Loc["WarningLegacyFormat"],
         DCBundleWarningCodes.CreatureNotInLibrary => string.Format(Loc["WarningCreatureNotInLibrary"], warning.Detail),
         DCBundleWarningCodes.TokenRemoved => string.Format(Loc["WarningTokenRemoved"], warning.Detail),
         DCBundleWarningCodes.BodyKeptAsIs => string.Format(Loc["WarningBodyKeptAsIs"], warning.Detail),

@@ -109,7 +109,7 @@ public sealed class ConflictPlanner
         plan.Items.Add(item);
         if (item.NeedsNewName)
         {
-            item.NewName = MakeUniqueName(plan, item, name);
+            item.NewName = SuggestedName(plan, item);
         }
     }
 
@@ -136,10 +136,47 @@ public sealed class ConflictPlanner
     {
         if (!item.AllowedChoices.Contains(choice)) return;
         item.Choice = choice;
-        if (item.NeedsNewName && (item.NewName == null || !IsNameAvailable(plan, item, item.NewName)))
+        if (item.NeedsNewName && (!_namedByHand.Contains(item) || item.NewName == null || !IsNameAvailable(plan, item, item.NewName)))
         {
-            item.NewName = MakeUniqueName(plan, item, item.IncomingName);
+            item.NewName = SuggestedName(plan, item);
         }
+    }
+
+    // ── names of copies ────────────────────────────────────────────────
+    // The wizard's "Names of copies: [before] name [after]" bar. A name typed
+    // by hand is kept when the bar changes; the others follow it.
+
+    public string NamePrefix { get; private set; } = "";
+    public string NameSuffix { get; private set; } = " (2)";
+
+    private readonly HashSet<DCImportItem> _namedByHand = new(ReferenceEqualityComparer.Instance);
+
+    /// <summary>A name typed in the wizard: kept from now on when the prefix or the suffix changes.</summary>
+    public void SetNewName(DCImportItem item, string? name)
+    {
+        item.NewName = name;
+        _namedByHand.Add(item);
+    }
+
+    public bool IsNamedByHand(DCImportItem item) => _namedByHand.Contains(item);
+
+    /// <summary>Changes the text put before and after the names, and suggests again every name not typed by hand.</summary>
+    public void SetNameAffixes(DCImportPlan plan, string? prefix, string? suffix)
+    {
+        NamePrefix = prefix ?? "";
+        NameSuffix = suffix ?? "";
+        RenameSuggested(plan, plan.AllItems.Where(i => i.NeedsNewName && !_namedByHand.Contains(i)).ToList());
+    }
+
+    /// <summary>The prefix, the name and the suffix, made unique (see <see cref="MakeUniqueName"/>).</summary>
+    public string SuggestedName(DCImportPlan plan, DCImportItem item) =>
+        MakeUniqueName(plan, item, NamePrefix + (item.IncomingName ?? "").Trim() + NameSuffix);
+
+    // Clears the names first, so that a name about to change never blocks another.
+    private void RenameSuggested(DCImportPlan plan, IReadOnlyList<DCImportItem> items)
+    {
+        foreach (var item in items) item.NewName = null;
+        foreach (var item in items) item.NewName = SuggestedName(plan, item);
     }
 
     /// <summary>
@@ -156,13 +193,24 @@ public sealed class ConflictPlanner
                                            && CreatedName(other) is string created && SameName(created, trimmed));
     }
 
-    /// <summary>The wanted name, or "name (2)", "name (3)"… until it is available.</summary>
+    /// <summary>
+    /// The wanted name, or "name (2)", "name (3)"… until it is available. A
+    /// name that already ends with a number in brackets counts on from it:
+    /// "name (2)" is followed by "name (3)", not "name (2) (2)".
+    /// </summary>
     public string MakeUniqueName(DCImportPlan plan, DCImportItem item, string wanted)
     {
         string baseName = (wanted ?? "").Trim();
         if (baseName.Length == 0) baseName = "?";
         if (IsNameAvailable(plan, item, baseName)) return baseName;
-        for (int n = 2; ; n++)
+        int n = 2;
+        var numbered = System.Text.RegularExpressions.Regex.Match(baseName, @"^(.*\S)\s*\((\d{1,6})\)$");
+        if (numbered.Success)
+        {
+            baseName = numbered.Groups[1].Value;
+            n = int.Parse(numbered.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture) + 1;
+        }
+        for (; ; n++)
         {
             string candidate = $"{baseName} ({n})";
             if (IsNameAvailable(plan, item, candidate)) return candidate;
@@ -173,18 +221,21 @@ public sealed class ConflictPlanner
     public IReadOnlyList<DCImportItem> InvalidNewNames(DCImportPlan plan) =>
         plan.AllItems.Where(i => i.NeedsNewName && (i.NewName == null || !IsNameAvailable(plan, i, i.NewName))).ToList();
 
-    /// <summary>"Apply to all of this kind": the same choice on every item of this kind and status that allows it.</summary>
+    /// <summary>The items "Same choice for all…" changes: those of the same kind and status.</summary>
+    public static IReadOnlyList<DCImportItem> SameKindAndStatus(DCImportPlan plan, DCImportItem item) =>
+        plan.AllItems.Where(i => i.Kind == item.Kind && i.Status == item.Status).ToList();
+
+    /// <summary>
+    /// "Same choice for all…": the same choice on every item of this kind and
+    /// status that allows it. Names typed by hand are kept while they are
+    /// valid; the others are suggested again.
+    /// </summary>
     public void ApplyToAllOfKind(DCImportPlan plan, DCAssetKind kind, ImportStatus status, ImportChoice choice)
     {
-        foreach (var item in plan.AllItems.Where(i => i.Kind == kind && i.Status == status && i.AllowedChoices.Contains(choice)))
-        {
-            item.Choice = choice;
-            item.NewName = null;
-        }
-        foreach (var item in plan.AllItems.Where(i => i.Kind == kind && i.Status == status && i.NeedsNewName))
-        {
-            item.NewName = MakeUniqueName(plan, item, item.IncomingName);
-        }
+        var items = plan.AllItems.Where(i => i.Kind == kind && i.Status == status && i.AllowedChoices.Contains(choice)).ToList();
+        foreach (var item in items) item.Choice = choice;
+        RenameSuggested(plan, items.Where(i => i.NeedsNewName
+                                               && (!_namedByHand.Contains(i) || i.NewName == null || !IsNameAvailable(plan, i, i.NewName))).ToList());
     }
 
     /// <summary>The items this import inserts that use the given one (to warn before it is skipped).</summary>

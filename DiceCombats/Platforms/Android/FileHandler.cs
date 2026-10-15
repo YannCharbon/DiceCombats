@@ -81,7 +81,7 @@ namespace DiceCombats
 
         public Task<string?> PickFolderAsync() => Task.FromResult<string?>(null);
 
-        public async Task<byte[]> LoadFileAsync()
+        public async Task<(string? name, byte[] data)> LoadFileAsync()
         {
             var intent = new Intent(Intent.ActionGetContent);
             intent.SetType("*/*");
@@ -91,7 +91,7 @@ namespace DiceCombats
             if (activity == null)
                 throw new InvalidOperationException("Current activity is not available.");
 
-            var tcs = new TaskCompletionSource<byte[]>();
+            var tcs = new TaskCompletionSource<(string? name, byte[] data)>();
 
             void OnActivityResult(int requestCode, Result resultCode, Intent? data)
             {
@@ -105,11 +105,11 @@ namespace DiceCombats
                         using var stream = activity.ContentResolver?.OpenInputStream(uri);
                         using var memoryStream = new MemoryStream();
                         stream?.CopyTo(memoryStream);
-                        tcs.SetResult(memoryStream.ToArray());
+                        tcs.SetResult((TryGetDisplayName(activity, uri) ?? uri.LastPathSegment, memoryStream.ToArray()));
                     }
                     else
                     {
-                        tcs.SetResult(Array.Empty<byte>());
+                        tcs.SetResult((null, Array.Empty<byte>()));
                     }
                 }
             }

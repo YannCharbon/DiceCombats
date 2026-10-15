@@ -6,6 +6,8 @@
  * See the LICENSE file in the repository root for details.
  */
 
+using DiceCombats.Storage;
+
 namespace DiceCombats.Portability;
 
 public enum DCImportStage { Idle, Refused, Summary, Wizard, Applying, Report, Failed }
@@ -38,6 +40,16 @@ public sealed class DCImportFlow
     public long FileSizeBytes { get; private set; }
 
     /// <summary>
+    /// True when the file is one of the copies of changes that could not be
+    /// saved (UnsavedCopies): read as an older export, it gets its own note.
+    /// </summary>
+    public bool FromUnsavedCopy { get; private set; }
+
+    /// <summary>Whether a file name is that of a kept copy of creatures or combats.</summary>
+    public static bool IsUnsavedCopyName(string? fileName) =>
+        fileName != null && UnsavedCopies.IsUnsavedCopy(Path.GetFileName(fileName), BackupService.DataFileNames);
+
+    /// <summary>
     /// Asks for a file and opens the import. Completes when the user closes it
     /// (or at once when the file dialog is cancelled), so the caller can show
     /// what changed.
@@ -45,16 +57,17 @@ public sealed class DCImportFlow
     public async Task ImportFromFileAsync()
     {
         if (Stage != DCImportStage.Idle) return;
-        var data = await _fileHandler.LoadFileAsync();
+        var (name, data) = await _fileHandler.LoadFileAsync();
         if (data == null || data.Length == 0) return;
-        await StartAsync(data);
+        await StartAsync(data, name);
     }
 
     /// <summary>Opens the import of a file. Returns the report when the user applied it, null otherwise.</summary>
-    public async Task<ImportReport?> StartAsync(byte[] data)
+    public async Task<ImportReport?> StartAsync(byte[] data, string? fileName = null)
     {
         if (Stage != DCImportStage.Idle) return null;
         _applied = null;
+        FromUnsavedCopy = IsUnsavedCopyName(fileName);
         _done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         FileSizeBytes = data.LongLength;
         try

@@ -333,9 +333,6 @@
   <data name="ChoiceUseLocal" xml:space="preserve">
     <value>Use the local one instead</value>
   </data>
-  <data name="ChoiceApplyToAll" xml:space="preserve">
-    <value>Apply to all of this kind</value>
-  </data>
   <data name="ChoiceImportHelp" xml:space="preserve">
     <value>Adds it to your library.</value>
   </data>
@@ -647,5 +644,44 @@
   </data>
   <data name="UnsavedCopiesManual" xml:space="preserve">
     <value>Some changes could not be saved because the same data was changed on another computer. They are kept in the data folder: {0}. These files cannot be imported. To use one of them, please make a backup first and close DiceCombats. Then give the file the name of the data file it belongs to, for example playerGroups.json, in place of that file.</value>
+  </data>
+  <data name="LockOpenAnywayHelp" xml:space="preserve">
+    <value>Opens the data folder here as well. If DiceCombats is still open on the other computer, please close it there first.</value>
+  </data>
+  <data name="WarningUnsavedCopy" xml:space="preserve">
+    <value>This file holds changes that DiceCombats kept because the same data had been changed on another computer. Importing it brings those changes back into your library.</value>
+  </data>
+  <data name="NameAffixLabel" xml:space="preserve">
+    <value>Names of copies:</value>
+  </data>
+  <data name="NameAffixName" xml:space="preserve">
+    <value>name</value>
+  </data>
+  <data name="NameAffixBefore" xml:space="preserve">
+    <value>Text before the name</value>
+  </data>
+  <data name="NameAffixAfter" xml:space="preserve">
+    <value>Text after the name</value>
+  </data>
+  <data name="NameAffixHelp" xml:space="preserve">
+    <value>Changes every new name below that you have not typed yourself.</value>
+  </data>
+  <data name="SameChoiceForCreature" xml:space="preserve">
+    <value>Same choice for all {0} creatures marked “{1}”</value>
+  </data>
+  <data name="SameChoiceForCombat" xml:space="preserve">
+    <value>Same choice for all {0} combats marked “{1}”</value>
+  </data>
+  <data name="SameChoiceForPlayerGroup" xml:space="preserve">
+    <value>Same choice for all {0} player groups marked “{1}”</value>
+  </data>
+  <data name="SameChoiceForFieldTemplate" xml:space="preserve">
+    <value>Same choice for all {0} user custom fields marked “{1}”</value>
+  </data>
+  <data name="SameChoiceForExternalApp" xml:space="preserve">
+    <value>Same choice for all {0} external apps marked “{1}”</value>
+  </data>
+  <data name="SameChoiceForAutomation" xml:space="preserve">
+    <value>Same choice for all {0} automations marked “{1}”</value>
   </data>
 </root>

@@ -68,7 +68,7 @@ namespace DiceCombats
             return folder?.Path;
         }
 
-        public async Task<byte[]> LoadFileAsync()
+        public async Task<(string? name, byte[] data)> LoadFileAsync()
         {
             var picker = new FileOpenPicker
             {
@@ -79,7 +79,7 @@ namespace DiceCombats
 
             var winuiWindow = App.Current?.Windows.FirstOrDefault()?.Handler?.PlatformView as MauiWinUIWindow;
             if (winuiWindow == null)
-                return Array.Empty<byte>();
+                return (null, Array.Empty<byte>());
 
             var hwnd = winuiWindow.WindowHandle;
             InitializeWithWindow.Initialize(picker, hwnd);
@@ -90,10 +90,10 @@ namespace DiceCombats
                 using var stream = await file.OpenStreamForReadAsync();
                 using var memoryStream = new MemoryStream();
                 await stream.CopyToAsync(memoryStream);
-                return memoryStream.ToArray();
+                return (file.Name, memoryStream.ToArray());
             }
 
-            return Array.Empty<byte>();
+            return (null, Array.Empty<byte>());
         }
 
         public async Task<(string path, byte[] data)> PickFileAsync()

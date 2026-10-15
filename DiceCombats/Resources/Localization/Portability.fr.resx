@@ -333,9 +333,6 @@
   <data name="ChoiceUseLocal" xml:space="preserve">
     <value>Utiliser la version locale à la place</value>
   </data>
-  <data name="ChoiceApplyToAll" xml:space="preserve">
-    <value>Appliquer à tout ce qui est de ce type</value>
-  </data>
   <data name="ChoiceImportHelp" xml:space="preserve">
     <value>L'ajoute à votre bibliothèque.</value>
   </data>
@@ -647,5 +644,44 @@
   </data>
   <data name="UnsavedCopiesManual" xml:space="preserve">
     <value>Certaines modifications n'ont pas pu être enregistrées, car les mêmes données ont été modifiées sur un autre ordinateur. Elles sont conservées dans le dossier de données : {0}. Ces fichiers ne peuvent pas être importés. Pour utiliser l'un d'eux, effectuez d'abord une sauvegarde et fermez DiceCombats. Renommez ensuite le fichier avec le nom du fichier de données auquel il correspond, par exemple playerGroups.json, en remplacement de celui-ci.</value>
+  </data>
+  <data name="LockOpenAnywayHelp" xml:space="preserve">
+    <value>Ouvre également le dossier de données sur cet ordinateur. Si DiceCombats est encore ouvert sur l'autre ordinateur, merci de le fermer d'abord.</value>
+  </data>
+  <data name="WarningUnsavedCopy" xml:space="preserve">
+    <value>Ce fichier contient des modifications que DiceCombats a conservées, car les mêmes données avaient été modifiées sur un autre ordinateur. En l'important, vous réintégrez ces modifications dans votre bibliothèque.</value>
+  </data>
+  <data name="NameAffixLabel" xml:space="preserve">
+    <value>Noms des copies :</value>
+  </data>
+  <data name="NameAffixName" xml:space="preserve">
+    <value>nom</value>
+  </data>
+  <data name="NameAffixBefore" xml:space="preserve">
+    <value>Texte placé avant le nom</value>
+  </data>
+  <data name="NameAffixAfter" xml:space="preserve">
+    <value>Texte placé après le nom</value>
+  </data>
+  <data name="NameAffixHelp" xml:space="preserve">
+    <value>S'applique à chaque nouveau nom ci-dessous que vous n'avez pas saisi vous-même.</value>
+  </data>
+  <data name="SameChoiceForCreature" xml:space="preserve">
+    <value>Même choix pour les {0} créatures marquées « {1} »</value>
+  </data>
+  <data name="SameChoiceForCombat" xml:space="preserve">
+    <value>Même choix pour les {0} combats marqués « {1} »</value>
+  </data>
+  <data name="SameChoiceForPlayerGroup" xml:space="preserve">
+    <value>Même choix pour les {0} groupes de joueurs marqués « {1} »</value>
+  </data>
+  <data name="SameChoiceForFieldTemplate" xml:space="preserve">
+    <value>Même choix pour les {0} champs personnalisés marqués « {1} »</value>
+  </data>
+  <data name="SameChoiceForExternalApp" xml:space="preserve">
+    <value>Même choix pour les {0} applications externes marquées « {1} »</value>
+  </data>
+  <data name="SameChoiceForAutomation" xml:space="preserve">
+    <value>Même choix pour les {0} automatisations marquées « {1} »</value>
   </data>
 </root>

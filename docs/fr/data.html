@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vos données dans DiceCombats - partage, sauvegardes et dossier de données</title>
+    <meta name="description" content="Comment DiceCombats partage vos créatures et vos combats avec d'autres MJ, importe leurs fichiers, sauvegarde vos données et les conserve dans un dossier utilisable depuis plusieurs ordinateurs." />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="icon" href="../logo.svg" type="image/svg+xml" />
+
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Vos données dans DiceCombats" />
+    <meta property="og:description" content="Comment DiceCombats partage vos créatures et vos combats avec d'autres MJ, importe leurs fichiers, sauvegarde vos données et les conserve dans un dossier utilisable depuis plusieurs ordinateurs." />
+    <meta property="og:image" content="https://yanncharbon.github.io/DiceCombats/logo.svg" />
+    <meta property="og:url" content="https://yanncharbon.github.io/DiceCombats/fr/data.html" />
+    <meta property="og:type" content="article" />
+
+    <link rel="alternate" href="https://yanncharbon.github.io/DiceCombats/data.html" hreflang="en" />
+    <link rel="alternate" href="https://yanncharbon.github.io/DiceCombats/fr/data.html" hreflang="fr" />
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="crumb">
+                <a class="crumb-family" href="https://yanncharbon.github.io/DiceAtrium/fr/" title="Famille Dice Atrium" aria-label="Famille Dice Atrium"><img src="../atrium-logo.svg" alt="" /></a>
+                <span class="crumb-sep" aria-hidden="true">/</span>
+                <a class="brand" href="./"><img src="../logo.svg" alt="" />DiceCombats</a>
+            </div>
+            <nav class="nav-sections" aria-label="Sections de la page">
+                <a href="#sharing">Partage</a>
+                <a href="#importing">Importation</a>
+                <a href="#backups">Sauvegardes</a>
+                <a href="#data-folder">Dossier de données</a>
+                <a href="#several-computers">Plusieurs ordinateurs</a>
+                <a href="#android">Android</a>
+            </nav>
+            <div class="nav-util">
+                <a class="nav-key" href="https://github.com/YannCharbon/DiceCombats/" title="GitHub" aria-label="GitHub"><img src="../github-mark-white.svg" alt="" /></a>
+                <a class="nav-key nav-lang" href="../data.html" hreflang="en" title="English version" aria-label="English version">EN</a>
+                <a class="btn primary nav-cta" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">Télécharger</a>
+            </div>
+        </div>
+    </header>
+
+    <header class="page-head">
+        <div class="wrap">
+            <a class="page-back" href="./#data">&larr; Retour à la page de DiceCombats</a>
+            <h1>Vos données</h1>
+            <p>Vos créatures, vos combats et vos réglages sont conservés sur votre appareil ou, sous Windows, dans le dossier de votre choix. Cette page décrit comment les partager avec d'autres MJ, comment DiceCombats les sauvegarde et comment utiliser les mêmes données sur plusieurs ordinateurs.</p>
+            <ul class="toc">
+                <li><a href="#sharing">Partage</a></li>
+                <li><a href="#importing">Importer un fichier</a></li>
+                <li><a href="#backups">Sauvegardes</a></li>
+                <li><a href="#data-folder">Le dossier de données</a></li>
+                <li><a href="#several-computers">Plusieurs ordinateurs</a></li>
+                <li><a href="#android">Sous Android</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+
+    <section id="sharing" class="doc">
+        <div class="wrap">
+            <h2>Partage</h2>
+            <p>Lorsque vous exportez un combat avec <strong>Exporter en fichier</strong>, le fichier contient aussi les créatures qu'il utilise, telles qu'elles figurent dans votre liste de créatures. La personne qui l'importe dispose ainsi de toute la rencontre, prête à être jouée.</p>
+            <p><strong>Exporter les créatures</strong> et <strong>Exporter les combats</strong> enregistrent une liste complète dans un seul fichier. Dans les Réglages, section Données, <strong>Exporter toute la bibliothèque…</strong> enregistre en une seule fois vos créatures, combats, groupes de joueurs, champs personnalisés et automatisations.</p>
+            <div class="note">
+                <p>Les jetons d'accès de vos automatisations ne sont jamais exportés. Un message invite la personne qui importe le fichier à les saisir de nouveau.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="importing" class="doc">
+        <div class="wrap">
+            <h2>Importer un fichier</h2>
+            <p>Le bouton <strong>Importer depuis un fichier…</strong> se trouve dans la liste des créatures, dans celle des combats et dans les Réglages. Il ouvre également les fichiers exportés par les versions précédentes de DiceCombats.</p>
+            <ol class="field-steps">
+                <li>Cliquez sur <strong>Importer depuis un fichier…</strong> et choisissez le fichier.</li>
+                <li>Lorsque rien dans le fichier ne figure déjà dans votre bibliothèque, un récapitulatif présente ce qui sera ajouté. Sinon, vous décidez du sort de chaque élément, comme expliqué ci-dessous.</li>
+                <li>Cliquez sur <strong>Importer</strong>. DiceCombats sauvegarde d'abord vos données, puis importe le fichier et indique ce qui a été ajouté, remplacé ou laissé de côté.</li>
+            </ol>
+
+            <h3>Décider du sort de chaque élément</h3>
+            <p>Lorsqu'une partie du fichier figure déjà dans votre bibliothèque, chaque élément est présenté comme <strong>Nouveau</strong>, <strong>À jour</strong>, <strong>Différent</strong> ou <strong>Nom déjà utilisé</strong>. À côté, une liste propose les choix possibles pour cet élément, avec sous elle une courte explication du choix retenu. Le choix proposé est déjà sélectionné.</p>
+            <ul>
+                <li><strong>Importer comme copie</strong> ajoute la version importée à côté de la vôtre, sous un nouveau nom. La vôtre reste inchangée.</li>
+                <li><strong>Remplacer la version locale</strong> remplace votre version par celle du fichier.</li>
+                <li><strong>Conserver la version locale</strong> laisse de côté la version importée&nbsp;; ce qui l'utilise dans le fichier utilisera la vôtre.</li>
+                <li><strong>Importer sous un autre nom</strong> ou <strong>Conserver les deux sous le même nom</strong>, lorsque seul le nom est déjà utilisé.</li>
+                <li><strong>Utiliser la version locale à la place</strong> laisse de côté l'élément importé et utilise le vôtre partout où le fichier en a besoin.</li>
+            </ul>
+            <p>Pour donner la même réponse à de nombreux éléments à la fois, utilisez le bouton situé à côté de la liste, par exemple <strong>Même choix pour les 12 créatures marquées «&nbsp;Différent&nbsp;»</strong>. Rien de ce que vous possédez déjà n'est modifié sans votre accord.</p>
+
+            <h3>Le nom des copies</h3>
+            <p>Lorsqu'au moins un élément doit recevoir un nouveau nom, une barre intitulée <strong>Noms des copies</strong> apparaît en haut de la fenêtre d'importation. Elle permet de choisir un texte placé avant le nom et un texte placé après. Par défaut, la copie de «&nbsp;Gobelin&nbsp;» s'appelle «&nbsp;Gobelin&nbsp;(2)&nbsp;». Si vous modifiez ces textes, les noms proposés sont mis à jour, sauf ceux que vous avez saisis vous-même. DiceCombats ajoute toujours un numéro lorsqu'un nom est déjà utilisé. Le bouton <strong>Importer</strong> reste indisponible tant qu'un nom est vide ou déjà utilisé.</p>
+        </div>
+    </section>
+
+    <section id="backups" class="doc">
+        <div class="wrap">
+            <h2>Sauvegardes</h2>
+            <p>DiceCombats sauvegarde vos données à la première ouverture de chaque journée, ainsi qu'avant chaque importation, chaque restauration et chaque copie de vos données vers un autre dossier. Une sauvegarde contient vos créatures, combats, groupes de joueurs, champs personnalisés, automatisations, journaux de combat et réglages.</p>
+            <p>Les dix sauvegardes automatiques les plus récentes sont conservées. Celles que vous effectuez vous-même, ainsi que celles qui précèdent une importation, une restauration ou une copie vers un autre dossier, ne sont jamais supprimées par l'application.</p>
+
+            <h3>Restaurer une sauvegarde</h3>
+            <ol class="field-steps">
+                <li>Ouvrez les Réglages, section Données. La sauvegarde la plus récente y est affichée.</li>
+                <li>Cliquez sur <strong>Restaurer</strong> à côté d'elle, ou sur <strong>Toutes les sauvegardes…</strong> pour voir les autres, avec leur date, l'ordinateur concerné et leur motif.</li>
+                <li>Confirmez. DiceCombats sauvegarde d'abord vos données actuelles, afin que vous puissiez revenir en arrière si nécessaire, puis restaure la sauvegarde choisie.</li>
+            </ol>
+
+            <h3>Les sauvegardes sous forme de fichier</h3>
+            <p><strong>Enregistrer une sauvegarde dans un fichier…</strong> sauvegarde vos données dans leur état actuel et enregistre le fichier à l'emplacement de votre choix. <strong>Restaurer depuis un fichier…</strong> permet ensuite de les récupérer. Sous Windows, <strong>Ouvrir le dossier des sauvegardes</strong> affiche l'emplacement où DiceCombats conserve ses sauvegardes.</p>
+        </div>
+    </section>
+
+    <section id="data-folder" class="doc">
+        <div class="wrap">
+            <h2>Le dossier de données</h2>
+            <p>Sous Windows, la partie <strong>Dossier de données</strong> des Réglages indique l'emplacement où DiceCombats conserve vos données et permet d'en choisir un autre.</p>
+            <ol class="field-steps">
+                <li>Cliquez sur <strong>Choisir un autre dossier…</strong> et sélectionnez le nouveau dossier.</li>
+                <li>Confirmez avec <strong>Déplacer mes données</strong>. DiceCombats effectue une sauvegarde, copie vos données dans le nouveau dossier, vérifie la copie, puis redémarre pour l'utiliser.</li>
+                <li>Vos anciennes données restent à leur emplacement. Une fois que vous avez vérifié que tout se trouve dans le nouveau dossier, vous pouvez les supprimer avec <strong>Supprimer l'ancienne copie</strong>.</li>
+            </ol>
+            <p><strong>Revenir au dossier par défaut</strong> ramène vos données à leur emplacement d'origine. Un dossier situé dans AppData ne peut pas être utilisé, et si le dossier choisi contient déjà d'autres fichiers, DiceCombats place ses données dans un sous-dossier.</p>
+
+            <h3>Un dossier qui contient déjà des données DiceCombats</h3>
+            <p>Sur votre second ordinateur, choisissez le même dossier. DiceCombats constate qu'il contient déjà des données DiceCombats, vous indique ce qu'il renferme et ce que contient cet ordinateur, puis vous demande ce que vous souhaitez faire&nbsp;:</p>
+            <ul>
+                <li><strong>Utiliser les données du dossier</strong> passe au dossier tel quel. Vos données actuelles restent à leur emplacement.</li>
+                <li><strong>Les remplacer par les miennes</strong> sauvegarde d'abord les données du dossier, puis les remplace par les vôtres.</li>
+                <li><strong>Fusionner</strong> ajoute vos données à celles du dossier&nbsp;; lorsqu'un élément existe des deux côtés, vous décidez de ce qu'il convient de faire, comme lors d'une importation.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="several-computers" class="doc">
+        <div class="wrap">
+            <h2>Utiliser plusieurs ordinateurs</h2>
+            <p>Sous Windows, vous pouvez conserver vos données dans un dossier synchronisé par OneDrive, Dropbox ou un autre service. Vous retrouvez ainsi les mêmes créatures et les mêmes combats sur chacun de vos ordinateurs. Merci de régler le service pour qu'il conserve toujours les fichiers de ce dossier sur l'appareil&nbsp;; sinon, DiceCombats risque de devoir attendre leur téléchargement.</p>
+
+            <h3>Un ordinateur à la fois</h3>
+            <p>Merci de n'ouvrir DiceCombats que sur un ordinateur à la fois. Si vous le lancez alors qu'il est encore ouvert sur un autre ordinateur, un écran vous indique lequel et depuis quand.</p>
+            <ul>
+                <li><strong>Ouvrir quand même</strong> ouvre le dossier de données sur cet ordinateur-ci également. Si DiceCombats est encore ouvert sur l'autre ordinateur, merci de l'y fermer d'abord.</li>
+                <li><strong>Quitter</strong> ferme DiceCombats sans rien modifier.</li>
+            </ul>
+
+            <h3>Modifications faites sur un autre ordinateur</h3>
+            <p>Lorsqu'un autre ordinateur modifie vos données pendant que DiceCombats est ouvert, un message vous propose de les <strong>Recharger</strong> au moment qui vous convient. DiceCombats ne les recharge jamais de lui-même, pas même au milieu d'un combat.</p>
+            <p>Si vous modifiez ensuite un élément déjà modifié sur l'autre ordinateur, DiceCombats vous demande s'il faut <strong>Recharger</strong>, pour reprendre la version de l'autre ordinateur, ou <strong>Remplacer</strong>, pour conserver la vôtre.</p>
+            <p>Si DiceCombats est fermé avant que vous ayez fait ce choix, vos modifications sont conservées dans le dossier de données, dans un fichier dont le nom se termine par <span class="code-style">.unsaved.json</span>. Elles vous sont signalées au démarrage suivant. Celles qui concernent les créatures et les combats peuvent être récupérées avec <strong>Importer depuis un fichier…</strong>&nbsp;; la fenêtre d'importation rappelle alors l'origine du fichier. Pour les autres données, le message affiché au démarrage explique comment mettre le fichier à la place du fichier de données auquel il correspond, après avoir effectué une sauvegarde.</p>
+
+            <h3>Messages au démarrage</h3>
+            <p>Au démarrage, DiceCombats vous signale les fichiers du dossier de données qui se trouvent uniquement dans le cloud. Il vous signale également les copies créées par votre service de synchronisation lorsque deux ordinateurs ont modifié le même fichier en même temps. DiceCombats utilise les fichiers d'origine&nbsp;; je vous invite à les comparer avec ces copies et à supprimer celles dont vous n'avez pas besoin.</p>
+
+            <h3>Lorsque le dossier est inaccessible</h3>
+            <p>Si votre dossier de données se trouve sur un disque externe ou sur un emplacement réseau qui n'est pas connecté, DiceCombats affiche un écran dédié plutôt qu'une bibliothèque vide. Il propose les choix suivants&nbsp;:</p>
+            <ul>
+                <li><strong>Réessayer</strong>, une fois le disque ou le réseau connecté&nbsp;;</li>
+                <li><strong>Choisir un autre dossier…</strong>, si vos données ont changé d'emplacement&nbsp;;</li>
+                <li><strong>Ouvrir le dossier par défaut à la place</strong>, pour cette session uniquement. Un message vous rappelle alors que vos modifications sont enregistrées dans le dossier par défaut, et non dans votre dossier de données&nbsp;;</li>
+                <li><strong>Quitter</strong>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="android" class="doc">
+        <div class="wrap">
+            <h2>Sous Android</h2>
+            <p>Le dossier de données ne peut pas être changé sous Android. Pour transférer vos données vers un autre appareil, deux possibilités s'offrent à vous&nbsp;:</p>
+            <ul>
+                <li><strong>Exporter toute la bibliothèque…</strong> sur le premier appareil, puis <strong>Importer depuis un fichier…</strong> sur le second&nbsp;;</li>
+                <li><strong>Enregistrer une sauvegarde dans un fichier…</strong> sur le premier appareil, puis <strong>Restaurer depuis un fichier…</strong> sur le second.</li>
+            </ul>
+        </div>
+    </section>
+
+    </main>
+
+    <footer>
+        <div class="wrap">
+            <span>DiceCombats, GPL-3.0-or-later. Développé avec .NET MAUI et Blazor.</span>
+            <span><a href="./">DiceCombats</a> &middot; <a href="https://github.com/YannCharbon/DiceCombats/">GitHub</a> &middot; <a href="https://yanncharbon.github.io/DiceAtrium/fr/">Dice Atrium</a> &middot; <a href="https://yanncharbon.github.io/DiceAudio/fr/">DiceAudio</a></span>
+        </div>
+    </footer>
+
+</body>
+</html>

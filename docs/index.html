@@ -388,52 +388,22 @@
     <section id="data">
         <div class="wrap">
             <h2>Your data</h2>
-            <p class="lead">Your creatures, combats and settings are kept on your device, or on Windows in a folder of your choice. DiceCombats lets you share them with other game masters, and it keeps backups of them for you.</p>
+            <p class="lead">Your creatures, combats and settings are kept on your device, or on Windows in a folder of your choice.</p>
             <div class="cards">
                 <div class="card">
-                    <h3>Sharing a combat with its creatures</h3>
-                    <p>When you export a combat with <strong>Export to file</strong>, the file also holds the creatures the combat uses, as they are in your creature list. Whoever imports it gets the whole encounter, ready to run. <strong>Export creatures</strong> and <strong>Export combats</strong> save a whole list in one file. In Settings, in the Data section, <strong>Export the whole library…</strong> also saves your player groups, user custom fields and automations. The access tokens of your automations are left out, and the person who imports the file is reminded to enter them again.</p>
-                </div>
-                <div class="card">
-                    <h3>Importing</h3>
-                    <p><strong>Import from a file…</strong> is available in the creature list, in the combat list and in Settings. It also opens files exported by older versions of DiceCombats. When nothing in the file is already in your library, a short summary asks you to confirm. When some items are already there, each one is shown as <strong>New</strong>, <strong>Up to date</strong>, <strong>Differs</strong> or <strong>Name already used</strong>. You then choose what to do with it, for example <strong>Import as a copy</strong>, <strong>Replace the local one</strong>, <strong>Keep the local one</strong> or <strong>Use the local one instead</strong>. The suggested choice is already selected, and <strong>Apply to all of this kind</strong> saves you from repeating it. Nothing you already have is changed without your choice, and a backup is made before the import.</p>
+                    <h3>Sharing</h3>
+                    <p>Export a combat with the creatures it uses, a list of creatures or your whole library, and give the file to another game master. When you import a file, you choose what to do with each item you already have.</p>
+                    <p class="card-more"><a href="data.html#sharing">Sharing and importing in detail</a></p>
                 </div>
                 <div class="card">
                     <h3>Backups</h3>
-                    <p>DiceCombats backs up your data the first time you open it each day, and before every import, every restore and every copy of your data to another folder. A backup holds your creatures, combats, player groups, user custom fields, automations, combat logs and settings. The ten most recent automatic backups are kept. The ones you make yourself, and those made before an import, a restore or a copy to another folder, are never deleted by the app.</p>
+                    <p>DiceCombats backs up your data every day and before every import or restore. You can restore any of these backups from the settings.</p>
+                    <p class="card-more"><a href="data.html#backups">Backups in detail</a></p>
                 </div>
                 <div class="card">
-                    <h3>Restoring a backup</h3>
-                    <p>In Settings, in the Data section, the most recent backup is shown with a <strong>Restore</strong> button, and <strong>All backups…</strong> lists the others with their date, computer and reason. Before restoring, DiceCombats backs up your current data, so you can go back if needed. <strong>Save a backup to a file…</strong> backs up your data as it is now and saves it where you choose. You can use it, for example, to take your data from an Android device to another one. <strong>Restore from a file…</strong> brings it back. On Windows, <strong>Open the backups folder</strong> shows where they are kept.</p>
-                </div>
-            </div>
-
-            <h2 id="several-computers" style="margin-top:34px;">Using several computers</h2>
-            <p class="lead">On Windows, you can keep your data in a folder that OneDrive, Dropbox or another service keeps in sync. You then find the same creatures and combats on each of your computers.</p>
-            <div class="cards">
-                <div class="card">
-                    <h3>Choosing the data folder</h3>
-                    <p>In Settings, in the Data section, <strong>Data folder</strong> shows where DiceCombats keeps your data. With <strong>Choose another folder…</strong>, DiceCombats copies your data to the new folder, checks the copy, then restarts and uses it. Your previous data stays where it was until you remove it with <strong>Delete the old copy</strong>. <strong>Back to the default folder</strong> takes your data back to where it was at first. A backup is made before your data is copied.</p>
-                </div>
-                <div class="card">
-                    <h3>A folder that already holds your data</h3>
-                    <p>On your second computer, choose the same folder. DiceCombats sees that it already holds DiceCombats data, shows what is in it and what is on this computer, and asks what you would like to do. <strong>Use the folder's data</strong> switches to the folder as it is. <strong>Replace it with mine</strong> backs up the folder's data, then replaces it with yours. <strong>Merge</strong> adds your data to the folder's, and you choose what to do when an item exists on both sides, as for an import.</p>
-                </div>
-                <div class="card">
-                    <h3>One computer at a time</h3>
-                    <p>Please open DiceCombats on one computer at a time. If you start it while it is still open on another computer, a screen tells you which one and since when, and you can choose <strong>Open anyway</strong> or <strong>Quit</strong>. If another computer changes your data while DiceCombats is open, a message offers to <strong>Reload</strong> it when you are ready. DiceCombats never reloads by itself, even in the middle of a combat. If you then change an item that was changed on the other computer, DiceCombats asks whether to <strong>Reload</strong> or to <strong>Overwrite</strong>. If DiceCombats is closed before you choose, your changes are kept in the data folder, and you are told about them at the next start. Changes to creatures and combats can then be brought back with <strong>Import from a file…</strong>.</p>
-                </div>
-                <div class="card">
-                    <h3>Keeping the files on this device</h3>
-                    <p>Please set your synchronisation service to always keep the files of the data folder on this device. Otherwise DiceCombats may have to wait for files to download. When it starts, DiceCombats tells you if some files are only in the cloud. It also tells you if the service has made copies of files that two computers changed at the same time.</p>
-                </div>
-                <div class="card">
-                    <h3>When the folder cannot be reached</h3>
-                    <p>If your data folder is on an external drive or a network drive that is not connected, DiceCombats shows a screen instead of an empty library. You can <strong>Try again</strong>, <strong>Choose another folder…</strong> if your data has moved, <strong>Open the default folder instead</strong> for this session only, or <strong>Quit</strong>. With the default folder, a message reminds you that your changes are saved there and not in your data folder.</p>
-                </div>
-                <div class="card">
-                    <h3>On Android</h3>
-                    <p>The data folder cannot be changed on Android. To take your data to another device, use <strong>Export the whole library…</strong> and <strong>Import from a file…</strong>, or <strong>Save a backup to a file…</strong> and <strong>Restore from a file…</strong>.</p>
+                    <h3>Several computers</h3>
+                    <p>On Windows, your data can live in a folder of your choice, for example one that OneDrive or Dropbox keeps in sync, so that you find the same creatures and combats on each of your computers.</p>
+                    <p class="card-more"><a href="data.html#data-folder">The data folder in detail</a></p>
                 </div>
             </div>
         </div>

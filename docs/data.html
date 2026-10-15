@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your data in DiceCombats - sharing, backups and the data folder</title>
+    <meta name="description" content="How DiceCombats shares your creatures and combats with other game masters, imports their files, backs up your data, and keeps it in a folder you can use from several computers." />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="logo.svg" type="image/svg+xml" />
+
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Your data in DiceCombats" />
+    <meta property="og:description" content="How DiceCombats shares your creatures and combats with other game masters, imports their files, backs up your data, and keeps it in a folder you can use from several computers." />
+    <meta property="og:image" content="https://yanncharbon.github.io/DiceCombats/logo.svg" />
+    <meta property="og:url" content="https://yanncharbon.github.io/DiceCombats/data.html" />
+    <meta property="og:type" content="article" />
+
+    <link rel="alternate" href="https://yanncharbon.github.io/DiceCombats/data.html" hreflang="en" />
+    <link rel="alternate" href="https://yanncharbon.github.io/DiceCombats/fr/data.html" hreflang="fr" />
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="crumb">
+                <a class="crumb-family" href="https://yanncharbon.github.io/DiceAtrium/" title="The Dice Atrium family" aria-label="The Dice Atrium family"><img src="atrium-logo.svg" alt="" /></a>
+                <span class="crumb-sep" aria-hidden="true">/</span>
+                <a class="brand" href="./"><img src="logo.svg" alt="" />DiceCombats</a>
+            </div>
+            <nav class="nav-sections" aria-label="Page sections">
+                <a href="#sharing">Sharing</a>
+                <a href="#importing">Importing</a>
+                <a href="#backups">Backups</a>
+                <a href="#data-folder">Data folder</a>
+                <a href="#several-computers">Several computers</a>
+                <a href="#android">Android</a>
+            </nav>
+            <div class="nav-util">
+                <a class="nav-key" href="https://github.com/YannCharbon/DiceCombats/" title="GitHub" aria-label="GitHub"><img src="github-mark-white.svg" alt="" /></a>
+                <a class="nav-key nav-lang" href="fr/data.html" hreflang="fr" title="Version française" aria-label="Version française">FR</a>
+                <a class="btn primary nav-cta" href="https://github.com/YannCharbon/DiceCombats/releases/latest/">Download</a>
+            </div>
+        </div>
+    </header>
+
+    <header class="page-head">
+        <div class="wrap">
+            <a class="page-back" href="./#data">&larr; Back to the DiceCombats page</a>
+            <h1>Your data</h1>
+            <p>Your creatures, combats and settings are kept on your device, or on Windows in a folder of your choice. This page explains how to share them with other game masters, how DiceCombats backs them up, and how to use the same data on several computers.</p>
+            <ul class="toc">
+                <li><a href="#sharing">Sharing</a></li>
+                <li><a href="#importing">Importing a file</a></li>
+                <li><a href="#backups">Backups</a></li>
+                <li><a href="#data-folder">The data folder</a></li>
+                <li><a href="#several-computers">Several computers</a></li>
+                <li><a href="#android">On Android</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main>
+
+    <section id="sharing" class="doc">
+        <div class="wrap">
+            <h2>Sharing</h2>
+            <p>When you export a combat with <strong>Export to file</strong>, the file also holds the creatures the combat uses, as they are in your creature list. Whoever imports it gets the whole encounter, ready to run.</p>
+            <p><strong>Export creatures</strong> and <strong>Export combats</strong> save a whole list in one file. In Settings, in the Data section, <strong>Export the whole library…</strong> saves your creatures, combats, player groups, user custom fields and automations at once.</p>
+            <div class="note">
+                <p>The access tokens of your automations are never exported. The person who imports the file is reminded to enter them again.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="importing" class="doc">
+        <div class="wrap">
+            <h2>Importing a file</h2>
+            <p><strong>Import from a file…</strong> is available in the creature list, in the combat list and in Settings. It also opens files exported by older versions of DiceCombats.</p>
+            <ol class="field-steps">
+                <li>Click <strong>Import from a file…</strong> and choose the file.</li>
+                <li>When nothing in the file is already in your library, a short summary shows what will be added. Otherwise, you choose what to do with each item, as explained below.</li>
+                <li>Click <strong>Import</strong>. DiceCombats makes a backup of your data first, then imports the file and shows what was added, replaced or left out.</li>
+            </ol>
+
+            <h3>Choosing what to do with each item</h3>
+            <p>When part of the file is already in your library, each item is marked <strong>New</strong>, <strong>Up to date</strong>, <strong>Differs</strong> or <strong>Name already used</strong>. Next to it, a list offers the choices that make sense for it, with a short explanation of the selected one underneath. The suggested choice is already selected.</p>
+            <ul>
+                <li><strong>Import as a copy</strong> adds the imported version next to yours, under a new name. Yours is not changed.</li>
+                <li><strong>Replace the local one</strong> overwrites your version with the imported one.</li>
+                <li><strong>Keep the local one</strong> leaves the imported version out. Anything imported that uses it then uses yours.</li>
+                <li><strong>Import with a new name</strong> or <strong>Keep both with the same name</strong>, when only the name is already used.</li>
+                <li><strong>Use the local one instead</strong> leaves the imported one out and uses yours wherever the file needs it.</li>
+            </ul>
+            <p>To give the same answer to many items at once, use the button next to the list, for example <strong>Same choice for all 12 creatures marked “Differs”</strong>. Nothing you already have is changed without your choice.</p>
+
+            <h3>Names of the copies</h3>
+            <p>When at least one item needs a new name, a bar at the top of the import window shows <strong>Names of copies</strong>, with a text to put before the name and a text to put after it. By default, a copy of “Goblin” is named “Goblin&nbsp;(2)”. If you change these texts, the suggested names are updated, except the ones you have typed yourself. DiceCombats still adds a number when a name is already used, and <strong>Import</strong> stays unavailable while a name is empty or already used.</p>
+        </div>
+    </section>
+
+    <section id="backups" class="doc">
+        <div class="wrap">
+            <h2>Backups</h2>
+            <p>DiceCombats backs up your data the first time you open it each day, and before every import, every restore and every copy of your data to another folder. A backup holds your creatures, combats, player groups, user custom fields, automations, combat logs and settings.</p>
+            <p>The ten most recent automatic backups are kept. The ones you make yourself, and those made before an import, a restore or a copy to another folder, are never deleted by the app.</p>
+
+            <h3>Restoring a backup</h3>
+            <ol class="field-steps">
+                <li>Open Settings and go to the Data section. The most recent backup is shown there.</li>
+                <li>Click <strong>Restore</strong> next to it, or <strong>All backups…</strong> to see the others with their date, computer and reason.</li>
+                <li>Confirm. DiceCombats first backs up your current data, so that you can go back if needed, then restores the backup you chose.</li>
+            </ol>
+
+            <h3>Backups as files</h3>
+            <p><strong>Save a backup to a file…</strong> backs up your data as it is now and saves it where you choose. <strong>Restore from a file…</strong> brings it back. On Windows, <strong>Open the backups folder</strong> shows where DiceCombats keeps its backups.</p>
+        </div>
+    </section>
+
+    <section id="data-folder" class="doc">
+        <div class="wrap">
+            <h2>The data folder</h2>
+            <p>On Windows, Settings shows under <strong>Data folder</strong> where DiceCombats keeps your data, and lets you choose another folder.</p>
+            <ol class="field-steps">
+                <li>Click <strong>Choose another folder…</strong> and select the new folder.</li>
+                <li>Confirm with <strong>Move my data</strong>. DiceCombats makes a backup, copies your data to the new folder, checks the copy, then restarts and uses it.</li>
+                <li>Your previous data stays where it was. Once you have checked that everything is in the new folder, you can remove it with <strong>Delete the old copy</strong>.</li>
+            </ol>
+            <p><strong>Back to the default folder</strong> takes your data back to where it was at first. A folder inside AppData cannot be used, and if the folder you choose already holds other files, DiceCombats keeps its data in a subfolder.</p>
+
+            <h3>A folder that already holds DiceCombats data</h3>
+            <p>On your second computer, choose the same folder. DiceCombats sees that it already holds DiceCombats data, shows what is in it and what is on this computer, and asks what you would like to do:</p>
+            <ul>
+                <li><strong>Use the folder's data</strong> switches to the folder as it is. Your current data stays where it is.</li>
+                <li><strong>Replace it with mine</strong> backs up the folder's data, then replaces it with yours.</li>
+                <li><strong>Merge</strong> adds your data to the folder's, and you choose what to do when an item exists on both sides, as with an import.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="several-computers" class="doc">
+        <div class="wrap">
+            <h2>Using several computers</h2>
+            <p>On Windows, you can keep your data in a folder that OneDrive, Dropbox or another service keeps in sync. You then find the same creatures and combats on each of your computers. Please set the service to always keep the files of this folder on the device, otherwise DiceCombats may have to wait for them to download.</p>
+
+            <h3>One computer at a time</h3>
+            <p>Please open DiceCombats on one computer at a time. If you start it while it is still open on another computer, a screen tells you which one and since when.</p>
+            <ul>
+                <li><strong>Open anyway</strong> opens the data folder here as well. If DiceCombats is still open on the other computer, please close it there first.</li>
+                <li><strong>Quit</strong> closes DiceCombats without changing anything.</li>
+            </ul>
+
+            <h3>Changes made on another computer</h3>
+            <p>If another computer changes your data while DiceCombats is open, a message offers to <strong>Reload</strong> it when you are ready. DiceCombats never reloads by itself, even in the middle of a combat.</p>
+            <p>If you then change an item that was changed on the other computer, DiceCombats asks whether to <strong>Reload</strong>, which takes the other computer's version, or to <strong>Overwrite</strong>, which keeps yours.</p>
+            <p>If DiceCombats is closed before you choose, your changes are kept in the data folder, in a file whose name ends in <span class="code-style">.unsaved.json</span>, and you are told about them at the next start. Changes to creatures and combats can be brought back with <strong>Import from a file…</strong>; the import window then reminds you where the file comes from. For the other data, the message at start explains how to put the file in place of the data file it belongs to, after making a backup.</p>
+
+            <h3>Notices at start</h3>
+            <p>When it starts, DiceCombats tells you if some files of the data folder are only in the cloud. It also tells you if your synchronisation service has made copies of files that two computers changed at the same time. DiceCombats uses the original files; please compare them with the copies and delete the copies you do not need.</p>
+
+            <h3>When the folder cannot be reached</h3>
+            <p>If your data folder is on an external drive or a network drive that is not connected, DiceCombats shows a screen instead of an empty library, with these choices:</p>
+            <ul>
+                <li><strong>Try again</strong>, once the drive or the network is connected;</li>
+                <li><strong>Choose another folder…</strong>, if your data has moved;</li>
+                <li><strong>Open the default folder instead</strong>, for this session only. A message then reminds you that your changes are saved in the default folder, not in your data folder;</li>
+                <li><strong>Quit</strong>.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="android" class="doc">
+        <div class="wrap">
+            <h2>On Android</h2>
+            <p>The data folder cannot be changed on Android. To take your data to another device, you can use either of these:</p>
+            <ul>
+                <li><strong>Export the whole library…</strong> on the first device, then <strong>Import from a file…</strong> on the other one;</li>
+                <li><strong>Save a backup to a file…</strong> on the first device, then <strong>Restore from a file…</strong> on the other one.</li>
+            </ul>
+        </div>
+    </section>
+
+    </main>
+
+    <footer>
+        <div class="wrap">
+            <span>DiceCombats, GPL-3.0-or-later. Built with .NET MAUI and Blazor.</span>
+            <span><a href="./">DiceCombats</a> &middot; <a href="https://github.com/YannCharbon/DiceCombats/">GitHub</a> &middot; <a href="https://yanncharbon.github.io/DiceAtrium/">Dice Atrium</a> &middot; <a href="https://yanncharbon.github.io/DiceAudio/">DiceAudio</a></span>
+        </div>
+    </footer>
+
+</body>
+</html>

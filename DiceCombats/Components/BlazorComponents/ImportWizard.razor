@@ -81,6 +81,9 @@
     .dc-import-row .dc-inp { flex: 1 1 220px; min-width: 0; }
     .dc-import-affixes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .dc-import-affixes .dc-inp { flex: 0 1 160px; min-width: 80px; }
+    .dc-import-name .dc-i { vertical-align: -3px; }
+    .dc-import-sub { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 4px; }
+    .dc-import-sub .dc-i { vertical-align: -2px; }
     .dc-import-bad { color: var(--danger); font-size: 12.5px; margin-top: 4px; }
     .dc-import-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
     .dc-import-sec { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 14px 0 6px; }
@@ -146,6 +149,7 @@
                 <div class="dc-import-sec">
                     <button type="button" class="dc-btn dc-btn-text dc-btn-sm" aria-expanded="@(open ? "true" : "false")" @onclick="() => Toggle(kind)">
                         <DcIcon Name="@(open ? "chevron-down" : "chevron-right")" />
+                        <DcIcon Name="@KindIcon(kind)" Class="dc-i-accent" />
                         <span class="dc-strip-name">@KindLabel(kind) (@rows.Count)</span>
                     </button>
                     @if (rows.Any(ConflictPlanner.IsSelectable))
@@ -218,7 +222,7 @@
                                @onchange="e => Planner.SetSelected(Plan, i, e.Value is bool v && v)" />
                     </label>
                 }
-                <span class="dc-import-name">@i.IncomingName</span>
+                <span class="dc-import-name"><DcIcon Name="@KindIcon(i.Kind)" Class="dc-i-muted" /> @i.IncomingName</span>
                 <span class="dc-tag">@StatusLabel(i.Status)</span>
             </div>
             @if (Detail(i) is string detail)
@@ -227,7 +231,12 @@
             }
             @if (i.Incoming is DCCombat combat && combat.CreaturesList.Count > 0)
             {
-                <div class="dc-meta" style="margin-top:2px;">@CombatCreatures(combat)</div>
+                <div class="dc-import-sub">
+                    @foreach (var line in CombatCreatures(combat))
+                    {
+                        <span class="dc-meta"><DcIcon Name="@KindIcon(DCAssetKind.Creature)" Size="14" Class="dc-i-muted" /> @line</span>
+                    }
+                </div>
             }
 
             @if (i.Status is ImportStatus.Differs or ImportStatus.NameUsed)
@@ -303,8 +312,19 @@
     };
 
     // The creatures of a combat, a name used several times shown once with its count.
-    private static string CombatCreatures(DCCombat combat) =>
-        string.Join(", ", combat.CreaturesList.GroupBy(c => c.Name).Select(g => g.Count() > 1 ? $"{g.Key} ×{g.Count()}" : g.Key));
+    private static IEnumerable<string> CombatCreatures(DCCombat combat) =>
+        combat.CreaturesList.GroupBy(c => c.Name).Select(g => g.Count() > 1 ? $"{g.Key} ×{g.Count()}" : g.Key);
+
+    // The icon the app already uses for each type (nav menu, pages, editors).
+    private static string KindIcon(DCAssetKind kind) => kind switch
+    {
+        DCAssetKind.Creature => "pets",
+        DCAssetKind.Combat => "shield",
+        DCAssetKind.PlayerGroup => "groups",
+        DCAssetKind.FieldTemplate => "bookmark",
+        DCAssetKind.ExternalApp => "launch",
+        _ => "auto-mode",
+    };
 
     private RenderFragment Warnings() => __builder =>
     {

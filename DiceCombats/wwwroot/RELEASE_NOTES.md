@@ -1,33 +1,57 @@
 # Release notes
 
-A follow-up to 0.6.0, which redrew the application but was only ever checked on a desktop window. On a
-phone several of the new controls ran past the right edge of the screen and were quietly cut off, because
-the pages are clipped rather than scrolled sideways. This release makes the redrawn layout hold together
-at phone width. Nothing about the desktop layout changes, with one exception noted below.
+This release is about your data: you can now share combats and creatures with other game masters, keep
+backups and restore them from Settings, and on Windows choose the folder where your data is kept and
+use it from several computers. The website has a new page, "Your data", which explains all of this step
+by step.
+
+### New
+
+- **Exporting**
+  Export to file on a combat saves it together with the creatures it uses, so whoever imports it gets
+  the whole encounter. Export creatures and Export combats save a whole list in one file, and Settings →
+  Data offers Export the whole library…, which also holds your player groups, user custom fields and
+  automations. The access tokens of your automations are never exported.
+
+- **Importing**
+  Import from a file… is available in the creature list, in the combat list and in Settings, and it also
+  opens files exported by older versions. The import window lists everything the file holds, with a tick
+  box for each part. When an item is already in your library, you choose what to do with it: import it as
+  a copy, replace yours or keep yours. One button gives the same answer to many items at once, and you
+  can set a text to put before and after the names of the copies.
+
+- **Backups**
+  DiceCombats backs up your creatures, combats, player groups, user custom fields, automations, combat
+  logs and settings the first time you open it each day, and before every import or restore. Settings →
+  Data shows the most recent backup with a Restore button, and All backups… lists the others. A backup
+  can also be saved to a file and restored from one, which is also the way to take your data to another
+  Android device.
+
+- **A data folder of your choice (Windows)**
+  Choose another folder… in Settings moves your data there, checks the copy and restarts. Your previous
+  data stays where it was until you delete it.
+
+- **The same data on several computers (Windows)**
+  A data folder kept in sync by OneDrive, Dropbox or a similar service can be used from several
+  computers. DiceCombats tells you when the folder is already open on another computer, offers to reload
+  when data was changed elsewhere, and asks which version to keep when both sides changed the same item.
+  It never reloads by itself, even in the middle of a combat.
+
+### Improvements
+
+- **Safer saving**
+  Creatures and combats are written in a way that survives a crash or a power cut in the middle of a
+  save, and a file that failed to load is no longer overwritten at the next save.
+
+- **Creatures with the same name**
+  A combat now recognises its creatures by an identifier rather than by their name. Two creatures that
+  share a name are no longer mixed up, and updating the creatures of a combat from your library tells you
+  which ones it could not find.
+
+- **Automations**
+  The first "next turn" event of a combat now has an empty previous creature, instead of "Default".
 
 ### Fixed
 
-- **The hit-point row on a creature card**
-  Six controls — the name, the bar, the stepper, damage, heal and apply — do not fit one line on a phone,
-  so the layout squeezed the one item with room to give: the stepper collapsed to a hairline a pixel and
-  a half wide, leaving no way to type or step a value, and the apply button was still cut in half. The
-  row now wraps and drops apply onto its own line.
-
-- **The custom fields of a creature, cut off down the right-hand side**
-  The field wall could not shrink below the width its cards wanted, so roughly fifty pixels of every card
-  were off-screen: the delete and library buttons at the end of each header, and the whole right column
-  of every option grid — half the conditions of a D&D conditions field could not be reached.
-
-- **Panels and grids wider than the screen they are on**
-  A grid whose columns declare a minimum width does not shrink below it, it overflows. Every such grid
-  now gives way when there is not enough room: the sections of the hit-point configuration dialog, the
-  explorers, the detailed popup, the option grids, the assistance panels and the automations page.
-
-- **A placeholder name wider than the screen**
-  The copyable variables under an automation trigger pushed their row past the edge of the panel.
-
-- **A horizontal scrollbar in the combat edition dialog**
-  Its two panels asked for the full width of their column and then added a margin on top, which put each
-  of them past the column on both sides. This one was never specific to phones — the same dialog carried
-  the same scrollbar on a desktop window, ten pixels wide instead of five. It is the one change in this
-  release that also alters the desktop layout.
+- **The title bar**
+  It could move out of place when the pages were rebuilt.

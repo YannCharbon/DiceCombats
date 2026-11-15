@@ -170,17 +170,22 @@ in a folder you can choose on Windows.
 Get the latest build here: [![Latest Release](https://img.shields.io/github/v/release/YannCharbon/DiceCombats?style=for-the-badge)](https://github.com/YannCharbon/DiceCombats/releases/latest)
 
 - **Windows**: download the ZIP from the latest release, extract it anywhere and run `DiceCombats.exe`.
-  You can pin it to the Start menu for easier access.
+  You can pin it to the Start menu for easier access. From then on, DiceCombats tells you when a new
+  version is out and installs it itself, right away or when you next close it.
 - **Android**: download and install the APK. The Android build is experimental, and some views may not
   yet display perfectly.
 
 ## Build from source
 
+The updater shared by the apps of the ecosystem, [DiceUpdater](https://github.com/YannCharbon/DiceUpdater),
+is a git submodule of this repository: clone with `--recurse-submodules`, or run `git submodule update --init`
+in an existing clone.
+
 You need the [.NET 10 SDK](https://dotnet.microsoft.com/download) and the MAUI workloads installed.
 All other dependencies are restored from NuGet. The solution can also be opened in Visual Studio.
 
 ```bash
-git clone https://github.com/YannCharbon/DiceCombats.git
+git clone --recurse-submodules https://github.com/YannCharbon/DiceCombats.git
 cd DiceCombats
 dotnet workload install maui-windows maui-android
 dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:IncludeAllContentForSelfExtract=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true

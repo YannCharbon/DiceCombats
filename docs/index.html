@@ -439,13 +439,13 @@
             <h2>Install</h2>
             <p class="lead">No installer and no account are needed. DiceCombats stores all its data locally on your device, in a folder you can choose on Windows.</p>
             <ul class="plain">
-                <li><strong>Windows</strong>: Download the ZIP from the latest release, extract it anywhere, and run <span class="code-style">DiceCombats.exe</span>. You can pin it to the Start menu for easier access.</li>
+                <li><strong>Windows</strong>: Download the ZIP from the latest release, extract it anywhere, and run <span class="code-style">DiceCombats.exe</span>. You can pin it to the Start menu for easier access. From then on, DiceCombats tells you when a new version is out and installs it itself, right away or when you next close it.</li>
                 <li><strong>Android</strong>: Download and install the APK. The Android build is experimental, and some views may not yet display perfectly.</li>
             </ul>
 
             <h2 style="margin-top:34px;">Build from source</h2>
             <p class="lead">You need the .NET 10 SDK and the MAUI workloads installed. All other dependencies are restored from NuGet.</p>
-<pre><code>git clone https://github.com/YannCharbon/DiceCombats.git
+<pre><code>git clone --recurse-submodules https://github.com/YannCharbon/DiceCombats.git
 dotnet workload install maui-windows maui-android
 dotnet publish DiceCombats/DiceCombats.csproj -f net10.0-windows10.0.19041.0 -c Release -p:RuntimeIdentifierOverride=win10-x64 -p:WindowsPackageType=None -p:IncludeAllContentForSelfExtract=true -p:PublishReadyToRun=true -p:IncludeNativeLibrariesForSelfExtract=true</code></pre>
         </div>

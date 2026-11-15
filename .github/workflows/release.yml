@@ -60,12 +60,25 @@ jobs:
 
           "assembly_version=$assemblyVersion" >> $env:GITHUB_ENV
           "tag_version=$cleanVersion" >> $env:GITHUB_ENV
+
+          # The version Android shows, and the number it compares: an APK only
+          # installs over one with a lower or equal versionCode. 0.8.0 -> 8000,
+          # 1.2.3 -> 1002003; always above the 2 of the builds made before this.
+          $parsed = [Version]$cleanVersion
+          $versionCode = $parsed.Major * 1000000 + $parsed.Minor * 1000 + [Math]::Max($parsed.Build, 0)
+          "android_version_name=$cleanVersion" >> $env:GITHUB_ENV
+          "android_version_code=$versionCode" >> $env:GITHUB_ENV
         }
         else {
           Write-Host "Manual trigger detected. Setting AssemblyVersion to 999.999.999.0"
 
           "assembly_version=999.999.999.0" >> $env:GITHUB_ENV
           "tag_version=dev-$env:GITHUB_RUN_NUMBER" >> $env:GITHUB_ENV
+
+          # Kept below every release on purpose: a test build installed on a
+          # phone must never stop the next real release from installing over it.
+          "android_version_name=dev-$env:GITHUB_RUN_NUMBER" >> $env:GITHUB_ENV
+          "android_version_code=1" >> $env:GITHUB_ENV
         }
 
     - name: Update AssemblyVersion in .csproj
@@ -202,14 +215,42 @@ jobs:
 
     - name: Publish Android APK
       shell: pwsh
+      env:
+        ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
       run: |
         $ErrorActionPreference = "Stop"
+
+        # Android installs an update over the app only when both are signed
+        # with the same key. Without a keystore, the build signs with a debug
+        # key made fresh on every runner, so each release could only be
+        # installed after uninstalling the previous one, and its data with it.
+        $signing = @()
+        if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_KEYSTORE_B64)) {
+          $keystore = Join-Path $env:RUNNER_TEMP "dicecombats.keystore"
+          [System.IO.File]::WriteAllBytes($keystore, [System.Convert]::FromBase64String($env:ANDROID_KEYSTORE_B64))
+          $signing = @(
+            "-p:AndroidKeyStore=true",
+            "-p:AndroidSigningKeyStore=$keystore",
+            "-p:AndroidSigningStorePass=env:ANDROID_KEYSTORE_PASSWORD",
+            "-p:AndroidSigningKeyAlias=$env:ANDROID_KEY_ALIAS",
+            "-p:AndroidSigningKeyPass=env:ANDROID_KEY_PASSWORD"
+          )
+        }
+        else {
+          Write-Host "::warning::ANDROID_KEYSTORE_B64 is not set: the APK is signed with a throwaway debug key and cannot update an installed copy."
+        }
 
         dotnet publish $env:PROJECT_PATH `
           -f $env:ANDROID_TFM `
           -c Release `
           -p:TargetFrameworks=$env:ANDROID_TFM `
           -p:AndroidPackageFormat=apk `
+          -p:ApplicationDisplayVersion=${{ env.android_version_name }} `
+          -p:ApplicationVersion=${{ env.android_version_code }} `
+          @signing `
           -o ./publish/android
 
     - name: Find and copy APK file
@@ -217,7 +258,11 @@ jobs:
       run: |
         $ErrorActionPreference = "Stop"
 
-        $apkFile = Get-ChildItem -Path ./publish/android -Filter *.apk -Recurse | Select-Object -First 1
+        # The signed package when a keystore was given, not its unsigned twin.
+        $apkFile = Get-ChildItem -Path ./publish/android -Filter *-Signed.apk -Recurse | Select-Object -First 1
+        if (-not $apkFile) {
+          $apkFile = Get-ChildItem -Path ./publish/android -Filter *.apk -Recurse | Select-Object -First 1
+        }
 
         if (-not $apkFile) {
           throw "No APK file found in ./publish/android."

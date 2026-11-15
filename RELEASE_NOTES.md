@@ -1,57 +1,39 @@
 # Release notes
 
-This release is about your data: you can now share combats and creatures with other game masters, keep
-backups and restore them from Settings, and on Windows choose the folder where your data is kept and
-use it from several computers. The website has a new page, "Your data", which explains all of this step
-by step.
+From now on, DiceCombats tells you when a new version is out and, on Windows, installs it for you, right
+away or when you close the app. This version is the last one to install by hand, from the ZIP or the APK
+as before. On Android, please read "Installing this version on Android" below first: this one time, the
+app has to be installed again.
 
 ### New
 
-- **Exporting**
-  Export to file on a combat saves it together with the creatures it uses, so whoever imports it gets
-  the whole encounter. Export creatures and Export combats save a whole list in one file, and Settings →
-  Data offers Export the whole library…, which also holds your player groups, user custom fields and
-  automations. The access tokens of your automations are never exported.
+- **Automatic updates (Windows)**
+  When a new version is out, a window shows its release notes with three choices. Update now saves your
+  data, closes DiceCombats, installs the new version and opens it again, in a few seconds. Postpone until
+  closing downloads it in the background and installs it when you close DiceCombats, which is handy in
+  the middle of a session. Later closes the window; the update stays available in Settings, in the
+  Updates section. Before anything is installed, DiceCombats checks that the download is complete and
+  carries the same signature as the version you use, and it puts the previous version back if anything
+  goes wrong. Your data is never touched.
 
-- **Importing**
-  Import from a file… is available in the creature list, in the combat list and in Settings, and it also
-  opens files exported by older versions. The import window lists everything the file holds, with a tick
-  box for each part. When an item is already in your library, you choose what to do with it: import it as
-  a copy, replace yours or keep yours. One button gives the same answer to many items at once, and you
-  can set a text to put before and after the names of the copies.
-
-- **Backups**
-  DiceCombats backs up your creatures, combats, player groups, user custom fields, automations, combat
-  logs and settings the first time you open it each day, and before every import or restore. Settings →
-  Data shows the most recent backup with a Restore button, and All backups… lists the others. A backup
-  can also be saved to a file and restored from one, which is also the way to take your data to another
-  Android device.
-
-- **A data folder of your choice (Windows)**
-  Choose another folder… in Settings moves your data there, checks the copy and restarts. Your previous
-  data stays where it was until you delete it.
-
-- **The same data on several computers (Windows)**
-  A data folder kept in sync by OneDrive, Dropbox or a similar service can be used from several
-  computers. DiceCombats tells you when the folder is already open on another computer, offers to reload
-  when data was changed elsewhere, and asks which version to keep when both sides changed the same item.
-  It never reloads by itself, even in the middle of a combat.
+- **New versions on Android**
+  The same window tells you when a new version is out. Download the update opens it in your browser; you
+  then open the downloaded file, and Android installs it over the current version and keeps your data.
+  Since DiceCombats does not come from an app store, the browser may warn that the file could be
+  dangerous, and Android may ask you to allow the browser to install apps. Both are expected.
 
 ### Improvements
 
-- **Safer saving**
-  Creatures and combats are written in a way that survives a crash or a power cut in the middle of a
-  save, and a file that failed to load is no longer overwritten at the next save.
+- **The version number on Android**
+  The Android settings now show the version of DiceCombats, instead of 1.0.
 
-- **Creatures with the same name**
-  A combat now recognises its creatures by an identifier rather than by their name. Two creatures that
-  share a name are no longer mixed up, and updating the creatures of a combat from your library tells you
-  which ones it could not find.
+### Installing this version on Android
 
-- **Automations**
-  The first "next turn" event of a combat now has an empty previous creature, instead of "Default".
+The earlier versions of DiceCombats for Android were not all signed with the same key, so Android cannot
+install this one over them. This time only, please:
 
-### Fixed
+1. In DiceCombats, open Settings → Data and press Save a backup to a file….
+2. Uninstall DiceCombats, then install this version.
+3. In Settings → Data, press Restore from a file… and choose the backup.
 
-- **The title bar**
-  It could move out of place when the pages were rebuilt.
+From this version on, every new version installs over the previous one and keeps your data.

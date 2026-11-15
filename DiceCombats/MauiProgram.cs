@@ -18,6 +18,7 @@ using DiceCombats.Rendering.Renderers;        // <— ADD
 using DiceCombats.Automations;
 using DiceCombats.Integrations;
 using DiceCombats.Storage;
+using DiceUpdater;
 
 #if WINDOWS
 using Microsoft.UI;
@@ -86,7 +87,16 @@ namespace DiceCombats
                             WebTitleBar.Attach(window);
 
                             // Attach to the Closing event and use the service provider
-                            _appWindow.Closing += (s, e) => SaveAndFlush(TimeSpan.FromSeconds(10));
+                            _appWindow.Closing += (s, e) =>
+                            {
+                                SaveAndFlush(TimeSpan.FromSeconds(10));
+
+                                // After everything is saved: an update chosen for the
+                                // closing starts now, and waits for the app to be gone
+                                // before it touches its files.
+                                try { ServiceProvider.GetRequiredService<UpdateService>().OnAppClosing(); }
+                                catch (Exception ex) { Debug.WriteLine($"Starting the update failed: {ex.Message}"); }
+                            };
                         });
                     });
 #endif
@@ -186,6 +196,27 @@ namespace DiceCombats
             var culture = new CultureInfo(cultureCode);
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+            // Updates come from the shared updater of the ecosystem (DiceUpdater).
+            // A debug run can read them from a local folder served over HTTP
+            // (DICE_UPDATE_FEED) to try an update without publishing a release.
+#if DEBUG
+            string? updateFeed = Environment.GetEnvironmentVariable("DICE_UPDATE_FEED");
+#else
+            string? updateFeed = null;
+#endif
+            builder.Services.AddDiceUpdater(new UpdaterOptions
+            {
+                AppName = "DiceCombats",
+                Repository = "YannCharbon/DiceCombats",
+                CurrentVersion = typeof(MauiProgram).Assembly.GetName().Version ?? new Version(0, 0, 0),
+                // The update texts follow the language chosen in the settings.
+                Language = () => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName,
+                FeedUrl = string.IsNullOrWhiteSpace(updateFeed) ? null : new Uri(updateFeed),
+                PrepareForExit = () => Task.Run(() => SaveAndFlush(TimeSpan.FromSeconds(10))),
+                Exit = () => MainThread.BeginInvokeOnMainThread(() => Application.Current?.Quit()),
+                OpenUri = uri => Launcher.Default.OpenAsync(uri),
+            });
 
             var app = builder.Build();
             ServiceProvider = app.Services; // Assign the root service provider

@@ -45,82 +45,60 @@
 @if (!SettingsView)
 {
     <div class="welcome-header">
-        @if (UpdateAvailable)
+        @if (!NewVersion)
         {
-            <h2>@Loc["UpdateAvailable"]</h2>
+            <h2>@Loc["Thanks"]</h2>
         }
         else
         {
-            @if (!NewVersion)
-            {
-                <h2>@Loc["Thanks"]</h2>
-            }
-            else
-            {
-                <h2>@Loc["NewVersion"] - v@_version</h2>
-            }
+            <h2>@Loc["NewVersion"] - v@_version</h2>
         }
     </div>
 }
 
 <div class="welcome-body">
-    @if (UpdateAvailable)
+    @* A newer version is offered by the update window (DiceUpdater), not here. *@
+    @if (!NewVersion)
     {
-        <p class="dc-strip-name" style="margin:0 0 6px;">DiceCombats <b>@UpdateInfos?.tag_name</b> @Loc["IsAvailable"].</p>
-        <br />
-        @if (CombatService.IsCurrentCulture("fr")) {
-            <p class="dc-meta" style="margin:0;">Se rendre sur <a class="dc-crumb" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> pour télécharger la mise à jour. Si vous souhaitez le faire plus tard, veuillez vous rendre dans les paramètres.</p>
-        } else {
-            <p class="dc-meta" style="margin:0;">Visit <a class="dc-crumb" href="@UpdateInfos?.html_url">@UpdateInfos?.html_url</a> to download the update or go to app settings if you want to do it later.</p>
-        }
-    } else
+        <h3 class="dc-h2">@Loc["KeyFeatures"]</h3>
+        <p>@Loc["KeyFeaturesDescription"]</p>
+        <ul>
+            <li>@((MarkupString)Loc["KeyFeature1"].Value)</li>
+            <li>@((MarkupString)Loc["KeyFeature2"].Value)</li>
+            <li>@((MarkupString)Loc["KeyFeature3"].Value)</li>
+            <li>@((MarkupString)Loc["KeyFeature4"].Value)</li>
+        </ul>
+    }
+    else
     {
-        @if (!NewVersion)
-        {
-            <h3 class="dc-h2">@Loc["KeyFeatures"]</h3>
-            <p>@Loc["KeyFeaturesDescription"]</p>
-            <ul>
-                <li>@((MarkupString)Loc["KeyFeature1"].Value)</li>
-                <li>@((MarkupString)Loc["KeyFeature2"].Value)</li>
-                <li>@((MarkupString)Loc["KeyFeature3"].Value)</li>
-                <li>@((MarkupString)Loc["KeyFeature4"].Value)</li>
-            </ul>
-        }
-        else
-        {
-            <div class="welcome-release-notes">
-                @((MarkupString)_releaseNotes)
-            </div>
-        }
-        <h3 class="dc-h2">@Loc["License"]</h3>
-        <p>@((MarkupString)Loc["LicenseDescription"].Value) <a href="https://github.com/YannCharbon/DiceCombats" class="dc-crumb" target="_blank"><DcIcon Name="github" title="GitHub" />&nbsp;GitHub</a>.</p>
-        <h3 class="dc-h2">@Loc["SupportProject"]</h3>
-        <p>
-            @Loc["SupportProjectDescription1"] <a href="https://github.com/YannCharbon/DiceCombats" class="dc-crumb" target="_blank"><DcIcon Name="github" title="GitHub" />&nbsp;GitHub</a>.
-            @Loc["SupportProjectDescription2"]
-        </p>
-        <p>@Loc["DonationDescription"]</p>
-        <span>
-            <a href="https://www.paypal.com/donate/?hosted_button_id=4X9ZURL5T4E6N" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button">
-                <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" />
-            </a>
-        </span>
-        <br />
-        <br />
-        @if (!SettingsView)
-        {
-            <h4>@Loc["Thanks2"]</h4>
-        }
+        <div class="welcome-release-notes">
+            @((MarkupString)_releaseNotes)
+        </div>
+    }
+    <h3 class="dc-h2">@Loc["License"]</h3>
+    <p>@((MarkupString)Loc["LicenseDescription"].Value) <a href="https://github.com/YannCharbon/DiceCombats" class="dc-crumb" target="_blank"><DcIcon Name="github" title="GitHub" />&nbsp;GitHub</a>.</p>
+    <h3 class="dc-h2">@Loc["SupportProject"]</h3>
+    <p>
+        @Loc["SupportProjectDescription1"] <a href="https://github.com/YannCharbon/DiceCombats" class="dc-crumb" target="_blank"><DcIcon Name="github" title="GitHub" />&nbsp;GitHub</a>.
+        @Loc["SupportProjectDescription2"]
+    </p>
+    <p>@Loc["DonationDescription"]</p>
+    <span>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=4X9ZURL5T4E6N" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button">
+            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" />
+        </a>
+    </span>
+    <br />
+    <br />
+    @if (!SettingsView)
+    {
+        <h4>@Loc["Thanks2"]</h4>
     }
 </div>
 
 @code {
     [Parameter]
     public bool NewVersion { get; set; } = false;
-    [Parameter]
-    public bool UpdateAvailable { get; set; } = false;
-    [Parameter]
-    public GitHubRelease? UpdateInfos { get; set; } = null;
     [Parameter]
     public bool SettingsView { get; set; } = false;
 
